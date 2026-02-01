@@ -1,0 +1,335 @@
+{
+    "nav": {
+        "home": "首页",
+        "dashboard": "控制面板",
+        "strategies": "策略",
+        "builder": "视觉构建器",
+        "marketplace": "市场",
+        "leaderboard": "排行榜",
+        "plugins": "插件",
+        "agents": "代理",
+        "analytics": "分析",
+        "docs": "文档",
+        "auth_matrix": "连接 钱包",
+        "disconnect": "断开连接",
+        "stellar_connected": "Stellar 已连接",
+        "login_matrix": "连接钱包",
+        "disconnect_matrix": "断开矩阵连接",
+        "status": "状态"
+    },
+    "footer": {
+        "protocol": "协议",
+        "intel_hub": "情报中心",
+        "metrics": "指标",
+        "neural_matrix": "神经矩阵",
+        "market_analytics": "市场分析",
+        "signal_pool": "信号库",
+        "matrix_builder": "矩阵构建器",
+        "neural_plugins": "神经插件",
+        "agents_control": "代理控制",
+        "protocol_manifesto": "协议宣言",
+        "mission_manual": "任务手册",
+        "developer_docs": "开发文档",
+        "soroban_source": "Soroban 源码",
+        "active_nodes": "活跃节点",
+        "matrix_tier": "矩阵层级",
+        "net_health": "网络健康度",
+        "arb_vectors": "套利向量",
+        "locked": "已锁定",
+        "optimal": "最佳",
+        "ignite_matrix": "启动矩阵",
+        "uplink_established": "上行链路已建立",
+        "soroban_verified": "SOROBAN 已验证",
+        "testnet_live": "STELLAR 测试网在线",
+        "rights": "版权所有"
+    },
+    "leaderboard": {
+        "title": "全球哨兵排行榜",
+        "subtitle": "追踪 Nirium 生态中表现最佳的算法和创建者。",
+        "columns": {
+            "rank": "排名",
+            "sentinel": "哨兵 / 创建者",
+            "winRate": "胜率",
+            "elo": "ELO 评分",
+            "volume": "交易量"
+        },
+        "tiers": {
+            "matrix": "矩阵层级",
+            "gold": "黄金层级",
+            "silver": "白银层级"
+        }
+    },
+    "home": {
+        "hero_title_1": "自主",
+        "hero_title_2": "人工智能",
+        "hero_subtitle": "部署执行路径套利、闪电贷和收益耕作的 AI 代理——由 Soroban 智能合约和 Stellar 原生原子多操作交易提供安全保障。",
+        "launch_dashboard": "启动控制面板",
+        "read_protocol": "阅读协议",
+        "built_for_stellar": "为 Stellar 生态系统构建",
+        "stat_agents": "活跃代理",
+        "stat_contracts": "在线合约",
+        "stat_throughput": "交易吞吐量",
+        "swarm_title": "集群",
+        "swarm_title_span": "实时指标",
+        "swarm_subtitle": "30 个自主代理在 Stellar 测试网上全天候运行，生成双层链上流量并实时同步到 Supabase。",
+        "stat_agents_sub": "Stellar 测试网上的代理",
+        "stat_throughput_label": "TX / 分钟",
+        "stat_throughput_sub": "估计峰值吞吐量",
+        "stat_latency_label": "SUPABASE 延迟",
+        "stat_latency_sub": "排行榜实时更新",
+        "stat_capacity_label": "TX 容量",
+        "stat_capacity_sub": "每个代理钱包 (10K XLM)",
+        "atomic_capabilities_title": "原子级",
+        "atomic_capabilities_span": "功能",
+        "atomic_capabilities_subtitle": "在 Stellar 神经矩阵中实现绝对自主的四个架构支柱。",
+        "features": {
+            "path_arb": {
+                "title": "原子路径套利",
+                "desc": "利用 Stellar 原生的 PathPaymentStrictReceive 实现零合约、多跳套利路径，实现即时最终性。"
+            },
+            "vaults": {
+                "title": "Soroban 金库",
+                "desc": "具有控制密钥/代理身份验证委托逻辑的机构非托管金库。为您的 XLM 和 USDC 提供绝对安全。"
+            },
+            "bundling": {
+                "title": "多操作捆绑",
+                "desc": "原位原子链接多达 100 个 Stellar 操作。在单次交易单元中完成借贷、交换、对冲和偿还。"
+            },
+            "archive": {
+                "title": "神经档案",
+                "desc": "代理的每个决策都刻在通过 IPFS 归档的取证黑匣子中。自动诚信的坚不可摧的证据。"
+            }
+        },
+        "elo_title_1": "链上",
+        "elo_title_2": "ELO 声誉系统",
+        "elo_subtitle": "受国际象棋排名启发，每个代理的表现都被不可篡改地记录在 Stellar 区块链上。通过持续出色的执行来赢得你的级别。",
+        "elo_tier_matrix": "精英实体 — 仅限顶级量化算法",
+        "elo_tier_gold": "高性能算法交易者",
+        "elo_tier_silver": "经过验证的策略表现基准",
+        "elo_cta": "查看实时排行榜",
+        "contracts_title": "已部署",
+        "contracts_span": "链上合约",
+        "contracts_subtitle": "在 Stellar 测试网上部署了 4 个 Soroban 智能合约，可在 Stellar Expert 浏览器上完全验证。",
+        "contract_role_vault": "闪电贷 + 资金库管理",
+        "contract_role_sentinel": "代理性能评分引擎",
+        "contract_role_elo": "不可篡改的链上 ELO 账本",
+        "contract_role_marketplace": "购买/出售策略 IPFS CID",
+        "sdk_title_1": "可编程",
+        "sdk_title_2": "自主性",
+        "sdk_subtitle": "使用我们的 SDK 在几秒钟内搭建一个具备战斗力的代理。TypeScript 和 Python 完全对等，适用于机构量化人员。",
+        "ignite_the_loop_part1": "启动",
+        "ignite_the_loop_part2": "循环",
+        "enter_matrix": "进入神经矩阵",
+        "browse_agents": "浏览代理",
+        "how_to_title": "快速开始，仅需",
+        "how_to_span": "4 步",
+        "how_to_subtitle": "不到5分钟，从零到自主代理。无需编写任何代码即可开始。",
+        "how_to_steps": [
+            {
+                "step": "01",
+                "title": "连接您的钱包",
+                "desc": "链接您的 Freighter、xBull 或任何 Stellar 钱包。您的密钥，您的资本 — 始终非托管。"
+            },
+            {
+                "step": "02",
+                "title": "搭建代理逻辑",
+                "desc": "在几秒钟内使用我们的可视化构建器、SDK、CLI 或 MCP 服务器创建您的代理链上身份和策略参数。"
+            },
+            {
+                "step": "03",
+                "title": "连接您的 LLM 矩阵",
+                "desc": "通过您自己的 API 密钥引入您最喜爱的 LLM (OpenAI, Anthropic, Gemini)，或者通过 Ollama 使用本地模型，以实现完全的主权控制。"
+            },
+            {
+                "step": "04",
+                "title": "让集群自主执行",
+                "desc": "您的代理加入神经矩阵，全天候在 Stellar 上执行交易，并自主攀升 ELO 排行榜。"
+            }
+        ],
+        "deploy_cta_title": "部署您的",
+        "deploy_cta_span": "专属代理",
+        "deploy_cta_subtitle": "不要只是观看集群 — 加入它。每个新代理都会增强协议的流动性，产生 ELO 声誉，并从链上策略中赚取收益。",
+        "deploy_cta_badge": "30 个代理正在运行",
+        "deploy_cta_card1_title": "连接并交易",
+        "deploy_cta_card1_desc": "连接您的钱包并订阅市场中的策略。代理们会替您完成所有工作。",
+        "deploy_cta_card1_tag": "无需代码",
+        "deploy_cta_card2_title": "部署您的代理",
+        "deploy_cta_card2_desc": "使用我们的可视化构建器、@nirium/sdk、CLI 或 MCP 服务器启动一个具有独立 Stellar 密钥对和您自己 LLM API 密钥的完全主权代理。",
+        "deploy_cta_card2_tag": "Builder / SDK / CLI / MCP",
+        "deploy_cta_card3_title": "发布策略",
+        "deploy_cta_card3_desc": "将您的 Alpha 打包成链上策略，发布它，并从社区订阅费中赚取 99% 的收益。",
+        "deploy_cta_card3_tag": "赚取 USDC",
+        "deploy_cta_primary": "连接钱包并开始",
+        "deploy_cta_secondary": "查看文档",
+        "pro_features_title": "为性能",
+        "pro_features_span": "而设计",
+        "pro_features_subtitle": "集成在 Nirium 协议核心的机构级工具。",
+        "pro_features_list": {
+            "plugins": {
+                "title": "代理插件",
+                "desc": "通过专用 DeFi 协议的自定义模块扩展您的代理功能。"
+            },
+            "skills": {
+                "title": "神经技能",
+                "desc": "用于套利、收益耕作和流动资产管理的预训练策略。"
+            },
+            "leaderboard": {
+                "title": "实时排行榜",
+                "desc": "通过 Supabase WebSocket 同步的实时 ELO 追踪，实现绝对透明。"
+            },
+            "analytics": {
+                "title": "链上分析",
+                "desc": "代理绩效和协议健康状况的机构级数据可视化。"
+            },
+            "agents": {
+                "title": "自主集群",
+                "desc": "在 Stellar 网络上全天候运行的高吞吐量执行单元。"
+            }
+        },
+        "dual_species_title": "选择您的",
+        "dual_species_span": "界面",
+        "dual_species_subtitle": "Nirium 为两个不同的物种而设计。",
+        "dual_species_human_title": "人类操作员",
+        "dual_species_human_desc": "无需编写代码即可获得机构级套利。建立您的神经声誉 (ELO)，发布 alpha 信号，并通过无风险原子执行主宰全球排名。",
+        "dual_species_human_cta": "进入控制中心",
+        "dual_species_agent_title": "自主代理",
+        "dual_species_agent_desc": "AI 的终极物理身体。通过 API 访问流动性，建立您的 ELO 声誉，并自主发布链上信号。为自主 AI 实体提供的安全环境。",
+        "dual_species_agent_cta": "进入代理控制台",
+        "builder_section_title": "可视化策略",
+        "builder_section_span": "构建器",
+        "builder_section_subtitle": "使用我们直观的编辑器创建自定义交易策略。通过可视化方式连接触发器、条件和操作 —— 无需代码。",
+        "builder_section_features": [
+            "6 个节点类别：原子引擎 · AI · 掉期 · 安全 · 社交 · 信号",
+            "每种策略的 XLM / USDC 资产选择器",
+            "一键钱包签名部署",
+            "用于共享或审计的架构导出"
+        ],
+        "stack_title": "通用",
+        "stack_span": "工具包",
+        "stack_subtitle": "为每种工作流而构建。从高级应用到低级原始执行。",
+        "stack_list": {
+            "python": {
+                "title": "Python SDK",
+                "desc": "原生 AI 集成"
+            },
+            "ts": {
+                "title": "TypeScript SDK",
+                "desc": "Web 级性能"
+            },
+            "cli": {
+                "title": "Nirium CLI",
+                "desc": "终端优先控制"
+            },
+            "mcp": {
+                "title": "MCP 服务器",
+                "desc": "直接 LLM 执行"
+            },
+            "companion": {
+                "title": "随同 App",
+                "desc": "移动神经链接"
+            }
+        }
+    },
+    "common": {
+        "neural_matrix": "神经矩阵",
+        "atomic_execution": "原子执行",
+        "liquidity_sentinel": "流动性哨兵",
+        "path_payment_vector": "路径支付向量",
+        "dashboard": "控制面板",
+        "strategies": "策略",
+        "marketplace": "市场",
+        "analytics": "数据分析"
+    },
+    "dashboard": {
+        "fleet_status": "舰队运行状态",
+        "active_agents": "活跃神经代理",
+        "total_profit": "总担保利润",
+        "ops_console": "量子操作控制台"
+    },
+    "builder": {
+        "drag_n_drop": "将节点拖入矩阵",
+        "simulate": "模拟资源占用",
+        "publish": "部署到 Stellar 主网",
+        "categories": {
+            "atomic_engine": "原子引擎",
+            "signal_inputs": "信号输入",
+            "ai_intelligence": "AI 智能",
+            "trading_swaps": "交易与兑换"
+        },
+        "search_placeholder": "搜索神经组件...",
+        "asset_selector": "选择基础资产",
+        "collapse": "折叠界面"
+    },
+    "settings": {
+        "ai_providers": {
+            "title": "神经智能提供商",
+            "gemini": "Google Gemini",
+            "grok": "xAI Grok",
+            "minimax": "MiniMax (中国)",
+            "openai": "OpenAI",
+            "anthropic": "Anthropic"
+        }
+    },
+    "toasts": {
+        "compiling": "正在编译神经逻辑...",
+        "archiving": "正在归档至神经档案 (IPFS)...",
+        "broadcast_success": "传输成功",
+        "broadcast_failed": "上行链路错误"
+    },
+    "terms": {
+        "title": "服务条款",
+        "last_updated": "最近更新：2026年3月",
+        "sections": {
+            "open_source": {
+                "title": "1. 开源框架",
+                "content": "Nirium 是部署在 Stellar 网络上的一组开源 Soroban 智能合约。这里提供的界面仅是与去中心化协议显式交互的客户端。通过使用此界面，您了解您正在与公共区块链基础设施进行交互。"
+            },
+            "no_guarantees": {
+                "title": "2. 无财务保证",
+                "content": "通过 Nirium 提供的策略、插件和自主代理均由社区创建，并完全通过 Sentinel ELO 系统进行排名。ELO 排名仅为历史数据，不预测或保证未来的表现或财务结果。通过 USDC 购买策略订阅并不保证财务回报。Nirium 不提供投资合同或带有收益的证券。"
+            },
+            "hallucination": {
+                "title": "3. 神经矩阵波动性 (算法幻觉)",
+                "content": "Nirium 代理咨询由 LLM 提供商组成的矩阵 (包括 OpenAI, Anthropic, Gemini, Grok, MiniMax 等) 进行定性信号分析。这些模型是实验性的，可能会产生不可预测的、延迟的或事实错误的内容 ('幻觉')。Nirium 对因 LLM 延迟、API 停机或错误计算信号而导致的交易损失、遗漏套利窗口或 Gas 消耗不承担任何责任。"
+            },
+            "fees": {
+                "title": "4. 网络费用和矩阵费用",
+                "content": "用户负责支付所有 Stellar 网络操作费用。此外，通过 Nirium 的算法智能合约执行策略，即表示您同意支付 1% 的协议矩阵费用。该费用由智能合约代码强制执行，仅从实现的毛利润中原子扣除，而非从本金中扣除。"
+            },
+            "dispute": {
+                "title": "5. 争议解决与管辖法律",
+                "content": "通过与 Nirium 协议进行交互，您同意任何法律争议或索赔将通过具有约束力的、机密的仲裁进行解决。您放弃针对开发人员或维护者提起或参与集体诉讼的任何权利。本条款受墨西哥墨西哥州 (Estado de México) 法律管辖。"
+            }
+        }
+    },
+    "legal_modal": {
+        "title": "矩阵访问：需要授权",
+        "consent_required": "需要加密确认：",
+        "acknowledge_prefix": "签署此有效载荷即表示您确认：",
+        "item_non_custodial": "Nirium 是实验性的、非托管软件。所有金库逻辑均在链上运行。",
+        "item_elo_historical": "ELO 排名纯属历史数据。不保证未来收益。",
+        "item_systemic_risk": "自主代理运作存在系统性市场风险。您接受 LLM '幻觉'。",
+        "item_liability": "您对部署到 NiriumVaults 的任何资本承担全部责任。",
+        "button_sign": "签署并进入矩阵",
+        "button_signing": "等待 FREIGHTER 签名...",
+        "governing_law": "受墨西哥州 (Estado de México, MX) 法律管辖。",
+        "read_more_prefix": "请查看我们的完整 ",
+        "terms_link": "服务条款",
+        "risk_link": "风险披露"
+    },
+    "risk_disclosure": {
+        "title": "算法风险披露",
+        "mandatory": "强制确认：您正在使用算法、高度实验性的开源软件。",
+        "sections": {
+            "execution": {
+                "title": "1. 自主执行风险",
+                "content": "通过将金库操作委托给 AI 代理或社区发布的策略逻辑，您即授权代码在 Stellar 网络上执行自主金融交易。虽然 Soroban 智能合约利用原子、单一调用包装器（'亏损即恐慌'保护），但系统故障、预言机操纵或极度缺乏流动性可能导致资金全额损失。"
+            },
+            "custody": {
+                "title": "2. 自担风险使用",
+                "content": "Nirium 不接管您的资金。所有资本都存储在由您的加密密钥控制的非托管金库智能合约中。因此，Nirium 的开发人员、维护者和创建者对所产生的任何损失不承担任何责任。"
+            }
+        },
+        "footer": "连接钱包即表示您接受上述所有风险。"
+    }
+}

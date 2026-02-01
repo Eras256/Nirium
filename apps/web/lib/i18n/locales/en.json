@@ -1,0 +1,23 @@
+{
+    "common": {
+        "neural_matrix": "Neural Matrix",
+        "atomic_execution": "Atomic Execution",
+        "liquidity_sentinel": "Liquidity Sentinel",
+        "path_payment_vector": "Path-Payment Vector",
+        "dashboard": "Dashboard",
+        "strategies": "Strategies",
+        "marketplace": "Marketplace",
+        "analytics": "Analytics"
+    },
+    "dashboard": {
+        "fleet_status": "Fleet Operational Status",
+        "active_agents": "Active Neural Agents",
+        "total_profit": "Total Secured Profit",
+        "ops_console": "Quantum Ops Console"
+    },
+    "builder": {
+        "drag_n_drop": "Drag & Drop Nodes into Matrix",
+        "simulate": "Simulate Resource Footprint",
+        "publish": "Deploy to Stellar Mainnet"
+    }
+}

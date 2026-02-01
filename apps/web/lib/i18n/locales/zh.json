@@ -1,0 +1,23 @@
+{
+    "common": {
+        "neural_matrix": "神经矩阵",
+        "atomic_execution": "原子执行",
+        "liquidity_sentinel": "流动性哨兵",
+        "path_payment_vector": "路径支付向量",
+        "dashboard": "控制面板",
+        "strategies": "策略",
+        "marketplace": "市场",
+        "analytics": "数据分析"
+    },
+    "dashboard": {
+        "fleet_status": "舰队运行状态",
+        "active_agents": "活跃神经代理",
+        "total_profit": "总担保利润",
+        "ops_console": "量子操作控制台"
+    },
+    "builder": {
+        "drag_n_drop": "将节点拖入矩阵",
+        "simulate": "模拟资源占用",
+        "publish": "部署到 Stellar 主网"
+    }
+}
