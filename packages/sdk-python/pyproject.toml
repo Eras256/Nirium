@@ -1,0 +1,22 @@
+[build-system]
+requires = ["setuptools>=68.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "nirium"
+version = "0.1.0"
+description = "Official Python SDK for the Nirium autonomous DeFi agent on Stellar"
+readme = "README.md"
+requires-python = ">=3.10"
+license = {text = "MIT"}
+authors = [{name = "Nirium Protocol"}]
+keywords = ["nirium", "stellar", "defi", "sdk", "soroban", "agent"]
+dependencies = [
+    "requests>=2.32.0",
+    "websockets>=13.0",
+]
+
+[project.urls]
+Homepage = "https://nirium.dev"
+Repository = "https://github.com/nirium/nirium"
+Documentation = "https://nirium.dev/docs"

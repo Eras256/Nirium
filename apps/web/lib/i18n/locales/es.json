@@ -1,0 +1,23 @@
+{
+    "common": {
+        "neural_matrix": "Matriz Neural",
+        "atomic_execution": "Ejecución Atómica",
+        "liquidity_sentinel": "Centinela de Liquidez",
+        "path_payment_vector": "Vector de Pago de Ruta",
+        "dashboard": "Panel de Control",
+        "strategies": "Estrategias",
+        "marketplace": "Mercado",
+        "analytics": "Analíticas"
+    },
+    "dashboard": {
+        "fleet_status": "Estado Operativo de Flota",
+        "active_agents": "Agentes Neurales Activos",
+        "total_profit": "Beneficio Total Asegurado",
+        "ops_console": "Consola de Operaciones Quantum"
+    },
+    "builder": {
+        "drag_n_drop": "Arrastra Nodos a la Matriz",
+        "simulate": "Simular Huella de Recursos",
+        "publish": "Desplegar en Stellar Mainnet"
+    }
+}
