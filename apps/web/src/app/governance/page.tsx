@@ -5,7 +5,7 @@ import dynamic from 'next/dynamic';
 import { motion } from 'framer-motion';
 import { GlassNavbar } from '@/components/ui/GlassNavbar';
 import { GlassCard, GlassCardHeader, GlassCardContent } from '@/components/ui/GlassCard';
-import { GlassButton, GlassIconButton } from '@/components/ui/GlassButton';
+import { GlassButton } from '@/components/ui/GlassButton';
 import { GlassModal } from '@/components/ui/GlassModal';
 import { GlassInput, GlassTextarea, GlassSelect } from '@/components/ui/GlassInput';
 

@@ -116,6 +116,7 @@ export function LiquidityChart({
     const [mounted, setMounted] = useState(false);
 
     useEffect(() => {
+        // eslint-disable-next-line
         setMounted(true);
     }, []);
 
@@ -240,6 +241,7 @@ export function VolumeChart({ className = '' }: { className?: string }) {
     const [mounted, setMounted] = useState(false);
 
     useEffect(() => {
+        // eslint-disable-next-line
         setMounted(true);
     }, []);
 

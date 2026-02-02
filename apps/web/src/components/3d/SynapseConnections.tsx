@@ -1,11 +1,9 @@
 'use client';
 
 import { useRef, useMemo } from 'react';
-import { useFrame, useThree } from '@react-three/fiber';
+import { useFrame } from '@react-three/fiber';
 import * as THREE from 'three';
-import { useStore } from '@/stores/useStore';
 
-const SYNAPSE_THRESHOLD = 0.1; // ε - distance threshold for synaptic connection
 const MAX_SYNAPSES = 5000;
 
 const synapseVertexShader = `
@@ -77,7 +75,6 @@ export function SynapseConnections({
 }: SynapseConnectionsProps) {
     const meshRef = useRef<THREE.Mesh>(null);
     const materialRef = useRef<THREE.ShaderMaterial>(null);
-    const cursorPosition = useStore((state) => state.cursorPosition);
 
     // Build synapse geometry connecting nearby particles
     const geometry = useMemo(() => {

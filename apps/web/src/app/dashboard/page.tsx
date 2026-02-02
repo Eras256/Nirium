@@ -27,12 +27,7 @@ const channelStatus = [
     { id: 'x402-storage', name: 'Distributed Storage', status: 'pending', usage: 0 },
 ];
 
-const validatorMetrics = [
-    { name: 'Node Health', value: 99.8, unit: '%', status: 'healthy' },
-    { name: 'Consensus Rounds', value: 12450, unit: '', status: 'healthy' },
-    { name: 'Avg Latency', value: 245, unit: 'ms', status: 'warning' },
-    { name: 'Connections', value: 48, unit: 'peers', status: 'healthy' },
-];
+
 
 export default function DashboardPage() {
     return (
