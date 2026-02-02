@@ -12,6 +12,7 @@ import {
     TooltipProps,
 } from 'recharts';
 import { motion } from 'framer-motion';
+import { useState, useEffect } from 'react';
 
 // Mock data for TVL visualization
 // Deterministic mock data for TVL visualization
@@ -70,7 +71,7 @@ function CustomTooltip({ active, payload, label }: CustomTooltipProps) {
             className="
         px-4 py-3 rounded-xl
         backdrop-blur-xl bg-black/80
-        border border-cyan-400/30
+        border border-[#D4AF37]/30
         shadow-lg
       "
         >
@@ -111,6 +112,12 @@ export function LiquidityChart({
     animate = true,
 }: LiquidityChartProps) {
     const data = useMemo(() => generateTVLData(), []);
+
+    const [mounted, setMounted] = useState(false);
+
+    useEffect(() => {
+        setMounted(true);
+    }, []);
 
     const currentTVL = data[data.length - 1].tvl;
     const previousTVL = data[data.length - 2].tvl;
@@ -158,62 +165,68 @@ export function LiquidityChart({
 
             {/* Chart */}
             <div style={{ height }}>
-                <ResponsiveContainer width="100%" height="100%">
-                    <AreaChart
-                        data={data}
-                        margin={{ top: 10, right: 10, left: 0, bottom: 0 }}
-                    >
-                        <defs>
-                            <linearGradient id="tvlGradient" x1="0" y1="0" x2="0" y2="1">
-                                <stop offset="0%" stopColor="#00f3ff" stopOpacity={0.4} />
-                                <stop offset="50%" stopColor="#9d4edd" stopOpacity={0.2} />
-                                <stop offset="100%" stopColor="#9d4edd" stopOpacity={0} />
-                            </linearGradient>
-                            <linearGradient id="lineGradient" x1="0" y1="0" x2="1" y2="0">
-                                <stop offset="0%" stopColor="#00f3ff" />
-                                <stop offset="100%" stopColor="#9d4edd" />
-                            </linearGradient>
-                        </defs>
+                {mounted ? (
+                    <ResponsiveContainer width="100%" height="100%">
+                        <AreaChart
+                            data={data}
+                            margin={{ top: 10, right: 10, left: 0, bottom: 0 }}
+                        >
+                            <defs>
+                                <linearGradient id="tvlGradient" x1="0" y1="0" x2="0" y2="1">
+                                    <stop offset="0%" stopColor="#D4AF37" stopOpacity={0.4} />
+                                    <stop offset="50%" stopColor="#A08020" stopOpacity={0.2} />
+                                    <stop offset="100%" stopColor="#A08020" stopOpacity={0} />
+                                </linearGradient>
+                                <linearGradient id="lineGradient" x1="0" y1="0" x2="1" y2="0">
+                                    <stop offset="0%" stopColor="#D4AF37" />
+                                    <stop offset="100%" stopColor="#A08020" />
+                                </linearGradient>
+                            </defs>
 
-                        {showGrid && (
-                            <CartesianGrid
-                                strokeDasharray="3 3"
-                                stroke="rgba(255,255,255,0.05)"
-                                vertical={false}
+                            {showGrid && (
+                                <CartesianGrid
+                                    strokeDasharray="3 3"
+                                    stroke="rgba(255,255,255,0.05)"
+                                    vertical={false}
+                                />
+                            )}
+
+                            <XAxis
+                                dataKey="date"
+                                axisLine={false}
+                                tickLine={false}
+                                tick={{ fill: 'rgba(255,255,255,0.4)', fontSize: 12 }}
+                                dy={10}
                             />
-                        )}
 
-                        <XAxis
-                            dataKey="date"
-                            axisLine={false}
-                            tickLine={false}
-                            tick={{ fill: 'rgba(255,255,255,0.4)', fontSize: 12 }}
-                            dy={10}
-                        />
+                            <YAxis
+                                axisLine={false}
+                                tickLine={false}
+                                tick={{ fill: 'rgba(255,255,255,0.4)', fontSize: 12 }}
+                                tickFormatter={(value) => `$${(value / 1000000).toFixed(0)}M`}
+                                dx={-10}
+                                width={60}
+                            />
 
-                        <YAxis
-                            axisLine={false}
-                            tickLine={false}
-                            tick={{ fill: 'rgba(255,255,255,0.4)', fontSize: 12 }}
-                            tickFormatter={(value) => `$${(value / 1000000).toFixed(0)}M`}
-                            dx={-10}
-                            width={60}
-                        />
+                            <Tooltip content={<CustomTooltip />} />
 
-                        <Tooltip content={<CustomTooltip />} />
-
-                        <Area
-                            type="monotone"
-                            dataKey="tvl"
-                            name="TVL"
-                            stroke="url(#lineGradient)"
-                            strokeWidth={3}
-                            fill="url(#tvlGradient)"
-                            animationDuration={1500}
-                            animationEasing="ease-out"
-                        />
-                    </AreaChart>
-                </ResponsiveContainer>
+                            <Area
+                                type="monotone"
+                                dataKey="tvl"
+                                name="TVL"
+                                stroke="url(#lineGradient)"
+                                strokeWidth={3}
+                                fill="url(#tvlGradient)"
+                                animationDuration={1500}
+                                animationEasing="ease-out"
+                            />
+                        </AreaChart>
+                    </ResponsiveContainer>
+                ) : (
+                    <div className="w-full h-full flex items-center justify-center bg-white/5 rounded-xl animate-pulse">
+                        <span className="text-[#D4AF37]/50 loading-text">Loading Chart...</span>
+                    </div>
+                )}
             </div>
         </motion.div>
     );
@@ -224,6 +237,11 @@ export function LiquidityChart({
  */
 export function VolumeChart({ className = '' }: { className?: string }) {
     const data = useMemo(() => generateTVLData(), []);
+    const [mounted, setMounted] = useState(false);
+
+    useEffect(() => {
+        setMounted(true);
+    }, []);
 
     return (
         <div className={`w-full ${className}`}>
@@ -235,23 +253,27 @@ export function VolumeChart({ className = '' }: { className?: string }) {
             </div>
 
             <div style={{ height: 150 }}>
-                <ResponsiveContainer width="100%" height="100%">
-                    <AreaChart data={data}>
-                        <defs>
-                            <linearGradient id="volumeGradient" x1="0" y1="0" x2="0" y2="1">
-                                <stop offset="0%" stopColor="#9d4edd" stopOpacity={0.4} />
-                                <stop offset="100%" stopColor="#9d4edd" stopOpacity={0} />
-                            </linearGradient>
-                        </defs>
-                        <Area
-                            type="monotone"
-                            dataKey="volume"
-                            stroke="#9d4edd"
-                            strokeWidth={2}
-                            fill="url(#volumeGradient)"
-                        />
-                    </AreaChart>
-                </ResponsiveContainer>
+                {mounted ? (
+                    <ResponsiveContainer width="100%" height="100%">
+                        <AreaChart data={data}>
+                            <defs>
+                                <linearGradient id="volumeGradient" x1="0" y1="0" x2="0" y2="1">
+                                    <stop offset="0%" stopColor="#D4AF37" stopOpacity={0.4} />
+                                    <stop offset="100%" stopColor="#D4AF37" stopOpacity={0} />
+                                </linearGradient>
+                            </defs>
+                            <Area
+                                type="monotone"
+                                dataKey="volume"
+                                stroke="#D4AF37"
+                                strokeWidth={2}
+                                fill="url(#volumeGradient)"
+                            />
+                        </AreaChart>
+                    </ResponsiveContainer>
+                ) : (
+                    <div className="w-full h-full bg-white/5 rounded-xl animate-pulse" />
+                )}
             </div>
         </div>
     );
