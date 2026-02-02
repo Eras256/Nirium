@@ -1,0 +1,376 @@
+{
+  "project": "Neural-Stellar Nexus",
+  "version": "1.0.0",
+  "created": "2026-02-01T16:41:00Z",
+  "phases": [
+    {
+      "id": 1,
+      "name": "Project Initialization",
+      "status": "pending",
+      "tasks": [
+        {
+          "id": "1.1",
+          "name": "Initialize Next.js 16 Project",
+          "description": "Create Next.js 16 app with App Router, TypeScript 5.7+, Tailwind CSS 4.0",
+          "command": "npx -y create-next-app@latest ./ --typescript --tailwind --eslint --app --src-dir --import-alias '@/*'",
+          "dependencies": [],
+          "priority": "critical"
+        },
+        {
+          "id": "1.2",
+          "name": "Install 3D Dependencies",
+          "description": "Install React Three Fiber, Drei, and postprocessing",
+          "command": "npm install three @types/three @react-three/fiber @react-three/drei @react-three/postprocessing leva zustand",
+          "dependencies": ["1.1"],
+          "priority": "critical"
+        },
+        {
+          "id": "1.3",
+          "name": "Install Chart Dependencies",
+          "description": "Install Recharts and data visualization libraries",
+          "command": "npm install recharts @types/recharts",
+          "dependencies": ["1.1"],
+          "priority": "high"
+        },
+        {
+          "id": "1.4",
+          "name": "Install Stellar SDK",
+          "description": "Install Stellar SDK for blockchain integration",
+          "command": "npm install @stellar/stellar-sdk",
+          "dependencies": ["1.1"],
+          "priority": "high"
+        },
+        {
+          "id": "1.5",
+          "name": "Initialize Soroban Workspace",
+          "description": "Create Rust workspace for Soroban contracts",
+          "command": "mkdir -p contracts && cd contracts && cargo init --name nexus-contracts --lib",
+          "dependencies": [],
+          "priority": "critical"
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "name": "Core 3D Infrastructure",
+      "status": "pending",
+      "tasks": [
+        {
+          "id": "2.1",
+          "name": "Create Neural Canvas Component",
+          "description": "Build the main R3F canvas that wraps the entire application",
+          "file": "src/components/3d/NeuralCanvas.tsx",
+          "dependencies": ["1.2"],
+          "priority": "critical"
+        },
+        {
+          "id": "2.2",
+          "name": "Implement GPGPU Particle System",
+          "description": "Create 50K particle neural network simulation with GPGPU",
+          "file": "src/components/3d/NeuralParticles.tsx",
+          "dependencies": ["2.1"],
+          "priority": "critical"
+        },
+        {
+          "id": "2.3",
+          "name": "Create Neural Shaders",
+          "description": "GLSL vertex and fragment shaders for particles and synapses",
+          "files": [
+            "src/components/3d/shaders/neuralVertex.glsl",
+            "src/components/3d/shaders/neuralFragment.glsl",
+            "src/components/3d/shaders/synapseVertex.glsl",
+            "src/components/3d/shaders/synapseFragment.glsl"
+          ],
+          "dependencies": ["2.1"],
+          "priority": "critical"
+        },
+        {
+          "id": "2.4",
+          "name": "Implement Glass Material System",
+          "description": "MeshTransmissionMaterial wrapper with physics-based refraction",
+          "file": "src/components/3d/GlassMaterial.tsx",
+          "dependencies": ["2.1"],
+          "priority": "critical"
+        },
+        {
+          "id": "2.5",
+          "name": "Create Post-processing Pipeline",
+          "description": "Bloom, chromatic aberration, vignette effects",
+          "file": "src/components/3d/PostProcessing.tsx",
+          "dependencies": ["2.1"],
+          "priority": "high"
+        }
+      ]
+    },
+    {
+      "id": 3,
+      "name": "UI Component Library",
+      "status": "pending",
+      "tasks": [
+        {
+          "id": "3.1",
+          "name": "Create Glass Navbar",
+          "description": "Floating glass navigation bar with refraction",
+          "file": "src/components/ui/GlassNavbar.tsx",
+          "dependencies": ["2.4"],
+          "priority": "critical"
+        },
+        {
+          "id": "3.2",
+          "name": "Create Glass Card Component",
+          "description": "Reusable glass card with transmission material",
+          "file": "src/components/ui/GlassCard.tsx",
+          "dependencies": ["2.4"],
+          "priority": "critical"
+        },
+        {
+          "id": "3.3",
+          "name": "Create Glass Button Component",
+          "description": "Interactive buttons with glass aesthetics",
+          "file": "src/components/ui/GlassButton.tsx",
+          "dependencies": ["2.4"],
+          "priority": "high"
+        },
+        {
+          "id": "3.4",
+          "name": "Create Glass Modal Component",
+          "description": "Modal dialogs with glass transmission",
+          "file": "src/components/ui/GlassModal.tsx",
+          "dependencies": ["2.4"],
+          "priority": "high"
+        },
+        {
+          "id": "3.5",
+          "name": "Create Glass Input Components",
+          "description": "Form inputs with glass styling",
+          "file": "src/components/ui/GlassInput.tsx",
+          "dependencies": ["2.4"],
+          "priority": "high"
+        }
+      ]
+    },
+    {
+      "id": 4,
+      "name": "Application Pages",
+      "status": "pending",
+      "tasks": [
+        {
+          "id": "4.1",
+          "name": "Create Root Layout",
+          "description": "Main layout with Neural Canvas and global glass wrapper",
+          "file": "src/app/layout.tsx",
+          "dependencies": ["2.1", "3.1"],
+          "priority": "critical"
+        },
+        {
+          "id": "4.2",
+          "name": "Create Landing Page",
+          "description": "Hero section with animated neural background",
+          "file": "src/app/page.tsx",
+          "dependencies": ["4.1"],
+          "priority": "critical"
+        },
+        {
+          "id": "4.3",
+          "name": "Create Dashboard Page",
+          "description": "TVL charts, wallet status, validator metrics",
+          "file": "src/app/dashboard/page.tsx",
+          "dependencies": ["4.1", "1.3"],
+          "priority": "critical"
+        },
+        {
+          "id": "4.4",
+          "name": "Create Markets Page",
+          "description": "DEX interface with 3D volumetric order book",
+          "file": "src/app/markets/page.tsx",
+          "dependencies": ["4.1"],
+          "priority": "critical"
+        },
+        {
+          "id": "4.5",
+          "name": "Create Governance Page",
+          "description": "DAO voting with floating proposal orbs",
+          "file": "src/app/governance/page.tsx",
+          "dependencies": ["4.1"],
+          "priority": "critical"
+        },
+        {
+          "id": "4.6",
+          "name": "Create Neural Lab Page",
+          "description": "Developer console with Monaco editor integration",
+          "file": "src/app/lab/page.tsx",
+          "dependencies": ["4.1"],
+          "priority": "critical"
+        }
+      ]
+    },
+    {
+      "id": 5,
+      "name": "Chart Components",
+      "status": "pending",
+      "tasks": [
+        {
+          "id": "5.1",
+          "name": "Create Liquidity Chart",
+          "description": "Interactive area chart with particle emissions",
+          "file": "src/components/charts/LiquidityChart.tsx",
+          "dependencies": ["1.3"],
+          "priority": "high"
+        },
+        {
+          "id": "5.2",
+          "name": "Create Volumetric Order Book",
+          "description": "3D crystalline pillars representing liquidity depth",
+          "file": "src/components/charts/VolumetricOrderBook.tsx",
+          "dependencies": ["2.1"],
+          "priority": "high"
+        },
+        {
+          "id": "5.3",
+          "name": "Create Proposal Orbs",
+          "description": "Metaball visualization for governance proposals",
+          "file": "src/components/charts/ProposalOrbs.tsx",
+          "dependencies": ["2.1"],
+          "priority": "high"
+        }
+      ]
+    },
+    {
+      "id": 6,
+      "name": "x402 Integration",
+      "status": "pending",
+      "tasks": [
+        {
+          "id": "6.1",
+          "name": "Create x402 Proxy Middleware",
+          "description": "Next.js proxy for x402 payment protocol",
+          "file": "src/proxy.ts",
+          "dependencies": ["1.4"],
+          "priority": "critical"
+        },
+        {
+          "id": "6.2",
+          "name": "Create Stellar Payment Adapter",
+          "description": "Client-side adapter for building and signing transactions",
+          "file": "src/lib/stellar/StellarPaymentAdapter.ts",
+          "dependencies": ["1.4"],
+          "priority": "critical"
+        },
+        {
+          "id": "6.3",
+          "name": "Create x402 Client",
+          "description": "Payment flow client for agent subscriptions",
+          "file": "src/lib/x402/paymentClient.ts",
+          "dependencies": ["6.2"],
+          "priority": "high"
+        }
+      ]
+    },
+    {
+      "id": 7,
+      "name": "Soroban Contracts",
+      "status": "pending",
+      "tasks": [
+        {
+          "id": "7.1",
+          "name": "Configure Cargo Workspace",
+          "description": "Set up Rust workspace with Soroban SDK v25",
+          "file": "contracts/Cargo.toml",
+          "dependencies": ["1.5"],
+          "priority": "critical"
+        },
+        {
+          "id": "7.2",
+          "name": "Implement Verifier Contract",
+          "description": "ZK-SNARK Groth16 verification with BN254",
+          "file": "contracts/verifier/src/lib.rs",
+          "dependencies": ["7.1"],
+          "priority": "critical"
+        },
+        {
+          "id": "7.3",
+          "name": "Implement Identity Pool Contract",
+          "description": "Merkle tree with Poseidon hash, nullifier registry",
+          "file": "contracts/identity-pool/src/lib.rs",
+          "dependencies": ["7.1"],
+          "priority": "critical"
+        },
+        {
+          "id": "7.4",
+          "name": "Implement Payment Gate Contract",
+          "description": "SEP-41 token acceptance and access token issuance",
+          "file": "contracts/payment-gate/src/lib.rs",
+          "dependencies": ["7.1"],
+          "priority": "critical"
+        }
+      ]
+    },
+    {
+      "id": 8,
+      "name": "Security Infrastructure",
+      "status": "pending",
+      "tasks": [
+        {
+          "id": "8.1",
+          "name": "Create Fuzz Harness",
+          "description": "Cargo fuzz harness for identity pool",
+          "file": "contracts/identity-pool/fuzz/fuzz_targets/fuzz_identity.rs",
+          "dependencies": ["7.3"],
+          "priority": "high"
+        },
+        {
+          "id": "8.2",
+          "name": "Add Kani Proofs",
+          "description": "Formal verification annotations for verifier",
+          "file": "contracts/verifier/src/proofs.rs",
+          "dependencies": ["7.2"],
+          "priority": "high"
+        },
+        {
+          "id": "8.3",
+          "name": "Create Security Documentation",
+          "description": "Trust assumptions and security model",
+          "file": "docs/SECURITY.md",
+          "dependencies": ["7.2", "7.3", "7.4"],
+          "priority": "high"
+        }
+      ]
+    },
+    {
+      "id": 9,
+      "name": "Testing & Deployment",
+      "status": "pending",
+      "tasks": [
+        {
+          "id": "9.1",
+          "name": "Create Playwright E2E Tests",
+          "description": "Test WebGL loading and x402 payment flow",
+          "file": "tests/e2e/nexus.spec.ts",
+          "dependencies": ["4.2", "4.3", "4.4", "4.5", "4.6"],
+          "priority": "high"
+        },
+        {
+          "id": "9.2",
+          "name": "Create Makefile",
+          "description": "Build automation for WASM and deployment",
+          "file": "Makefile",
+          "dependencies": ["7.2", "7.3", "7.4"],
+          "priority": "high"
+        },
+        {
+          "id": "9.3",
+          "name": "Create Docker Compose",
+          "description": "Container orchestration for development",
+          "file": "docker-compose.yml",
+          "dependencies": ["9.2"],
+          "priority": "medium"
+        }
+      ]
+    }
+  ],
+  "totalTasks": 38,
+  "criticalPath": [
+    "1.1", "1.2", "2.1", "2.2", "2.4", "3.1", "4.1", "4.2", "4.3", "4.4", "4.5", "4.6"
+  ],
+  "estimatedDuration": "4-6 hours autonomous execution"
+}
