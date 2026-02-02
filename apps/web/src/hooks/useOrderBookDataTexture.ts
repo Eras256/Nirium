@@ -2,8 +2,8 @@ import { useMemo, useEffect, useState } from 'react';
 import * as THREE from 'three';
 import { StellarMarketService } from '@/services/StellarMarketService';
 
-// Configuración de la simulación
-const SIZE = 128; // Textura de 128x128 = 16,384 partículas (Optimizado para WebGL fluido)
+// Simulation Configuration
+const SIZE = 128; // 128x128 texture = 16,384 particles (Optimized for smooth WebGL)
 const COUNT = SIZE * SIZE;
 
 interface Order {
@@ -12,10 +12,10 @@ interface Order {
 }
 
 export const useOrderBookDataTexture = (pair: string) => {
-    // 1. Crear el buffer de datos inicial
+    // 1. Create the initial data buffer
     const data = useMemo(() => new Float32Array(COUNT * 4), []);
 
-    // 2. Crear la textura de Three.js
+    // 2. Create the Three.js texture
     const texture = useMemo(() => {
         const tex = new THREE.DataTexture(
             data,
@@ -28,43 +28,43 @@ export const useOrderBookDataTexture = (pair: string) => {
         return tex;
     }, [data]);
 
-    // Estado para el Spot Price (Precio central donde chocan los vórtices)
-    const [spotPrice, setSpotPrice] = useState(0.12); // Valor inicial ej. XLM/USDC
+    // State for the Spot Price (Central collision point of the vortices)
+    const [spotPrice, setSpotPrice] = useState(0.12); // Initial value e.g. XLM/USDC
 
     useEffect(() => {
         let isMounted = true;
 
         const fetchData = async () => {
             try {
-                // A. Actualizar Precio Spot (El centro del choque)
+                // A. Update Spot Price (The collision center)
                 const price = await StellarMarketService.getSpotPrice();
                 if (isMounted) setSpotPrice(price);
 
-                // B. Actualizar Muros de Liquidez (Los vórtices)
+                // B. Update Liquidity Walls (The vortices)
                 const { bids, asks } = await StellarMarketService.getOrderBookDepth();
 
-                // RELLENADO DE TEXTURA REAL
+                // REAL TEXTURE FILLING
                 for (let i = 0; i < COUNT; i++) {
                     const stride = i * 4;
                     const isAsk = i > COUNT / 2;
                     const sourceArray = isAsk ? asks : bids;
 
-                    // Si hay menos órdenes que partículas, repetimos órdenes aleatoriamente
-                    // para mantener la densidad visual del vórtice.
+                    // If there are fewer orders than particles, repeat orders randomly
+                    // to maintain the visual density of the vortex.
                     let order: Order;
                     if (sourceArray && sourceArray.length > 0) {
                         order = sourceArray[Math.floor(Math.random() * sourceArray.length)];
                     } else {
-                        // Fallback ficticio si no hay libro
+                        // Fictitious fallback if no order book is available
                         const offset = isAsk ? 0.001 : -0.001;
                         order = { price: price + offset + (Math.random() * 0.005 * (isAsk ? 1 : -1)), volume: Math.random() * 0.1 };
                     }
 
-                    // Mapeo a Canales RGBA
-                    data[stride] = order.price;      // R: Posición Y (Price Target)
-                    data[stride + 1] = order.volume; // G: Radio (Grosor del tornado / Volume)
+                    // Mapping to RGBA Channels
+                    data[stride] = order.price;      // R: Y Position (Price Target)
+                    data[stride + 1] = order.volume; // G: Radius (Tornado thickness / Volume)
                     data[stride + 2] = isAsk ? 1.0 : 0.0; // B: Color (0=Bid, 1=Ask)
-                    data[stride + 3] = Math.random(); // A: Ruido individual
+                    data[stride + 3] = Math.random(); // A: Individual noise
                 }
 
                 texture.needsUpdate = true;
@@ -74,10 +74,10 @@ export const useOrderBookDataTexture = (pair: string) => {
             }
         };
 
-        // Polling Loop: Cada 2 segundos
+        // Polling Loop: Every 2 seconds
         const interval = setInterval(fetchData, 2000);
 
-        // Llamada inicial inmediata
+        // Immediate initial call
         fetchData();
 
         return () => {

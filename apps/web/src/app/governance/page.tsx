@@ -120,7 +120,7 @@ export default function GovernancePage() {
                     >
                         <div>
                             <h1 className="text-3xl md:text-4xl font-bold text-white mb-2">
-                                Salón de <span className="gradient-text">Gobernanza</span>
+                                Governance <span className="gradient-text">Hall</span>
                             </h1>
                             <p className="text-white/50">
                                 Quadratic voting with ZK-proof identity verification
@@ -177,7 +177,7 @@ export default function GovernancePage() {
                         >
                             <GlassCard variant="elevated" size="lg">
                                 <GlassCardHeader
-                                    title="Ágora Digital"
+                                    title="Digital Agora"
                                     subtitle="Active proposals visualized • Size = Quorum"
                                     icon={<span className="text-cyan-400">⬡</span>}
                                 />
