@@ -1,7 +1,6 @@
 'use client';
 
 import { forwardRef, ReactNode, InputHTMLAttributes } from 'react';
-import { motion } from 'framer-motion';
 
 interface GlassInputProps extends Omit<InputHTMLAttributes<HTMLInputElement>, 'size'> {
     label?: string;

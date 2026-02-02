@@ -36,6 +36,7 @@ export function GlassModal({
     const [mounted, setMounted] = useState(false);
 
     useEffect(() => {
+        // eslint-disable-next-line
         setMounted(true);
     }, []);
 
@@ -187,6 +188,7 @@ export function GlassDrawer({
     const [mounted, setMounted] = useState(false);
 
     useEffect(() => {
+        // eslint-disable-next-line
         setMounted(true);
     }, []);
 

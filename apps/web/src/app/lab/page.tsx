@@ -5,7 +5,7 @@ import dynamic from 'next/dynamic';
 import { motion } from 'framer-motion';
 import { GlassNavbar } from '@/components/ui/GlassNavbar';
 import { GlassCard, GlassCardHeader, GlassCardContent } from '@/components/ui/GlassCard';
-import { GlassButton, GlassIconButton } from '@/components/ui/GlassButton';
+import { GlassButton } from '@/components/ui/GlassButton';
 import { GlassInput } from '@/components/ui/GlassInput';
 
 const NeuralCanvas = dynamic(
@@ -211,8 +211,15 @@ export default function LabPage() {
         setIsRunning(false);
     };
 
+    const [now, setNow] = useState<number | null>(null);
+    useEffect(() => {
+        // eslint-disable-next-line
+        setNow(Date.now());
+    }, []);
+
     const formatTime = (date: Date) => {
-        const diff = (Date.now() - date.getTime()) / 1000 / 60;
+        if (!now) return '...';
+        const diff = (now - date.getTime()) / 1000 / 60;
         if (diff < 60) return `${Math.round(diff)}m ago`;
         if (diff < 1440) return `${Math.round(diff / 60)}h ago`;
         return `${Math.round(diff / 1440)}d ago`;

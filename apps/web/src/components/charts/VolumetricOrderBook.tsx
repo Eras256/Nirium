@@ -1,7 +1,6 @@
 'use client';
 
-import { useMemo, useState } from 'react';
-import { motion } from 'framer-motion';
+import { useMemo } from 'react';
 
 interface OrderLevel {
     price: number;

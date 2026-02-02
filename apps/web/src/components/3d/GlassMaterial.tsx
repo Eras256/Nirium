@@ -1,6 +1,6 @@
 'use client';
 
-import { forwardRef, useMemo, useRef } from 'react';
+import { forwardRef, useRef } from 'react';
 import { useFrame } from '@react-three/fiber';
 import { MeshTransmissionMaterial, RoundedBox, Float } from '@react-three/drei';
 import * as THREE from 'three';
@@ -115,16 +115,16 @@ GlassPanel.displayName = 'GlassPanel';
 /**
  * GlassCard - A higher-level component that combines GlassPanel with HTML content overlay
  */
-interface GlassCardProps extends Omit<GlassPanelProps, 'children'> {
+export interface GlassCardProps extends Omit<GlassPanelProps, 'children'> {
     htmlContent?: React.ReactNode;
     glassOpacity?: number;
 }
 
 export function GlassCard({
-    htmlContent,
-    glassOpacity = 0.8,
+    _htmlContent,
+    _glassOpacity,
     ...props
-}: GlassCardProps) {
+}: GlassCardProps & { _htmlContent?: React.ReactNode; _glassOpacity?: number }) {
     return (
         <group>
             <GlassPanel {...props} />
@@ -150,11 +150,11 @@ export function GlassSphere({
     radius = 0.5,
     position = [0, 0, 0],
     color = '#ffffff',
-    emissive = '#00f3ff',
-    emissiveIntensity = 0.3,
+    _emissive,
+    _emissiveIntensity,
     transmission = 0.9,
     thickness = 2,
-}: GlassSphereProps) {
+}: GlassSphereProps & { _emissive?: string; _emissiveIntensity?: number }) {
     const meshRef = useRef<THREE.Mesh>(null);
 
     useFrame((state) => {
