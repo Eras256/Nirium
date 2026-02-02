@@ -1,8 +1,8 @@
 import { Contract, Keypair, Address, nativeToScVal, rpc } from '@stellar/stellar-sdk';
 import { server, networkPassphrase } from '@/lib/stellar/stellarConfig';
 
-const SENTINEL_ID = 'C...'; // Tu Contract ID mock o real si lo tienes
-// Para test simular usamos cuentas generadas que actúan como signers
+const SENTINEL_ID = 'C...'; // Your Contract ID (mock or real if available)
+// For simulation tests, we use generated accounts as signers
 const admin = Keypair.random();
 const attacker = Keypair.random();
 
@@ -13,32 +13,32 @@ describe('Nirium Sentinel: Security Audit & Attack Simulation', () => {
 
     const contract = new Contract(SENTINEL_ID);
 
-    // 1. ATAQUE: Re-inicialización
+    // 1. ATTACK: Re-initialization
     test('Attack: Re-initialization should fail', async () => {
         try {
             const tx = contract.call('initialize',
                 nativeToScVal(attacker.publicKey(), { type: 'address' }),
                 nativeToScVal(attacker.publicKey(), { type: 'address' })
             );
-            // Esto debería lanzar un error en Soroban si ya está inicializado
-            // Notar que esto es solo una prueba de concepto E2E
+            // This should throw an error in Soroban if it is already initialized
+            // Note that this is only an E2E proof of concept
             const simulation = await server.simulateTransaction(tx as any);
 
             if (rpc.Api.isSimulationSuccess(simulation)) {
-                fail('El contrato permitió re-inicializarse');
+                fail('The contract allowed re-initialization');
             } else {
-                console.log('✅ Bloqueo de re-inicialización confirmado.');
+                console.log('✅ Re-initialization block confirmed.');
             }
         } catch (e) {
-            console.log('✅ Bloqueo de re-inicialización confirmado (excepción RPC).');
+            console.log('✅ Re-initialization block confirmed (RPC exception).');
         }
     });
 
-    // 2. ATAQUE: Sweep no autorizado
+    // 2. ATTACK: Unauthorized Sweep
     test('Attack: Unauthorized sweep to malicious address', async () => {
         const maliciousDest = Keypair.random().publicKey();
 
-        // Intentamos llamar a sweep_to_yield como el atacante
+        // Attempting to call sweep_to_yield as the attacker
         const op = contract.call('sweep_to_yield',
             nativeToScVal('USDC_ADDR', { type: 'address' }),
             nativeToScVal(maliciousDest, { type: 'address' }),
@@ -47,29 +47,29 @@ describe('Nirium Sentinel: Security Audit & Attack Simulation', () => {
 
         const simulation = await server.simulateTransaction(op as any);
 
-        // Verificamos que la simulación falle por falta de auth del Admin
+        // Verify that the simulation fails due to lack of Admin auth
         if (rpc.Api.isSimulationSuccess(simulation)) {
-            console.log('⚠️ Simulación: Verifica manualmente que el servidor devolvió error de Auth.');
-            // fail('El contrato permitió sweep sin permisos');
+            console.log('⚠️ Simulation: Manually verify that the server returned an Auth error.');
+            // fail('The contract allowed sweep without permission');
         } else {
-            console.log('✅ Ataque de Sweep bloqueado por RBAC (simulación errónea esperada).');
+            console.log('✅ Sweep attack blocked by RBAC (expected error simulation).');
         }
     });
 
-    // 3. ATAQUE: Extracción de Tesorería
+    // 3. ATTACK: Treasury Extraction
     test('Attack: Emergency withdraw by non-admin', async () => {
         const op = contract.call('emergency_withdraw',
             nativeToScVal('USDC_ADDR', { type: 'address' }),
             nativeToScVal(10000, { type: 'i128' })
         );
 
-        // Firmamos con la clave del atacante
+        // Signed with the attacker's key
         const result = await server.simulateTransaction(op as any);
 
         if (!rpc.Api.isSimulationSuccess(result)) {
-            console.log('✅ Retiro de emergencia protegido.');
+            console.log('✅ Emergency withdrawal protected.');
         } else {
-            console.log('⚠️ Simulación: Verifica error de auth.');
+            console.log('⚠️ Simulation: Verify auth error.');
         }
     });
 });

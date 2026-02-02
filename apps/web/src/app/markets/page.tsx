@@ -55,7 +55,7 @@ export default function MarketsPage() {
                         className="mb-8"
                     >
                         <h1 className="text-3xl md:text-4xl font-bold text-white mb-2">
-                            Mercados <span className="gradient-text">Cuánticos</span>
+                            Neural <span className="gradient-text">Markets</span>
                         </h1>
                         <p className="text-white/50">
                             Trade Stellar assets with Real-time Institutional Depth Chart
