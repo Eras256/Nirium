@@ -169,11 +169,12 @@ export class X402Client {
             }
 
             return txHash;
-        } catch (error: any) {
+        } catch (error: unknown) {
+            const err = error as Error;
             throw this.createError(
                 'PAYMENT_FAILED',
-                `Payment failed: ${error.message}`,
-                { originalError: error }
+                `Payment failed: ${err.message || 'Unknown error'}`,
+                { originalError: err }
             );
         }
     }

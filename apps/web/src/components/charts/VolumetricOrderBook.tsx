@@ -42,7 +42,6 @@ const generateDepthData = () => {
 
 export function VolumetricOrderBook({ height = 400 }: { className?: string, height?: number }) {
     const { bids, asks, maxTotal } = useMemo(() => generateDepthData(), []);
-    const [hoverPrice, setHoverPrice] = useState<number | null>(null);
 
     // SVG scaling helpers
     const width = 100; // viewBox width units

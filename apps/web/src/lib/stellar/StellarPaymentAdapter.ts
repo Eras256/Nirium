@@ -167,10 +167,12 @@ export class StellarPaymentAdapter {
                 resultXdr: response.result_xdr,
                 successful: response.successful,
             };
-        } catch (error: any) {
-            if (error.response?.data?.extras?.result_codes) {
+        } catch (error: unknown) {
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            const sdkError = error as any;
+            if (sdkError.response?.data?.extras?.result_codes) {
                 throw new Error(
-                    `Transaction failed: ${JSON.stringify(error.response.data.extras.result_codes)}`
+                    `Transaction failed: ${JSON.stringify(sdkError.response.data.extras.result_codes)}`
                 );
             }
             throw error;
@@ -231,7 +233,6 @@ export class StellarPaymentAdapter {
         }
 
         return StellarSdk.TransactionBuilder.buildFeeBumpTransaction(
-            // @ts-ignore - Type mismatch in SDK
             this.keypair || StellarSdk.Keypair.fromPublicKey(this.config.facilitatorPublicKey),
             baseFee.toString(),
             innerTransaction,
@@ -258,6 +259,7 @@ export class StellarPaymentAdapter {
         const key = publicKey || this.getPublicKey();
         const account = await this.server.loadAccount(key);
 
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         return account.balances.map((balance: any) => ({
             asset: balance.asset_type === 'native' ? 'XLM' : balance.asset_code,
             balance: balance.balance,
