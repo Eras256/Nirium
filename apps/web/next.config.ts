@@ -12,22 +12,7 @@ const nextConfig: NextConfig = {
   ],
 
   // Turbopack configuration for GLSL files
-  turbopack: {
-    rules: {
-      '*.glsl': {
-        loaders: ['raw-loader'],
-        as: '*.js',
-      },
-      '*.vert': {
-        loaders: ['raw-loader'],
-        as: '*.js',
-      },
-      '*.frag': {
-        loaders: ['raw-loader'],
-        as: '*.js',
-      },
-    },
-  },
+
 
   // Configure webpack for GLSL shader imports (fallback for non-turbo builds)
   webpack: (config) => {
