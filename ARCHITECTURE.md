@@ -1,374 +1,103 @@
-# Nirium: Master Architecture Document v1.0
-> **Institutional Edition 2026** | Stellar Protocol 25 (X-Ray) + Neural UI
+# Nirium Architecture: Hub & Spoke Model (v2.0)
+> **Institutional Edition** | Protocol 25 | Hub & Spoke Design
 
 ---
 
-## 1. System Overview
+## 1. System Topology: Hub & Spoke
 
-Nirium is a **sovereign decentralized infrastructure** that fuses immersive visual experiences with absolute mathematical security. It operates on three fundamental pillars:
+The architecture shifts from isolated contracts to a centralized "Hub" (The Sentinel) managing peripheral "Spokes" (Specialized Contracts).
 
-```
-┌─────────────────────────────────────────────────────────────────────────────┐
-│                                  NIRIUM                                     │
-├─────────────────────────────────────────────────────────────────────────────┤
-│                                                                             │
-│  ┌───────────────────┐   ┌───────────────────┐   ┌───────────────────────┐ │
-│  │   NEURAL UI       │   │   ZK-PRIVACY      │   │   x402 ECONOMY        │ │
-│  │   (Frontend)      │◄─►│   (Backend)       │◄─►│   (Integration)       │ │
-│  └───────────────────┘   └───────────────────┘   └───────────────────────┘ │
-│         │                        │                        │                 │
-│         ▼                        ▼                        ▼                 │
-│  ┌─────────────┐         ┌─────────────┐         ┌─────────────────────┐   │
-│  │ Next.js 16  │         │ Soroban     │         │ HTTP 402 Protocol   │   │
-│  │ R3F/WebGL   │         │ Rust SDK    │         │ Stellar Payments    │   │
-│  │ GPGPU       │         │ ZK-SNARKs   │         │ Agent Subscriptions │   │
-│  └─────────────┘         └─────────────┘         └─────────────────────┘   │
-│                                                                             │
-└─────────────────────────────────────────────────────────────────────────────┘
-```
-
----
-
-## 2. Frontend Architecture: Neural UI
-
-### 2.1 Technology Stack
-
-| Layer | Technology | Version | Purpose |
-|-------|------------|---------|---------|
-| Framework | Next.js | 16.x | App Router, RSC, Streaming |
-| Language | TypeScript | 5.7+ | Type safety |
-| 3D Engine | React Three Fiber | 9.x | WebGL abstraction |
-| 3D Utils | @react-three/drei | latest | Materials, helpers |
-| Post-processing | @react-three/postprocessing | latest | Bloom, effects |
-| Styling | Tailwind CSS | 4.0 | Utility-first CSS |
-| Charts | Recharts | latest | Data visualization |
-| State | Zustand | latest | Global state |
-
-### 2.2 Visual System Architecture
-
-```
-┌─────────────────────────────────────────────────────────────────────────────┐
-│                           RENDERING PIPELINE                                │
-├─────────────────────────────────────────────────────────────────────────────┤
-│                                                                             │
-│  ┌─────────────┐    ┌─────────────┐    ┌─────────────┐    ┌─────────────┐  │
-│  │   Scene     │───►│   GPGPU     │───►│   Glass     │───►│   Post      │  │
-│  │   Setup     │    │   Compute   │    │   Material  │    │   Process   │  │
-│  └─────────────┘    └─────────────┘    └─────────────┘    └─────────────┘  │
-│        │                  │                  │                  │          │
-│        ▼                  ▼                  ▼                  ▼          │
-│  ┌─────────────┐    ┌─────────────┐    ┌─────────────┐    ┌─────────────┐  │
-│  │ Camera      │    │ 50K Neural  │    │ Transmission│    │ Bloom       │  │
-│  │ Controls    │    │ Particles   │    │ Refraction  │    │ Chromatic   │  │
-│  │ Lighting    │    │ Synapses    │    │ Aberration  │    │ Vignette    │  │
-│  └─────────────┘    └─────────────┘    └─────────────┘    └─────────────┘  │
-│                                                                             │
-└─────────────────────────────────────────────────────────────────────────────┘
-```
-
-### 2.3 Neural Particle System (GPGPU)
-
-The neural network simulation uses GPU-accelerated computing:
-
-| Parameter | Value | Description |
-|-----------|-------|-------------|
-| Particle Count | 50,000 | Neural nodes |
-| Synapse Threshold (ε) | 0.1 | Distance for connection |
-| Cursor Force (k) | 15.0 | Attractor strength |
-| Force Falloff | 1/r² | Inverse square law |
-| Frame Rate Target | 60fps | Smooth animation |
-
-**GLSL Shader Mathematics:**
-```glsl
-// Cursor attractor force
-vec3 cursorForce = normalize(cursorPos - particlePos) * (k / (distance * distance));
-
-// Synapse opacity calculation
-float opacity = 1.0 - (distance / epsilon);
-```
-
-### 2.4 MeshTransmissionMaterial Configuration
-
-| Property | Value | Effect |
-|----------|-------|--------|
-| transmission | 1.0 | Full transparency |
-| thickness | 3.5 | Substantial glass depth |
-| roughness | 0.15 | Frosted polish |
-| chromaticAberration | 0.06 | RGB edge separation |
-| anisotropy | 0.5 | Directional blur |
-| distortion | 0.2 | Liquid deformation |
-
-### 2.5 Navigation Architecture
-
-```
-NAVBAR (Floating Glass Container)
-├── 📊 Dashboard (Panel de Control Nirium)
-│   ├── TVL Charts (Recharts + R3F wrapper)
-│   ├── Wallet Balance Display
-│   ├── x402 Channel Status
-│   └── Validator Health Metrics
-│
-├── 📈 Markets (Mercados Cuánticos)
-│   ├── Swap Interface (XLM, USDC, AQUA)
-│   ├── 3D Volumetric Order Book
-│   │   └── Crystalline pillars for liquidity depth
-│   └── Trade Execution Shockwaves
-│
-├── 🗳️ Governance (Salón de Gobernanza)
-│   ├── Quadratic Voting System
-│   ├── ZK-Proof Identity Verification
-│   ├── Floating Proposal Orbs (Metaballs)
-│   └── Real-time Approval Gradients
-│
-└── 🔬 Neural Lab (Laboratorio x402)
-    ├── API Key Management Console
-    ├── Monaco Editor Integration
-    ├── Transaction Debugger
-    └── Agent Subscription Manager
+```mermaid
+graph TD
+    User((Institutional User)) -->|Deposits| Pool[ZK-Identity Pool]
+    User -->|Interacts| UI[Neural UI / Next.js 16]
+    
+    Agent((AI Agent)) -->|x402 Payment| Gate[Payment Gate]
+    Agent -->|API Request| Proxy[Next.js Proxy Interceptor]
+    
+    subgraph "On-Chain Hub (Soroban)"
+        Sentinel[Treasury Sentinel (HUB)]
+        Pool -.->|Liquidity| Sentinel
+        Gate -.->|Revenue| Sentinel
+        
+        DEX[Stellar DEX]
+        Sentinel -->|Yield Sweep| DEX
+    end
+    
+    subgraph "Off-Chain"
+        Proxy -->|Verify Payment| Gate
+    end
 ```
 
 ---
 
-## 3. Backend Architecture: Stellar Protocol 25 (X-Ray)
+## 2. Core Contracts (The Spokes)
 
-### 3.1 Soroban Contract Architecture
+### 2.1 Identity Pool (Privacy Spoke)
+*   **Role**: Anonymizes funds. Users deposit public funds, receive a ZK-Commitment, and withdraw to fresh addresses.
+*   **Tech**:
+    *   **Merkle Tree**: Depth 20, Poseidon Hash ($t=3$).
+    *   **Verification**: Uses `bn254_multi_pairing_check` host function (Protocol 25) for Groth16 proofs.
+    *   **Anti-Spam**: Minimum deposit thresholds, fee-bump requirements.
 
-```
-┌─────────────────────────────────────────────────────────────────────────────┐
-│                        SOROBAN CONTRACT SYSTEM                              │
-├─────────────────────────────────────────────────────────────────────────────┤
-│                                                                             │
-│  ┌───────────────────────────────────────────────────────────────────────┐ │
-│  │                          Verifier.rs                                  │ │
-│  │  ┌─────────────┐  ┌─────────────┐  ┌─────────────────────────────┐   │ │
-│  │  │bn254_g1_add │  │bn254_g1_mul │  │bn254_multi_pairing_check    │   │ │
-│  │  └─────────────┘  └─────────────┘  └─────────────────────────────┘   │ │
-│  │                    ↓ Groth16 Proof Verification ↓                     │ │
-│  └───────────────────────────────────────────────────────────────────────┘ │
-│                                    │                                        │
-│  ┌───────────────────────────────────────────────────────────────────────┐ │
-│  │                       IdentityPool.rs                                 │ │
-│  │  ┌─────────────────┐  ┌─────────────────┐  ┌─────────────────────┐   │ │
-│  │  │ Merkle Tree     │  │ Poseidon Hash   │  │ Nullifier Registry  │   │ │
-│  │  │ (Persistent)    │  │ (t=3, rate=2)   │  │ (Temporary/TTL)     │   │ │
-│  │  └─────────────────┘  └─────────────────┘  └─────────────────────┘   │ │
-│  └───────────────────────────────────────────────────────────────────────┘ │
-│                                    │                                        │
-│  ┌───────────────────────────────────────────────────────────────────────┐ │
-│  │                       PaymentGate.rs                                  │ │
-│  │  ┌─────────────────┐  ┌─────────────────┐  ┌─────────────────────┐   │ │
-│  │  │ SEP-41 Token    │  │ PaymentAuthorized│  │ Access Token        │   │ │
-│  │  │ Acceptance      │  │ Event Emission   │  │ Issuance (NFT/VC)   │   │ │
-│  │  └─────────────────┘  └─────────────────┘  └─────────────────────┘   │ │
-│  └───────────────────────────────────────────────────────────────────────┘ │
-│                                                                             │
-└─────────────────────────────────────────────────────────────────────────────┘
-```
+### 2.2 Payment Gate (Revenue Spoke)
+*   **Role**: Monetizes API access via x402.
+*   **Flow**:
+    1.  Receives Payment (USDC/XLM).
+    2.  Emits `PaymentAuthorized(agent, tier, amount)`.
+    3.  Forwards funds **immediately** to the Sentinel (Hub). It holds 0 liquidity.
 
-### 3.2 Cryptographic Primitives
-
-#### BN254 Curve Operations (CAP-0074)
-```rust
-// Host functions from Stellar Protocol 25
-env.bn254_g1_add(point_a, point_b)?;
-env.bn254_g1_mul(point, scalar)?;
-env.bn254_multi_pairing_check(pairs)?; // e(A,B)·e(C,D)... = 1_GT
-```
-
-#### Poseidon Hash Configuration
-| Parameter | Value | Purpose |
-|-----------|-------|---------|
-| Width (t) | 3 | State size |
-| Rate | 2 | Elements per round |
-| Inputs | secret + nullifier | Identity commitment |
-
-### 3.3 Storage Strategy
-
-| Storage Type | Use Case | TTL |
-|--------------|----------|-----|
-| Persistent | Merkle roots, contract state | Permanent |
-| Temporary | Nullifier maps | 30 days |
-| Instance | Configuration, admin keys | Contract lifetime |
+### 2.3 Treasury Sentinel (The Hub)
+*   **Role**: Active Liquidity Manager.
+*   **Logic**:
+    *   **Aggregation**: Receives streams from Payment Gate and fees from Identity Pool.
+    *   **Yield Sweeping**:
+        *   `if balance(USDC) > 10,000`:
+        *   Executing `swap(USDC -> yUSDC)` on Stellar DEX.
+    *   **Access Control**:
+        *   `Admin`: Can change sweep parameters.
+        *   `Operator (Agent)`: Can request operational funds (up to allowance).
 
 ---
 
-## 4. x402 Protocol Integration
+## 3. Frontend Architecture (Neural UI)
 
-### 4.1 Payment Flow Architecture
+### 3.1 The "Glass" Engine
+We abandon standard CSS blurring for physics-based rendering.
+*   **Material**: `MeshTransmissionMaterial` (R3F).
+*   **Properties**:
+    *   **Refraction**: True background distortion.
+    *   **Chromatic Aberration**: Premium spectral separation at edges.
+    *   **Fresnel**: Highlight intensity based on viewing angle.
 
-```
-┌─────────────────────────────────────────────────────────────────────────────┐
-│                           x402 PAYMENT FLOW                                 │
-├─────────────────────────────────────────────────────────────────────────────┤
-│                                                                             │
-│  ┌─────────┐    ┌─────────┐    ┌─────────┐    ┌─────────┐    ┌─────────┐  │
-│  │  Agent  │───►│ Proxy   │───►│  402    │───►│ Stellar │───►│  API    │  │
-│  │ Request │    │ Check   │    │Response │    │ Payment │    │ Access  │  │
-│  └─────────┘    └─────────┘    └─────────┘    └─────────┘    └─────────┘  │
-│       │              │              │              │              │        │
-│       │         Authorization      │              │              │        │
-│       │         Header Check       │              │              │        │
-│       │              │              │              │              │        │
-│       │         ┌────▼────┐        │              │              │        │
-│       │         │ Missing │        │              │              │        │
-│       │         │ x402    │────────┘              │              │        │
-│       │         │ Token   │                       │              │        │
-│       │         └─────────┘                       │              │        │
-│       │                                           │              │        │
-│       │    ◄──────────── 402 Response ────────────┘              │        │
-│       │         x402-chain: stellar                              │        │
-│       │         x402-amount: 5.0                                 │        │
-│       │         x402-destination: G-VAULT                        │        │
-│       │                                                          │        │
-│       ▼                                                          │        │
-│  ┌─────────┐                                                     │        │
-│  │ Build   │────────────────────────────────────────────────────►│        │
-│  │ Tx +    │                                                     │        │
-│  │ Sign    │                                                     │        │
-│  └─────────┘                                                     │        │
-│                                                                             │
-└─────────────────────────────────────────────────────────────────────────────┘
-```
+### 3.2 GPGPU Neural Field
+*   **Simulation**: 50,000 Particles using FBO (Frame Buffer Object) techniques.
+*   **Interactivity**:
+    *   **Cursor Attractor**: $F = k / r^2$ force field.
+    *   **Curl Noise**: Simulates fluid turbulence in the void.
+*   **Performance**: All logic executes on GPU (Vertex Shaders), CPU only sends `uMouse` uniforms.
 
-### 4.2 HTTP Headers Specification
-
-| Header | Value | Description |
-|--------|-------|-------------|
-| x402-chain | stellar | Target blockchain |
-| x402-token | USDC_CONTRACT_ID | Payment token |
-| x402-amount | 5.0 | Required payment |
-| x402-destination | G-NIRIUM-VAULT... | Recipient address |
-| x402-memo | tx_hash | Transaction reference |
+### 3.3 x402 Proxy Interceptor
+An edge-compatible request handler in `src/proxy.ts`.
+*   **Interceptor Flow**:
+    1.  Incoming Request -> `check_header('Authorization')`
+    2.  If missing -> Return `402 Payment Required` + `x402-chain: stellar` + `x402-destination: <SENTINEL_ADDR>`.
+    3.  If present (`Authorization: x402 <TX_HASH>`) -> Verify Tx on Horizon -> Grant Access.
 
 ---
 
-## 5. Security Architecture
+## 4. Integration & Security
 
-### 5.1 Defense Layers
+### 4.1 Security Standard (Veridise V5)
+*   **Fuzzing**: `cargo-fuzz` harness targeting the Sentinel's solvency invariant.
+*   **Circuit Breakers**: Global `Pausable` implementation controlled by Admin Multi-Sig.
+*   **RBAC**: Strict separation of `Admin` (Cold Storage) vs `Operator` (Hot Wallet Agents).
 
-```
-┌─────────────────────────────────────────────────────────────────────────────┐
-│                         SECURITY LAYERS                                     │
-├─────────────────────────────────────────────────────────────────────────────┤
-│                                                                             │
-│  Layer 1: Input Validation                                                  │
-│  ├── Vec<T> and Map<K,V> explicit validation                               │
-│  ├── Host value injection prevention                                        │
-│  └── Type boundary checks                                                   │
-│                                                                             │
-│  Layer 2: Fuzzing (cargo-fuzz)                                             │
-│  ├── Random transaction bombardment                                         │
-│  ├── Invariant: deposits >= withdrawals + balance                          │
-│  ├── Invariant: nullifier uniqueness                                       │
-│  └── Admin function access control                                          │
-│                                                                             │
-│  Layer 3: Formal Verification (Kani)                                        │
-│  ├── Integer overflow/underflow proofs                                      │
-│  ├── Elliptic curve arithmetic safety                                       │
-│  └── State machine correctness                                              │
-│                                                                             │
-│  Layer 4: Panic Handling                                                    │
-│  ├── panic_with_error! macro usage                                          │
-│  ├── Controlled error propagation                                           │
-│  └── Distinguishable logic vs crash errors                                  │
-│                                                                             │
-└─────────────────────────────────────────────────────────────────────────────┘
-```
-
-### 5.2 Trust Assumptions
-
-| Role | Permissions | Trust Level |
-|------|-------------|-------------|
-| Admin | Update verifier, pause contracts | HIGH |
-| Facilitator | Submit fee-bump transactions | MEDIUM |
-| User | Deposit, withdraw, vote | LOW |
-| Agent | x402 payments, API access | LOW |
+### 4.2 Data Flow
+*   **Payments**: Agent -> Payment Gate -> Sentinel -> DEX (Yield).
+*   **Privacy**: User -> Identity Pool -> (ZK Proof) -> Fresh Address.
 
 ---
 
-## 6. Directory Structure
-
-```
-nirium/
-├── apps/
-│   └── web/                          # Next.js 16 Application
-│       ├── app/
-│       │   ├── layout.tsx
-│       │   ├── page.tsx
-│       │   ├── dashboard/
-│       │   ├── markets/
-│       │   ├── governance/
-│       │   └── lab/
-│       ├── components/
-│       │   ├── 3d/
-│       │   │   ├── NeuralCanvas.tsx
-│       │   │   ├── NeuralParticles.tsx
-│       │   │   ├── GlassMaterial.tsx
-│       │   │   └── shaders/
-│       │   ├── ui/
-│       │   │   ├── GlassNavbar.tsx
-│       │   │   ├── GlassCard.tsx
-│       │   │   └── ...
-│       │   └── charts/
-│       ├── lib/
-│       │   ├── stellar/
-│       │   │   └── StellarPaymentAdapter.ts
-│       │   └── x402/
-│       │       └── paymentClient.ts
-│       └── proxy.ts
-│
-├── contracts/                         # Soroban Rust Contracts
-│   ├── verifier/
-│   │   ├── src/
-│   │   │   └── lib.rs
-│   │   └── Cargo.toml
-│   ├── identity-pool/
-│   │   ├── src/
-│   │   │   └── lib.rs
-│   │   └── Cargo.toml
-│   ├── payment-gate/
-│   │   ├── src/
-│   │   │   └── lib.rs
-│   │   └── Cargo.toml
-│   └── Cargo.toml                    # Workspace manifest
-│
-├── tests/
-│   ├── e2e/                          # Playwright tests
-│   └── fuzz/                         # Cargo fuzz harnesses
-│
-├── docs/
-│   ├── ARCHITECTURE.md
-│   ├── SECURITY.md
-│   └── API.md
-│
-├── Makefile
-├── docker-compose.yml
-└── README.md
-```
-
----
-
-## 7. Deployment Targets
-
-| Environment | Network | Purpose |
-|-------------|---------|---------|
-| Development | Stellar Testnet | Local testing |
-| Staging | Stellar Testnet | Integration testing |
-| Production | Stellar Mainnet | Live deployment |
-
----
-
-## 8. Performance Targets
-
-| Metric | Target | Measurement |
-|--------|--------|-------------|
-| First Contentful Paint | < 1.5s | Lighthouse |
-| WebGL Frame Rate | 60fps | Chrome DevTools |
-| Contract Execution | < 100ms | Soroban Profiler |
-| ZK Verification | < 200ms | Host function timing |
-
----
-
-**Document Version:** 1.0  
-**Last Updated:** 2026-02-01  
-**Author:** Nirium Team
+**Author**: Nirium Architect  
+**Target**: Mainnet Protocol 25

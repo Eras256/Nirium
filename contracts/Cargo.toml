@@ -4,6 +4,7 @@ members = [
     "verifier",
     "identity-pool",
     "payment-gate",
+    "sentinel",
 ]
 
 [workspace.package]

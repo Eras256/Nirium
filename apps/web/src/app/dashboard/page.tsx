@@ -1,11 +1,14 @@
 'use client';
 
+import { useState } from 'react';
 import dynamic from 'next/dynamic';
 import { motion } from 'framer-motion';
 import { GlassNavbar } from '@/components/ui/GlassNavbar';
 import { GlassCard, GlassCardHeader, GlassCardContent } from '@/components/ui/GlassCard';
 import { GlassButton } from '@/components/ui/GlassButton';
 import { LiquidityChart, VolumeChart } from '@/components/charts/LiquidityChart';
+import { TreasuryView } from '@/components/dashboard/TreasuryView';
+import { PrivacyControl } from '@/components/dashboard/PrivacyControl';
 import { NIRIUM_CONTRACTS } from '@/lib/contracts';
 
 const NeuralCanvas = dynamic(
@@ -27,12 +30,16 @@ const channelStatus = [
     { id: 'x402-storage', name: 'Distributed Storage', status: 'pending', usage: 0 },
 ];
 
-
-
 export default function DashboardPage() {
+    const [isGeneratingProof, setIsGeneratingProof] = useState(false);
+
     return (
         <main className="relative min-h-screen">
-            <NeuralCanvas />
+            {/* Neural Background reacts to Privacy State */}
+            <NeuralCanvas
+                intensity={isGeneratingProof ? 3.0 : 1.0}
+                color={isGeneratingProof ? '#a855f7' : undefined} // Purple when computing ZK, default Cyan otherwise
+            />
             <GlassNavbar />
 
             <div className="content-layer pt-28 pb-12 px-4">
@@ -65,79 +72,13 @@ export default function DashboardPage() {
                             </GlassCard>
                         </motion.div>
 
-                        {/* Wallet Card */}
+                        {/* Treasury Sentinel Card (Replaces static Wallet) */}
                         <motion.div
                             initial={{ opacity: 0, y: 20 }}
                             animate={{ opacity: 1, y: 0 }}
                             transition={{ delay: 0.2 }}
                         >
-                            <GlassCard variant="glow" size="lg" className="h-full">
-                                <GlassCardHeader
-                                    title="Wallet"
-                                    subtitle={walletData.address}
-                                    icon={<span className="text-cyan-400">◈</span>}
-                                />
-                                <GlassCardContent>
-                                    <div className="space-y-4">
-                                        <div className="flex justify-between items-center py-3 border-b border-white/10">
-                                            <div className="flex items-center gap-3">
-                                                <div className="w-8 h-8 rounded-full bg-gradient-to-r from-blue-400 to-blue-600 flex items-center justify-center text-xs font-bold">
-                                                    XLM
-                                                </div>
-                                                <span className="text-white">Stellar Lumens</span>
-                                            </div>
-                                            <div className="text-right">
-                                                <div className="text-white font-medium">
-                                                    {walletData.xlmBalance.toLocaleString()}
-                                                </div>
-                                                <div className="text-white/40 text-sm">
-                                                    ${(walletData.xlmBalance * 0.35).toLocaleString()}
-                                                </div>
-                                            </div>
-                                        </div>
-
-                                        <div className="flex justify-between items-center py-3 border-b border-white/10">
-                                            <div className="flex items-center gap-3">
-                                                <div className="w-8 h-8 rounded-full bg-gradient-to-r from-green-400 to-green-600 flex items-center justify-center text-xs font-bold">
-                                                    USDC
-                                                </div>
-                                                <span className="text-white">USD Coin</span>
-                                            </div>
-                                            <div className="text-right">
-                                                <div className="text-white font-medium">
-                                                    {walletData.usdcBalance.toLocaleString()}
-                                                </div>
-                                                <div className="text-white/40 text-sm">
-                                                    ${walletData.usdcBalance.toLocaleString()}
-                                                </div>
-                                            </div>
-                                        </div>
-
-                                        <div className="flex justify-between items-center py-3">
-                                            <div className="flex items-center gap-3">
-                                                <div className="w-8 h-8 rounded-full bg-gradient-to-r from-purple-400 to-purple-600 flex items-center justify-center text-xs font-bold">
-                                                    AQUA
-                                                </div>
-                                                <span className="text-white">Aquarius</span>
-                                            </div>
-                                            <div className="text-right">
-                                                <div className="text-white font-medium">
-                                                    {walletData.aquaBalance.toLocaleString()}
-                                                </div>
-                                                <div className="text-white/40 text-sm">
-                                                    ${(walletData.aquaBalance * 0.008).toLocaleString()}
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                    <div className="mt-6">
-                                        <GlassButton variant="primary" fullWidth>
-                                            Deposit
-                                        </GlassButton>
-                                    </div>
-                                </GlassCardContent>
-                            </GlassCard>
+                            <TreasuryView />
                         </motion.div>
 
                         {/* Volume Chart */}
@@ -151,13 +92,19 @@ export default function DashboardPage() {
                             </GlassCard>
                         </motion.div>
 
-                        {/* x402 Channels */}
+                        {/* x402 Channels & Privacy Control */}
                         <motion.div
                             initial={{ opacity: 0, y: 20 }}
                             animate={{ opacity: 1, y: 0 }}
                             transition={{ delay: 0.4 }}
+                            className="flex flex-col gap-6"
                         >
-                            <GlassCard variant="default" size="lg" className="h-full">
+                            {/* Privacy Layer Control */}
+                            <PrivacyControl
+                                onGeneratingChange={setIsGeneratingProof}
+                            />
+
+                            <GlassCard variant="default" size="lg" className="flex-1">
                                 <GlassCardHeader
                                     title="x402 Channels"
                                     subtitle="Payment channel status"
