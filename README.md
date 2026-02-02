@@ -49,9 +49,10 @@ Built for the machine-to-machine era. Nirium supports the **x402 protocol**, all
 
 | Contract | Purpose | Contract ID |
 |----------|---------|-------------|
-| **🛡️ Sentinel** | Yield Optimization & Treasury | `CDYZGBO7GEDCGQ7TZ3TCQ3PKXKCSNYTJK4CZFALT5I5YU6XNNDLOY2LC` |
-| **🔐 Verifier** | ZK-SNARK Groth16 Logic | `CATHHUZHDRULWMYSOA7OCDQWBB7DDGJ6AWNMIWKR6FIUQZMIISUJ54ZA` |
-| **🆔 Identity** | Privacy Mixer & Merkle Tree | `CCUCUIT6S4ZK3WL7Q5UYBI4KDMYDSGMQOTAC4K5AHUQI4HTCSLVJTYZY` |
+| **🛡️ Sentinel** | Hub, Yield & Treasury | `CDWCUIDKAOD7AK4M2B2O4YELJ2ZZPHQHVH4A2VVWJHEQLQPK5O2YUA47` |
+| **🔐 Verifier** | ZK-SNARK Groth16 Logic | `CDMQZ4E2AOKG4XYKVEX674A6JEGO3QPY3TAOBLJD77QAZXPTFXEIZA5W` |
+| **🆔 Identity** | Privacy Mixer & Merkle Tree | `CCE5LK3SWBEJO45L66SQ3US4SZYECS7K3Z2WKQ4LLUGJX7OFXXPNLYBK` |
+| **🎟️ Payment Gate** | x402 Machine Payments | `CBPAUF54AXBMBSXDW5KJN7IY6OOWQKQ4DPBI63QCTTFJSQMB3UX4HJCF` |
 
 ---
 
