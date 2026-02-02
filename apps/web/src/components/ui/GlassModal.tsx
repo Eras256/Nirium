@@ -91,7 +91,7 @@ export function GlassModal({
                 rounded-3xl overflow-hidden
                 backdrop-blur-2xl
                 border border-white/10
-                shadow-[0_24px_80px_rgba(0,0,0,0.5),0_0_60px_rgba(0,243,255,0.1)]
+                shadow-[0_24px_80px_rgba(0,0,0,0.5),0_0_60px_rgba(212,175,55,0.1)]
                 ${sizes[size]}
                 ${className}
               `}
@@ -106,7 +106,7 @@ export function GlassModal({
                                 className="absolute inset-0 pointer-events-none"
                                 style={{
                                     background:
-                                        'radial-gradient(circle at top, rgba(0,243,255,0.1), transparent 50%)',
+                                        'radial-gradient(circle at top, rgba(212,175,55,0.1), transparent 50%)',
                                 }}
                             />
 

@@ -23,6 +23,7 @@ export function useNiriumContracts() {
     const invokeContract = async (
         contractId: string,
         method: string,
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         args: any[] = []
     ) => {
         if (!address) throw new Error("Wallet not connected");
@@ -66,7 +67,7 @@ export function useNiriumContracts() {
 
     // --- Contract Specific Methods ---
 
-    const depositToPool = async (amount: number) => {
+    const depositToPool = async (_amount: number) => {
         // This would involve token transfer + contract call
         // For now, we just connect the ID
         console.log(`Depositing to pool: ${NIRIUM_CONTRACTS.IDENTITY_POOL}`);

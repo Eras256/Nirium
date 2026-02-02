@@ -26,6 +26,7 @@ export function useFreighter() {
             const server = new Horizon.Server(serverUrl);
             try {
                 const account = await server.loadAccount(pubKey);
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any
                 const nativeBalance = account.balances.find((b: any) => b.asset_type === 'native');
                 if (nativeBalance) {
                     setBalance(nativeBalance.balance);
