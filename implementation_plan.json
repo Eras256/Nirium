@@ -1,0 +1,165 @@
+{
+    "project": "Nirium Institutional Build 2026",
+    "version": "1.0.0",
+    "target_date": "2026-02-28",
+    "phases": [
+        {
+            "id": "phase_1",
+            "name": "Strategic Planning",
+            "status": "in_progress",
+            "tasks": [
+                {
+                    "id": "1.1",
+                    "name": "Generate Architecture Document",
+                    "artifact": "ARCHITECTURE.md",
+                    "status": "pending"
+                },
+                {
+                    "id": "1.2",
+                    "name": "Generate Implementation Graph",
+                    "artifact": "implementation_plan.json",
+                    "status": "completed"
+                },
+                {
+                    "id": "1.3",
+                    "name": "Define Security Strategy",
+                    "artifact": "SECURITY_STRATEGY.md",
+                    "status": "pending"
+                }
+            ]
+        },
+        {
+            "id": "phase_2",
+            "name": "Frontend Architecture (Neural UI)",
+            "dependencies": [
+                "phase_1"
+            ],
+            "status": "pending",
+            "tasks": [
+                {
+                    "id": "2.1",
+                    "name": "Institutional Glass Engine",
+                    "file": "src/components/ui/InstitutionalGlass.tsx",
+                    "tech": [
+                        "R3F",
+                        "MeshTransmissionMaterial"
+                    ],
+                    "specs": {
+                        "transmission": 1.0,
+                        "thickness": 3.5,
+                        "roughness": 0.15
+                    }
+                },
+                {
+                    "id": "2.2",
+                    "name": "Neural Particle System (GPGPU)",
+                    "file": "src/components/visuals/NeuralField.tsx",
+                    "tech": [
+                        "GPGPU",
+                        "FBO",
+                        "Shaders"
+                    ],
+                    "specs": {
+                        "count": 50000,
+                        "physics": "Curl Noise + Attractor"
+                    }
+                },
+                {
+                    "id": "2.3",
+                    "name": "Institutional Navbar",
+                    "components": [
+                        "Nexus Dashboard",
+                        "Quantum Markets",
+                        "Governance Hall",
+                        "Neural Lab"
+                    ],
+                    "visuals": [
+                        "Volumetric Order Book",
+                        "Metaballs Voting"
+                    ]
+                }
+            ]
+        },
+        {
+            "id": "phase_3",
+            "name": "Backend Architecture (Soroban Protocol 25)",
+            "dependencies": [
+                "phase_1"
+            ],
+            "status": "pending",
+            "tasks": [
+                {
+                    "id": "3.1",
+                    "name": "ZK-Identity Pool",
+                    "path": "contracts/identity-pool",
+                    "tech": [
+                        "soroban-poseidon",
+                        "Groth16 Verifier"
+                    ],
+                    "critical": "Use native bn254_multi_pairing_check host function"
+                },
+                {
+                    "id": "3.2",
+                    "name": "Treasury Sentinel",
+                    "path": "contracts/sentinel",
+                    "logic": [
+                        "Yield Sweeper",
+                        "AccessControl"
+                    ],
+                    "functions": [
+                        "sweep_idle_funds()",
+                        "permit_agent()"
+                    ]
+                }
+            ]
+        },
+        {
+            "id": "phase_4",
+            "name": "Integrations (x402 & Middleware)",
+            "dependencies": [
+                "phase_2",
+                "phase_3"
+            ],
+            "status": "pending",
+            "tasks": [
+                {
+                    "id": "4.1",
+                    "name": "x402 Proxy Interceptor",
+                    "file": "src/proxy.ts",
+                    "logic": "Intercept /api calls, enforce 402 Payment Required"
+                },
+                {
+                    "id": "4.2",
+                    "name": "Client Payment Handler",
+                    "file": "src/lib/paymentClient.ts",
+                    "logic": "Catch 402, build Fee Bump Tx, retry request"
+                }
+            ]
+        },
+        {
+            "id": "phase_5",
+            "name": "Security & Validation (Veridise V5)",
+            "dependencies": [
+                "phase_3",
+                "phase_4"
+            ],
+            "status": "pending",
+            "tasks": [
+                {
+                    "id": "5.1",
+                    "name": "Fuzzing Harness",
+                    "tool": "cargo-fuzz",
+                    "target": "contracts/sentinel",
+                    "invariant": "balance_after == balance_before + deposit - withdrawal"
+                },
+                {
+                    "id": "5.2",
+                    "name": "Formal Verification",
+                    "tool": "Kani",
+                    "target": "contracts/identity-pool",
+                    "proof": "Commitment overwrites are mathematically impossible"
+                }
+            ]
+        }
+    ]
+}

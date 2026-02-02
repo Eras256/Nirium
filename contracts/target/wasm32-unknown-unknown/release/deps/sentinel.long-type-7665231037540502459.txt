@@ -1,0 +1,1 @@
+SentinelError: From<soroban_sdk::Error>

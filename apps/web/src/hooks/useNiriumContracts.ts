@@ -1,83 +1,135 @@
 import { NIRIUM_CONTRACTS } from '@/lib/contracts';
 import { useFreighter } from './useFreighter';
-import * as StellarSdk from '@stellar/stellar-sdk';
+import {
+    rpc,
+    Contract,
+    TransactionBuilder,
+    Networks,
+    TimeoutInfinite,
+    nativeToScVal,
+    xdr
+} from '@stellar/stellar-sdk';
+import { signTransaction } from '@stellar/freighter-api';
 
-/**
- * Hook for interacting with Nirium Smart Contracts
- */
+const RPC_URL = process.env.NEXT_PUBLIC_SOROBAN_RPC_URL || 'https://soroban-testnet.stellar.org';
+
 export function useNiriumContracts() {
-    const { address, network } = useFreighter();
+    const { address } = useFreighter();
+    const server = new rpc.Server(RPC_URL);
 
-    // Helper to get a ready-to-use Server instance
-    const getServer = () => {
-        const horizonUrl = network === 'TESTNET' || !network
-            ? 'https://horizon-testnet.stellar.org'
-            : 'https://horizon.stellar.org';
-        return new StellarSdk.Horizon.Server(horizonUrl);
+    const checkConnection = () => {
+        if (!address) throw new Error("Wallet not connected");
     };
 
     /**
-     * Invite Contract Function
-     * Generic helper to invoke a Soroban contract
+     * Generic Contract Invocation
      */
     const invokeContract = async (
         contractId: string,
         method: string,
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        args: any[] = []
+        args: xdr.ScVal[] = []
     ) => {
-        if (!address) throw new Error("Wallet not connected");
+        checkConnection();
+        // rpc.Server.getAccount returns the correct Account object for TxBuilder
+        const account = await server.getAccount(address!);
 
-        // Dynamic import Freighter
-        const { signTransaction } = await import('@stellar/freighter-api');
+        const contract = new Contract(contractId);
+        const op = contract.call(method, ...args);
 
-        const server = getServer();
-        const account = await server.loadAccount(address);
-
-        // Build transaction (invoke host function)
-        const contract = new StellarSdk.Contract(contractId);
-
-        // Note: In a real app, you'd map 'args' to ScProps. 
-        // For this demo, we assume args are already ScVal or we handle empty args.
-        // This is a simplified implementation.
-        const operation = contract.call(method, ...args);
-
-        const tx = new StellarSdk.TransactionBuilder(account, {
-            fee: '100', // Base fee, Soroban might need more resources which Freighter handles or we simulate
-            networkPassphrase: StellarSdk.Networks.TESTNET, // Default to testnet
+        const tx = new TransactionBuilder(account, {
+            fee: '100',
+            networkPassphrase: Networks.TESTNET,
         })
-            .addOperation(operation)
-            .setTimeout(300)
+            .addOperation(op)
+            .setTimeout(TimeoutInfinite)
             .build();
 
-        // Sign with Freighter
-        const signedTx = await signTransaction(tx.toXDR(), {
-            networkPassphrase: StellarSdk.Networks.TESTNET
-        });
+        // 1. Simulate
+        const sim = await server.simulateTransaction(tx);
 
-        if (signedTx.signedTxXdr) {
-            // In a full implementation, you would submit this XDR to RPC (Soroban RPC), not Horizon
-            // because Horizon doesn't fully support Soroban transaction submission/simulation yet in some ver.
-            // But for this "connection" demo, we'll return the XDR or try to submit if RPC enabled.
-            return signedTx.signedTxXdr;
+        if (!rpc.Api.isSimulationSuccess(sim)) {
+            console.error("Simulation failed:", sim);
+            throw new Error(`Simulation failed for ${method}: ${sim.error || 'Unknown error'}`);
         }
 
-        throw new Error("Failed to sign transaction");
+        // 2. Assemble (Auto-updates fees and footprint)
+        const builtTx = rpc.assembleTransaction(tx, sim).build();
+
+        // 3. Sign with Freighter
+        const signedRes = await signTransaction(builtTx.toXDR(), {
+            networkPassphrase: Networks.TESTNET
+        });
+
+        if (!signedRes.signedTxXdr) throw new Error("User declined signature");
+
+        // 4. Submit
+        const sendRes = await server.sendTransaction(
+            TransactionBuilder.fromXDR(signedRes.signedTxXdr, Networks.TESTNET)
+        );
+
+        if (sendRes.status === 'PENDING') {
+            return sendRes.hash;
+        } else if (sendRes.status === 'ERROR') {
+            // Soroban RPC error details
+            console.error("Tx Submit Error:", sendRes);
+            throw new Error("Transaction submission failed");
+        }
+
+        return sendRes.hash;
     };
 
-    // --- Contract Specific Methods ---
+    /**
+     * Identity Pool: Deposit
+     */
+    const depositToPool = async (amountXlm: number) => {
+        const amountSc = nativeToScVal(BigInt(Math.floor(amountXlm * 1e7)), { type: 'i128' });
 
-    const depositToPool = async (_amount: number) => {
-        // This would involve token transfer + contract call
-        // For now, we just connect the ID
-        console.log(`Depositing to pool: ${NIRIUM_CONTRACTS.IDENTITY_POOL}`);
-        // return invokeContract(NIRIUM_CONTRACTS.IDENTITY_POOL, 'deposit', [...]);
+        return invokeContract(
+            NIRIUM_CONTRACTS.IDENTITY_POOL,
+            'deposit',
+            [
+                nativeToScVal(address, { type: 'address' }), // from
+                amountSc // amount
+            ]
+        );
+    };
+
+    /**
+     * Read-Only Contract Call (Simulation)
+     */
+    const queryContract = async (
+        contractId: string,
+        method: string,
+        args: xdr.ScVal[] = []
+    ) => {
+        checkConnection();
+        const account = await server.getAccount(address!);
+
+        const contract = new Contract(contractId);
+        const op = contract.call(method, ...args);
+
+        const tx = new TransactionBuilder(account, {
+            fee: '100',
+            networkPassphrase: Networks.TESTNET,
+        })
+            .addOperation(op)
+            .setTimeout(TimeoutInfinite)
+            .build();
+
+        const sim = await server.simulateTransaction(tx);
+
+        if (!rpc.Api.isSimulationSuccess(sim) || !sim.result || !sim.result.retval) {
+            console.error("Query simulation failed:", sim);
+            throw new Error(`Query failed for ${method}`);
+        }
+
+        return sim.result.retval;
     };
 
     return {
-        contracts: NIRIUM_CONTRACTS,
         invokeContract,
+        queryContract,
         depositToPool,
-        // Add other contract methods here
+        contracts: NIRIUM_CONTRACTS
     };
 }
