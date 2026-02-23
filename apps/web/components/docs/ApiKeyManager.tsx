@@ -116,8 +116,8 @@ export default function ApiKeyManager() {
     return (
         <div className="bg-[#0A0A0A] border border-white/10 rounded-xl p-6 max-w-2xl">
             <div className="flex items-center gap-3 mb-6">
-                <div className="bg-neon-purple/20 p-2 rounded-lg">
-                    <Key className="w-6 h-6 text-neon-purple" />
+                <div className="bg-stellar-yellow/20 p-2 rounded-lg">
+                    <Key className="w-6 h-6 text-stellar-yellow" />
                 </div>
                 <div>
                     <h3 className="text-xl font-bold text-white">Agent Console</h3>
@@ -131,7 +131,7 @@ export default function ApiKeyManager() {
                     <p className="text-gray-300 font-medium">Wallet Not Connected</p>
                     <p className="text-sm text-gray-500 mb-4">Connect your wallet to generate keys</p>
                     {/* Note: The user should use the main Navbar connect button */}
-                    <div className="text-xs text-neon-cyan bg-neon-cyan/10 px-3 py-1 rounded-full">
+                    <div className="text-xs text-stellar-teal bg-stellar-teal/10 px-3 py-1 rounded-full">
                         Use Navbar to Connect
                     </div>
                 </div>
@@ -157,7 +157,7 @@ export default function ApiKeyManager() {
                     <button
                         onClick={handleGenerateKey}
                         disabled={isLoading}
-                        className="w-full py-3 bg-gradient-to-r from-neon-purple to-neon-cyan text-black font-bold rounded-lg hover:opacity-90 transition-all flex items-center justify-center gap-2"
+                        className="w-full py-3 bg-gradient-to-r from-stellar-yellow to-stellar-teal text-black font-bold rounded-lg hover:opacity-90 transition-all flex items-center justify-center gap-2"
                     >
                         {isLoading ? (
                             <>
@@ -181,8 +181,8 @@ export default function ApiKeyManager() {
 
                     <div className="relative">
                         <div className="text-xs text-gray-500 mb-1 ml-1 uppercase font-bold tracking-wider">Your Secret API Key</div>
-                        <div className="flex items-center gap-2 bg-black border border-neon-cyan/50 rounded-lg p-1 pr-2">
-                            <div className="flex-1 bg-transparent font-mono text-neon-cyan px-3 py-2 text-lg truncate">
+                        <div className="flex items-center gap-2 bg-black border border-stellar-teal/50 rounded-lg p-1 pr-2">
+                            <div className="flex-1 bg-transparent font-mono text-stellar-teal px-3 py-2 text-lg truncate">
                                 {generatedKey.apiKey}
                             </div>
                             <button

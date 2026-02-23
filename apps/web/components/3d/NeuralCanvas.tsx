@@ -2,20 +2,10 @@
 
 import { Canvas } from '@react-three/fiber';
 import { Suspense, useEffect, useState } from 'react';
-import { EffectComposer, Bloom, Vignette, Noise } from '@react-three/postprocessing';
-import { NeuralField } from '@/components/visuals/NeuralField';
-import * as THREE from 'three';
+import { EffectComposer, Bloom, Vignette } from '@react-three/postprocessing';
+import { NeuralOrb } from '@/app/components/NeuralOrb';
 
-// Fix React 19 type compatibility for postprocessing effects
-const NoiseImpl = Noise as any;
-const VignetteImpl = Vignette as any;
-
-interface NeuralCanvasProps {
-    intensity?: number;
-    color?: string;
-}
-
-export function NeuralCanvas({ intensity = 1.0, color }: NeuralCanvasProps) {
+export function NeuralCanvas() {
     const [mounted, setMounted] = useState(false);
 
     useEffect(() => {
@@ -25,30 +15,24 @@ export function NeuralCanvas({ intensity = 1.0, color }: NeuralCanvasProps) {
     if (!mounted) return null;
 
     return (
-        <div className="w-full h-full fixed inset-0 -z-10 bg-[#02040A]">
+        <div className="w-full h-full relative">
             <Canvas
-                camera={{ position: [0, 0, 30], fov: 45 }}
+                camera={{ position: [0, 0, 25], fov: 45 }}
                 gl={{
-                    antialias: false,
-                    powerPreference: "high-performance",
-                    alpha: false,
-                    stencil: false,
-                    depth: false
+                    antialias: true,
+                    alpha: true,
                 }}
-                dpr={[1, 1.5]} // Optimize pixel ratio for performance
             >
                 <Suspense fallback={null}>
-                    <NeuralField intensity={intensity} color={color} />
-
-                    <EffectComposer enableNormalPass={false}>
+                    <NeuralOrb />
+                    <EffectComposer>
                         <Bloom
-                            luminanceThreshold={0.2}
+                            luminanceThreshold={0.1}
                             luminanceSmoothing={0.9}
                             height={300}
-                            intensity={1.5}
+                            intensity={0.8}
                         />
-                        <NoiseImpl opacity={0.05} />
-                        <VignetteImpl eskil={false} offset={0.1} darkness={1.1} />
+                        <Vignette eskil={false} offset={0.1} darkness={1.1} />
                     </EffectComposer>
                 </Suspense>
             </Canvas>

@@ -87,7 +87,7 @@ export default function OpsConsole({ isExpanded, onToggleExpand }: { isExpanded:
             {/* Header */}
             <div className="bg-white/5 border-b border-white/5 px-4 py-3 flex justify-between items-center shrink-0">
                 <div className="flex items-center gap-2">
-                    <Terminal className="w-4 h-4 text-neon-cyan" />
+                    <Terminal className="w-4 h-4 text-stellar-teal" />
                     <span className="text-xs font-mono font-bold text-gray-300">OPS CONSOLE // LIVE FEED</span>
                     <span className={`flex items-center gap-1.5 ml-2 px-1.5 py-0.5 rounded ${s.bg} text-[10px] ${s.text} border`}>
                         <span className={`w-1 h-1 rounded-full ${s.dot} ${status === 'online' ? 'animate-pulse' : ''}`}></span>
@@ -133,7 +133,7 @@ export default function OpsConsole({ isExpanded, onToggleExpand }: { isExpanded:
                                 className={`font-bold mr-2 ${log.level === 'error' ? 'text-red-500' :
                                     log.level === 'warn' ? 'text-yellow-500' :
                                         log.level === 'success' ? 'text-green-400' :
-                                            log.level === 'system' ? 'text-neon-cyan' :
+                                            log.level === 'system' ? 'text-stellar-teal' :
                                                 'text-blue-400'
                                     }`}
                             >

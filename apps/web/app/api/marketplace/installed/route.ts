@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server';
 
 // Skills that are always pre-installed in Nirium (core plugins)
 const DEFAULT_INSTALLED = [
-    { id: 'walrus-blackbox-logger', slug: 'walrus-blackbox-logger', name: 'Walrus Blackbox Logger', version: '0.0.7' },
+    { id: 'neural-blackbox', slug: 'neural-blackbox', name: 'Neural Blackbox', version: '0.0.7' },
     { id: 'usdc-vault-manager', slug: 'usdc-vault-manager', name: 'USDC Vault Manager', version: '0.0.7' },
 ];
 

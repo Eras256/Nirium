@@ -1,0 +1,36 @@
+{
+    "name": "@nirium/agent",
+    "version": "0.1.0",
+    "private": true,
+    "description": "Nirium Autonomous Agent Backend — Market scanner, AI loop, skill system",
+    "main": "dist/index.js",
+    "scripts": {
+        "dev": "tsx watch src/index.ts",
+        "build": "tsc",
+        "start": "node dist/index.js",
+        "lint": "eslint src/",
+        "test": "jest --passWithNoTests"
+    },
+    "dependencies": {
+        "@stellar/stellar-sdk": "^14.0.0",
+        "cors": "^2.8.5",
+        "dotenv": "^16.4.5",
+        "express": "^5.1.0",
+        "jsonwebtoken": "^9.0.2",
+        "node-cron": "^3.0.3",
+        "uuid": "^11.1.0",
+        "ws": "^8.18.0"
+    },
+    "devDependencies": {
+        "@types/cors": "^2.8.17",
+        "@types/express": "^5.0.0",
+        "@types/jsonwebtoken": "^9.0.7",
+        "@types/node": "^22.0.0",
+        "@types/node-cron": "^3.0.11",
+        "@types/uuid": "^10.0.0",
+        "@types/ws": "^8.5.13",
+        "jest": "^30.0.0",
+        "tsx": "^4.19.0",
+        "typescript": "^5.7.0"
+    }
+}

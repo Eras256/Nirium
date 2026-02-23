@@ -2,9 +2,9 @@
 	"name": "nirium-root",
 	"private": true,
 	"scripts": {
-		"dev": "pnpm --filter web dev",
-		"build": "pnpm --filter web build",
-		"start": "pnpm --filter web start"
+		"dev": "pnpm --parallel --filter nirium-web --filter @nirium/agent run dev",
+		"build": "pnpm --filter nirium-web build",
+		"start": "pnpm --filter nirium-web start"
 	},
 	"dependencies": {
 		"next": "16.1.6",

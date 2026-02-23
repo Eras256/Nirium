@@ -43,17 +43,17 @@ const ICON_MAP: any = {
     Layers, MousePointer2, Info, ChevronRight, Download, Bolt, FlaskConical, KeyRound, TrendingUp
 };
 
-const nodeTypes: any = { suiNode: CustomNode };
+const nodeTypes: any = { niriumNode: CustomNode };
 
 const NODE_TEMPLATES = [
     {
         category: 'ATOMIC ENGINE',
-        color: 'from-neon-cyan to-blue-500',
+        color: 'from-stellar-teal to-blue-500',
         items: [
-            { type: 'action', label: 'FLASH_LOAN', icon: 'Bolt', desc: 'Borrow capital atomically (Hot Potato)' },
+            { type: 'action', label: 'FLASH_LOAN', icon: 'Bolt', desc: 'Borrow capital atomically (Multi-Op)' },
             { type: 'action', label: 'EXECUTE_LOOP', icon: 'RefreshCw', desc: 'Full borrow-trade-repay cycle' },
-            { type: 'action', label: 'CREATE_AGENT_CAP', icon: 'KeyRound', desc: 'Mint agent license (0.1 XLM fee)' },
-            { type: 'action', label: 'REPAY_LOAN', icon: 'TrendingUp', desc: 'Satisfy Hot Potato receipt + profit' },
+            { type: 'action', label: 'CREATE_AGENT_AUTH', icon: 'KeyRound', desc: 'Mint agent auth (0.1 XLM fee)' },
+            { type: 'action', label: 'REPAY_LOAN', icon: 'TrendingUp', desc: 'Satisfy Multi-Op receipt + profit' },
         ]
     },
     {
@@ -79,9 +79,9 @@ const NODE_TEMPLATES = [
         category: 'TRADING & SWAPS',
         color: 'from-blue-400 to-cyan-500',
         items: [
-            { type: 'action', label: 'CETUS_SWAP', icon: 'RefreshCw', desc: 'Atomic swap on Cetus CLMM' },
-            { type: 'action', label: 'TURBOS_SWAP', icon: 'Repeat', desc: 'Liquidity pool swap on Turbos' },
-            { type: 'action', label: 'DEEPBOOK_LIMIT', icon: 'ArrowRight', desc: 'CLOB order placement' },
+            { type: 'action', label: 'SOROSWAP_SWAP', icon: 'RefreshCw', desc: 'Atomic swap on Soroswap AMM' },
+            { type: 'action', label: 'PHOENIX_SWAP', icon: 'Repeat', desc: 'Liquidity pool swap on Phoenix' },
+            { type: 'action', label: 'SDEX_LIMIT', icon: 'ArrowRight', desc: 'SDEX Orderbook placement' },
         ]
     },
     {
@@ -89,9 +89,9 @@ const NODE_TEMPLATES = [
         color: 'from-emerald-500 to-green-600',
         items: [
             { type: 'action', label: 'VAULT_DEPOSIT', icon: 'Lock', desc: 'Secure Enclave capital locking' },
-            { type: 'action', label: 'VAULT_WITHDRAW', icon: 'Fingerprint', desc: 'OwnerCap verified liquidation' },
-            { type: 'condition', label: 'ENCLAVE_GUARD', icon: 'Shield', desc: 'Move-native safety filter' },
-            { type: 'action', label: 'WALRUS_BLACKBOX', icon: 'Database', desc: 'Decentralized forensic logging' },
+            { type: 'action', label: 'VAULT_WITHDRAW', icon: 'Fingerprint', desc: 'Auth-verified liquidation' },
+            { type: 'condition', label: 'ENCLAVE_GUARD', icon: 'Shield', desc: 'Soroban-native safety filter' },
+            { type: 'action', label: 'NEURAL_BLACKBOX', icon: 'Database', desc: 'Decentralized forensic logging' },
         ]
     },
     {
@@ -108,7 +108,7 @@ const NODE_TEMPLATES = [
 const initialNodes: Node[] = [
     {
         id: 'start-0',
-        type: 'suiNode',
+        type: 'niriumNode',
         data: { label: 'INIT_KERNEL', icon: 'Play', type: 'trigger', color: 'from-green-400 to-emerald-500' },
         position: { x: 100, y: 100 },
     },
@@ -152,7 +152,7 @@ function StrategyBuilderInner() {
     }, []);
 
     const onConnect = useCallback(
-        (params: Connection) => setEdges((eds) => addEdge({ ...params, animated: true, style: { stroke: '#00f3ff' } }, eds)),
+        (params: Connection) => setEdges((eds) => addEdge({ ...params, animated: true, style: { stroke: '#2DEBE8' } }, eds)),
         [setEdges]
     );
 
@@ -181,7 +181,7 @@ function StrategyBuilderInner() {
         const newId = getId();
         const newNode: Node = {
             id: newId,
-            type: 'suiNode',
+            type: 'niriumNode',
             position,
             data: {
                 label: template.label,
@@ -198,7 +198,7 @@ function StrategyBuilderInner() {
                     source: lastNode.id,
                     target: newId,
                     animated: true,
-                    style: { stroke: '#00f3ff' }
+                    style: { stroke: '#2DEBE8' }
                 };
                 setEdges((eds) => addEdge(newEdge, eds));
             }
@@ -221,7 +221,7 @@ function StrategyBuilderInner() {
             const newId = getId();
             const newNode: Node = {
                 id: newId,
-                type: 'suiNode',
+                type: 'niriumNode',
                 position,
                 data: {
                     label: template.label,
@@ -238,7 +238,7 @@ function StrategyBuilderInner() {
                         source: lastNode.id,
                         target: newId,
                         animated: true,
-                        style: { stroke: '#00f3ff' }
+                        style: { stroke: '#2DEBE8' }
                     };
                     setEdges((eds) => addEdge(newEdge, eds));
                 }
@@ -300,7 +300,7 @@ function StrategyBuilderInner() {
 
             // 1. Local Persistence
             try {
-                const localKey = `sui-loop-fleet-${account.address}`;
+                const localKey = `nirium-fleet-${account.address}`;
                 const existing = JSON.parse(localStorage.getItem(localKey) || "[]");
                 const filtered = existing.filter((s: any) => s.id !== sid && s.strategy_id !== sid);
                 localStorage.setItem(localKey, JSON.stringify([{ ...newStrat, id: sid }, ...filtered]));
@@ -317,10 +317,10 @@ function StrategyBuilderInner() {
                 });
             }
 
-            // 3. Walrus simulation on deploy
+            // 3. Neural Archive simulation on deploy
             if (deploy) {
                 setTimeout(() => {
-                    toast.success(`⬆ Schema archived to Walrus (blob: ${sid.slice(0, 12)}...)`, { duration: 3000 });
+                    toast.success(`⬆ Schema archived to Neural Archive (blob: ${sid.slice(0, 12)}...)`, { duration: 3000 });
                 }, 1000);
             }
 
@@ -346,7 +346,7 @@ function StrategyBuilderInner() {
         try {
             const { StrategyService } = await import("@/lib/strategyService");
             const dbStrategies = await StrategyService.getStrategies(account.address);
-            const localKey = `sui-loop-fleet-${account.address}`;
+            const localKey = `nirium-fleet-${account.address}`;
             const localRaw = localStorage.getItem(localKey);
             let merged = [...dbStrategies];
             if (localRaw) {
@@ -410,7 +410,7 @@ function StrategyBuilderInner() {
                         animate={{ opacity: 1, scale: 1 }}
                         exit={{ opacity: 0, scale: 0.8 }}
                         onClick={() => setSidebarOpen(true)}
-                        className="absolute top-3 left-3 z-50 md:hidden bg-[#0F0F0F]/90 backdrop-blur-md border border-white/20 p-2.5 rounded-xl text-neon-cyan hover:bg-white/10 shadow-xl"
+                        className="absolute top-3 left-3 z-50 md:hidden bg-[#0F0F0F]/90 backdrop-blur-md border border-white/20 p-2.5 rounded-xl text-stellar-teal hover:bg-white/10 shadow-xl"
                     >
                         <Menu size={18} />
                     </motion.button>
@@ -428,7 +428,7 @@ function StrategyBuilderInner() {
                     <div className="flex items-center justify-between">
                         <h2 className="text-xs font-black tracking-[0.2em] text-gray-500 uppercase">Component Lab</h2>
                         <div className="flex items-center gap-2">
-                            <span className="text-[10px] font-mono text-neon-cyan/50">v0.0.7</span>
+                            <span className="text-[10px] font-mono text-stellar-teal/50">v0.0.7</span>
                             <button
                                 onClick={() => setSidebarOpen(false)}
                                 className="md:hidden p-1 hover:bg-white/5 rounded-lg text-gray-500 hover:text-white"
@@ -444,7 +444,7 @@ function StrategyBuilderInner() {
                         <div className="flex items-center gap-1">
                             <button
                                 onClick={() => setSelectedAsset('USDC')}
-                                className={`px-3 py-1.5 rounded-lg text-[11px] font-bold transition-all ${selectedAsset === 'USDC' ? 'bg-neon-purple text-white shadow-[0_0_10px_rgba(168,85,247,0.4)]' : 'text-gray-500 hover:text-white'}`}
+                                className={`px-3 py-1.5 rounded-lg text-[11px] font-bold transition-all ${selectedAsset === 'USDC' ? 'bg-stellar-yellow text-white shadow-[0_0_10px_rgba(168,85,247,0.4)]' : 'text-gray-500 hover:text-white'}`}
                             >
                                 USDC
                             </button>
@@ -464,7 +464,7 @@ function StrategyBuilderInner() {
                             placeholder="Find Kernel Core..."
                             value={searchQuery}
                             onChange={(e) => setSearchQuery(e.target.value)}
-                            className="w-full bg-white/5 border border-white/10 rounded-xl pl-9 pr-3 py-2 text-xs text-white focus:outline-none focus:border-neon-cyan/50 transition-all font-mono"
+                            className="w-full bg-white/5 border border-white/10 rounded-xl pl-9 pr-3 py-2 text-xs text-white focus:outline-none focus:border-stellar-teal/50 transition-all font-mono"
                         />
                     </div>
                 </div>
@@ -486,7 +486,7 @@ function StrategyBuilderInner() {
                                     >
                                         <div className="p-2 rounded-lg bg-white/5 group-hover:bg-white/10 transition-colors shrink-0">
                                             {ICON_MAP[item.icon] ? (
-                                                React.createElement(ICON_MAP[item.icon], { size: 15, className: "text-gray-400 group-hover:text-neon-cyan" })
+                                                React.createElement(ICON_MAP[item.icon], { size: 15, className: "text-gray-400 group-hover:text-stellar-teal" })
                                             ) : (
                                                 <Box size={15} />
                                             )}
@@ -499,7 +499,7 @@ function StrategyBuilderInner() {
                                         </div>
                                         <button
                                             onClick={(e) => { e.stopPropagation(); onAddNode(item); if (window.innerWidth < 768) setSidebarOpen(false); }}
-                                            className="p-1.5 rounded-lg hover:bg-neon-cyan/20 text-white/20 hover:text-neon-cyan transition-all opacity-0 group-hover:opacity-100 shrink-0"
+                                            className="p-1.5 rounded-lg hover:bg-stellar-teal/20 text-white/20 hover:text-stellar-teal transition-all opacity-0 group-hover:opacity-100 shrink-0"
                                         >
                                             <Plus size={14} />
                                         </button>
@@ -511,10 +511,10 @@ function StrategyBuilderInner() {
                 </div>
 
                 <div className="p-3 bg-black/40 border-t border-white/5">
-                    <div className="flex items-center gap-2 p-2.5 bg-neon-cyan/5 rounded-xl border border-neon-cyan/10">
-                        <Info size={13} className="text-neon-cyan shrink-0" />
+                    <div className="flex items-center gap-2 p-2.5 bg-stellar-teal/5 rounded-xl border border-stellar-teal/10">
+                        <Info size={13} className="text-stellar-teal shrink-0" />
                         <p className="text-[10px] text-gray-400 leading-tight">
-                            Drag nodes onto the matrix. Asset: <span className={selectedAsset === 'USDC' ? 'text-neon-purple font-bold' : 'text-[#4ca2ff] font-bold'}>{selectedAsset}</span>
+                            Drag nodes onto the matrix. Asset: <span className={selectedAsset === 'USDC' ? 'text-stellar-yellow font-bold' : 'text-[#4ca2ff] font-bold'}>{selectedAsset}</span>
                         </p>
                     </div>
                 </div>
@@ -553,7 +553,7 @@ function StrategyBuilderInner() {
                     <MiniMap
                         className="!bg-[#0F0F0F] !border-white/10 !rounded-xl hidden sm:block"
                         maskColor="rgba(0, 0, 0, 0.7)"
-                        nodeColor={(n: any) => n.data?.color ? '#00f3ff' : '#333'}
+                        nodeColor={(n: any) => n.data?.color ? '#2DEBE8' : '#333'}
                         nodeStrokeWidth={3}
                         zoomable
                         pannable
@@ -569,8 +569,8 @@ function StrategyBuilderInner() {
                         mt-3 md:mt-4
                         max-w-[calc(100vw-5rem)] sm:max-w-xs md:max-w-none
                     `}>
-                        <div className="bg-neon-cyan/20 p-1.5 sm:p-2 rounded-xl border border-neon-cyan/30 hidden sm:flex shrink-0">
-                            <Layers className="text-neon-cyan" size={16} />
+                        <div className="bg-stellar-teal/20 p-1.5 sm:p-2 rounded-xl border border-stellar-teal/30 hidden sm:flex shrink-0">
+                            <Layers className="text-stellar-teal" size={16} />
                         </div>
                         <div className="min-w-0 flex-1">
                             <input
@@ -581,7 +581,7 @@ function StrategyBuilderInner() {
                             <div className="flex items-center gap-1.5 flex-wrap">
                                 <span className={`w-1.5 h-1.5 rounded-full ${account ? 'bg-green-500' : 'bg-red-500'} animate-pulse shrink-0`}></span>
                                 <span className="text-[9px] sm:text-[10px] font-mono text-gray-500">{account ? 'ACTIVE' : 'OFFLINE'}</span>
-                                <span className={`text-[9px] sm:text-[10px] font-mono font-bold px-1.5 py-0.5 rounded ${selectedAsset === 'USDC' ? 'bg-neon-purple/20 text-neon-purple' : 'bg-blue-500/20 text-[#4ca2ff]'}`}>
+                                <span className={`text-[9px] sm:text-[10px] font-mono font-bold px-1.5 py-0.5 rounded ${selectedAsset === 'USDC' ? 'bg-stellar-yellow/20 text-stellar-yellow' : 'bg-blue-500/20 text-[#4ca2ff]'}`}>
                                     {selectedAsset}
                                 </span>
                             </div>
@@ -601,7 +601,7 @@ function StrategyBuilderInner() {
                         <button
                             onClick={() => handleSave(true)}
                             disabled={isSaving}
-                            className="bg-neon-cyan px-4 md:px-8 py-2.5 rounded-xl font-mono text-[11px] font-black tracking-widest text-black hover:bg-cyan-400 shadow-[0_0_20px_rgba(0,243,255,0.3)] transition-all flex items-center gap-2 disabled:opacity-50"
+                            className="bg-stellar-teal px-4 md:px-8 py-2.5 rounded-xl font-mono text-[11px] font-black tracking-widest text-black hover:bg-cyan-400 shadow-[0_0_20px_rgba(0,243,255,0.3)] transition-all flex items-center gap-2 disabled:opacity-50"
                         >
                             <Play size={14} fill="currentColor" />
                             <span className="hidden sm:inline">COMPILE KERNEL</span>
@@ -617,7 +617,7 @@ function StrategyBuilderInner() {
                                 className="bg-[#0F0F0F]/90 backdrop-blur-md border border-white/10 p-3 rounded-xl text-gray-400 hover:text-white transition-all shadow-xl group relative"
                             >
                                 <History size={18} />
-                                <span className="absolute right-full mr-2 px-2 py-1 bg-black text-[10px] text-neon-cyan border border-white/10 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap hidden md:block">VIEW KERNEL LOGS</span>
+                                <span className="absolute right-full mr-2 px-2 py-1 bg-black text-[10px] text-stellar-teal border border-white/10 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap hidden md:block">VIEW KERNEL LOGS</span>
                             </button>
                             <button
                                 onClick={handleExport}
@@ -662,7 +662,7 @@ function StrategyBuilderInner() {
                             <div className="flex-1 overflow-y-auto p-4 space-y-3 custom-scrollbar">
                                 {isLoadingHistory ? (
                                     <div className="flex flex-col items-center justify-center h-64 space-y-4">
-                                        <div className="w-8 h-8 border-2 border-neon-cyan border-t-transparent rounded-full animate-spin"></div>
+                                        <div className="w-8 h-8 border-2 border-stellar-teal border-t-transparent rounded-full animate-spin"></div>
                                         <p className="text-[10px] font-mono text-gray-500 uppercase tracking-widest">Scanning Uplink...</p>
                                     </div>
                                 ) : history.length === 0 ? (
@@ -680,9 +680,9 @@ function StrategyBuilderInner() {
                                             animate={{ opacity: 1, y: 0 }}
                                             transition={{ delay: i * 0.05 }}
                                             onClick={() => loadKernel(strat)}
-                                            className="w-full text-left p-4 bg-[#111] border border-white/5 rounded-2xl hover:border-neon-cyan/30 hover:bg-[#161616] transition-all group flex gap-4"
+                                            className="w-full text-left p-4 bg-[#111] border border-white/5 rounded-2xl hover:border-stellar-teal/30 hover:bg-[#161616] transition-all group flex gap-4"
                                         >
-                                            <div className="w-10 h-10 rounded-xl bg-neon-cyan/5 border border-neon-cyan/10 flex items-center justify-center shrink-0 group-hover:bg-neon-cyan/20 transition-colors">
+                                            <div className="w-10 h-10 rounded-xl bg-stellar-teal/5 border border-stellar-teal/10 flex items-center justify-center shrink-0 group-hover:bg-stellar-teal/20 transition-colors">
                                                 <span className="text-lg">{strat.emoji || '🤖'}</span>
                                             </div>
                                             <div className="flex-1 min-w-0">
@@ -703,11 +703,11 @@ function StrategyBuilderInner() {
                                                 </div>
                                                 <div className="flex items-center gap-3 text-[9px] text-gray-500 font-mono">
                                                     <span className="flex items-center gap-1"><Clock size={10} /> {new Date(strat.created_at).toLocaleDateString()}</span>
-                                                    <span className="flex items-center gap-1 font-bold text-neon-cyan/60">{strat.yield} APIA</span>
+                                                    <span className="flex items-center gap-1 font-bold text-stellar-teal/60">{strat.yield} APIA</span>
                                                 </div>
                                             </div>
                                             <div className="self-center">
-                                                <ChevronRight size={14} className="text-gray-700 group-hover:text-neon-cyan transition-colors" />
+                                                <ChevronRight size={14} className="text-gray-700 group-hover:text-stellar-teal transition-colors" />
                                             </div>
                                         </motion.button>
                                     ))
@@ -723,11 +723,11 @@ function StrategyBuilderInner() {
 
 export default function StrategyBuilderPro() {
     return (
-        <main className="h-screen w-screen bg-[#0A0A0A] text-white flex flex-col font-sans selection:bg-neon-cyan/30 overflow-hidden">
+        <main className="h-screen w-screen bg-[#0A0A0A] text-white flex flex-col font-sans selection:bg-stellar-teal/30 overflow-hidden">
             <Navbar />
 
             {/* Mobile banner for touch hint */}
-            <div className="md:hidden flex items-center gap-2 bg-neon-cyan/5 border-b border-neon-cyan/10 px-4 py-2 text-[11px] text-neon-cyan/70 font-mono shrink-0">
+            <div className="md:hidden flex items-center gap-2 bg-stellar-teal/5 border-b border-stellar-teal/10 px-4 py-2 text-[11px] text-stellar-teal/70 font-mono shrink-0">
                 <MousePointer2 size={12} />
                 Tap the ☰ button to open the Component Lab. Pinch to zoom the canvas.
             </div>
@@ -743,7 +743,7 @@ export default function StrategyBuilderPro() {
             <style jsx global>{`
                 .react-flow__handle {
                     width: 8px; height: 8px;
-                    background: #00f3ff !important;
+                    background: #2DEBE8 !important;
                     border: 2px solid #000 !important;
                 }
                 .react-flow__attribution { display: none; }
@@ -760,7 +760,7 @@ export default function StrategyBuilderPro() {
                 .custom-scrollbar::-webkit-scrollbar { width: 4px; }
                 .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
                 .custom-scrollbar::-webkit-scrollbar-thumb { background: #333; border-radius: 10px; }
-                .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: #00f3ff; }
+                .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: #2DEBE8; }
             `}</style>
         </main>
     );

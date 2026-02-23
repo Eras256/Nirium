@@ -36,8 +36,8 @@ import { useFreighter } from "@/hooks/useFreighter";
 // Core Plugins Definition
 const CORE_PLUGINS = [
     {
-        id: "sui-deep-research",
-        slug: "sui-deep-research",
+        id: "nirium-deep-research",
+        slug: "nirium-deep-research",
         name: "Stellar Deep Research",
         description: "Autonomous web scraping and analysis engine. Reads whitepapers, news, and protocol docs to inform decisions.",
         icon: Globe,
@@ -78,14 +78,14 @@ const CORE_PLUGINS = [
         id: "flash-loan-engine",
         slug: "flash-loan-engine",
         name: "Flash Loan Engine",
-        description: "Executes zero-collateral flash loans via DeepBook V3 in a single atomic transaction. Arbitrage, liquidation, and refinancing in one block.",
+        description: "Executes zero-collateral flash loans via Soroban atomic primitives. Arbitrage and liquidation in one block.",
         icon: Zap,
         color: "from-yellow-400 to-orange-500",
         category: "DeFi Execution",
         features: ["Zero-Collateral Loans", "Atomic Arbitrage", "Auto Repayment"],
         version: "0.0.7",
         author: "Nirium Core",
-        tags: ["flash", "loan", "arbitrage", "deepbook"]
+        tags: ["flash", "loan", "arbitrage", "stellar"]
     },
     {
         id: "onchain-oracle",
@@ -130,14 +130,14 @@ const CORE_PLUGINS = [
         id: "auto-compounder",
         slug: "auto-compounder",
         name: "Auto-Compounder",
-        description: "Automatically harvests and reinvests yield from Scallop and Cetus positions. Maximizes APY without manual intervention, 24/7.",
+        description: "Automatically harvests and reinvests yield from Blend and Phoenix positions. Maximizes APY without manual intervention, 24/7.",
         icon: RefreshCw,
         color: "from-green-400 to-emerald-600",
         category: "Yield Ops",
-        features: ["Scallop Harvest", "Cetus LP Compound", "Gas-Optimized"],
+        features: ["Blend Harvest", "Phoenix LP Compound", "Fee-Optimized"],
         version: "0.0.7",
         author: "Nirium Core",
-        tags: ["compound", "yield", "scallop", "cetus"]
+        tags: ["compound", "yield", "blend", "phoenix"]
     },
     {
         id: "portfolio-rebalancer",
@@ -169,40 +169,40 @@ const CORE_PLUGINS = [
         id: "liquidity-sniper",
         slug: "liquidity-sniper",
         name: "Liquidity Sniper",
-        description: "Monitors new pool launches on Cetus and Turbos. Automatically deploys capital in the first blocks after launch to capture early liquidity rewards.",
+        description: "Monitors new pool launches on Phoenix and Soroswap. Automatically deploys capital to capture early liquidity rewards.",
         icon: Crosshair,
         color: "from-fuchsia-500 to-purple-700",
         category: "Sniping",
         features: ["New Pool Detection", "Auto-Entry Logic", "Rug Pull Filter"],
         version: "0.0.7",
         author: "Nirium Core",
-        tags: ["snipe", "liquidity", "launch", "cetus"]
+        tags: ["snipe", "liquidity", "launch", "phoenix"]
     },
     {
-        id: "walrus-blackbox",
-        slug: "walrus-blackbox",
-        name: "Walrus Blackbox",
-        description: "Immutable decentralized forensic logging via Stellar Walrus. Every trade, decision, and anomaly is cryptographically sealed and stored on-chain. Tamper-proof audit trail for full transparency.",
+        id: "neural-blackbox",
+        slug: "neural-blackbox",
+        name: "Neural Blackbox",
+        description: "Immutable decentralized forensic logging. Every trade, decision, and anomaly is cryptographically sealed and archived. Tamper-proof audit trail.",
         icon: Layers,
         color: "from-pink-500 to-rose-600",
         category: "Audit & Logs",
-        features: ["Walrus Blob Storage", "Immutable Audit Trail", "Forensic Replay", "WALRUS_BLACKBOX Node"],
+        features: ["IPFS Blob Storage", "Immutable Audit Trail", "Forensic Replay", "Archive Node"],
         version: "0.0.7",
         author: "Nirium Core",
-        tags: ["walrus", "logs", "audit", "decentralized", "forensic"]
+        tags: ["archive", "logs", "audit", "decentralized", "forensic"]
     },
     {
         id: "usdc-vault-manager",
         slug: "usdc-vault-manager",
         name: "USDC Vault Manager",
-        description: "Full lifecycle management for USDC vaults on Nirium. Handles deposit, withdrawal, yield routing, and auto-rotation across Navi and Scallop USDC lending pools.",
+        description: "Full lifecycle management for USDC vaults on Nirium. Handles deposit, withdrawal, yield routing, and auto-rotation across Phoenix and Blend USDC pools.",
         icon: Waves,
         color: "from-violet-500 to-indigo-600",
         category: "Vault Ops",
-        features: ["USDC Vault Deploy", "Navi/Scallop Rotation", "Yield Auto-Route", "XLM/USDC Toggle"],
+        features: ["USDC Vault Deploy", "Phoenix/Blend Rotation", "Yield Auto-Route", "XLM/USDC Toggle"],
         version: "0.0.7",
         author: "Nirium Core",
-        tags: ["usdc", "vault", "multi-asset", "navi", "scallop"]
+        tags: ["usdc", "vault", "multi-asset", "phoenix", "blend"]
     },
 ];
 
@@ -278,19 +278,19 @@ export default function PluginsPage() {
 
             // Plugin-specific bootup activity logs (delayed for realism)
             const PLUGIN_BOOT_LOGS: Record<string, Array<{ msg: string; level: 'info' | 'system' | 'success' | 'warn' }>> = {
-                'sui-deep-research': [{ msg: 'DEEP RESEARCH: Browser engine initialized — crawling Stellar ecosystem docs...', level: 'info' }, { msg: 'DEEP RESEARCH: 312 whitepapers indexed. Ready.', level: 'success' }],
+                'nirium-deep-research': [{ msg: 'DEEP RESEARCH: Browser engine initialized — crawling Stellar ecosystem docs...', level: 'info' }, { msg: 'DEEP RESEARCH: 312 whitepapers indexed. Ready.', level: 'success' }],
                 'social-sentiment': [{ msg: 'SOCIAL SENTIMENT: Connecting to X/Twitter stream...', level: 'info' }, { msg: 'SOCIAL SENTIMENT: Sentiment feed active — bullish bias detected on $XLM.', level: 'success' }],
                 'knowledge-graph': [{ msg: 'KNOWLEDGE GRAPH: Tavily search engine bound. Building context graph...', level: 'info' }, { msg: 'KNOWLEDGE GRAPH: 5,241 nodes resolved. Graph ready.', level: 'success' }],
-                'flash-loan-engine': [{ msg: 'FLASH LOAN ENGINE: Connecting to DeepBook V3 liquidity pools...', level: 'info' }, { msg: 'FLASH LOAN ENGINE: 3 arbitrage routes identified. Atomic execution ready.', level: 'success' }],
+                'flash-loan-engine': [{ msg: 'FLASH LOAN ENGINE: Connecting to SDEX liquidity pools...', level: 'info' }, { msg: 'FLASH LOAN ENGINE: 3 arbitrage routes identified. Atomic execution ready.', level: 'success' }],
                 'onchain-oracle': [{ msg: 'ORACLE: Binding Pyth Network price feeds...', level: 'info' }, { msg: 'ORACLE: 47 assets tracked. Staleness guard active. Feed live.', level: 'success' }],
                 'whale-tracker': [{ msg: 'WHALE TRACKER: Scanning top 100 Stellar wallets...', level: 'info' }, { msg: 'WHALE TRACKER: 2 accumulation patterns detected — monitoring active.', level: 'warn' }],
                 'risk-shield': [{ msg: 'RISK SHIELD: Loading Kelly Criterion model...', level: 'info' }, { msg: 'RISK SHIELD: VaR thresholds configured. Circuit breaker armed.', level: 'success' }],
-                'auto-compounder': [{ msg: 'AUTO-COMPOUNDER: Reading Scallop positions...', level: 'info' }, { msg: 'AUTO-COMPOUNDER: Next harvest scheduled in 4h. Cetus LP compounding enabled.', level: 'success' }],
+                'auto-compounder': [{ msg: 'AUTO-COMPOUNDER: Reading Blend positions...', level: 'info' }, { msg: 'AUTO-COMPOUNDER: Next harvest scheduled in 4h. Phoenix LP compounding enabled.', level: 'success' }],
                 'portfolio-rebalancer': [{ msg: 'PORTFOLIO REBALANCER: Fetching current allocation weights...', level: 'info' }, { msg: 'PORTFOLIO REBALANCER: Drift within threshold (1.2%). Auto-rebalance on standby.', level: 'success' }],
                 'mev-interceptor': [{ msg: 'MEV INTERCEPTOR: Mempool scanning initiated...', level: 'info' }, { msg: 'MEV INTERCEPTOR: 2 sandwich patterns blocked. Monitoring live.', level: 'warn' }],
-                'liquidity-sniper': [{ msg: 'LIQUIDITY SNIPER: Watching Cetus & Turbos for new pool launches...', level: 'info' }, { msg: 'LIQUIDITY SNIPER: Rug-pull filter loaded. Standing by for launch events.', level: 'success' }],
-                'walrus-blackbox': [{ msg: 'WALRUS BLACKBOX: Establishing uplink to Stellar Walrus network...', level: 'info' }, { msg: 'WALRUS BLACKBOX: Blob storage active. Forensic logging armed. Tamper-proof.', level: 'success' }],
-                'usdc-vault-manager': [{ msg: 'USDC VAULT MANAGER: Scanning for existing USDC vaults...', level: 'info' }, { msg: 'USDC VAULT MANAGER: Navi & Scallop USDC pools indexed. Auto-rotation active.', level: 'success' }],
+                'liquidity-sniper': [{ msg: 'LIQUIDITY SNIPER: Watching Phoenix & Soroswap for new pool launches...', level: 'info' }, { msg: 'LIQUIDITY SNIPER: Rug-pull filter loaded. Standing by for launch events.', level: 'success' }],
+                'neural-blackbox': [{ msg: 'NEURAL BLACKBOX: Establishing uplink to decentralized archive network...', level: 'info' }, { msg: 'NEURAL BLACKBOX: Blob storage active. Forensic logging armed. Tamper-proof.', level: 'success' }],
+                'usdc-vault-manager': [{ msg: 'USDC VAULT MANAGER: Scanning for existing USDC vaults...', level: 'info' }, { msg: 'USDC VAULT MANAGER: Phoenix & Blend USDC pools indexed. Auto-rotation active.', level: 'success' }],
             };
 
             const bootLogs = PLUGIN_BOOT_LOGS[selectedPlugin.slug];
@@ -318,25 +318,25 @@ export default function PluginsPage() {
     }, []);
 
     return (
-        <main className="min-h-screen bg-black text-white font-sans selection:bg-neon-cyan/30">
+        <main className="min-h-screen bg-black text-white font-sans selection:bg-stellar-teal/30">
             <Navbar />
 
             {/* Background Effects */}
             <div className="fixed inset-0 z-0">
-                <div className="absolute top-0 left-0 w-full h-[600px] bg-gradient-to-b from-neon-purple/5 to-transparent opacity-40" />
-                <div className="absolute bottom-0 right-0 w-[800px] h-[800px] bg-neon-cyan/5 blur-[150px] rounded-full" />
+                <div className="absolute top-0 left-0 w-full h-[600px] bg-gradient-to-b from-stellar-yellow/5 to-transparent opacity-40" />
+                <div className="absolute bottom-0 right-0 w-[800px] h-[800px] bg-stellar-teal/5 blur-[150px] rounded-full" />
                 <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full h-full bg-[url('/grid.svg')] bg-repeat opacity-[0.03]" />
             </div>
 
             <div className="relative z-10 pt-32 pb-20 px-4 sm:px-6 lg:px-8">
-                <div className="max-w-7xl mx-auto">
+                <div className="max-w-[1600px] w-full mx-auto">
 
                     {/* Header */}
                     <div className="text-center mb-16 section-lift">
                         <motion.div
                             initial={{ opacity: 0, y: 20 }}
                             animate={{ opacity: 1, y: 0 }}
-                            className="inline-flex items-center gap-2 px-3 py-1 bg-neon-cyan/10 border border-neon-cyan/30 rounded-full text-neon-cyan text-xs font-mono mb-6"
+                            className="inline-flex items-center gap-2 px-3 py-1 bg-stellar-teal/10 border border-stellar-teal/30 rounded-full text-stellar-teal text-xs font-mono mb-6"
                         >
                             <Cpu size={14} />
                             CORE NEURAL EXTENSIONS
@@ -348,7 +348,7 @@ export default function PluginsPage() {
                             transition={{ delay: 0.1 }}
                             className="text-4xl md:text-6xl font-black tracking-tighter mb-6"
                         >
-                            <span className="text-white">LOOP</span> <span className="text-gradient">PLUGINS</span>
+                            <span className="text-white">NIRIUM</span> <span className="text-gradient">HUB</span>
                         </motion.h1>
 
                         <motion.p
@@ -358,7 +358,7 @@ export default function PluginsPage() {
                             className="text-xl text-gray-400 max-w-2xl mx-auto leading-relaxed"
                         >
                             Upgrade your agents with advanced cognitive capabilities.<br />
-                            From atomic DeFi execution and Walrus forensic logging to social intelligence and MEV capture.
+                            From atomic DeFi execution and decentralized forensic logging to social intelligence and MEV capture.
                         </motion.p>
 
                         {/* Plugin Count */}
@@ -372,13 +372,13 @@ export default function PluginsPage() {
                                 {CORE_PLUGINS.length} plugins available
                             </span>
                             <span className="px-4 py-1.5 bg-green-500/10 border border-green-500/20 rounded-full text-sm font-mono text-green-400">
-                                ✓ All Move-verified
+                                ✓ All Soroban-verified
                             </span>
                             <span className="px-4 py-1.5 bg-blue-500/10 border border-blue-500/20 rounded-full text-sm font-mono text-[#4ca2ff]">
                                 ✓ XLM + USDC compatible
                             </span>
                             <span className="px-4 py-1.5 bg-pink-500/10 border border-pink-500/20 rounded-full text-sm font-mono text-pink-400">
-                                ✓ Walrus logging
+                                ✓ Forensic logging
                             </span>
                         </motion.div>
                     </div>
@@ -393,7 +393,7 @@ export default function PluginsPage() {
                                 transition={{ delay: 0.3 + (idx * 0.1) }}
                                 className="group relative"
                             >
-                                <div className="absolute inset-0 bg-gradient-to-br from-neon-purple/20 to-neon-cyan/20 rounded-3xl blur-xl opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+                                <div className="absolute inset-0 bg-gradient-to-br from-stellar-yellow/20 to-stellar-teal/20 rounded-3xl blur-xl opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
 
                                 <div className="relative h-full glass-panel p-8 rounded-3xl border border-white/10 hover:border-white/20 transition-all flex flex-col">
                                     {/* Icon */}
@@ -404,7 +404,7 @@ export default function PluginsPage() {
                                     {/* Content */}
                                     <div className="flex-1">
                                         <div className="flex items-center justify-between mb-2">
-                                            <span className="text-xs font-mono text-neon-cyan tracking-wider uppercase border border-neon-cyan/20 px-2 py-1 rounded bg-neon-cyan/5">
+                                            <span className="text-xs font-mono text-stellar-teal tracking-wider uppercase border border-stellar-teal/20 px-2 py-1 rounded bg-stellar-teal/5">
                                                 {plugin.category}
                                             </span>
                                             <span className="text-xs text-gray-500 font-mono">v{plugin.version}</span>
@@ -443,7 +443,7 @@ export default function PluginsPage() {
                                             </Link>
                                             <button
                                                 onClick={() => setSelectedPlugin(plugin)}
-                                                className="px-6 py-4 rounded-xl bg-neon-cyan/10 hover:bg-neon-cyan/20 text-neon-cyan border border-neon-cyan/20 transition-all flex items-center justify-center"
+                                                className="px-6 py-4 rounded-xl bg-stellar-teal/10 hover:bg-stellar-teal/20 text-stellar-teal border border-stellar-teal/20 transition-all flex items-center justify-center"
                                                 title="Install to another agent"
                                             >
                                                 <UserPlus size={18} />
@@ -452,7 +452,7 @@ export default function PluginsPage() {
                                     ) : (
                                         <button
                                             onClick={() => setSelectedPlugin(plugin)}
-                                            className="w-full py-4 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 hover:border-white/20 transition-all flex items-center justify-center gap-2 group-hover:bg-neon-cyan group-hover:text-black group-hover:font-bold"
+                                            className="w-full py-4 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 hover:border-white/20 transition-all flex items-center justify-center gap-2 group-hover:bg-stellar-teal group-hover:text-black group-hover:font-bold"
                                         >
                                             <Download size={18} />
                                             <span>Install Plugin</span>
@@ -472,7 +472,7 @@ export default function PluginsPage() {
                     >
                         <div className="flex flex-col md:flex-row items-center gap-8">
                             <div className="shrink-0 p-4 bg-black/30 rounded-full border border-white/10">
-                                <Shield size={40} className="text-neon-purple" />
+                                <Shield size={40} className="text-stellar-yellow" />
                             </div>
                             <div>
                                 <h3 className="text-xl font-bold mb-2">Verified Core Modules</h3>

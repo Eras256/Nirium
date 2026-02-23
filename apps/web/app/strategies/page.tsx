@@ -11,9 +11,9 @@ import { useRouter } from "next/navigation";
 // Base Template Definitions
 const BASE_STRATEGIES = [
     {
-        id: "sui-usdc-loop",
+        id: "nirium-usdc-loop",
         name: "XLM-USDC Kinetic Vector",
-        description: "High-frequency triangular arbitrage secured by Move atomic PTBs. Executes only when spread > 0.4% with Hot Potato safety.",
+        description: "High-frequency triangular arbitrage secured by Soroban multi-op transactions. Executes only when spread > 0.4% with atomic safety.",
         risk: "Low",
         tags: ["Stable", "Blue Chip"],
         color: "from-blue-500 to-cyan-500",
@@ -48,8 +48,8 @@ const BASE_STRATEGIES = [
     },
     {
         id: "lending-loop-max",
-        name: "Navi-Scallop Recursive Yield",
-        description: "Maximizes yield by recursively borrowing and supplying XLM across Navi and Scallop protocols.",
+        name: "Blend Recursive Yield",
+        description: "Maximizes yield by recursively borrowing and supplying XLM across Blend protocol.",
         risk: "Medium",
         tags: ["Leverage", "Lending"],
         color: "from-indigo-500 to-blue-600",
@@ -66,16 +66,16 @@ const BASE_STRATEGIES = [
     },
     {
         id: "stable-yield-agg",
-        name: "Stablecoin Optimization Loop",
-        description: "Auto-rotates USDC/USDT capital between Scallop, Navi, and Cetus to capture the highest lending rates.",
+        name: "Lending Optimization Loop",
+        description: "Auto-rotates USDC capital between Blend and Phoenix to capture the highest lending rates.",
         risk: "Very Low",
         tags: ["Stablecoin", "Savings"],
         color: "from-teal-500 to-cyan-600",
         baseApy: 18.5
     },
     {
-        id: "cetus-clmm-active",
-        name: "CLMM Active Provisioner",
+        id: "soroswap-amm-active",
+        name: "Soroswap AMM Position",
         description: "Concentrated liquidity provision with automated range rebalancing to maximize trading fees.",
         risk: "High",
         tags: ["Liquidity", "High Yield"],
@@ -83,8 +83,8 @@ const BASE_STRATEGIES = [
         baseApy: 65.4
     },
     {
-        id: "bluefin-delta-neutral",
-        name: "Delta Neutral Funding Farmer",
+        id: "phoenix-delta-neutral",
+        name: "Delta Neutral Phoenix Farmer",
         description: "Farms funding rates by longing Spot XLM and shorting Perp XLM. Market neutral strategy.",
         risk: "Low",
         tags: ["Hedging", "Complex"],
@@ -121,7 +121,7 @@ const BASE_STRATEGIES = [
     {
         id: "dual-yield-compounder",
         name: "Dual Token Yield Compounder",
-        description: "Simultaneously earns XLM staking rewards and USDC lending yield by splitting collateral across Scallop and native validators.",
+        description: "Simultaneously earns XLM staking rewards and USDC lending yield by splitting capital across Blend and native validators.",
         risk: "Very Low",
         tags: ["Savings", "Staking"],
         color: "from-cyan-600 to-blue-700",
@@ -130,7 +130,7 @@ const BASE_STRATEGIES = [
     {
         id: "liquidation-hunter",
         name: "Liquidation Vector",
-        description: "Monitors undercollateralized positions across Navi and Scallop. Triggers liquidations at protocol discount, capturing instant profit.",
+        description: "Monitors undercollateralized positions across Blend protocol. Triggers liquidations at protocol discount.",
         risk: "High",
         tags: ["Liquidation", "High Yield"],
         color: "from-red-700 to-rose-800",
@@ -191,7 +191,7 @@ export default function StrategiesPage() {
                 } else if (s.id === 'stable-yield-agg') {
                     dynamicApy = 18 + (Math.random() * 1.5);
                     dynamicTvl = 8500 + Math.random() * 100;
-                } else if (s.id === 'cetus-clmm-active') {
+                } else if (s.id === 'soroswap-clmm-active') {
                     dynamicApy += (Math.random() * 20 - 10);
                     dynamicTvl = 600 + Math.random() * 50;
                 } else if (s.id === 'bluefin-delta-neutral') {
@@ -277,27 +277,27 @@ export default function StrategiesPage() {
         <main className="min-h-screen relative overflow-x-hidden flex flex-col pt-36 pb-20">
             {/* Background elements */}
             <div className="fixed inset-0 z-0 pointer-events-none">
-                <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-neon-purple/20 rounded-full blur-[120px] opacity-50"></div>
-                <div className="absolute bottom-0 left-0 w-[500px] h-[500px] bg-neon-cyan/10 rounded-full blur-[120px] opacity-50"></div>
+                <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-stellar-yellow/20 rounded-full blur-[120px] opacity-50"></div>
+                <div className="absolute bottom-0 left-0 w-[500px] h-[500px] bg-stellar-teal/10 rounded-full blur-[120px] opacity-50"></div>
             </div>
 
             <Navbar />
 
-            <div className="max-w-7xl mx-auto px-6 w-full relative z-10">
+            <div className="max-w-[1600px] w-full mx-auto px-6 relative z-10">
 
                 {/* Header */}
                 <div className="mb-12">
-                    <h1 className="text-4xl md:text-6xl font-black tracking-tighter mb-4">
-                        PROTOCOL <span className="text-gradient">ARSENAL</span>
+                    <h1 className="text-5xl md:text-7xl font-black tracking-tighter mb-6 relative">
+                        PROTOCOL <span className="text-stellar-teal">ARSENAL</span>
                     </h1>
                     <p className="text-gray-400 max-w-2xl text-lg">
-                        Deploy autonomous kernels to the Stellar Network targeting <span className="text-[#4ca2ff] font-bold">XLM</span> or <span className="text-neon-purple font-bold">USDC</span> vaults.
+                        Deploy autonomous kernels to the Stellar Network targeting <span className="text-[#4ca2ff] font-bold">XLM</span> or <span className="text-stellar-yellow font-bold">USDC</span> vaults.
                         Clone institutional-grade logic or architect your own in the Builder.
                     </p>
                 </div>
 
                 {/* Strategies Grid */}
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
                     {strategies.map((strat, i) => (
                         <motion.div
                             key={strat.id}
@@ -305,10 +305,10 @@ export default function StrategiesPage() {
                             animate={{ opacity: 1, y: 0 }}
                             transition={{ delay: i * 0.1 }}
                             whileHover={{ y: -5 }}
-                            className="glass-panel p-6 rounded-2xl flex flex-col border border-white/5 hover:border-white/20 transition-all group"
+                            className="bg-[#080808] p-6 rounded-2xl flex flex-col border border-white/5 hover:border-stellar-teal/30 hover:shadow-[0_0_30px_rgba(45,235,232,0.1)] transition-all group"
                         >
-                            <div className={`h-32 w-full rounded-xl bg-gradient-to-br ${strat.color} mb-6 relative overflow-hidden`}>
-                                <div className="absolute inset-0 bg-black/20 backdrop-blur-[2px]"></div>
+                            <div className={`h-32 w-full rounded-xl bg-white/5 border-b border-white/5 mb-6 relative overflow-hidden`}>
+                                <div className="absolute inset-0 bg-gradient-to-t from-[#050505] to-transparent"></div>
                                 <div className="absolute inset-0 flex items-center justify-center">
                                     <Cpu size={48} className="text-white opacity-90 drop-shadow-lg" />
                                 </div>
@@ -319,17 +319,17 @@ export default function StrategiesPage() {
                             </div>
 
                             <div className="flex justify-between items-start mb-2">
-                                <h3 className="text-xl font-bold tracking-tight">{strat.name}</h3>
-                                <div className={`text-xs px-2 py-1 rounded font-bold font-mono uppercase ${strat.risk === 'Very Low' ? 'bg-emerald-500/20 text-emerald-400' :
-                                        strat.risk === 'Low' ? 'bg-green-500/20 text-green-400' :
-                                            strat.risk === 'Medium' ? 'bg-amber-500/20 text-amber-400' :
-                                                'bg-red-500/20 text-red-400'
+                                <h3 className="text-2xl font-black tracking-tighter text-white">{strat.name}</h3>
+                                <div className={`text-[10px] px-2 py-1 rounded font-bold font-mono uppercase ${strat.risk === 'Very Low' ? 'bg-emerald-500/20 text-emerald-400' :
+                                    strat.risk === 'Low' ? 'bg-green-500/20 text-green-400' :
+                                        strat.risk === 'Medium' ? 'bg-amber-500/20 text-amber-400' :
+                                            'bg-red-500/20 text-red-400'
                                     }`}>
                                     {strat.risk} Risk
                                 </div>
                             </div>
 
-                            <p className="text-sm text-gray-400 mb-3 flex-1 leading-relaxed">
+                            <p className="text-xs text-gray-400 mb-4 flex-1 leading-relaxed">
                                 {strat.description}
                             </p>
 
@@ -343,11 +343,11 @@ export default function StrategiesPage() {
                             </div>
 
                             <div className="grid grid-cols-2 gap-4 mb-6">
-                                <div className="bg-white/5 rounded-lg p-3">
+                                <div className="bg-[#111] border border-white/5 rounded-lg p-3 group-hover:border-stellar-teal/20 transition-colors">
                                     <div className="text-[10px] text-gray-500 uppercase tracking-widest mb-1">Alpha Coefficient</div>
-                                    <div className="text-xl font-mono text-neon-cyan animate-pulse-slow">{strat.apy}</div>
+                                    <div className="text-xl font-mono text-stellar-teal animate-pulse-slow">{strat.apy}</div>
                                 </div>
-                                <div className="bg-white/5 rounded-lg p-3">
+                                <div className="bg-[#111] border border-white/5 rounded-lg p-3">
                                     <div className="text-[10px] text-gray-500 uppercase tracking-widest mb-1">Liquidity Depth</div>
                                     <div className="text-xl font-mono text-white">{strat.tvl}</div>
                                 </div>
@@ -358,7 +358,7 @@ export default function StrategiesPage() {
                                 <div className="flex items-center bg-black/40 border border-white/10 rounded-lg p-1">
                                     <button
                                         onClick={() => setSelectedAssets({ ...selectedAssets, [strat.id]: 'USDC' })}
-                                        className={`px-3 py-1 rounded-md text-xs font-bold transition-colors ${(selectedAssets[strat.id] || 'XLM') === 'USDC' ? 'bg-neon-purple text-white shadow-lg' : 'text-gray-500 hover:text-white'}`}
+                                        className={`px-3 py-1 rounded-md text-xs font-bold transition-colors ${(selectedAssets[strat.id] || 'XLM') === 'USDC' ? 'bg-stellar-yellow text-white shadow-lg' : 'text-gray-500 hover:text-white'}`}
                                     >
                                         USDC
                                     </button>
@@ -380,7 +380,7 @@ export default function StrategiesPage() {
                                 <button
                                     onClick={() => handleDeploy(strat)}
                                     disabled={deployingId === strat.id}
-                                    className="flex-1 bg-neon-cyan text-black py-3 rounded-lg text-sm font-bold hover:shadow-[0_0_20px_rgba(0,243,255,0.4)] transition-all flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed font-mono">
+                                    className="flex-1 bg-stellar-yellow text-black py-3 rounded-lg text-sm font-bold hover:shadow-[0_0_20px_rgba(255,200,0,0.4)] transition-all flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed font-mono">
                                     {deployingId === strat.id ? (
                                         <div className="w-4 h-4 border-2 border-black border-t-transparent rounded-full animate-spin"></div>
                                     ) : (
@@ -392,18 +392,18 @@ export default function StrategiesPage() {
                     ))}
 
                     {/* "Create New" Card */}
-                    <Link href="/strategies/builder" className="border border-dashed border-white/10 rounded-2xl p-6 flex flex-col items-center justify-center text-center gap-4 hover:bg-white/5 hover:border-neon-cyan/30 transition-all text-gray-400 hover:text-white cursor-pointer min-h-[400px] group">
-                        <div className="w-16 h-16 rounded-full bg-white/5 group-hover:bg-neon-cyan/10 flex items-center justify-center mb-2 transition-colors border border-white/5 group-hover:border-neon-cyan/20">
-                            <Zap size={32} className="group-hover:text-neon-cyan transition-colors" />
+                    <Link href="/strategies/builder" className="border border-dashed border-white/10 rounded-2xl p-6 flex flex-col items-center justify-center text-center gap-4 hover:bg-white/5 hover:border-stellar-teal/30 transition-all text-gray-400 hover:text-white cursor-pointer min-h-[400px] group">
+                        <div className="w-16 h-16 rounded-full bg-white/5 group-hover:bg-stellar-teal/10 flex items-center justify-center mb-2 transition-colors border border-white/5 group-hover:border-stellar-teal/20">
+                            <Zap size={32} className="group-hover:text-stellar-teal transition-colors" />
                         </div>
-                        <h3 className="text-xl font-bold font-mono tracking-tight group-hover:text-neon-cyan transition-colors">ARCHITECT NEW PROTOCOL</h3>
+                        <h3 className="text-xl font-bold font-mono tracking-tight group-hover:text-stellar-teal transition-colors">ARCHITECT NEW PROTOCOL</h3>
                         <p className="text-sm max-w-xs text-gray-400">
                             Visual drag-and-drop Builder with 6 node categories:<br />
-                            <span className="text-neon-cyan font-mono text-[10px] uppercase">Atomic Engine · AI Intelligence · Swaps · Security · Social · Signals</span>
+                            <span className="text-stellar-teal font-mono text-[10px] uppercase">Atomic Engine · AI Intelligence · Swaps · Security · Social · Signals</span>
                         </p>
                         <div className="flex items-center gap-2 mt-2">
                             <span className="text-[10px] font-mono bg-blue-500/10 text-[#4ca2ff] px-2 py-0.5 rounded">XLM</span>
-                            <span className="text-[10px] font-mono bg-neon-purple/10 text-neon-purple px-2 py-0.5 rounded">USDC</span>
+                            <span className="text-[10px] font-mono bg-stellar-yellow/10 text-stellar-yellow px-2 py-0.5 rounded">USDC</span>
                             <span className="text-[10px] font-mono bg-white/5 text-gray-500 px-2 py-0.5 rounded">+ Export Schema</span>
                         </div>
                     </Link>

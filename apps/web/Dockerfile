@@ -24,7 +24,7 @@ COPY . .
 ENV NEXT_TELEMETRY_DISABLED 1
 
 # Build the web package
-RUN pnpm --filter suiloop-web build
+RUN pnpm --filter nirium-web build
 
 # Runner stage
 FROM base AS runner
