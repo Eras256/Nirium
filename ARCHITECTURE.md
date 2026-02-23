@@ -9,15 +9,13 @@ The architecture shifts from isolated contracts to a centralized "Hub" (The Sent
 
 ```mermaid
 graph TD
-    User((Institutional User)) -->|Deposits| Pool[ZK-Identity Pool]
-    User -->|Interacts| UI[Neural UI / Next.js 16]
+    User((Institutional User)) -->|Interacts| UI[Neural UI / Next.js 16]
     
     Agent((AI Agent)) -->|x402 Payment| Gate[Payment Gate]
     Agent -->|API Request| Proxy[Next.js Proxy Interceptor]
     
     subgraph "On-Chain Hub (Soroban)"
         Sentinel[Treasury Sentinel (HUB)]
-        Pool -.->|Liquidity| Sentinel
         Gate -.->|Revenue| Sentinel
         
         DEX[Stellar DEX]
@@ -33,24 +31,17 @@ graph TD
 
 ## 2. Core Contracts (The Spokes)
 
-### 2.1 Identity Pool (Privacy Spoke)
-*   **Role**: Anonymizes funds. Users deposit public funds, receive a ZK-Commitment, and withdraw to fresh addresses.
-*   **Tech**:
-    *   **Merkle Tree**: Depth 20, Poseidon Hash ($t=3$).
-    *   **Verification**: Uses `bn254_multi_pairing_check` host function (Protocol 25) for Groth16 proofs.
-    *   **Anti-Spam**: Minimum deposit thresholds, fee-bump requirements.
-
-### 2.2 Payment Gate (Revenue Spoke)
+### 2.1 Payment Gate (Revenue Spoke)
 *   **Role**: Monetizes API access via x402.
 *   **Flow**:
     1.  Receives Payment (USDC/XLM).
     2.  Emits `PaymentAuthorized(agent, tier, amount)`.
     3.  Forwards funds **immediately** to the Sentinel (Hub). It holds 0 liquidity.
 
-### 2.3 Treasury Sentinel (The Hub)
+### 2.2 Treasury Sentinel (The Hub)
 *   **Role**: Active Liquidity Manager.
 *   **Logic**:
-    *   **Aggregation**: Receives streams from Payment Gate and fees from Identity Pool.
+    *   **Aggregation**: Receives streams from Payment Gate.
     *   **Yield Sweeping**:
         *   `if balance(USDC) > 10,000`:
         *   Executing `swap(USDC -> yUSDC)` on Stellar DEX.
@@ -95,7 +86,6 @@ An edge-compatible request handler in `src/proxy.ts`.
 
 ### 4.2 Data Flow
 *   **Payments**: Agent -> Payment Gate -> Sentinel -> DEX (Yield).
-*   **Privacy**: User -> Identity Pool -> (ZK Proof) -> Fresh Address.
 
 ---
 

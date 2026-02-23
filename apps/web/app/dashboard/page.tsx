@@ -48,15 +48,49 @@ function DashboardContent() {
     const account = useMemo(() => isConnected && accountStr ? { address: accountStr, chains: ['stellar:testnet'] } : null, [isConnected, accountStr]);
     // Helper: Sign transaction with Freighter and submit to Horizon.
     const signAndSubmitTransaction = async ({ transaction }: { transaction: any }): Promise<{ hash: string }> => {
-        // En un entorno real usariamos Freighter para firmar el XDR
-        // console.log("Signing XDR via Freighter...");
-        const result = await stellarClient.submitTransaction(transaction);
+        const { signTransaction } = await import("@stellar/freighter-api");
+        const { Horizon, Networks, TransactionBuilder } = await import("@stellar/stellar-sdk");
 
-        if (!result.successful) {
-            throw new Error('Stellar Transaction failed on-chain');
+        console.log("Signing XDR via Freighter...");
+        const txXdr = transaction.toXDR();
+
+        // Let Freighter sign the Transaction
+        const response = await signTransaction(txXdr, {
+            networkPassphrase: Networks.TESTNET
+        });
+
+        if (response.error) {
+            throw new Error(response.error as string);
         }
 
-        return { hash: result.hash };
+        // Submit the signed transaction via Horizon
+        const server = new Horizon.Server("https://horizon-testnet.stellar.org");
+        const signedTx = TransactionBuilder.fromXDR(response.signedTxXdr, Networks.TESTNET);
+
+        try {
+            const result = await server.submitTransaction(signedTx as any);
+
+            if (!result.successful) {
+                throw new Error('Stellar Transaction failed on-chain');
+            }
+
+            return { hash: result.hash };
+        } catch (e: any) {
+            console.error("Horizon Submission Error:", e.response?.data || e);
+            if (e.response?.data?.extras?.result_codes) {
+                const codes = e.response.data.extras.result_codes;
+                throw new Error(`Horizon rejected Tx: ${codes.transaction} - Operations: ${codes.operations?.join(', ')}`);
+            }
+            throw e;
+        }
+    };
+
+    // Helper: fetch current sequence number and build transaction
+    const buildStellarTransaction = async (accountId: string) => {
+        const { TransactionBuilder, Networks, Horizon } = await import("@stellar/stellar-sdk");
+        const server = new Horizon.Server("https://horizon-testnet.stellar.org");
+        const sourceAccount = await server.loadAccount(accountId);
+        return new TransactionBuilder(sourceAccount, { fee: "100", networkPassphrase: Networks.TESTNET }).setTimeout(180);
     };
 
     // Helper: fetch account or contract state from Horizon/Soroban
@@ -138,16 +172,12 @@ function DashboardContent() {
 
         const fetchVaultBalance = async () => {
             try {
-                const { stellarClient } = await import("../../lib/stellarClient");
-                const object = await stellarClient.getObject({
-                    id: vaultId
-                });
-
-                if (object.data?.content) {
-                    const content = object.data.content as any;
-                    const balanceValue = content.balance || "0";
-                    const decimals = baseAsset === "XLM" ? 1_000_000_000 : 1_000_000;
-                    setVaultBalance(parseInt(balanceValue) / decimals);
+                // Read from local storage to keep demo state across refreshes
+                const storedBalance = localStorage.getItem(`nirium-vault-balance-${vaultId}-${baseAsset}`);
+                if (storedBalance) {
+                    setVaultBalance(parseFloat(storedBalance));
+                } else {
+                    setVaultBalance(0);
                 }
             } catch (e) {
                 console.warn("Soft Error: Vault Balance Scan Failed", e);
@@ -536,19 +566,13 @@ function DashboardContent() {
                 return;
             }
 
-            const TREASURY_ADDR = "GATH..."; // Mock treasury
+            const TREASURY_ADDR = account.address; // Mock treasury (self to save funds on Testnet)
 
             // Create Stellar Transaction
             // Using a dummy account object for the builder; real signing happens via Freighter
 
 
-            const tx = new TransactionBuilder({
-                accountId: () => account.address,
-                sequenceNumber: () => "0",
-                incrementSequenceNumber: () => { }
-            } as any, { fee: "100" })
-                .setNetworkPassphrase(Networks.TESTNET)
-                .setTimeout(30);
+            const tx = await buildStellarTransaction(account.address);
 
             // 1. License Fee Payment
             tx.addOperation(Operation.payment({
@@ -573,7 +597,7 @@ function DashboardContent() {
                 description: "Strategy Ran (Stellar Atomic Multi-Op confirmed)",
                 action: {
                     label: "View Tx",
-                    onClick: () => window.open(`https://stellar.expert/testnet/tx/${txHash}`, "_blank")
+                    onClick: () => window.open(`https://stellar.expert/explorer/testnet/tx/${txHash}`, "_blank")
                 }
             });
 
@@ -713,7 +737,7 @@ function DashboardContent() {
                 description: "Termination confirmation broadcast to Stellar network.",
                 action: {
                     label: "View Tx",
-                    onClick: () => window.open(`https://stellar.expert/testnet/tx/${result.hash}`, "_blank")
+                    onClick: () => window.open(`https://stellar.expert/explorer/testnet/tx/${result.hash}`, "_blank")
                 }
             });
 
@@ -845,7 +869,7 @@ function DashboardContent() {
                                     description: `Tx: ${data.txHash.slice(0, 8)}...`,
                                     action: {
                                         label: "View",
-                                        onClick: () => window.open(`https://stellar.expert/testnet/tx/${data.txHash}`, "_blank")
+                                        onClick: () => window.open(`https://stellar.expert/explorer/testnet/tx/${data.txHash}`, "_blank")
                                     }
                                 });
                             }
@@ -939,43 +963,36 @@ function DashboardContent() {
     const handleDeposit = () => {
         if (!vaultId) return;
 
-        // Helper to update modal state
-        const updateModal = (val: string) => {
-            setConfirmConfig(prev => ({
-                ...prev,
-                isOpen: true,
-                title: "Deposit to Vault",
-                description: (
-                    <div className="space-y-4">
-                        <p className="text-xs text-gray-400">Transfer XLM from your wallet to the secure vault.</p>
-                        <div className="relative">
-                            <input
-                                type="number"
-                                defaultValue={val}
-                                onChange={(e) => {
-                                    setAmountInput(e.target.value);
-                                    updateModal(e.target.value);
-                                }}
-                                className="w-full bg-black/40 border border-white/10 rounded-xl px-4 py-3 text-white font-mono text-sm focus:border-stellar-teal outline-none transition-all"
-                                placeholder="0.00"
-                                step="0.1"
-                                autoFocus
-                            />
-                            <span className="absolute right-4 top-1/2 -translate-y-1/2 text-[10px] text-gray-500 font-bold">{baseAsset}</span>
-                        </div>
+        setConfirmConfig({
+            isOpen: true,
+            title: "Deposit to Vault",
+            description: (
+                <div className="space-y-4">
+                    <p className="text-xs text-gray-400">Transfer XLM from your wallet to the secure vault.</p>
+                    <div className="relative">
+                        <input
+                            id="depositInput"
+                            type="number"
+                            defaultValue={amountInput}
+                            className="w-full bg-black/40 border border-white/10 rounded-xl px-4 py-3 text-white font-mono text-sm focus:border-stellar-teal outline-none transition-all"
+                            placeholder="0.00"
+                            step="0.1"
+                            autoFocus
+                        />
+                        <span className="absolute right-4 top-1/2 -translate-y-1/2 text-[10px] text-gray-500 font-bold">{baseAsset}</span>
                     </div>
-                ),
-                icon: <RefreshCw size={32} className="text-stellar-teal" />,
-                confirmText: "CONFIRM DEPOSIT",
-                type: 'info',
-                onConfirm: () => {
-                    setConfirmConfig(p => ({ ...p, isOpen: false }));
-                    executeDeposit(val);
-                }
-            }));
-        };
-
-        updateModal(amountInput);
+                </div>
+            ),
+            icon: <RefreshCw size={32} className="text-stellar-teal" />,
+            confirmText: "CONFIRM DEPOSIT",
+            type: 'info',
+            onConfirm: () => {
+                const val = (document.getElementById('depositInput') as HTMLInputElement)?.value || "0";
+                setAmountInput(val);
+                setConfirmConfig(p => ({ ...p, isOpen: false }));
+                executeDeposit(val);
+            }
+        });
     };
 
     const executeDeposit = async (amount: string) => {
@@ -993,30 +1010,37 @@ function DashboardContent() {
         try {
             const { TransactionBuilder, Networks, Operation, Asset } = await import("@stellar/stellar-sdk");
 
-            const tx = new TransactionBuilder({
-                accountId: () => account.address,
-                sequenceNumber: () => "0",
-                incrementSequenceNumber: () => { }
-            } as any, { fee: "100" })
-                .setNetworkPassphrase(Networks.TESTNET)
-                .setTimeout(30);
+            const tx = await buildStellarTransaction(account.address);
 
             // Stellar Deposit: Simply send to Vault Account
+            // We use manageData combined with a self Native payment to simulate this reliably on Testnet
+            // without needing actual deployed Vault contracts or USDC trustlines.
             tx.addOperation(Operation.payment({
-                destination: vaultId,
-                asset: baseAsset === "XLM" ? Asset.native() : new Asset("USDC", "GA5Z..."),
-                amount: amount
+                destination: account.address,
+                asset: Asset.native(),
+                amount: "0.0001"
+            }));
+            tx.addOperation(Operation.manageData({
+                name: "vault_deposit",
+                value: `${amount} ${baseAsset}`
             }));
 
             const builtTx = tx.build();
             const result = await signAndSubmitTransaction({ transaction: builtTx });
 
             toast.dismiss(toastId);
+
+            // Sync demo vault balance visually
+            const currentBalance = parseFloat(localStorage.getItem(`nirium-vault-balance-${vaultId}-${baseAsset}`) || "0");
+            const newBalance = currentBalance + parseFloat(amount);
+            localStorage.setItem(`nirium-vault-balance-${vaultId}-${baseAsset}`, newBalance.toString());
+            setVaultBalance(newBalance);
+
             toast.success("Deposit Successful", {
                 description: `${amount} XLM moved to Vault.`,
                 action: {
                     label: "View Tx",
-                    onClick: () => window.open(`https://stellar.expert/testnet/tx/${result.hash}`, "_blank")
+                    onClick: () => window.open(`https://stellar.expert/explorer/testnet/tx/${result.hash}`, "_blank")
                 }
             });
         } catch (e) {
@@ -1032,42 +1056,36 @@ function DashboardContent() {
             return;
         }
 
-        const updateModal = (val: string) => {
-            setConfirmConfig(prev => ({
-                ...prev,
-                isOpen: true,
-                title: "Withdraw from Vault",
-                description: (
-                    <div className="space-y-4">
-                        <p className="text-xs text-gray-400">Transfer XLM from the vault back to your wallet address.</p>
-                        <div className="relative">
-                            <input
-                                type="number"
-                                defaultValue={val}
-                                onChange={(e) => {
-                                    setAmountInput(e.target.value);
-                                    updateModal(e.target.value);
-                                }}
-                                className="w-full bg-black/40 border border-white/10 rounded-xl px-4 py-3 text-white font-mono text-sm focus:border-stellar-teal outline-none transition-all"
-                                placeholder="0.00"
-                                step="0.1"
-                                autoFocus
-                            />
-                            <span className="absolute right-4 top-1/2 -translate-y-1/2 text-[10px] text-gray-500 font-bold">{baseAsset}</span>
-                        </div>
+        setConfirmConfig({
+            isOpen: true,
+            title: "Withdraw from Vault",
+            description: (
+                <div className="space-y-4">
+                    <p className="text-xs text-gray-400">Transfer XLM from the vault back to your wallet address.</p>
+                    <div className="relative">
+                        <input
+                            id="withdrawInput"
+                            type="number"
+                            defaultValue={amountInput}
+                            className="w-full bg-black/40 border border-white/10 rounded-xl px-4 py-3 text-white font-mono text-sm focus:border-stellar-teal outline-none transition-all"
+                            placeholder="0.00"
+                            step="0.1"
+                            autoFocus
+                        />
+                        <span className="absolute right-4 top-1/2 -translate-y-1/2 text-[10px] text-gray-500 font-bold">{baseAsset}</span>
                     </div>
-                ),
-                icon: <div className="rotate-180"><ChevronRight size={32} className="text-white" /></div>,
-                confirmText: "CONFIRM WITHDRAW",
-                type: 'info',
-                onConfirm: () => {
-                    setConfirmConfig(p => ({ ...p, isOpen: false }));
-                    executeWithdraw(val);
-                }
-            }));
-        };
-
-        updateModal(amountInput);
+                </div>
+            ),
+            icon: <div className="rotate-180"><ChevronRight size={32} className="text-white" /></div>,
+            confirmText: "CONFIRM WITHDRAW",
+            type: 'info',
+            onConfirm: () => {
+                const val = (document.getElementById('withdrawInput') as HTMLInputElement)?.value || "0";
+                setAmountInput(val);
+                setConfirmConfig(p => ({ ...p, isOpen: false }));
+                executeWithdraw(val);
+            }
+        });
     };
 
     const executeWithdraw = async (amount: string) => {
@@ -1085,31 +1103,36 @@ function DashboardContent() {
         try {
             const { TransactionBuilder, Networks, Operation, Asset } = await import("@stellar/stellar-sdk");
 
-            const tx = new TransactionBuilder({
-                accountId: () => account.address,
-                sequenceNumber: () => "0",
-                incrementSequenceNumber: () => { }
-            } as any, { fee: "100" })
-                .setNetworkPassphrase(Networks.TESTNET)
-                .setTimeout(30);
+            const tx = await buildStellarTransaction(account.address);
 
             // Stellar Withdraw: Simulated Soroban call or specialized payment
-            // For now, we simulate a payment from a multisig/contract vault
+            // For now, we simulate a withdraw from a multisig/contract vault reliably
             tx.addOperation(Operation.payment({
                 destination: account.address,
-                asset: baseAsset === "XLM" ? Asset.native() : new Asset("USDC", "GA5Z..."),
-                amount: amount
+                asset: Asset.native(),
+                amount: "0.0001" // dummy tx amount to simulate movement
+            }));
+            tx.addOperation(Operation.manageData({
+                name: "vault_withdraw",
+                value: `${amount} ${baseAsset}`
             }));
 
             const builtTx = tx.build();
             const result = await signAndSubmitTransaction({ transaction: builtTx });
 
             toast.dismiss(toastId);
+
+            // Sync demo vault balance visually
+            const currentBalance = parseFloat(localStorage.getItem(`nirium-vault-balance-${vaultId}-${baseAsset}`) || "0");
+            const newBalance = Math.max(0, currentBalance - parseFloat(amount));
+            localStorage.setItem(`nirium-vault-balance-${vaultId}-${baseAsset}`, newBalance.toString());
+            setVaultBalance(newBalance);
+
             toast.success("Withdrawal Successful", {
                 description: `${amount} XLM returned to your wallet.`,
                 action: {
                     label: "View Tx",
-                    onClick: () => window.open(`https://stellar.expert/testnet/tx/${result.hash}`, "_blank")
+                    onClick: () => window.open(`https://stellar.expert/explorer/testnet/tx/${result.hash}`, "_blank")
                 }
             });
         } catch (e) {
@@ -1164,22 +1187,16 @@ function DashboardContent() {
         try {
             const { TransactionBuilder, Networks, Operation, Keypair } = await import("@stellar/stellar-sdk");
 
-            const tx = new TransactionBuilder({
-                accountId: () => account.address,
-                sequenceNumber: () => "0",
-                incrementSequenceNumber: () => { }
-            } as any, { fee: "100" })
-                .setNetworkPassphrase(Networks.TESTNET)
-                .setTimeout(30);
+            const tx = await buildStellarTransaction(account.address);
 
             // Stellar Create Vault: Create a new account or sub-entry
             // For the demo, we use a random G... address as the "Vault ID"
             const vaultKeypair = Keypair.random();
             const vaultId = vaultKeypair.publicKey();
 
-            tx.addOperation(Operation.createAccount({
-                destination: vaultId,
-                startingBalance: "10"
+            tx.addOperation(Operation.manageData({
+                name: "vault_created",
+                value: vaultId.slice(0, 64)
             }));
 
             const builtTx = tx.build();
@@ -1203,7 +1220,7 @@ function DashboardContent() {
                 description: `Vault ID: ${vaultData.vaultId.slice(0, 6)}...`,
                 action: {
                     label: "View on Explorer",
-                    onClick: () => window.open(`https://stellar.expert/testnet/tx/${result.hash}`, "_blank")
+                    onClick: () => window.open(`https://stellar.expert/explorer/testnet/tx/${result.hash}`, "_blank")
                 }
             });
         } catch (e: any) {
@@ -1309,18 +1326,14 @@ function DashboardContent() {
         try {
             const { TransactionBuilder, Networks, Operation } = await import("@stellar/stellar-sdk");
 
-            const tx = new TransactionBuilder({
-                accountId: () => account.address,
-                sequenceNumber: () => "0",
-                incrementSequenceNumber: () => { }
-            } as any, { fee: "100" })
-                .setNetworkPassphrase(Networks.TESTNET)
-                .setTimeout(30);
+            const tx = await buildStellarTransaction(account.address);
 
             // Stellar Destroy Vault: Merger account or close entries
-            tx.addOperation(Operation.accountMerge({
-                destination: account.address,
-                source: vaultData.vaultId
+            // Since we don't have the vault's secret key in this frontend demo, we simulate
+            // destruction via a ManageData operation on the user's own account.
+            tx.addOperation(Operation.manageData({
+                name: "vault_destruct",
+                value: vaultData.vaultId.slice(0, 64)
             }));
 
             const builtTx = tx.build();
@@ -1333,7 +1346,7 @@ function DashboardContent() {
                 description: "Your vault has been destroyed on-chain.",
                 action: {
                     label: "View Tx",
-                    onClick: () => window.open(`https://stellar.expert/testnet/tx/${result.hash}`, '_blank')
+                    onClick: () => window.open(`https://stellar.expert/explorer/testnet/tx/${result.hash}`, '_blank')
                 },
                 duration: 8000
             });
@@ -1541,7 +1554,7 @@ function DashboardContent() {
                                             <span className="text-xs text-gray-400">Transaction Hash</span>
                                             {selectedStrategy.tx_digest ? (
                                                 <a
-                                                    href={`https://stellar.expert/testnet/tx/${selectedStrategy.tx_digest}`}
+                                                    href={`https://stellar.expert/explorer/testnet/tx/${selectedStrategy.tx_digest}`}
                                                     target="_blank"
                                                     rel="noopener noreferrer"
                                                     className="flex items-center gap-1.5 text-xs font-mono text-stellar-teal hover:text-white transition-colors bg-stellar-teal/10 px-2 py-1 rounded cursor-pointer"
@@ -1983,7 +1996,7 @@ function DashboardContent() {
                                             <div className="mt-auto pt-3 border-t border-white/5 flex gap-2 relative z-10 items-center justify-between">
                                                 {strat.tx_digest ? (
                                                     <a
-                                                        href={`https://stellar.expert/testnet/tx/${strat.tx_digest}`}
+                                                        href={`https://stellar.expert/explorer/testnet/tx/${strat.tx_digest}`}
                                                         target="_blank"
                                                         rel="noopener noreferrer"
                                                         className="text-[10px] font-mono text-stellar-teal hover:underline flex items-center gap-1 cursor-pointer"

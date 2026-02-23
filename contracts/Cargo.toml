@@ -1,8 +1,6 @@
 [workspace]
 resolver = "2"
 members = [
-    "verifier",
-    "identity-pool",
     "payment-gate",
     "sentinel",
 ]
