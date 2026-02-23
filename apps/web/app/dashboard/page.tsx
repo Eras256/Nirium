@@ -1195,7 +1195,7 @@ function DashboardContent() {
             const vaultId = vaultKeypair.publicKey();
 
             tx.addOperation(Operation.manageData({
-                name: "vault_created",
+                name: `vault_${baseAsset}_create`,
                 value: vaultId.slice(0, 64)
             }));
 
@@ -1332,7 +1332,7 @@ function DashboardContent() {
             // Since we don't have the vault's secret key in this frontend demo, we simulate
             // destruction via a ManageData operation on the user's own account.
             tx.addOperation(Operation.manageData({
-                name: "vault_destruct",
+                name: `vault_${baseAsset}_closed`,
                 value: vaultData.vaultId.slice(0, 64)
             }));
 
