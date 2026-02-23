@@ -9,9 +9,13 @@ const config: Config = {
     theme: {
         extend: {
             colors: {
-                background: "#030014",
-                "neon-cyan": "#00f3ff",
-                "neon-purple": "#bd00ff",
+                background: "#050505",
+                "stellar-teal": "#2DEBE8",
+                "stellar-yellow": "#FFC800",
+            },
+            fontFamily: {
+                sans: ['var(--font-inter)'],
+                mono: ['var(--font-inconsolata)'],
             },
             backgroundImage: {
                 "gradient-radial": "radial-gradient(var(--tw-gradient-stops))",

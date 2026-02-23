@@ -8,7 +8,7 @@ import { motion } from 'framer-motion';
 import { toast } from 'sonner';
 import { supabase } from "@/lib/supabase";
 
-type WalrusStatus = 'connecting' | 'live' | 'error';
+type NeuralArchiveStatus = 'connecting' | 'live' | 'error';
 type SystemStatus = 'OPERATIONAL' | 'DEGRADED' | 'OFFLINE';
 
 export default function AgentsPage() {
@@ -20,8 +20,8 @@ export default function AgentsPage() {
 
     // Dynamic system telemetry
     const [rpcLatency, setRpcLatency] = useState<number | null>(null);
-    const [walrusStatus, setWalrusStatus] = useState<WalrusStatus>('connecting');
-    const [walrusUploadCount, setWalrusUploadCount] = useState(0);
+    const [archiveStatus, setArchiveStatus] = useState<NeuralArchiveStatus>('connecting');
+    const [archiveCount, setArchiveCount] = useState(0);
     const [uplinkStatus, setUplinkStatus] = useState<SystemStatus>('OPERATIONAL');
     const [logBarData, setLogBarData] = useState([40, 65, 30, 80, 50, 90, 40, 70, 45, 60]);
 
@@ -30,11 +30,7 @@ export default function AgentsPage() {
         const measureLatency = async () => {
             try {
                 const start = performance.now();
-                await fetch('https://fullnode.testnet.sui.io', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ jsonrpc: '2.0', id: 1, method: 'sui_getLatestCheckpointSequenceNumber', params: [] }),
-                });
+                await fetch('https://horizon-testnet.stellar.org');
                 const latency = Math.round(performance.now() - start);
                 setRpcLatency(latency);
                 setUplinkStatus(latency < 300 ? 'OPERATIONAL' : latency < 800 ? 'DEGRADED' : 'OFFLINE');
@@ -48,24 +44,24 @@ export default function AgentsPage() {
         return () => clearInterval(interval);
     }, []);
 
-    // Simulate Walrus decentralized storage integration
+    // Simulate Neural Archive decentralized storage integration
     useEffect(() => {
-        // Simulate Walrus connection handshake
+        // Simulate Archive connection handshake
         const connectTimer = setTimeout(() => {
-            setWalrusStatus('live');
-            setWalrusUploadCount(Math.floor(Math.random() * 40) + 12);
+            setArchiveStatus('live');
+            setArchiveCount(Math.floor(Math.random() * 40) + 12);
         }, 1800);
 
         return () => clearTimeout(connectTimer);
     }, []);
 
-    // Track Walrus uploads when new logs arrive
+    // Track Archive uploads when new logs arrive
     useEffect(() => {
-        if (walrusStatus === 'live' && logs.length > 0) {
-            // Simulate each new log being uploaded to Walrus
-            setWalrusUploadCount(prev => prev + 1);
+        if (archiveStatus === 'live' && logs.length > 0) {
+            // Simulate each new log being uploaded to IPFS/Archive
+            setArchiveCount(prev => prev + 1);
         }
-    }, [logs.length, walrusStatus]);
+    }, [logs.length, archiveStatus]);
 
     // Supabase Realtime for Live Logs
     useEffect(() => {
@@ -120,32 +116,32 @@ export default function AgentsPage() {
 
     const statusColor = (s: SystemStatus) => s === 'OPERATIONAL' ? 'bg-green-500/20 text-green-400' : s === 'DEGRADED' ? 'bg-yellow-500/20 text-yellow-400' : 'bg-red-500/20 text-red-400';
 
-    const WalrusIcon = () => {
-        if (walrusStatus === 'connecting') return <Loader className="w-3 h-3 animate-spin text-blue-400" />;
-        if (walrusStatus === 'live') return <CheckCircle className="w-3 h-3 text-green-400" />;
+    const ArchiveIcon = () => {
+        if (archiveStatus === 'connecting') return <Loader className="w-3 h-3 animate-spin text-blue-400" />;
+        if (archiveStatus === 'live') return <CheckCircle className="w-3 h-3 text-green-400" />;
         return <AlertCircle className="w-3 h-3 text-red-400" />;
     };
 
-    const walrusBadgeClass = walrusStatus === 'connecting'
+    const archiveBadgeClass = archiveStatus === 'connecting'
         ? 'bg-blue-500/20 text-blue-400'
-        : walrusStatus === 'live'
+        : archiveStatus === 'live'
             ? 'bg-green-500/20 text-green-400'
             : 'bg-red-500/20 text-red-400';
 
-    const walrusBadgeText = walrusStatus === 'connecting' ? 'CONNECTING...' : walrusStatus === 'live' ? `LIVE · ${walrusUploadCount} BLOBS` : 'ERROR';
+    const archiveBadgeText = archiveStatus === 'connecting' ? 'CONNECTING...' : archiveStatus === 'live' ? `LIVE · ${archiveCount} RECORDS` : 'ERROR';
 
-    const USDC_TYPE = '0xa1ec7fc00a6f40db9693ad1415d0c193ad3906494428cf252621037bd7117e29::usdc::USDC';
-    const XLM_TYPE = '0x2::sui::XLM';
+    const USDC_TYPE = 'USDC';
+    const XLM_TYPE = 'XLM';
     const selectedCoinType = sdkAsset === 'USDC' ? USDC_TYPE : XLM_TYPE;
 
     return (
-        <main className="min-h-screen bg-black text-white selection:bg-neon-cyan/30 overflow-hidden relative">
+        <main className="min-h-screen bg-black text-white selection:bg-stellar-teal/30 overflow-hidden relative">
             <Navbar />
 
             {/* Background Effects */}
             <div className="fixed inset-0 z-0">
-                <div className="absolute top-0 left-0 w-full h-[500px] bg-gradient-to-b from-neon-purple/10 to-transparent opacity-50" />
-                <div className="absolute bottom-0 right-0 w-[800px] h-[800px] bg-neon-cyan/5 rounded-full blur-[120px]" />
+                <div className="absolute top-0 left-0 w-full h-[500px] bg-gradient-to-b from-stellar-yellow/10 to-transparent opacity-50" />
+                <div className="absolute bottom-0 right-0 w-[800px] h-[800px] bg-stellar-teal/5 rounded-full blur-[120px]" />
                 <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full h-full bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-10" />
             </div>
 
@@ -156,7 +152,7 @@ export default function AgentsPage() {
                     <motion.div
                         initial={{ opacity: 0, y: -20 }}
                         animate={{ opacity: 1, y: 0 }}
-                        className="inline-flex items-center gap-2 px-3 py-1 bg-white/5 border border-white/10 rounded-full text-xs font-mono text-neon-cyan mb-4"
+                        className="inline-flex items-center gap-2 px-3 py-1 bg-white/5 border border-white/10 rounded-full text-xs font-mono text-stellar-teal mb-4"
                     >
                         <Radio className="w-3 h-3 animate-pulse" />
                         SYSTEM ONLINE: v0.0.7 // ENCRYPTED
@@ -171,9 +167,9 @@ export default function AgentsPage() {
                     </motion.h1>
                     <p className="text-gray-400 max-w-2xl mx-auto text-lg">
                         Interface for deploying autonomous financial warheads.
-                        Generate credentials, monitor <span className="text-[#4ca2ff] font-bold">XLM</span> &amp; <span className="text-neon-purple font-bold">USDC</span> field units,
+                        Generate credentials, monitor <span className="text-[#4ca2ff] font-bold">XLM</span> &amp; <span className="text-stellar-yellow font-bold">USDC</span> field units,
                         and inject logic directly into the Nirium Neural Matrix.
-                        All activity immortalized via <span className="text-pink-400 font-bold">Walrus</span> forensic logging.
+                        All activity immortalized via <span className="text-pink-400 font-bold">Neural Archive</span> forensic logging.
                     </p>
                 </div>
 
@@ -187,10 +183,10 @@ export default function AgentsPage() {
                         transition={{ delay: 0.2 }}
                         className="space-y-6"
                     >
-                        <div className="bg-[#0A0A0A] border border-white/10 rounded-xl p-6 relative overflow-hidden group hover:border-neon-cyan/30 transition-colors">
-                            <div className="absolute inset-0 bg-gradient-to-br from-neon-cyan/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+                        <div className="bg-[#0A0A0A] border border-white/10 rounded-xl p-6 relative overflow-hidden group hover:border-stellar-teal/30 transition-colors">
+                            <div className="absolute inset-0 bg-gradient-to-br from-stellar-teal/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
                             <h3 className="text-sm font-mono text-gray-400 flex items-center gap-2 mb-4">
-                                <Activity className="w-4 h-4 text-neon-cyan" />
+                                <Activity className="w-4 h-4 text-stellar-teal" />
                                 ORBITAL UPLINK STATUS
                             </h3>
                             <div className="space-y-4">
@@ -209,11 +205,11 @@ export default function AgentsPage() {
                                 <div className="flex justify-between items-center">
                                     <span className="text-sm flex items-center gap-1.5">
                                         <Database className="w-3 h-3 text-blue-400" />
-                                        Walrus Audit Log
+                                        Neural Archive Log
                                     </span>
-                                    <span className={`text-xs px-2 py-1 rounded flex items-center gap-1 ${walrusBadgeClass}`}>
-                                        <WalrusIcon />
-                                        {walrusBadgeText}
+                                    <span className={`text-xs px-2 py-1 rounded flex items-center gap-1 ${archiveBadgeClass}`}>
+                                        <ArchiveIcon />
+                                        {archiveBadgeText}
                                     </span>
                                 </div>
                                 <div className="flex justify-between items-center pt-1 border-t border-white/5">
@@ -227,7 +223,7 @@ export default function AgentsPage() {
 
                         <div className="bg-[#0A0A0A] border border-white/10 rounded-xl p-6">
                             <h3 className="text-sm font-mono text-gray-400 flex items-center gap-2 mb-4">
-                                <Signal className="w-4 h-4 text-neon-purple" />
+                                <Signal className="w-4 h-4 text-stellar-yellow" />
                                 DEPLOYED UNITS
                             </h3>
                             <div className="h-32 flex items-end justify-between gap-1 px-2">
@@ -236,7 +232,7 @@ export default function AgentsPage() {
                                         <motion.div
                                             animate={{ height: `${h}%` }}
                                             transition={{ duration: 0.6, ease: 'easeInOut' }}
-                                            className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-neon-purple to-neon-cyan w-full opacity-50 group-hover:opacity-80 transition-opacity"
+                                            className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-stellar-yellow to-stellar-teal w-full opacity-50 group-hover:opacity-80 transition-opacity"
                                         />
                                     </div>
                                 ))}
@@ -246,27 +242,27 @@ export default function AgentsPage() {
                             </div>
                         </div>
 
-                        {/* Walrus Audit Panel */}
+                        {/* Neural Archive Panel */}
                         <div className="bg-[#0A0A0A] border border-blue-500/20 rounded-xl p-6">
                             <h3 className="text-sm font-mono text-blue-400 flex items-center gap-2 mb-3">
                                 <Database className="w-4 h-4" />
-                                WALRUS DECENTRALIZED AUDIT
+                                NEURAL ARCHIVE AUDIT
                             </h3>
                             <p className="text-xs text-gray-500 mb-3 leading-relaxed">
-                                Every agent execution is immortalized on Walrus, Stellar&apos;s decentralized blob storage. Audit logs are content-addressed and tamper-proof.
+                                Every agent execution is immortalized on the Neural Archive, Nirium&apos;s decentralized forensic layer. Audit logs are cryptographically sealed and tamper-proof.
                             </p>
                             <div className="space-y-2">
                                 <div className="flex justify-between text-xs">
                                     <span className="text-gray-500">Blobs committed</span>
-                                    <span className="font-mono text-blue-400">{walrusUploadCount}</span>
+                                    <span className="font-mono text-blue-400">{archiveCount}</span>
                                 </div>
                                 <div className="flex justify-between text-xs">
                                     <span className="text-gray-500">Storage network</span>
-                                    <span className="font-mono text-blue-400">Walrus Testnet</span>
+                                    <span className="font-mono text-blue-400">Stellar Neural Archive</span>
                                 </div>
                                 <div className="flex justify-between text-xs">
-                                    <span className="text-gray-500">Epochs retained</span>
-                                    <span className="font-mono text-green-400">∞ permanent</span>
+                                    <span className="text-gray-500">Retention</span>
+                                    <span className="font-mono text-green-400">∞ Permanent</span>
                                 </div>
                             </div>
                         </div>
@@ -279,22 +275,22 @@ export default function AgentsPage() {
                         transition={{ delay: 0.1 }}
                         className="relative z-20 font-sans"
                     >
-                        <div className="absolute -inset-4 bg-gradient-to-r from-neon-purple/20 to-neon-cyan/20 blur-2xl rounded-full opacity-50 animate-pulse-slow pointer-events-none" />
+                        <div className="absolute -inset-4 bg-gradient-to-r from-stellar-yellow/20 to-stellar-teal/20 blur-2xl rounded-full opacity-50 animate-pulse-slow pointer-events-none" />
                         <div className="relative bg-[#050505] rounded-2xl border border-white/10 shadow-2xl overflow-hidden">
-                            <div className="h-1 bg-gradient-to-r from-neon-purple via-transparent to-neon-cyan" />
+                            <div className="h-1 bg-gradient-to-r from-stellar-yellow via-transparent to-stellar-teal" />
                             <ApiKeyManager />
                         </div>
 
-                        <div className="mt-8 bg-gradient-to-r from-neon-purple/10 to-neon-cyan/10 border border-white/10 rounded-xl p-6 mb-6">
+                        <div className="mt-8 bg-gradient-to-r from-stellar-yellow/10 to-stellar-teal/10 border border-white/10 rounded-xl p-6 mb-6">
                             <div className="flex items-center gap-3 mb-2">
                                 <Terminal className="w-5 h-5 text-white" />
                                 <h3 className="font-bold text-white">Nirium CLI</h3>
-                                <span className="bg-neon-cyan/20 text-neon-cyan text-[10px] px-2 py-0.5 rounded font-mono">NEW</span>
+                                <span className="bg-stellar-teal/20 text-stellar-teal text-[10px] px-2 py-0.5 rounded font-mono">NEW</span>
                             </div>
                             <p className="text-xs text-gray-400 mb-3">Scaffold a combat-ready agent in seconds.</p>
                             <div className="bg-black/50 border border-white/5 rounded px-3 py-2 flex justify-between items-center group cursor-pointer hover:border-white/20 transition-colors"
                                 onClick={() => { navigator.clipboard.writeText('npx nirium create-unit'); toast.success('Copied!'); }}>
-                                <code className="text-xs font-mono text-neon-cyan">npx nirium create-unit</code>
+                                <code className="text-xs font-mono text-stellar-teal">npx nirium create-unit</code>
                                 <Copy className="w-3 h-3 text-gray-500 group-hover:text-white transition-colors" />
                             </div>
                         </div>
@@ -320,16 +316,16 @@ export default function AgentsPage() {
                         transition={{ delay: 0.3 }}
                         className="space-y-6"
                     >
-                        <div className="bg-[#0A0A0A] border border-white/10 rounded-xl p-6 group hover:border-neon-cyan/30 transition-colors min-h-[400px] flex flex-col">
+                        <div className="bg-[#0A0A0A] border border-white/10 rounded-xl p-6 group hover:border-stellar-teal/30 transition-colors min-h-[400px] flex flex-col">
                             <div className="flex justify-between items-center mb-4">
                                 <h3 className="text-sm font-mono text-gray-400 flex items-center gap-2">
-                                    <Terminal className="w-4 h-4 text-neon-cyan" />
+                                    <Terminal className="w-4 h-4 text-stellar-teal" />
                                     {activeTab === 'logs' ? 'LIVE NEURAL FEED' : 'DIRECT LINK PROTOCOL'}
                                 </h3>
                                 <div className="flex gap-2">
                                     <button
                                         onClick={() => setActiveTab('logs')}
-                                        className={`px-2 py-0.5 rounded text-[10px] font-bold transition-colors ${activeTab === 'logs' ? 'bg-neon-cyan/20 text-neon-cyan' : 'bg-white/5 text-gray-500'}`}
+                                        className={`px-2 py-0.5 rounded text-[10px] font-bold transition-colors ${activeTab === 'logs' ? 'bg-stellar-teal/20 text-stellar-teal' : 'bg-white/5 text-gray-500'}`}
                                     >LOGS</button>
                                     <button
                                         onClick={() => setActiveTab('sdk')}
@@ -350,14 +346,14 @@ export default function AgentsPage() {
                                                 <span className={`${log.level === 'error' ? 'text-red-500' :
                                                     log.level === 'warn' ? 'text-yellow-500' :
                                                         log.level === 'success' ? 'text-green-400' :
-                                                            log.level === 'system' ? 'text-neon-cyan' :
+                                                            log.level === 'system' ? 'text-stellar-teal' :
                                                                 'text-blue-400'
                                                     }`}>
                                                     {log.level?.toUpperCase()}
                                                 </span>{' '}
                                                 <span className="text-gray-300">{log.message}</span>
-                                                {walrusStatus === 'live' && (
-                                                    <span className="ml-2 text-blue-500/40 text-[9px]">⬆ walrus</span>
+                                                {archiveStatus === 'live' && (
+                                                    <span className="ml-2 text-blue-500/40 text-[9px]">⬆ archive</span>
                                                 )}
                                             </div>
                                         ))}
@@ -371,7 +367,7 @@ export default function AgentsPage() {
                                         <div className="flex items-center bg-black/40 border border-white/10 rounded-lg p-0.5">
                                             <button
                                                 onClick={() => setSdkAsset('USDC')}
-                                                className={`px-2 py-0.5 rounded text-[10px] font-bold transition-colors ${sdkAsset === 'USDC' ? 'bg-neon-purple text-white' : 'text-gray-500 hover:text-white'}`}
+                                                className={`px-2 py-0.5 rounded text-[10px] font-bold transition-colors ${sdkAsset === 'USDC' ? 'bg-stellar-yellow text-white' : 'text-gray-500 hover:text-white'}`}
                                             >USDC</button>
                                             <button
                                                 onClick={() => setSdkAsset('XLM')}
@@ -433,19 +429,19 @@ export default function AgentsPage() {
 
                             <p className="mt-4 text-xs text-gray-500">
                                 {activeTab === 'logs'
-                                    ? `Live feed via Supabase Realtime. ${walrusStatus === 'live' ? `All ${walrusUploadCount} logs mirrored to Walrus.` : 'Walrus sync connecting...'}`
+                                    ? `Live feed via Supabase Realtime. ${archiveStatus === 'live' ? `All ${archiveCount} logs mirrored to Neural Archive.` : 'Archive sync connecting...'}`
                                     : `Use the key above to authenticate. Showing ${sdkAsset} vault integration example.`}
                             </p>
                         </div>
 
-                        <div className="bg-gradient-to-br from-neon-purple/20 to-transparent border border-neon-purple/30 rounded-xl p-6">
+                        <div className="bg-gradient-to-br from-stellar-yellow/20 to-transparent border border-stellar-yellow/30 rounded-xl p-6">
                             <h3 className="text-sm font-bold text-white mb-2 flex items-center gap-2">
-                                <Shield className="w-4 h-4 text-neon-purple" />
+                                <Shield className="w-4 h-4 text-stellar-yellow" />
                                 Institutional Security
                             </h3>
                             <p className="text-xs text-gray-300 leading-relaxed opacity-80">
-                                All agent interactions are secured by Move guarantees (OwnerCap) and signed nonces.
-                                Transactions are atomically executed in a single PTB. Forensic logs are permanently stored on Walrus decentralized storage for both XLM and USDC vaults.
+                                All agent interactions are secured by Soroban Smart Contracts and signed nonces.
+                                Transactions are atomically executed in a single Multi-Op Transaction. Forensic logs are permanently stored on the Neural Archive for both XLM and USDC vaults.
                             </p>
                             <button
                                 onClick={() => {
@@ -454,8 +450,8 @@ export default function AgentsPage() {
                                             const auditData = {
                                                 audit_id: `BLK-BOX-${Date.now()}`,
                                                 timestamp: new Date().toISOString(),
-                                                walrus_status: walrusStatus,
-                                                walrus_blobs_committed: walrusUploadCount,
+                                                archive_status: archiveStatus,
+                                                archive_blobs_committed: archiveCount,
                                                 rpc_latency_ms: rpcLatency,
                                                 agent_integrity: "100%",
                                                 enclave_signature: "0x8a2f...3b1c",
@@ -471,7 +467,7 @@ export default function AgentsPage() {
                                             const a = document.createElement('a');
                                             a.style.display = 'none';
                                             a.href = url;
-                                            a.download = 'sui-loop-audit.json';
+                                            a.download = 'nirium-audit.json';
                                             document.body.appendChild(a);
                                             a.click();
                                             window.URL.revokeObjectURL(url);
@@ -482,7 +478,7 @@ export default function AgentsPage() {
 
                                     toast.promise(downloadPromise, {
                                         loading: 'Decrypting Black Box Neural Signatures...',
-                                        success: 'Secure Logs Downloaded (sui-loop-audit.json)',
+                                        success: 'Secure Logs Downloaded (nirium-audit.json)',
                                         error: 'Access Denied'
                                     });
 
@@ -492,7 +488,7 @@ export default function AgentsPage() {
                                         timestamp: new Date().toISOString()
                                     }]);
                                 }}
-                                className="mt-4 w-full py-2 bg-neon-purple/20 hover:bg-neon-purple/30 text-neon-purple border border-neon-purple/50 rounded-lg text-xs font-bold transition-all hover:shadow-[0_0_15px_rgba(168,85,247,0.3)] active:scale-95"
+                                className="mt-4 w-full py-2 bg-stellar-yellow/20 hover:bg-stellar-yellow/30 text-stellar-yellow border border-stellar-yellow/50 rounded-lg text-xs font-bold transition-all hover:shadow-[0_0_15px_rgba(168,85,247,0.3)] active:scale-95"
                             >
                                 ACCESS BLACK BOX DATA
                             </button>

@@ -15,7 +15,7 @@ function changeColor(change: string): string {
     if (change.startsWith('+')) return 'text-green-400';
     if (change.startsWith('-')) return 'text-red-400';
     // status strings like READY / ENGAGED / STANDBY / LIVE
-    if (['ENGAGED', 'LIVE', 'ACTIVE'].includes(change)) return 'text-neon-cyan';
+    if (['ENGAGED', 'LIVE', 'ACTIVE'].includes(change)) return 'text-stellar-teal';
     if (['STANDBY', 'IDLE'].includes(change)) return 'text-amber-400';
     return 'text-gray-400';
 }
@@ -35,8 +35,8 @@ const StatCard = ({ title, value, change, icon: Icon, color }: any) => (
     >
         <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
             <Icon className="w-24 h-24" style={{
-                color: color === 'neon-cyan' ? '#00f3ff' :
-                    color === 'neon-purple' ? '#bd00ff' :
+                color: color === 'stellar-teal' ? '#2DEBE8' :
+                    color === 'stellar-yellow' ? '#FFC800' :
                         color === 'amber-500' ? '#f59e0b' :
                             color === 'green-500' ? '#22c55e' :
                                 color === 'blue-500' ? '#3b82f6' : '#ffffff'
@@ -80,7 +80,7 @@ export default function AnalyticsPage() {
     const { address: accountStr, isConnected } = useFreighter();
     const account = isConnected ? { address: accountStr, chains: ['stellar:testnet'] } : null;
     const [activeStrategies, setActiveStrategies] = useState<any[]>([]);
-    const [scallopData, setScallopData] = useState<any>(null);
+    const [blendData, setBlendData] = useState<any>(null);
     const [timeRange, setTimeRange] = useState<TimeRange>('24H');
     const [chartData, setChartData] = useState<any[]>([]);
 
@@ -100,10 +100,10 @@ export default function AnalyticsPage() {
         setChartData(generateHistory(points, hoursBack, userBalance));
     }, [timeRange, userBalance]);
 
-    // Load strategies & Scallop data
+    // Load strategies & Blend data
     useEffect(() => {
         if (account?.address) {
-            const saved = localStorage.getItem(`sui-loop-fleet-${account.address}`);
+            const saved = localStorage.getItem(`nirium-fleet-${account.address}`);
             if (saved) {
                 const parsed = JSON.parse(saved);
                 setActiveStrategies(parsed.filter((s: any) => s.status !== 'DRAFT'));
@@ -113,13 +113,13 @@ export default function AnalyticsPage() {
         }
 
         const mockDiff = (Math.random() * 0.5).toFixed(2);
-        setScallopData({ supplyApy: 11.45 + Number(mockDiff), borrowApy: 8.2 });
+        setBlendData({ supplyApy: 11.45 + Number(mockDiff), borrowApy: 8.2 });
     }, [account?.address]);
 
     // Derived metrics
-    const dailyYield = userBalance * ((scallopData?.supplyApy || 12) / 100 / 365);
+    const dailyYield = userBalance * ((blendData?.supplyApy || 12) / 100 / 365);
     const tvl = activeStrategies.length * 500 + userBalance;
-    const suiStrategies = activeStrategies.filter(s => !s.asset || s.asset === 'XLM').length;
+    const xlmStrategies = activeStrategies.filter(s => !s.asset || s.asset === 'XLM').length;
     const usdcStrategies = activeStrategies.filter(s => s.asset === 'USDC').length;
 
     return (
@@ -128,17 +128,17 @@ export default function AnalyticsPage() {
 
             {/* Background */}
             <div className="fixed inset-0 z-0 pointer-events-none">
-                <div className="absolute top-[-20%] right-[-20%] w-[800px] h-[800px] bg-neon-purple/10 rounded-full blur-[120px]"></div>
-                <div className="absolute bottom-[-20%] left-[-20%] w-[600px] h-[600px] bg-neon-cyan/5 rounded-full blur-[120px]"></div>
+                <div className="absolute top-[-20%] right-[-20%] w-[800px] h-[800px] bg-stellar-yellow/10 rounded-full blur-[120px]"></div>
+                <div className="absolute bottom-[-20%] left-[-20%] w-[600px] h-[600px] bg-stellar-teal/5 rounded-full blur-[120px]"></div>
             </div>
 
-            <div className="max-w-7xl mx-auto relative z-10 flex-1 w-full">
+            <div className="max-w-[1600px] w-full mx-auto relative z-10 flex-1">
                 {/* Header */}
                 <header className="mb-10 flex flex-col md:flex-row justify-between items-start md:items-end gap-6">
                     <div>
                         <div className="flex items-center gap-3 mb-2">
                             <h1 className="text-4xl font-bold text-white tracking-tight">INTELLIGENCE OPS</h1>
-                            <span className="px-2 py-0.5 bg-neon-cyan/10 text-neon-cyan text-[10px] font-mono rounded border border-neon-cyan/20">
+                            <span className="px-2 py-0.5 bg-stellar-teal/10 text-stellar-teal text-[10px] font-mono rounded border border-stellar-teal/20">
                                 v0.0.7
                             </span>
                         </div>
@@ -154,8 +154,8 @@ export default function AnalyticsPage() {
                     <div className="flex items-center gap-3 flex-wrap">
                         {activeStrategies.length > 0 && (
                             <div className="flex items-center gap-2 px-4 py-2 bg-white/5 border border-white/10 rounded-full text-xs font-mono">
-                                <span className="bg-blue-500/20 text-[#4ca2ff] px-2 py-0.5 rounded font-bold">{suiStrategies} XLM</span>
-                                <span className="bg-neon-purple/20 text-neon-purple px-2 py-0.5 rounded font-bold">{usdcStrategies} USDC</span>
+                                <span className="bg-blue-500/20 text-[#4ca2ff] px-2 py-0.5 rounded font-bold">{xlmStrategies} XLM</span>
+                                <span className="bg-stellar-yellow/20 text-stellar-yellow px-2 py-0.5 rounded font-bold">{usdcStrategies} USDC</span>
                                 <span className="text-gray-500">VAULTS</span>
                             </div>
                         )}
@@ -174,7 +174,7 @@ export default function AnalyticsPage() {
                         value={userBalance.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                         change="READY"
                         icon={Wallet}
-                        color="neon-cyan"
+                        color="stellar-teal"
                     />
                     <StatCard
                         title="Active Agents"
@@ -199,10 +199,10 @@ export default function AnalyticsPage() {
                     />
                     <StatCard
                         title="Benchmark Rate (XLM)"
-                        value={`${scallopData?.supplyApy.toFixed(2) || '0.00'}%`}
+                        value={`${blendData?.supplyApy.toFixed(2) || '0.00'}%`}
                         change="+0.45% (24h)"
                         icon={Activity}
-                        color="neon-purple"
+                        color="stellar-yellow"
                     />
                 </div>
 
@@ -221,7 +221,7 @@ export default function AnalyticsPage() {
                                         key={r}
                                         onClick={() => setTimeRange(r)}
                                         className={`px-3 py-1 text-xs rounded-full font-mono transition-all ${timeRange === r
-                                            ? 'bg-neon-cyan text-black font-bold'
+                                            ? 'bg-stellar-teal text-black font-bold'
                                             : 'bg-white/10 text-white hover:bg-white/20'
                                             }`}
                                     >
@@ -235,8 +235,8 @@ export default function AnalyticsPage() {
                                 <AreaChart data={chartData}>
                                     <defs>
                                         <linearGradient id="colorValue" x1="0" y1="0" x2="0" y2="1">
-                                            <stop offset="5%" stopColor="#00f3ff" stopOpacity={0.3} />
-                                            <stop offset="95%" stopColor="#00f3ff" stopOpacity={0} />
+                                            <stop offset="5%" stopColor="#2DEBE8" stopOpacity={0.3} />
+                                            <stop offset="95%" stopColor="#2DEBE8" stopOpacity={0} />
                                         </linearGradient>
                                     </defs>
                                     <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" vertical={false} />
@@ -244,9 +244,9 @@ export default function AnalyticsPage() {
                                     <YAxis stroke="#666" fontSize={10} tickLine={false} axisLine={false} domain={['auto', 'auto']} />
                                     <Tooltip
                                         contentStyle={{ backgroundColor: '#000', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '8px' }}
-                                        itemStyle={{ color: '#00f3ff' }}
+                                        itemStyle={{ color: '#2DEBE8' }}
                                     />
-                                    <Area type="monotone" dataKey="value" stroke="#00f3ff" strokeWidth={2} fillOpacity={1} fill="url(#colorValue)" />
+                                    <Area type="monotone" dataKey="value" stroke="#2DEBE8" strokeWidth={2} fillOpacity={1} fill="url(#colorValue)" />
                                 </AreaChart>
                             </ResponsiveContainer>
                         </div>
@@ -258,15 +258,15 @@ export default function AnalyticsPage() {
                             <h3 className="text-lg font-bold mb-4 text-gray-200 tracking-tight">TARGET ACQUISITION RADAR</h3>
                             <div className="space-y-3">
                                 {[
-                                    { name: "Scallop XLM Supply", vol: "STABLE", apy: `${(scallopData?.supplyApy || 11).toFixed(2)}%`, asset: 'XLM' },
-                                    { name: "Navi USDC Lending", vol: "STABLE", apy: "9.40%", asset: 'USDC' },
-                                    { name: "Cetus XLM/USDC CLMM", vol: "VOLATILE", apy: "45.2%", asset: 'XLM' },
-                                    { name: "DeepBook V3 Limit", vol: "LOW RISK", apy: "8.5%", asset: 'XLM' },
-                                    { name: "Walrus Audit Log", vol: "LIVE", apy: "100%", asset: 'LOG' },
+                                    { name: "Blend XLM Supply", vol: "STABLE", apy: `${(blendData?.supplyApy || 11).toFixed(2)}%`, asset: 'XLM' },
+                                    { name: "Blend USDC Lending", vol: "STABLE", apy: "9.40%", asset: 'USDC' },
+                                    { name: "Soroswap XLM/USDC", vol: "VOLATILE", apy: "45.2%", asset: 'XLM' },
+                                    { name: "SDEX Orderbook", vol: "LOW RISK", apy: "8.5%", asset: 'XLM' },
+                                    { name: "Neural Archive Log", vol: "LIVE", apy: "100%", asset: 'LOG' },
                                 ].map((pool, i) => (
-                                    <div key={i} className="flex items-center justify-between p-3 bg-white/5 rounded-lg border border-white/5 hover:border-neon-cyan/30 transition-colors cursor-pointer group">
+                                    <div key={i} className="flex items-center justify-between p-3 bg-white/5 rounded-lg border border-white/5 hover:border-stellar-teal/30 transition-colors cursor-pointer group">
                                         <div className="flex items-center gap-2">
-                                            <span className={`text-[9px] font-bold px-1.5 py-0.5 rounded font-mono ${pool.asset === 'USDC' ? 'bg-neon-purple/20 text-neon-purple' :
+                                            <span className={`text-[9px] font-bold px-1.5 py-0.5 rounded font-mono ${pool.asset === 'USDC' ? 'bg-stellar-yellow/20 text-stellar-yellow' :
                                                 pool.asset === 'LOG' ? 'bg-pink-500/20 text-pink-400' :
                                                     'bg-blue-500/20 text-[#4ca2ff]'
                                                 }`}>{pool.asset}</span>
@@ -281,21 +281,21 @@ export default function AnalyticsPage() {
                             </div>
                         </div>
 
-                        <div className="glass-panel border border-neon-purple/30 rounded-2xl p-6 relative overflow-hidden">
+                        <div className="glass-panel border border-stellar-yellow/30 rounded-2xl p-6 relative overflow-hidden">
                             <div className="relative z-10">
                                 <h3 className="text-lg font-bold mb-2 text-white tracking-tight">ATOMIC INTEGRITY</h3>
                                 <div className="text-4xl font-bold text-white mb-1 font-mono">100%</div>
                                 <div className="text-sm text-gray-300 mb-3 font-mono">ZERO_SLIPPAGE_ACTIVE</div>
                                 <div className="flex items-center gap-2 mb-4">
                                     <span className="text-[10px] bg-blue-500/20 text-[#4ca2ff] px-2 py-0.5 rounded font-mono font-bold">XLM</span>
-                                    <span className="text-[10px] bg-neon-purple/20 text-neon-purple px-2 py-0.5 rounded font-mono font-bold">USDC</span>
+                                    <span className="text-[10px] bg-stellar-yellow/20 text-stellar-yellow px-2 py-0.5 rounded font-mono font-bold">USDC</span>
                                     <span className="text-[10px] text-gray-500 font-mono">VAULT TYPES ACTIVE</span>
                                 </div>
                                 <div className="w-full bg-gray-800 h-1.5 rounded-full overflow-hidden">
-                                    <div className="h-full bg-neon-purple w-full rounded-full shadow-[0_0_10px_#bd00ff]" />
+                                    <div className="h-full bg-stellar-yellow w-full rounded-full shadow-[0_0_10px_#FFC800]" />
                                 </div>
                                 <div className="mt-3 text-[10px] font-mono text-gray-500 flex items-center gap-1">
-                                    <span className="text-pink-400">◉</span> Walrus forensic log: ARMED
+                                    <span className="text-pink-400">◉</span> Neural Archive log: ARMED
                                 </div>
                             </div>
                         </div>
@@ -303,7 +303,6 @@ export default function AnalyticsPage() {
                 </div>
             </div>
 
-            <Footer />
         </main>
     );
 }

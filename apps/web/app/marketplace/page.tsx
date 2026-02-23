@@ -82,11 +82,11 @@ export default function MarketplacePage() {
                         id: 'flash-loan-executor',
                         name: 'Flash Loan Executor',
                         slug: 'flash-loan-executor',
-                        version: '0.0.7',
-                        description: 'Execute atomic flash loans using the Hot Potato pattern.',
+                        version: '0.1.0',
+                        description: 'Execute atomic flash loans using Soroban single-invocation primitives.',
                         author: 'Nirium Team',
                         category: 'trading',
-                        tags: ['flash-loan', 'defi', 'atomic'],
+                        tags: ['flash-loan', 'stellar', 'atomic'],
                         downloads: 12453,
                         rating: 4.8,
                         reviewCount: 234,
@@ -158,14 +158,14 @@ export default function MarketplacePage() {
                         isFeatured: false
                     },
                     {
-                        id: 'scallop-optimizer',
-                        name: 'Scallop Yield Optimizer',
-                        slug: 'scallop-optimizer',
+                        id: 'blend-optimizer',
+                        name: 'Blend Yield Optimizer',
+                        slug: 'blend-optimizer',
                         version: '1.8.0',
-                        description: 'Optimize Scallop lending positions for best APY.',
+                        description: 'Optimize Blend lending positions for best APY.',
                         author: 'YieldFarm',
                         category: 'trading',
-                        tags: ['scallop', 'lending', 'yield'],
+                        tags: ['blend', 'lending', 'yield'],
                         downloads: 7845,
                         rating: 4.7,
                         reviewCount: 134,
@@ -233,14 +233,14 @@ export default function MarketplacePage() {
                         isFeatured: true
                     },
                     {
-                        id: 'cetus-lp-manager',
-                        name: 'Cetus LP Manager',
-                        slug: 'cetus-lp-manager',
+                        id: 'soroswap-lp-manager',
+                        name: 'Soroswap LP Manager',
+                        slug: 'soroswap-lp-manager',
                         version: '2.0.0',
-                        description: 'Manage Cetus CLMM positions with auto-rebalance.',
+                        description: 'Manage Soroswap AMM positions with auto-rebalance.',
                         author: 'LPMasters',
                         category: 'trading',
-                        tags: ['cetus', 'lp', 'liquidity'],
+                        tags: ['soroswap', 'lp', 'liquidity'],
                         downloads: 6789,
                         rating: 4.5,
                         reviewCount: 112,
@@ -263,14 +263,14 @@ export default function MarketplacePage() {
                         isFeatured: false
                     },
                     {
-                        id: 'navi-lending-bot',
-                        name: 'Navi Lending Bot',
-                        slug: 'navi-lending-bot',
+                        id: 'blend-lending-bot',
+                        name: 'Blend Lending Bot',
+                        slug: 'blend-lending-bot',
                         version: '1.1.0',
-                        description: 'Auto-manages lending positions on Navi Protocol. Monitors health factor and rebalances collateral to avoid liquidation.',
-                        author: 'NaviLabs',
+                        description: 'Auto-manages lending positions on Blend Protocol. Monitors health factor and rebalances collateral to avoid liquidation.',
+                        author: 'ProtocolLabs',
                         category: 'trading',
-                        tags: ['navi', 'lending', 'health-factor'],
+                        tags: ['phoenix', 'lending', 'health-factor'],
                         downloads: 5230,
                         rating: 4.6,
                         reviewCount: 98,
@@ -278,14 +278,14 @@ export default function MarketplacePage() {
                         isFeatured: true
                     },
                     {
-                        id: 'deepbook-market-maker',
-                        name: 'DeepBook Market Maker',
-                        slug: 'deepbook-market-maker',
+                        id: 'sdex-market-maker',
+                        name: 'SDEX Market Maker',
+                        slug: 'sdex-market-maker',
                         version: '0.9.2',
-                        description: 'Places and manages limit orders on DeepBook V3. Earns maker rebates by providing continuous two-sided liquidity.',
+                        description: 'Places and manages limit orders on SDEX. Earns maker rebates by providing continuous two-sided liquidity.',
                         author: 'MMGuild',
                         category: 'trading',
-                        tags: ['deepbook', 'market-making', 'limit-orders'],
+                        tags: ['sdex', 'market-making', 'limit-orders'],
                         downloads: 3870,
                         rating: 4.4,
                         reviewCount: 61,
@@ -300,7 +300,7 @@ export default function MarketplacePage() {
                         description: 'Monitors position prices and executes atomic stop-loss orders on DeepBook when thresholds are breached. Zero-latency protection.',
                         author: 'RiskArsenal',
                         category: 'utility',
-                        tags: ['stop-loss', 'risk', 'protection'],
+                        tags: ['stop-loss', 'risk', 'protection', 'sdex'],
                         downloads: 11230,
                         rating: 4.8,
                         reviewCount: 203,
@@ -323,14 +323,14 @@ export default function MarketplacePage() {
                         isFeatured: true
                     },
                     {
-                        id: 'walrus-storage-logger',
-                        name: 'Walrus Storage Logger',
-                        slug: 'walrus-storage-logger',
+                        id: 'ipfs-blackbox-logger',
+                        name: 'IPFS Blackbox Logger',
+                        slug: 'ipfs-blackbox-logger',
                         version: '1.0.0',
-                        description: 'Archives all agent execution logs to Stellar Walrus decentralized storage. Provides permanent, verifiable audit trails on-chain.',
-                        author: 'WalrusDevs',
+                        description: 'Archives all agent execution logs to decentralized IPFS storage. Provides permanent, verifiable audit trails.',
+                        author: 'Nirium Team',
                         category: 'utility',
-                        tags: ['walrus', 'storage', 'logs', 'audit'],
+                        tags: ['ipfs', 'storage', 'logs', 'audit'],
                         downloads: 2980,
                         rating: 4.3,
                         reviewCount: 44,
@@ -342,7 +342,7 @@ export default function MarketplacePage() {
                         name: 'Cross-DEX Aggregator',
                         slug: 'cross-dex-aggregator',
                         version: '3.1.0',
-                        description: 'Routes swaps across Cetus, Turbos, Kriya, and DeepBook to ensure best execution price. Split-route supported.',
+                        description: 'Routes swaps across Phoenix, Soroswap, and SDEX to ensure best execution price. Atomic multi-hop routing supported.',
                         author: 'AggregateDAO',
                         category: 'trading',
                         tags: ['dex', 'aggregator', 'swap', 'routing'],
@@ -383,14 +383,14 @@ export default function MarketplacePage() {
                         isFeatured: false
                     },
                     {
-                        id: 'walrus-blackbox-logger',
-                        name: 'Walrus Blackbox Logger',
-                        slug: 'walrus-blackbox-logger',
-                        version: '0.0.7',
-                        description: 'Immutable decentralized forensic logging via Stellar Walrus. Every agent decision is cryptographically sealed and stored on-chain. Tamper-proof audit trail with forensic replay.',
+                        id: 'neural-archive-logger',
+                        name: 'Neural Archive Logger',
+                        slug: 'neural-archive-logger',
+                        version: '0.1.0',
+                        description: 'Immutable decentralized forensic logging. Every agent decision is cryptographically sealed and archived. Tamper-proof audit trail.',
                         author: 'Nirium Team',
                         category: 'utility',
-                        tags: ['walrus', 'logs', 'audit', 'decentralized', 'forensic'],
+                        tags: ['archive', 'logs', 'audit', 'decentralized', 'forensic'],
                         downloads: 3100,
                         rating: 4.7,
                         reviewCount: 52,
@@ -402,10 +402,10 @@ export default function MarketplacePage() {
                         name: 'USDC Vault Manager',
                         slug: 'usdc-vault-manager',
                         version: '0.0.7',
-                        description: 'Full lifecycle management for USDC vaults. Handles deposit, withdrawal, yield routing, and auto-rotation across Navi and Scallop USDC lending pools.',
+                        description: 'Full lifecycle management for USDC vaults. Handles deposit, withdrawal, yield routing, and auto-rotation across Phoenix and Blend USDC lending pools.',
                         author: 'Nirium Team',
                         category: 'trading',
-                        tags: ['usdc', 'vault', 'multi-asset', 'navi', 'scallop'],
+                        tags: ['usdc', 'vault', 'multi-asset', 'phoenix', 'blend'],
                         downloads: 4200,
                         rating: 4.6,
                         reviewCount: 71,
@@ -526,28 +526,28 @@ export default function MarketplacePage() {
 
                 // Skill-specific bootup logs (sequential, simulates skill activating)
                 const SKILL_BOOT_LOGS: Record<string, Array<{ msg: string; level: 'info' | 'success' | 'warn' }>> = {
-                    'flash-loan-executor': [{ msg: 'SKILL: Flash Loan Executor binding to Hot Potato module...', level: 'info' }, { msg: 'SKILL: Atomic flash loan ready. Reviewing arbitrage routes.', level: 'success' }],
+                    'flash-loan-executor': [{ msg: 'SKILL: Flash Loan Executor binding to Soroban atomic module...', level: 'info' }, { msg: 'SKILL: Atomic flash loan ready. Reviewing arbitrage routes.', level: 'success' }],
                     'price-oracle': [{ msg: 'SKILL: Multi-Source Oracle aggregating CoinGecko + DeFiLlama + Pyth...', level: 'info' }, { msg: 'SKILL: Price feeds live — 200+ assets tracked.', level: 'success' }],
                     'telegram-alerts-pro': [{ msg: 'SKILL: Telegram bot connecting to notification channel...', level: 'info' }, { msg: 'SKILL: Telegram Alerts Pro active. Test message sent.', level: 'success' }],
                     'whale-tracker': [{ msg: 'SKILL: Whale Tracker initializing top-100 wallet scanner...', level: 'info' }, { msg: 'SKILL: 3 whale wallets flagged for accumulation. Monitoring.', level: 'warn' }],
-                    'lst-arbitrage': [{ msg: 'SKILL: LST Arbitrage Bot reading afXLM/vXLM peg status...', level: 'info' }, { msg: 'SKILL: Peg deviation within range. Watching for unstaking epoch.', level: 'success' }],
-                    'scallop-optimizer': [{ msg: 'SKILL: Scallop Optimizer reading current lending APY...', level: 'info' }, { msg: 'SKILL: Optimal supply allocation found — rebalancing 12% collateral.', level: 'success' }],
+                    'lst-arbitrage': [{ msg: 'SKILL: LST Arbitrage Bot reading yXLM/XLM peg status...', level: 'info' }, { msg: 'SKILL: Peg deviation within range. Watching for redemption window.', level: 'success' }],
+                    'blend-optimizer': [{ msg: 'SKILL: Blend Optimizer reading current lending APY...', level: 'info' }, { msg: 'SKILL: Optimal supply allocation found — rebalancing 12% collateral.', level: 'success' }],
                     'discord-integration': [{ msg: 'SKILL: Discord Bot binding to guild via OAuth2...', level: 'info' }, { msg: 'SKILL: Slash commands registered. Discord integration live.', level: 'success' }],
-                    'portfolio-tracker': [{ msg: 'SKILL: Portfolio Tracker indexing wallet positions...', level: 'info' }, { msg: 'SKILL: 7 open positions tracked. P&L dashboard ready.', level: 'success' }],
+                    'portfolio-tracker': [{ msg: 'SKILL: Portfolio Tracker indexing wallet positions...', level: 'info' }, { msg: 'SKILL: 12 open positions tracked. P&L dashboard ready.', level: 'success' }],
                     'pyth-oracle': [{ msg: 'SKILL: Pyth Network Oracle subscribing to price feeds...', level: 'info' }, { msg: 'SKILL: 230 Pyth price feeds active. Staleness guard enabled.', level: 'success' }],
-                    'twitter-sentiment': [{ msg: 'SKILL: X/Twitter Sentiment scanning $XLM ecosystem keywords...', level: 'info' }, { msg: 'SKILL: Bullish sentiment index: 72%. Signal feed active.', level: 'success' }],
-                    'cetus-lp-manager': [{ msg: 'SKILL: Cetus LP Manager reading CLMM position ranges...', level: 'info' }, { msg: 'SKILL: 2 positions in range. Auto-rebalance armed.', level: 'success' }],
-                    'gas-optimizer': [{ msg: 'SKILL: Gas Optimizer analyzing transaction batching opportunities...', level: 'info' }, { msg: 'SKILL: Batch mode enabled. Estimated 34% gas savings.', level: 'success' }],
-                    'navi-lending-bot': [{ msg: 'SKILL: Navi Lending Bot reading health factor across positions...', level: 'info' }, { msg: 'SKILL: Health factor 1.82 — safe. Auto-rebalance threshold set.', level: 'success' }],
+                    'twitter-sentiment': [{ msg: 'SKILL: X/Twitter Sentiment scanning #Stellar ecosystem keywords...', level: 'info' }, { msg: 'SKILL: Bullish sentiment index: 72%. Signal feed active.', level: 'success' }],
+                    'phoenix-lp-manager': [{ msg: 'SKILL: Phoenix LP Manager reading AMM position ranges...', level: 'info' }, { msg: 'SKILL: 2 positions in range. Auto-rebalance armed.', level: 'success' }],
+                    'gas-optimizer': [{ msg: 'SKILL: Fee Optimizer analyzing transaction multi-op opportunities...', level: 'info' }, { msg: 'SKILL: Multi-op mode enabled. Estimated 45% fee savings.', level: 'success' }],
+                    'blend-lending-bot': [{ msg: 'SKILL: Blend Lending Bot reading health factor across positions...', level: 'info' }, { msg: 'SKILL: Health factor 1.82 — safe. Auto-rebalance threshold set.', level: 'success' }],
                     'deepbook-market-maker': [{ msg: 'SKILL: DeepBook Market Maker placing two-sided limit orders...', level: 'info' }, { msg: 'SKILL: 4 limit orders placed. Maker rebate capture active.', level: 'success' }],
                     'stop-loss-guardian': [{ msg: 'SKILL: Stop-Loss Guardian monitoring 3 open positions...', level: 'info' }, { msg: 'SKILL: Stop orders armed at -8% threshold. Protection active.', level: 'warn' }],
                     'eliza-trading-brain': [{ msg: 'SKILL: ElizaOS Trading Brain loading LLM context model...', level: 'info' }, { msg: 'SKILL: AI decision layer active. Pre-execution analysis enabled.', level: 'success' }],
-                    'walrus-storage-logger': [{ msg: 'SKILL: Walrus Logger connecting to decentralized storage...', level: 'info' }, { msg: 'SKILL: Storage endpoint active. Logs will be archived on-chain.', level: 'success' }],
-                    'cross-dex-aggregator': [{ msg: 'SKILL: Cross-DEX Aggregator indexing Cetus, Turbos, Kriya, DeepBook...', level: 'info' }, { msg: 'SKILL: 4 DEXes indexed. Best-route execution enabled.', level: 'success' }],
+                    'neural-storage-logger': [{ msg: 'SKILL: Neural Logger connecting to decentralized storage...', level: 'info' }, { msg: 'SKILL: Storage endpoint active. Logs will be archived on-chain.', level: 'success' }],
+                    'cross-dex-aggregator': [{ msg: 'SKILL: Cross-DEX Aggregator indexing Phoenix, Soroswap, SDEX...', level: 'info' }, { msg: 'SKILL: 3 DEXes indexed. Best-route execution enabled.', level: 'success' }],
                     'pnl-reporter': [{ msg: 'SKILL: P&L Reporter calculating realized/unrealized positions...', level: 'info' }, { msg: 'SKILL: Daily P&L report scheduled. Delivery target: Telegram.', level: 'success' }],
                     'webhook-trigger': [{ msg: 'SKILL: Webhook Trigger generating secure endpoint key...', level: 'info' }, { msg: 'SKILL: Webhook live at /api/hook/{agentId}. Ready for TradingView.', level: 'success' }],
-                    'walrus-blackbox-logger': [{ msg: 'SKILL: Walrus Blackbox establishing uplink to Stellar Walrus network...', level: 'info' }, { msg: 'SKILL: Blob storage active. Forensic logging armed. Tamper-proof seal enabled.', level: 'success' }],
-                    'usdc-vault-manager': [{ msg: 'SKILL: USDC Vault Manager scanning for existing USDC vaults...', level: 'info' }, { msg: 'SKILL: Navi & Scallop USDC pools indexed. Auto-rotation active.', level: 'success' }],
+                    'neural-blackbox': [{ msg: 'SKILL: Neural Archive establishing uplink to IPFS network...', level: 'info' }, { msg: 'SKILL: Blob storage active. Forensic logging armed. Tamper-proof seal enabled.', level: 'success' }],
+                    'usdc-vault-manager': [{ msg: 'SKILL: USDC Vault Manager scanning for existing USDC vaults...', level: 'info' }, { msg: 'SKILL: Phoenix & Blend USDC pools indexed. Auto-rotation active.', level: 'success' }],
                 };
 
                 const bootLogs = SKILL_BOOT_LOGS[skill.slug];
@@ -603,25 +603,25 @@ export default function MarketplacePage() {
 
 
     return (
-        <main className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950">
+        <main className="min-h-screen bg-[#050505]">
             <Navbar />
 
             {/* Hero Section */}
             <section className="relative pt-36 pb-12 px-4 sm:px-6 lg:px-8">
-                <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,rgba(59,130,246,0.1),transparent_70%)]" />
+                <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,rgba(45,235,232,0.1),transparent_70%)]" />
 
-                <div className="max-w-7xl mx-auto relative z-10">
+                <div className="max-w-[1600px] w-full mx-auto relative z-10">
                     <motion.div
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
                         className="text-center mb-12"
                     >
-                        <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-gradient-to-r from-purple-500/20 to-blue-500/20 border border-purple-500/30 mb-6">
-                            <Package className="w-4 h-4 text-purple-400" />
-                            <span className="text-sm text-purple-300">LoopHub Marketplace</span>
+                        <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-stellar-teal/10 border border-stellar-teal/30 mb-6">
+                            <Package className="w-4 h-4 text-stellar-teal" />
+                            <span className="text-sm text-stellar-teal">Nirium Matrix Hub</span>
                         </div>
 
-                        <h1 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-white via-blue-100 to-purple-200 bg-clip-text text-transparent mb-4">
+                        <h1 className="text-5xl md:text-7xl font-black tracking-tighter bg-gradient-to-r from-white via-white to-gray-400 bg-clip-text text-transparent mb-4">
                             Extend Your Agent
                         </h1>
                         <p className="text-lg text-slate-400 max-w-2xl mx-auto">
@@ -631,18 +631,18 @@ export default function MarketplacePage() {
                         {/* Stats */}
                         <div className="flex justify-center gap-8 mt-8">
                             <div className="text-center">
-                                <div className="text-3xl font-bold text-white">{stats.totalSkills}</div>
-                                <div className="text-sm text-slate-400">Skills</div>
+                                <div className="text-4xl font-black font-mono text-stellar-teal animate-pulse-slow">{stats.totalSkills}</div>
+                                <div className="text-[10px] text-gray-500 uppercase tracking-widest font-bold mt-1">Skills</div>
                             </div>
                             <div className="text-center">
-                                <div className="text-3xl font-bold text-white">
+                                <div className="text-4xl font-black font-mono text-stellar-teal animate-pulse-slow">
                                     {(stats.totalDownloads / 1000).toFixed(1)}K
                                 </div>
-                                <div className="text-sm text-slate-400">Downloads</div>
+                                <div className="text-[10px] text-gray-500 uppercase tracking-widest font-bold mt-1">Downloads</div>
                             </div>
                             <div className="text-center">
-                                <div className="text-3xl font-bold text-white">{categories.length}</div>
-                                <div className="text-sm text-slate-400">Categories</div>
+                                <div className="text-4xl font-black font-mono text-stellar-teal animate-pulse-slow">{categories.length}</div>
+                                <div className="text-[10px] text-gray-500 uppercase tracking-widest font-bold mt-1">Categories</div>
                             </div>
                         </div>
                     </motion.div>
@@ -661,7 +661,7 @@ export default function MarketplacePage() {
                                 placeholder="Search skills by name, description, or tag..."
                                 value={searchQuery}
                                 onChange={(e) => setSearchQuery(e.target.value)}
-                                className="w-full pl-12 pr-4 py-4 bg-slate-800/50 border border-slate-700 rounded-2xl text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-purple-500/50 focus:border-purple-500/50 transition-all"
+                                className="w-full pl-12 pr-4 py-4 bg-[#080808] border border-white/5 rounded-2xl text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-stellar-teal/50 focus:border-stellar-teal transition-all"
                             />
                         </div>
                     </motion.div>
@@ -671,7 +671,7 @@ export default function MarketplacePage() {
             {/* Featured Skills Carousel */}
             {featuredSkills.length > 0 && (
                 <section className="px-4 sm:px-6 lg:px-8 mb-12">
-                    <div className="max-w-7xl mx-auto">
+                    <div className="max-w-[1600px] w-full mx-auto">
                         <div className="flex items-center gap-2 mb-6">
                             <Sparkles className="w-5 h-5 text-yellow-400" />
                             <h2 className="text-xl font-semibold text-white">Featured Skills</h2>
@@ -684,10 +684,10 @@ export default function MarketplacePage() {
                                     initial={{ opacity: 0, y: 20 }}
                                     animate={{ opacity: 1, y: 0 }}
                                     transition={{ delay: 0.1 + idx * 0.1 }}
-                                    className="group relative overflow-hidden rounded-2xl bg-gradient-to-br from-purple-500/10 to-blue-500/10 border border-purple-500/20 p-6 hover:border-purple-500/40 transition-all"
+                                    className="group relative overflow-hidden rounded-2xl bg-[#080808] border border-white/5 p-6 hover:border-stellar-teal/50 hover:shadow-[0_0_30px_rgba(45,235,232,0.1)] transition-all cursor-pointer"
                                 >
                                     <div className="absolute top-4 right-4">
-                                        <span className="px-2 py-1 text-xs bg-yellow-500/20 text-yellow-300 rounded-full flex items-center gap-1">
+                                        <span className="px-2 py-1 text-xs bg-stellar-yellow/20 text-stellar-yellow rounded-full flex items-center gap-1">
                                             <Sparkles className="w-3 h-3" /> Featured
                                         </span>
                                     </div>
@@ -699,10 +699,10 @@ export default function MarketplacePage() {
                                         })()}
                                     </div>
 
-                                    <h3 className="text-lg font-semibold text-white mb-2 group-hover:text-purple-300 transition-colors">
+                                    <h3 className="text-lg font-semibold text-white mb-2 group-hover:text-stellar-teal transition-colors">
                                         {skill.name}
                                     </h3>
-                                    <p className="text-sm text-slate-400 mb-4 line-clamp-2">
+                                    <p className="text-[10px] text-gray-500 uppercase tracking-widest font-bold mt-1 mb-4 line-clamp-2">
                                         {skill.description}
                                     </p>
 
@@ -739,7 +739,7 @@ export default function MarketplacePage() {
                                                         e.stopPropagation();
                                                         setSelectedSkillToInstall(skill);
                                                     }}
-                                                    className="flex items-center justify-center p-2 bg-purple-500/10 text-purple-400 rounded-lg hover:bg-purple-500/20 transition-all border border-purple-500/20"
+                                                    className="flex items-center justify-center p-2 bg-stellar-teal/10 text-stellar-teal rounded-lg hover:bg-stellar-teal/20 transition-all border border-stellar-teal/20"
                                                     title="Install to another unit"
                                                 >
                                                     <UserPlus size={16} />
@@ -751,7 +751,7 @@ export default function MarketplacePage() {
                                                     e.stopPropagation();
                                                     setSelectedSkillToInstall(skill);
                                                 }}
-                                                className="flex items-center gap-2 px-3 py-1.5 bg-slate-700/50 hover:bg-purple-600 text-white rounded-lg text-sm font-medium transition-colors border border-slate-600/50 hover:border-purple-500/50 z-10 relative"
+                                                className="flex items-center gap-2 px-3 py-1.5 bg-slate-700/50 hover:bg-stellar-yellow hover:text-black text-white rounded-lg text-sm font-bold transition-colors border border-slate-600/50 hover:border-stellar-yellow z-10 relative"
                                             >
                                                 <Zap className="w-3.5 h-3.5" />
                                                 Install
@@ -767,7 +767,7 @@ export default function MarketplacePage() {
 
             {/* Categories */}
             <section className="px-4 sm:px-6 lg:px-8 mb-8">
-                <div className="max-w-7xl mx-auto">
+                <div className="max-w-[1600px] w-full mx-auto">
                     <div className="flex flex-wrap gap-3">
                         <button
                             onClick={() => setSelectedCategory(null)}
@@ -801,7 +801,7 @@ export default function MarketplacePage() {
 
             {/* Sort Options */}
             <section className="px-4 sm:px-6 lg:px-8 mb-6">
-                <div className="max-w-7xl mx-auto flex items-center justify-between">
+                <div className="max-w-[1600px] w-full mx-auto flex items-center justify-between">
                     <p className="text-slate-400">
                         {filteredSkills.length} skills found
                     </p>
@@ -810,7 +810,7 @@ export default function MarketplacePage() {
                         <select
                             value={sortBy}
                             onChange={(e) => setSortBy(e.target.value as any)}
-                            className="bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:ring-2 focus:ring-purple-500/50"
+                            className="bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:ring-2 focus:ring-stellar-teal/50"
                         >
                             <option value="downloads">Most Downloads</option>
                             <option value="rating">Highest Rated</option>
@@ -822,7 +822,7 @@ export default function MarketplacePage() {
 
             {/* Skills Grid */}
             <section className="px-4 sm:px-6 lg:px-8 pb-24">
-                <div className="max-w-7xl mx-auto">
+                <div className="max-w-[1600px] w-full mx-auto">
                     {loading ? (
                         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                             {[...Array(6)].map((_, i) => (
@@ -865,11 +865,11 @@ export default function MarketplacePage() {
                                             </div>
                                         </div>
 
-                                        <h3 className="text-lg font-semibold text-white mb-1 group-hover:text-purple-300 transition-colors">
+                                        <h3 className="text-lg font-semibold text-white mb-1 group-hover:text-stellar-teal transition-colors">
                                             {skill.name}
                                         </h3>
                                         <p className="text-sm text-slate-500 mb-1">by {skill.author}</p>
-                                        <p className="text-sm text-slate-400 mb-4 line-clamp-2">
+                                        <p className="text-[10px] text-gray-500 uppercase tracking-widest font-bold mt-1 mb-4 line-clamp-2">
                                             {skill.description}
                                         </p>
 
@@ -930,7 +930,7 @@ export default function MarketplacePage() {
                                                             e.stopPropagation();
                                                             setSelectedSkillToInstall(skill);
                                                         }}
-                                                        className="flex items-center gap-2 px-3 py-1.5 bg-purple-500/10 text-purple-400 rounded-lg hover:bg-purple-500/20 text-sm font-medium transition-colors border border-purple-500/20"
+                                                        className="flex items-center gap-2 px-3 py-1.5 bg-stellar-teal/10 text-stellar-teal rounded-lg hover:bg-stellar-teal/20 text-sm font-medium transition-colors border border-stellar-teal/20"
                                                         title="Install to another agent"
                                                     >
                                                         <UserPlus className="w-3 h-3" />
@@ -939,7 +939,7 @@ export default function MarketplacePage() {
                                             ) : (
                                                 <button
                                                     onClick={() => setSelectedSkillToInstall(skill)}
-                                                    className="px-3 py-1.5 bg-purple-500/20 text-purple-300 rounded-lg text-sm font-medium hover:bg-purple-500/30 transition-colors flex items-center gap-1"
+                                                    className="px-3 py-1.5 bg-stellar-yellow text-black rounded-lg text-sm font-bold hover:shadow-[0_0_20px_rgba(255,200,0,0.3)] transition-colors flex items-center gap-1"
                                                 >
                                                     <Zap className="w-3.5 h-3.5" />
                                                     Install
@@ -967,8 +967,8 @@ export default function MarketplacePage() {
             {/* CTA Section */}
             <section className="px-4 sm:px-6 lg:px-8 pb-24">
                 <div className="max-w-3xl mx-auto">
-                    <div className="bg-gradient-to-br from-purple-500/10 to-blue-500/10 rounded-2xl border border-purple-500/20 p-8 text-center">
-                        <Code2 className="w-12 h-12 text-purple-400 mx-auto mb-4" />
+                    <div className="bg-[#080808] rounded-2xl border border-white/5 p-8 text-center mt-12 mb-20">
+                        <Code2 className="w-12 h-12 text-stellar-teal mx-auto mb-4" />
                         <h3 className="text-2xl font-bold text-white mb-2">Build Your Own Skill</h3>
                         <p className="text-slate-400 mb-6">
                             Create and publish skills for the Nirium community.
@@ -1020,7 +1020,7 @@ export default function MarketplacePage() {
                             className="w-full max-w-md bg-[#0A0A0A] border border-white/10 rounded-2xl p-6 shadow-2xl"
                         >
                             <h3 className="text-xl font-bold mb-4 flex items-center gap-2">
-                                <Play className="w-5 h-5 text-neon-cyan" />
+                                <Play className="w-5 h-5 text-stellar-teal" />
                                 Execute {selectedSkillToExecute.name}
                             </h3>
                             <div className="space-y-3">
@@ -1028,13 +1028,13 @@ export default function MarketplacePage() {
                                     <button
                                         key={action.name}
                                         onClick={() => handleExecuteAction(selectedSkillToExecute.slug, action.name)}
-                                        className="w-full flex items-center justify-between p-4 rounded-xl bg-white/5 hover:bg-white/10 border border-white/5 hover:border-neon-cyan/30 transition-all group"
+                                        className="w-full flex items-center justify-between p-4 rounded-xl bg-white/5 hover:bg-white/10 border border-white/5 hover:border-stellar-teal/30 transition-all group"
                                     >
                                         <div className="text-left">
-                                            <div className="font-mono text-neon-cyan text-sm group-hover:text-white transition-colors">{action.name}</div>
+                                            <div className="font-mono text-stellar-teal text-sm group-hover:text-white transition-colors">{action.name}</div>
                                             <div className="text-xs text-gray-500">{action.description}</div>
                                         </div>
-                                        <ChevronRight className="w-4 h-4 text-gray-600 group-hover:text-neon-cyan" />
+                                        <ChevronRight className="w-4 h-4 text-gray-600 group-hover:text-stellar-teal" />
                                     </button>
                                 ))}
                             </div>

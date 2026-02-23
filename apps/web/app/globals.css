@@ -1,21 +1,24 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import "tailwindcss/base";
+@import "tailwindcss/components";
+@import "tailwindcss/utilities";
 
 :root {
-  --background: #030014;
+  --background: #050505;
   --foreground: #ffffff;
-  --neon-cyan: #00f3ff;
-  --neon-purple: #bd00ff;
+  --stellar-teal: #00f0ff;
+  --stellar-yellow: #8a2be2;
+  --neon-green: #39ff14;
   --glass-border: rgba(255, 255, 255, 0.1);
   --glass-bg: rgba(255, 255, 255, 0.03);
+  --obsidian: #0A0A0A;
 }
 
 body {
   color: var(--foreground);
   background: var(--background);
-  font-family: 'Inter', sans-serif;
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
   overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
 }
 
 /* State of Art Glassmorphism Class */
@@ -28,7 +31,7 @@ body {
 }
 
 .text-gradient {
-  background: linear-gradient(to right, #00f3ff, #bd00ff);
+  background: linear-gradient(to right, #2DEBE8, #FFC800);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;

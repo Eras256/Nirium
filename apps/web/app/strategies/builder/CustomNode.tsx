@@ -36,7 +36,7 @@ const CustomNode = ({ data, selected }: NodeProps) => {
         <div className={`
             w-44 sm:w-56 md:w-64
             rounded-xl backdrop-blur-xl border shadow-2xl group transition-all
-            ${selected ? 'border-neon-cyan ring-1 ring-neon-cyan z-50 animate-pulse-slow' : 'border-white/10 bg-[#151515]/90'}
+            ${selected ? 'border-stellar-teal ring-1 ring-stellar-teal z-50 animate-pulse-slow' : 'border-white/10 bg-[#151515]/90'}
         `}>
             {/* Accent Bar */}
             <div className={`h-1.5 w-full rounded-t-xl bg-gradient-to-r ${gradColor} opacity-80 group-hover:opacity-100 transition-opacity`} />
@@ -45,12 +45,12 @@ const CustomNode = ({ data, selected }: NodeProps) => {
             <Handle
                 type="target"
                 position={Position.Left}
-                className="w-2.5 h-2.5 sm:w-3 sm:h-3 border border-white/20 rounded-full !left-[-6px] sm:!left-[-7px] !bg-neon-cyan"
+                className="w-2.5 h-2.5 sm:w-3 sm:h-3 border border-white/20 rounded-full !left-[-6px] sm:!left-[-7px] !bg-stellar-teal"
             />
 
             <div className="p-2.5 sm:p-3.5 md:p-4">
                 <div className="flex items-start gap-2 sm:gap-3 md:gap-4">
-                    <div className={`p-1.5 sm:p-2 md:p-2.5 rounded-lg bg-white/5 border border-white/5 shrink-0 ${selected ? 'text-neon-cyan' : 'text-gray-300'
+                    <div className={`p-1.5 sm:p-2 md:p-2.5 rounded-lg bg-white/5 border border-white/5 shrink-0 ${selected ? 'text-stellar-teal' : 'text-gray-300'
                         }`}>
                         <Icon size={14} className="sm:hidden" />
                         <Icon size={16} className="hidden sm:block md:hidden" />
@@ -65,7 +65,7 @@ const CustomNode = ({ data, selected }: NodeProps) => {
                                 {data.type as string}
                             </span>
                             {!!data.sublabel && (
-                                <span className="text-[8px] sm:text-[9px] text-neon-purple font-mono uppercase truncate opacity-70">
+                                <span className="text-[8px] sm:text-[9px] text-stellar-yellow font-mono uppercase truncate opacity-70">
                                     {data.sublabel as string}
                                 </span>
                             )}
@@ -78,7 +78,7 @@ const CustomNode = ({ data, selected }: NodeProps) => {
             <Handle
                 type="source"
                 position={Position.Right}
-                className="w-2.5 h-2.5 sm:w-3 sm:h-3 border border-white/20 rounded-full !right-[-6px] sm:!right-[-7px] !bg-neon-cyan animate-pulse"
+                className="w-2.5 h-2.5 sm:w-3 sm:h-3 border border-white/20 rounded-full !right-[-6px] sm:!right-[-7px] !bg-stellar-teal animate-pulse"
             />
         </div>
     );

@@ -34,7 +34,7 @@ export default function InstallSkillModal({ skill, isOpen, onClose, onInstall, i
     useEffect(() => {
         if (isOpen && account?.address) {
             try {
-                const localKey = `sui-loop-fleet-${account.address}`;
+                const localKey = `nirium-fleet-${account.address}`;
                 const raw = localStorage.getItem(localKey);
                 if (raw) {
                     const parsed = JSON.parse(raw);
@@ -120,7 +120,7 @@ export default function InstallSkillModal({ skill, isOpen, onClose, onInstall, i
                                         disabled={isInstalling}
                                     >
                                         <div className="flex items-center gap-3">
-                                            <div className={`w-8 h-8 rounded-lg flex items-center justify-center ${currentAgent.id === 'global' ? 'bg-neon-cyan/20 text-neon-cyan' : 'bg-purple-500/20 text-purple-400'}`}>
+                                            <div className={`w-8 h-8 rounded-lg flex items-center justify-center ${currentAgent.id === 'global' ? 'bg-stellar-teal/20 text-stellar-teal' : 'bg-purple-500/20 text-purple-400'}`}>
                                                 {currentAgent.id === 'global' ? <Cpu size={16} /> : <Shield size={16} />}
                                             </div>
                                             <div className="text-left">
@@ -150,7 +150,7 @@ export default function InstallSkillModal({ skill, isOpen, onClose, onInstall, i
                                                         className="w-full px-4 py-3 flex items-center justify-between hover:bg-white/5 transition-colors group"
                                                     >
                                                         <div className="flex items-center gap-3">
-                                                            <div className={`w-8 h-8 rounded-lg flex items-center justify-center ${agent.id === 'global' ? 'bg-neon-cyan/10 text-neon-cyan' : 'bg-purple-500/10 text-purple-400'}`}>
+                                                            <div className={`w-8 h-8 rounded-lg flex items-center justify-center ${agent.id === 'global' ? 'bg-stellar-teal/10 text-stellar-teal' : 'bg-purple-500/10 text-purple-400'}`}>
                                                                 {agent.id === 'global' ? <Cpu size={16} /> : <Shield size={16} />}
                                                             </div>
                                                             <div className="text-left">

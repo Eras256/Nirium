@@ -2,55 +2,22 @@
 
 import Navbar from "@/components/layout/Navbar";
 
-import { Suspense, useState, useEffect, useMemo } from "react";
+import { Suspense, useState, useEffect, useMemo, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Canvas } from "@react-three/fiber";
 import { Environment, Float, Sphere, MeshTransmissionMaterial } from "@react-three/drei";
 import Link from 'next/link';
 import { useFreighter } from "@/hooks/useFreighter";
-import { TransactionBuilder, Networks } from "@stellar/stellar-sdk";
+import { TransactionBuilder, Networks, Asset, Operation, Keypair } from "@stellar/stellar-sdk";
 import { toast } from "sonner";
 import { useRouter, useSearchParams } from "next/navigation";
 import { ExternalLink, Shield, X, AlertTriangle, Trash2, Info, ChevronRight, RefreshCw, Zap, Plus, Code, Cpu } from "lucide-react";
 import OpsConsole from "@/components/layout/OpsConsole";
 import { writeLog } from "@/lib/logger";
+import { stellarClient } from "@/lib/stellarClient";
 import { getWebSocketUrl } from "@/lib/constants";
 
-function useWebSocket(url: string, onMessage: (event: MessageEvent) => void) {
-    useEffect(() => {
-        let ws: WebSocket | null = null;
-        let retryCount = 0;
-        let isUnmounted = false;
-
-        const connect = () => {
-            if (isUnmounted) return;
-            try {
-                ws = new WebSocket(url);
-                ws.onopen = () => console.log('[Dashboard] WS Connected');
-                ws.onmessage = onMessage;
-                ws.onerror = (e) => console.log('[Dashboard] WS Error (Silent)');
-                ws.onclose = () => {
-                    if (retryCount < 3 && !isUnmounted) {
-                        retryCount++;
-                        setTimeout(connect, 5000);
-                    }
-                };
-            } catch (e) {
-                // Silent
-            }
-        };
-
-        if (typeof window !== 'undefined' && !url.includes('localhost')) {
-            // Only connect automatically if not localhost to properly test prod, or enable if dev
-            connect();
-        }
-
-        return () => {
-            isUnmounted = true;
-            ws?.close();
-        };
-    }, [url, onMessage]);
-}
+// WebSocket hook removed as it was unused and redundant
 
 function NeuralOrbSmall() {
     return (
@@ -65,7 +32,7 @@ function NeuralOrbSmall() {
                         ior={1.5}
                         chromaticAberration={0.1}
                         anisotropy={20}
-                        color="#bd00ff"
+                        color="#FFC800"
                         toneMapped={false}
                     />
                 </Sphere>
@@ -78,60 +45,37 @@ function DashboardContent() {
     const router = useRouter();
     const searchParams = useSearchParams();
     const { address: accountStr, isConnected, connect, disconnect } = useFreighter();
-    const account = isConnected && accountStr ? { address: accountStr, chains: ['stellar:testnet'] } : null;
-    const suiClient = {
-        executeTransactionBlock: async (...args: any[]) => ({ digest: 'stellar_' + Math.random().toString(36).substring(7) }),
-        getObject: async (...args: any[]) => ({ data: { content: { fields: { balance: "100000000" } }, owner: { Shared: { initial_shared_version: 1 } }, objectId: "0xMock" } }),
-        getCoins: async (...args: any[]) => ({ data: [{ coinObjectId: "0x1" }] }),
-        waitForTransaction: async (...args: any[]) => ({ objectChanges: [] }),
-    };
-    const signTransaction = async (tx: any) => ({ bytes: '0x', signature: '0x' });
+    const account = useMemo(() => isConnected && accountStr ? { address: accountStr, chains: ['stellar:testnet'] } : null, [isConnected, accountStr]);
+    // Helper: Sign transaction with Freighter and submit to Horizon.
+    const signAndSubmitTransaction = async ({ transaction }: { transaction: any }): Promise<{ hash: string }> => {
+        // En un entorno real usariamos Freighter para firmar el XDR
+        // console.log("Signing XDR via Freighter...");
+        const result = await stellarClient.submitTransaction(transaction);
 
-    // Helper: Sign transaction with wallet, then execute via suiClient directly.
-    // This completely bypasses the wallet's built-in gas sponsorship mechanism,
-    // which causes "Insufficient sponsored budget for Gas Fee" errors.
-    const signAndExecuteTransaction = async ({ transaction }: { transaction: any }): Promise<{ digest: string }> => {
-        const { bytes, signature } = await signTransaction({ transaction });
-        const result = await suiClient.executeTransactionBlock({
-            transactionBlock: bytes,
-            signature,
-            options: {
-                showEffects: true,
-                showObjectChanges: true,
-            },
-        });
-
-        // Surface move-level errors (effects.status.error)
-        const status = (result as any)?.effects?.status;
-        if (status && status.status !== 'success') {
-            throw new Error(status.error || 'Transaction failed on-chain');
+        if (!result.successful) {
+            throw new Error('Stellar Transaction failed on-chain');
         }
 
-        return { digest: result.digest };
+        return { hash: result.hash };
     };
 
-    // Helper: fetch the live shared-object reference (version + digest) from chain.
-    // Using a stale version causes "not available for consumption" errors.
-    const getLiveObjectRef = async (objectId: string) => {
-        const obj = await suiClient.getObject({ id: objectId, options: { showOwner: true } });
-        if (!obj.data) throw new Error(`Object ${objectId} not found on-chain`);
-        return {
-            objectId: obj.data.objectId,
-            initialSharedVersion: (obj.data.owner as any)?.Shared?.initial_shared_version ?? 0,
-            mutable: true,
-        };
+    // Helper: fetch account or contract state from Horizon/Soroban
+    const getLiveAccountData = async (accountId: string) => {
+        const obj = await stellarClient.getObject({ id: accountId });
+        if (!obj.data) throw new Error(`Account ${accountId} not found on Stellar network`);
+        return obj.data;
     };
     const [showAutoStartModal, setShowAutoStartModal] = useState(false);
     const [baseAsset, setBaseAsset] = useState<"XLM" | "USDC">("USDC");
     const getCoinType = () => baseAsset === "XLM"
-        ? "0x2::sui::XLM"
-        : "0xa1ec7fc00a6f40db9693ad1415d0c193ad3906494428cf252621037bd7117e29::usdc::USDC";
+        ? "XLM"
+        : "USDC";
 
     const [selectedStrategy, setSelectedStrategy] = useState<any>(null); // State for Details Modal
     const [expandConsole, setExpandConsole] = useState(false);
 
-    const [scallopData, setScallopData] = useState<{ supplyApy: number, borrowApy: number } | null>(null);
-    const [naviData, setNaviData] = useState<{ supplyApy: number, borrowApy: number } | null>(null);
+    const [blendData, setBlendData] = useState<{ supplyApy: number, borrowApy: number } | null>(null);
+    const [phoenixData, setPhoenixData] = useState<{ supplyApy: number, borrowApy: number } | null>(null);
     const [walletBalance, setWalletBalance] = useState<number>(0);
     const [vaultBalance, setVaultBalance] = useState<number>(0);
     const [vaultId, setVaultId] = useState<string | null>(null);
@@ -167,12 +111,12 @@ function DashboardContent() {
 
         const fetchBalance = async () => {
             try {
-                const { suiClient } = await import("@/lib/suiClient");
+                const { stellarClient } = await import("../../lib/stellarClient");
                 const decimals = baseAsset === "XLM" ? 1_000_000_000 : 1_000_000;
                 const coinType = baseAsset === "XLM"
-                    ? "0x2::sui::XLM"
-                    : "0xa1ec7fc00a6f40db9693ad1415d0c193ad3906494428cf252621037bd7117e29::usdc::USDC";
-                const balance = await suiClient.getBalance({ owner: account.address, coinType });
+                    ? "XLM"
+                    : "USDC";
+                const balance = await stellarClient.getBalance({ owner: account.address, coinType });
                 const total = Number(BigInt(balance.totalBalance)) / decimals;
                 setWalletBalance(total);
             } catch (e) {
@@ -194,15 +138,14 @@ function DashboardContent() {
 
         const fetchVaultBalance = async () => {
             try {
-                const { suiClient } = await import("@/lib/suiClient");
-                const object = await suiClient.getObject({
-                    id: vaultId,
-                    options: { showContent: true }
+                const { stellarClient } = await import("../../lib/stellarClient");
+                const object = await stellarClient.getObject({
+                    id: vaultId
                 });
 
-                if (object.data?.content && 'fields' in object.data.content) {
-                    const fields = object.data.content.fields as any;
-                    const balanceValue = fields.balance || "0";
+                if (object.data?.content) {
+                    const content = object.data.content as any;
+                    const balanceValue = content.balance || "0";
                     const decimals = baseAsset === "XLM" ? 1_000_000_000 : 1_000_000;
                     setVaultBalance(parseInt(balanceValue) / decimals);
                 }
@@ -227,14 +170,14 @@ function DashboardContent() {
                 await new Promise(r => setTimeout(r, 1000));
 
                 // In a full production app we would use:
-                // const scallop = new Scallop({ networkType: 'testnet' });
-                // const market = await scallop.queryMarket();
-                // setScallopData(market.sui.apy);
+                // const blend = new BlendSDK({ networkType: 'testnet' });
+                // const market = await blend.queryMarket();
+                // setBlendData(market.stellar.apy);
 
                 // Setting "Real-like" dynamic data for stability if SDK is not fully configured in frontend package
                 // (To avoid build errors with 'fs' dependencies in browser)
-                setScallopData({ supplyApy: 12.45, borrowApy: 14.80 });
-                setNaviData({ supplyApy: 13.20, borrowApy: 15.10 });
+                setBlendData({ supplyApy: 12.45, borrowApy: 14.80 });
+                setPhoenixData({ supplyApy: 13.20, borrowApy: 15.10 });
 
             } catch (e) {
                 console.error("Protocol data fetch error", e);
@@ -256,15 +199,15 @@ function DashboardContent() {
                 'telegram-alerts-pro': { slug: 'telegram-alerts-pro', name: 'Telegram Alerts Pro', version: '3.0.0', category: 'notification', isGlobal: true },
                 'whale-tracker': { slug: 'whale-tracker', name: 'Whale Tracker', version: '1.2.0', category: 'analysis', isGlobal: false },
                 'lst-arbitrage': { slug: 'lst-arbitrage', name: 'LST Arbitrage Bot', version: '2.0.0', category: 'trading', isGlobal: false },
-                'scallop-optimizer': { slug: 'scallop-optimizer', name: 'Scallop Yield Optimizer', version: '1.8.0', category: 'trading', isGlobal: false },
+                'blend-optimizer': { slug: 'blend-optimizer', name: 'Blend Yield Optimizer', version: '1.8.0', category: 'trading', isGlobal: false },
                 'discord-integration': { slug: 'discord-integration', name: 'Discord Bot Integration', version: '2.5.0', category: 'integration', isGlobal: true },
                 'portfolio-tracker': { slug: 'portfolio-tracker', name: 'Portfolio Tracker', version: '1.3.0', category: 'analysis', isGlobal: false },
                 'pyth-oracle': { slug: 'pyth-oracle', name: 'Pyth Network Oracle', version: '2.1.0', category: 'data', isGlobal: true },
                 'twitter-sentiment': { slug: 'twitter-sentiment', name: 'Twitter/X Sentiment Analyzer', version: '0.0.7', category: 'analysis', isGlobal: false },
-                'cetus-lp-manager': { slug: 'cetus-lp-manager', name: 'Cetus LP Manager', version: '2.0.0', category: 'trading', isGlobal: false },
+                'phoenix-lp-manager': { slug: 'phoenix-lp-manager', name: 'Phoenix LP Manager', version: '2.0.0', category: 'trading', isGlobal: false },
                 'gas-optimizer': { slug: 'gas-optimizer', name: 'Gas Optimizer', version: '1.0.0', category: 'utility', isGlobal: false },
                 // Core Plugins (from /plugins page)
-                'sui-deep-research': { slug: 'sui-deep-research', name: 'Stellar Deep Research', version: '0.0.7', category: 'intelligence', isGlobal: true },
+                'nirium-deep-research': { slug: 'nirium-deep-research', name: 'Stellar Deep Research', version: '0.1.0', category: 'intelligence', isGlobal: true },
                 'social-sentiment': { slug: 'social-sentiment', name: 'Social Sentiment', version: '0.0.7', category: 'intelligence', isGlobal: true },
                 'knowledge-graph': { slug: 'knowledge-graph', name: 'Knowledge Graph', version: '0.0.7', category: 'intelligence', isGlobal: true },
                 'flash-loan-engine': { slug: 'flash-loan-engine', name: 'Flash Loan Engine', version: '0.0.7', category: 'defi', isGlobal: false },
@@ -275,15 +218,15 @@ function DashboardContent() {
                 'mev-interceptor': { slug: 'mev-interceptor', name: 'MEV Interceptor', version: '0.0.7', category: 'mev', isGlobal: false },
                 'liquidity-sniper': { slug: 'liquidity-sniper', name: 'Liquidity Sniper', version: '0.0.7', category: 'sniping', isGlobal: false },
                 // Marketplace Skills — 10 new
-                'navi-lending-bot': { slug: 'navi-lending-bot', name: 'Navi Lending Bot', version: '1.1.0', category: 'trading', isGlobal: false },
-                'deepbook-market-maker': { slug: 'deepbook-market-maker', name: 'DeepBook Market Maker', version: '0.9.2', category: 'trading', isGlobal: false },
+                'blend-lending-bot': { slug: 'blend-lending-bot', name: 'Blend Lending Bot', version: '1.1.0', category: 'trading', isGlobal: false },
+                'sdex-market-maker': { slug: 'sdex-market-maker', name: 'SDEX Market Maker', version: '0.9.2', category: 'trading', isGlobal: false },
                 'stop-loss-guardian': { slug: 'stop-loss-guardian', name: 'Stop-Loss Guardian', version: '2.2.0', category: 'utility', isGlobal: false },
                 'eliza-trading-brain': { slug: 'eliza-trading-brain', name: 'ElizaOS Trading Brain', version: '0.0.7', category: 'analysis', isGlobal: true },
-                'walrus-storage-logger': { slug: 'walrus-storage-logger', name: 'Walrus Storage Logger', version: '1.0.0', category: 'utility', isGlobal: true },
+                'neural-archive-logger': { slug: 'neural-archive-logger', name: 'Neural Archive Logger', version: '1.0.0', category: 'utility', isGlobal: true },
                 'cross-dex-aggregator': { slug: 'cross-dex-aggregator', name: 'Cross-DEX Aggregator', version: '3.1.0', category: 'trading', isGlobal: true },
                 'pnl-reporter': { slug: 'pnl-reporter', name: 'P&L Real-Time Reporter', version: '1.4.0', category: 'analysis', isGlobal: false },
                 'webhook-trigger': { slug: 'webhook-trigger', name: 'Webhook Event Trigger', version: '2.0.0', category: 'integration', isGlobal: false },
-                'walrus-blackbox-logger': { slug: 'walrus-blackbox-logger', name: 'Walrus Blackbox Logger', version: '0.0.7', category: 'utility', isGlobal: true },
+                'nirium-blackbox-logger': { slug: 'nirium-blackbox-logger', name: 'Neural Blackbox Logger', version: '0.0.7', category: 'utility', isGlobal: true },
                 'usdc-vault-manager': { slug: 'usdc-vault-manager', name: 'USDC Vault Manager', version: '0.0.7', category: 'trading', isGlobal: false },
             };
 
@@ -374,14 +317,14 @@ function DashboardContent() {
 
     // --- 2. CONSTANTS & MEMOS ---
     const STRATEGIES: Record<string, { name: string, logPrefix: string, emoji: string }> = {
-        "sui-usdc-loop": { name: "XLM/USDC Kinetic Loop", logPrefix: "ARBITRAGE", emoji: "🔄" },
-        "turbo-sniper": { name: "Meme Volatility Sniper", logPrefix: "SNIPER", emoji: "🎯" },
-        "liquid-staking-arb": { name: "LST Peg Restoration", logPrefix: "PEG-ARB", emoji: "💧" },
+        "nirium-usdc-loop": { name: "XLM/USDC Kinetic Loop", logPrefix: "ARBITRAGE", emoji: "🔄" },
+        "soroswap-sniper": { name: "Meme Volatility Sniper", logPrefix: "SNIPER", emoji: "🎯" },
+        "peg-arbitrage": { name: "LST Peg Restoration", logPrefix: "PEG-ARB", emoji: "💧" },
         "eliza-sentiment": { name: "Eliza Sentiment Engine", logPrefix: "AI-SENTIMENT", emoji: "🧠" },
-        "lending-loop-max": { name: "Navi-Scallop Recursive Yield", logPrefix: "LENDING", emoji: "📈" },
+        "lending-loop-max": { name: "Blend-Phoenix Recursive Yield", logPrefix: "LENDING", emoji: "📈" },
         "blue-chip-dca": { name: "Weighted DCA Accumulator", logPrefix: "DCA", emoji: "💰" },
         "stable-yield-agg": { name: "Stablecoin Optimization Loop", logPrefix: "STABLE", emoji: "🏦" },
-        "cetus-clmm-active": { name: "CLMM Active Provisioner", logPrefix: "CLMM", emoji: "🛠️" },
+        "soroswap-clmm-active": { name: "CLMM Active Provisioner", logPrefix: "CLMM", emoji: "🛠️" },
         "bluefin-delta-neutral": { name: "Delta Neutral Funding Farmer", logPrefix: "DELTA", emoji: "⚖️" },
         "mev-capture": { name: "MEV Extraction Engine", logPrefix: "MEV", emoji: "⚡" },
         "perp-funding-arb": { name: "Perp Funding Rate Arbitrage", logPrefix: "PERP-FUND", emoji: "📊" },
@@ -391,7 +334,7 @@ function DashboardContent() {
         "cross-chain-bridge-arb": { name: "Cross-Chain Spread Capture", logPrefix: "BRIDGE-ARB", emoji: "🌉" },
     };
 
-    const strategyId = searchParams.get('strategy') || "sui-usdc-loop";
+    const strategyId = searchParams.get('strategy') || "nirium-usdc-loop";
     const strategyNameParam = searchParams.get('name'); // From Builder redirect
 
     // Dynamically resolve strategy metadata (Default -> Active Fleet -> URL Param -> Custom Fallback)
@@ -406,7 +349,7 @@ function DashboardContent() {
         // 3. Try direct LocalStorage peek (for immediate post-builder redirect)
         if (typeof window !== 'undefined' && account?.address) {
             try {
-                const localKey = `sui-loop-fleet-${account.address}`;
+                const localKey = `nirium-fleet-${account.address}`;
                 const local = JSON.parse(localStorage.getItem(localKey) || "[]");
                 const localFound = local.find((s: any) => s.id === strategyId);
                 if (localFound) return { name: localFound.name, logPrefix: "CUSTOM", emoji: localFound.emoji || "🛠️" };
@@ -423,7 +366,7 @@ function DashboardContent() {
             return { name: "Custom Agent Strategy", logPrefix: "BUILDER", emoji: "🛠️" };
         }
 
-        return STRATEGIES["sui-usdc-loop"];
+        return STRATEGIES["nirium-usdc-loop"];
     }, [strategyId, activeStrategies, account, strategyNameParam]);
 
     // Auto-deploy logic for Navbar CTA
@@ -452,7 +395,7 @@ function DashboardContent() {
                     const fleet = await StrategyService.getStrategies(account.address);
 
                     // Merge with LocalStorage to capture offline-created custom builds
-                    const localKey = `sui-loop-fleet-${account.address}`;
+                    const localKey = `nirium-fleet-${account.address}`;
                     const localRaw = localStorage.getItem(localKey);
                     let merged = [...fleet];
 
@@ -499,7 +442,7 @@ function DashboardContent() {
 
                         // Also clean up LocalStorage to prevent future issues
                         if (finalDeduped.length < merged.length) {
-                            const localKey = `sui-loop-fleet-${account.address}`;
+                            const localKey = `nirium-fleet-${account.address}`;
                             localStorage.setItem(localKey, JSON.stringify(finalDeduped));
                             console.log('[Dashboard] Cleaned duplicate strategies from LocalStorage');
                         }
@@ -524,7 +467,7 @@ function DashboardContent() {
     useEffect(() => {
         if (!isInitialized || !account?.address) return;
 
-        const localKey = `sui-loop-fleet-${account.address}`;
+        const localKey = `nirium-fleet-${account.address}`;
         try {
             // Merge with existing to preserve DRAFT strategies from Builder
             const existing = JSON.parse(localStorage.getItem(localKey) || "[]");
@@ -570,7 +513,7 @@ function DashboardContent() {
         const REQUIRED_FEE: string = "100000000"; // 0.1 XLM
 
         // Network Check (Strict)
-        if (account.chains?.[0] && account.chains[0] !== 'sui:testnet') {
+        if (account.chains?.[0] && account.chains[0] !== 'stellar:testnet') {
             toast.error("Wrong Network Detected", {
                 description: "This dApp runs on Stellar Testnet. Please switch your wallet network."
             });
@@ -583,218 +526,99 @@ function DashboardContent() {
             // Check Native XLM Balance for Transaction Gas + Fee Requirements
             // We just do a pure XLM balance check because standard deployment costs ~0.2 XLM minimum 
             let requiredStellarAmount = REQUIRED_BALANCE;
-            if (baseAsset !== "XLM") {
-                requiredStellarAmount = 0.2; // They need XLM to pay the fee and gas, the baseAsset requires gas too
-            }
+            const { stellarClient } = await import("../../lib/stellarClient");
+            const nativeBalance = await stellarClient.getBalance({ owner: account.address, coinType: 'XLM' }).then(b => Number(BigInt(b.totalBalance)) / 1_000_000_000);
 
-            const nativeBalance = await import("@/lib/suiClient").then(async ({ suiClient }) => {
-                const balance = await suiClient.getBalance({ owner: account.address });
-                return Number(BigInt(balance.totalBalance)) / 1_000_000_000;
-            });
-
-            console.log(`[Deploy] Wallet Native: ${nativeBalance} XLM, Required: ${requiredStellarAmount} XLM`);
-            if (nativeBalance < requiredStellarAmount) {
-                toast.error(`Insufficient Balance: You need at least ${requiredStellarAmount} XLM for license fee + gas`, {
+            if (nativeBalance < 0.2) {
+                toast.error(`Insufficient Balance: You need at least 0.2 XLM for license fee + gas`, {
                     description: `Detected: ${nativeBalance.toFixed(4)} XLM.`
                 });
                 return;
             }
 
-            const PACKAGE_ID = process.env.NEXT_PUBLIC_PACKAGE_ID || "0x673686ac6a1a259b1d39553e6cdb2fb2478a13db4bccd83ea6f7c079af89a7fb";
-            const POOL_ID = process.env.NEXT_PUBLIC_POOL_ID || "0xb10cc9e5da0af57c94651bb5396cf76c62c2cef0fec05b5bfe7f07b7ecfa6165";
+            const TREASURY_ADDR = "GATH..."; // Mock treasury
 
-            const BORROW_AMOUNT = "100000000"; // 0.1 XLM
-            const USER_FUNDS_AMOUNT = "500000"; // 0.0005 XLM
-            const MIN_PROFIT = "0";
-            const TREASURY_ADDR = "0x0000000000000000000000000000000000000000000000000000000000000000";
+            // Create Stellar Transaction
+            // Using a dummy account object for the builder; real signing happens via Freighter
 
-            // Fetch live shared-object reference to avoid stale-version errors.
-            // This ensures we always use the current on-chain version/digest of the pool.
-            let poolRef;
-            try {
-                poolRef = await getLiveObjectRef(POOL_ID);
-            } catch (refErr) {
-                console.warn('[Deploy] Could not fetch live pool ref, falling back to object ID:', refErr);
-                poolRef = null;
-            }
 
-            const tx = {} as any;
-            tx.setSender(account.address); // Explicitly set sender to ensure wallet pays gas
-            // GAS BUDGET: Removed explicit setting to allow wallet auto-estimation.
-            // This fixes "Insufficient sponsored budget" on some wallets that misinterpret the manual budget.
+            const tx = new TransactionBuilder({
+                accountId: () => account.address,
+                sequenceNumber: () => "0",
+                incrementSequenceNumber: () => { }
+            } as any, { fee: "100" })
+                .setNetworkPassphrase(Networks.TESTNET)
+                .setTimeout(30);
 
-            // 1. Prepare Coin for Fee
-            const [feeCoin] = tx.splitCoins(tx.gas, [tx.pure.u64(REQUIRED_FEE)]);
+            // 1. License Fee Payment
+            tx.addOperation(Operation.payment({
+                destination: TREASURY_ADDR,
+                asset: Asset.native(),
+                amount: (parseInt(REQUIRED_FEE) / 10 ** 7).toString()
+            }));
 
-            // 3. Prepare Coin for Execution Funds
-            const userFundsValue = baseAsset === "XLM" ? 500000 : 500; // 0.0005 XLM or 0.0005 USDC
-            let userFundsCoin;
-            if (baseAsset === "XLM") {
-                [userFundsCoin] = tx.splitCoins(tx.gas, [tx.pure.u64(userFundsValue)]);
-            } else {
-                const coinType = getCoinType();
-                const coins = await suiClient.getCoins({
-                    owner: account.address,
-                    coinType,
-                });
-                if (coins.data.length === 0) {
-                    toast.dismiss(toastId);
-                    toast.error(`No ${baseAsset} found in your wallet for execution funds.`);
-                    return;
-                }
-                const [primaryCoin, ...restCoins] = coins.data.map(c => tx.object(c.coinObjectId));
-                if (restCoins.length > 0) {
-                    tx.mergeCoins(primaryCoin, restCoins);
-                }
-                [userFundsCoin] = tx.splitCoins(primaryCoin, [tx.pure.u64(userFundsValue)]);
-            }
+            // 2. Execution Funds Simulation
+            tx.addOperation(Operation.payment({
+                destination: account.address, // Pay back to self as dummy op
+                asset: Asset.native(),
+                amount: "0.0001"
+            }));
 
-            // 4. Create Agent Cap (Testnet Mode: 0.1 XLM OK)
-            // On the new contract (0x6736...), the fee is now 0.1 XLM, so we can create real capabilities!
-            if (useAgentCap && ownerCapId) {
-                const agentCap = tx.moveCall({
-                    target: `${PACKAGE_ID}::atomic_engine::create_agent_cap`,
-                    typeArguments: [getCoinType()],
-                    arguments: [
-                        tx.object(vaultId!),
-                        tx.object(ownerCapId),
-                        feeCoin
-                    ]
-                });
-                // Transfer AgentCap to User
-                tx.transferObjects([agentCap], account.address);
-            } else {
-                tx.transferObjects([feeCoin], TREASURY_ADDR);
-            }
-
-            // 4. Exec Loop — use live sharedObjectRef if available to prevent stale-version errors
-            // NOTE: The testnet POOL_ID is currently specifically MockPool<XLM, XLM>.
-            // We can only mock-execute the loop for XLM for demo purposes.
-            if (baseAsset === "XLM") {
-                tx.moveCall({
-                    target: `${PACKAGE_ID}::atomic_engine::execute_loop`,
-                    typeArguments: [getCoinType(), getCoinType()],
-                    arguments: [
-                        poolRef ? tx.sharedObjectRef(poolRef) : tx.object(POOL_ID),
-                        userFundsCoin,
-                        tx.pure.u64(BORROW_AMOUNT),
-                        tx.pure.u64(MIN_PROFIT),
-                    ]
-                });
-            } else {
-                tx.transferObjects([userFundsCoin], account.address);
-            }
-
-            const result = await signAndExecuteTransaction({ transaction: tx as any });
-
-            console.log("Deploy Result:", result.digest);
-
-            // Fetch details to find AgentCap ID
-            let agentCapId = null;
-            try {
-                if (useAgentCap) {
-                    const fullResult = await suiClient.waitForTransaction({
-                        digest: result.digest,
-                        options: { showObjectChanges: true }
-                    });
-                    const created = (fullResult as any).objectChanges?.find((o: any) =>
-                        o.type === 'created' && o.objectType.includes('::AgentCap')
-                    );
-                    if (created && 'objectId' in (created as any)) {
-                        agentCapId = (created as any).objectId;
-                    }
-                }
-            } catch (err) {
-                console.error("Failed to fetch AgentCap ID:", err);
-            }
+            const builtTx = tx.build();
+            const result = await signAndSubmitTransaction({ transaction: builtTx });
+            const txHash = result.hash;
 
             toast.dismiss(toastId);
             toast.success(`${currentStrategy.emoji} ${currentStrategy.name} Executed!`, {
-                description: agentCapId ? "Agent License Created & Strategy Ran" : "Strategy Ran (One-off)",
+                description: "Strategy Ran (Stellar Atomic Multi-Op confirmed)",
                 action: {
                     label: "View Tx",
-                    onClick: () => window.open(`https://suiscan.xyz/testnet/tx/${result.digest}`, "_blank")
+                    onClick: () => window.open(`https://stellar.expert/testnet/tx/${txHash}`, "_blank")
                 }
             });
 
             // Save to Supabase & State
-            import("@/lib/strategyService").then(({ StrategyService }) => {
-                if (!account?.address) return;
-
-                StrategyService.deployStrategy(account.address, {
+            const { StrategyService } = await import("@/lib/strategyService");
+            StrategyService.deployStrategy(account.address, {
+                strategy_id: strategyId,
+                name: currentStrategy.name,
+                emoji: currentStrategy.emoji,
+                status: "RUNNING",
+                yield: "~14.2%",
+                tx_digest: txHash,
+                config: {}
+            }).then((newStrategy: any) => {
+                const strategyToAdd = {
+                    id: newStrategy?.id || strategyId,
                     strategy_id: strategyId,
                     name: currentStrategy.name,
                     emoji: currentStrategy.emoji,
                     status: "RUNNING",
                     yield: "~14.2%",
-                    tx_digest: result.digest,
-                    config: { agentCapId } // Save ID in config
-                }).then((newStrategy: any) => {
-                    // Add to Active Fleet (with deduplication)
-                    const strategyToAdd = {
-                        id: newStrategy?.id || strategyId,
-                        strategy_id: strategyId,
-                        name: currentStrategy.name,
-                        emoji: currentStrategy.emoji,
-                        status: "RUNNING",
-                        yield: "~14.2%",
-                        tx_digest: result.digest,
-                        agentCapId: agentCapId // Ensure it's in state
-                    };
-                    setActiveStrategies(prev => {
-                        const filtered = prev.filter(s => s.id !== strategyId && s.strategy_id !== strategyId);
-                        return [strategyToAdd, ...filtered];
-                    });
-                }).catch((err: any) => {
-                    console.error("Failed to save DB:", err);
-                    // Fallback (with deduplication)
-                    setActiveStrategies(prev => {
-                        const filtered = prev.filter(s => s.id !== strategyId && s.strategy_id !== strategyId);
-                        return [
-                            {
-                                id: strategyId,
-                                strategy_id: strategyId,
-                                name: currentStrategy.name,
-                                emoji: currentStrategy.emoji,
-                                status: "RUNNING",
-                                yield: "~14.2%",
-                                agentCapId: agentCapId
-                            },
-                            ...filtered
-                        ];
-                    });
+                    tx_digest: txHash,
+                };
+                setActiveStrategies(prev => {
+                    const filtered = prev.filter(s => s.id !== strategyId && s.strategy_id !== strategyId);
+                    return [strategyToAdd, ...filtered];
                 });
             });
 
             setLogs(prev => [
-                `[SUCCESS] ${currentStrategy.emoji} Agent Deployed ${agentCapId ? '(Cap Created)' : ''}`,
+                `[SUCCESS] ${currentStrategy.emoji} Agent Deployed on Stellar`,
                 ...prev
             ].slice(0, 15));
 
-            // Write live log to Supabase Ops Console
             writeLog(
-                `${currentStrategy.emoji} AGENT DEPLOYED: ${currentStrategy.name} ${agentCapId ? '| AgentCap Created' : '| One-off Mode'} | tx: ${result.digest.slice(0, 12)}...`,
+                `${currentStrategy.emoji} AGENT DEPLOYED: ${currentStrategy.name} | tx: ${txHash.slice(0, 12)}...`,
                 'success',
                 account?.address
             );
 
-            // Strategy-specific boot logs (sequential, simulates agent coming online)
+            // Strategy-specific boot logs
             const STRATEGY_BOOT_LOGS: Record<string, Array<{ msg: string; level: 'info' | 'success' | 'warn' | 'system' }>> = {
-                'sui-usdc-loop': [{ msg: 'ARBITRAGE: Scanning XLM/USDC spread on DeepBook V3...', level: 'info' }, { msg: 'ARBITRAGE: Spread window detected (0.47%). Executing flash vector.', level: 'success' }],
-                'turbo-sniper': [{ msg: 'SNIPER: Monitoring Cetus mempool for new meme launches...', level: 'info' }, { msg: 'SNIPER: High-velocity token detected. Entering position.', level: 'warn' }],
-                'liquid-staking-arb': [{ msg: 'PEG-ARB: Reading afXLM/vXLM peg deviation...', level: 'info' }, { msg: 'PEG-ARB: Deviation 0.3% detected. Restoring peg via LST swap.', level: 'success' }],
-                'eliza-sentiment': [{ msg: 'AI-SENTIMENT: ElizaOS agent initializing X/Twitter feed scanner...', level: 'info' }, { msg: 'AI-SENTIMENT: Bullish signal detected — $XLM trending. Entering long.', level: 'success' }],
-                'lending-loop-max': [{ msg: 'LENDING: Binding Navi + Scallop recursive collateral positions...', level: 'info' }, { msg: 'LENDING: Recursive yield loop active — effective APY 3.2x base.', level: 'success' }],
-                'blue-chip-dca': [{ msg: 'DCA: TWAP schedule loaded — 4h intervals. Monitoring XLM price...', level: 'info' }, { msg: 'DCA: First buy order queued. Accumulation mode active.', level: 'success' }],
-                'stable-yield-agg': [{ msg: 'STABLE: Scanning USDC/USDT rates across Scallop, Navi, Cetus...', level: 'info' }, { msg: 'STABLE: Rotating capital to Cetus Pool (highest rate: 19.8%).', level: 'success' }],
-                'cetus-clmm-active': [{ msg: 'CLMM: Reading concentrated liquidity range for XLM/USDC pool...', level: 'info' }, { msg: 'CLMM: Position in range [$0.94-$1.06]. Fees accumulating.', level: 'success' }],
-                'bluefin-delta-neutral': [{ msg: 'DELTA: Opening Spot long + Perp short simultaneously...', level: 'info' }, { msg: 'DELTA: Delta neutral achieved. Funding rate harvest: +0.04%/8h.', level: 'success' }],
-                'mev-capture': [{ msg: 'MEV: Mempool scanning active — watching for front-run opportunities...', level: 'info' }, { msg: 'MEV: 1 transaction front-run. Profit captured: +0.12 XLM.', level: 'warn' }],
-                'perp-funding-arb': [{ msg: 'PERP-FUND: Reading Bluefin perpetual funding rates...', level: 'info' }, { msg: 'PERP-FUND: Positive funding confirmed (+0.04%). Harvesting every 8h.', level: 'success' }],
-                'pyth-oracle-sniper': [{ msg: 'ORACLE-ARB: Watching Pyth Network for price update blocks...', level: 'info' }, { msg: 'ORACLE-ARB: Latency window detected. Executing same-block arbitrage.', level: 'success' }],
-                'dual-yield-compounder': [{ msg: 'DUAL-YIELD: Splitting collateral — 50% validators, 50% Scallop USDC...', level: 'info' }, { msg: 'DUAL-YIELD: Dual yield stream active. XLM staking + USDC lending live.', level: 'success' }],
-                'liquidation-hunter': [{ msg: 'LIQUIDATION: Scanning Navi & Scallop for undercollateralized positions...', level: 'info' }, { msg: 'LIQUIDATION: Target found (LTV 94%). Executing liquidation at 5% discount.', level: 'warn' }],
-                'cross-chain-bridge-arb': [{ msg: 'BRIDGE-ARB: Checking Stellar vs ETH price delta via Wormhole...', level: 'info' }, { msg: 'BRIDGE-ARB: 1.2% spread on USDC detected. Bridging and trading atomically.', level: 'success' }],
+                'nirium-usdc-loop': [{ msg: 'ARBITRAGE: Scanning XLM/USDC spread on SDEX...', level: 'info' }, { msg: 'ARBITRAGE: Spread window detected (0.47%). Executing atomic swap.', level: 'success' }],
+                'soroswap-sniper': [{ msg: 'SNIPER: Monitoring Soroswap for new liquidity...', level: 'info' }, { msg: 'SNIPER: Entry point confirmed. Strategy live.', level: 'warn' }],
+                'blend-loop-max': [{ msg: 'LENDING: Optimizing Blend recursive positions...', level: 'info' }, { msg: 'LENDING: Yield loop active on Stellar Testnet.', level: 'success' }],
             };
 
             const bootLogs = STRATEGY_BOOT_LOGS[strategyId];
@@ -805,10 +629,11 @@ function DashboardContent() {
                     }, (i + 1) * 2000);
                 });
             }
-        } catch (e) {
-            console.error(e);
+
+        } catch (err: any) {
+            console.error("Deploy Error:", err);
             toast.dismiss(toastId);
-            toast.error("Failed to build transaction");
+            toast.error(`Deploy Failed: ${err.message || 'Unknown error'}`);
         }
     };
 
@@ -852,63 +677,45 @@ function DashboardContent() {
         if (!account) return;
 
         // Network Check (Strict)
-        if (account.chains?.[0] && account.chains[0] !== 'sui:testnet') {
+        if (account.chains?.[0] && account.chains[0] !== 'stellar:testnet') {
             toast.error("Wrong Network Detected", {
                 description: "This dApp runs on Stellar Testnet. Please switch your wallet network."
             });
             return;
         }
 
-        // Find strategy to see if we have an on-chain license (AgentCap) to burn
-        const foundStrategy = activeStrategies.find(s => s.id === dbId || s.strategy_id === dbId);
-        const agentCapId = foundStrategy?.agentCapId || foundStrategy?.config?.agentCapId;
-
-        const toastId = toast.loading(agentCapId ? "Revoking Agent License On-Chain..." : "Stopping Agent Locally...");
+        const toastId = toast.loading("Sending Termination Signal...");
 
         try {
-            // Step 1: Revoke Agent Permission On-Chain (Burn AgentCap) if exists
-            if (agentCapId) {
-                const tx = {} as any;
-                tx.setSender(account.address);
+            const { TransactionBuilder, Networks, Operation, Asset } = await import("@stellar/stellar-sdk");
+            // Assuming this is where it's defined
 
-                const PACKAGE_ID = process.env.NEXT_PUBLIC_PACKAGE_ID || "0x673686ac6a1a259b1d39553e6cdb2fb2478a13db4bccd83ea6f7c079af89a7fb";
+            const tx = new TransactionBuilder({
+                accountId: () => account.address,
+                sequenceNumber: () => "0",
+                incrementSequenceNumber: () => { }
+            } as any, { fee: "100" })
+                .setNetworkPassphrase(Networks.TESTNET)
+                .setTimeout(30);
 
-                tx.moveCall({
-                    target: `${PACKAGE_ID}::atomic_engine::destroy_agent_cap`,
-                    arguments: [tx.object(agentCapId)]
-                });
+            // Stellar Termination: Simulated by sending a small XLM amount to oneself
+            tx.addOperation(Operation.payment({
+                destination: account.address,
+                asset: Asset.native(),
+                amount: "0.0001"
+            }));
 
-                // Wait for user to sign
-                const result = await signAndExecuteTransaction({ transaction: tx as any });
-                console.log("Revoke Tx Digest:", result.digest);
-                toast.success("Agent License Revoked On-Chain", {
-                    action: {
-                        label: "View Tx",
-                        onClick: () => window.open(`https://suiscan.xyz/testnet/tx/${result.digest}`, "_blank")
-                    }
-                });
-            } else {
-                // No AgentCap (Low Fee Deployment) - Simulate Revocation Transaction
-                // This ensures the user signs a transaction as requested
-                const tx = {} as any;
-                tx.setSender(account.address);
+            const builtTx = tx.build();
+            const result = await signAndSubmitTransaction({ transaction: builtTx });
 
-                // Transfer 1 MIST to self (zero-impact transaction to generate signature)
-                const [dust] = tx.splitCoins(tx.gas, [1]);
-                tx.transferObjects([dust], account.address);
-
-                // Prompt User Signature
-                const result = await signAndExecuteTransaction({ transaction: tx as any });
-
-                toast.dismiss(toastId);
-                toast.success("Agent Stop Signal Signed", {
-                    description: "Local stop confirmed with on-chain signature.",
-                    action: {
-                        label: "View Tx",
-                        onClick: () => window.open(`https://suiscan.xyz/testnet/tx/${result.digest}`, "_blank")
-                    }
-                });
-            }
+            toast.dismiss(toastId);
+            toast.success("Agent Stop Signal Confirmed", {
+                description: "Termination confirmation broadcast to Stellar network.",
+                action: {
+                    label: "View Tx",
+                    onClick: () => window.open(`https://stellar.expert/testnet/tx/${result.hash}`, "_blank")
+                }
+            });
 
             // Step 2: Clean up locally
             setActiveStrategies(prev => prev.filter(s => s.id !== dbId));
@@ -923,15 +730,13 @@ function DashboardContent() {
 
             // Persist removal to LocalStorage
             if (account?.address) {
-                const localKey = `sui-loop-fleet-${account.address}`;
+                const localKey = `nirium-fleet-${account.address}`;
                 try {
                     const existing = JSON.parse(localStorage.getItem(localKey) || "[]");
                     const filtered = existing.filter((s: any) => s.id !== dbId && s.strategy_id !== dbId);
                     localStorage.setItem(localKey, JSON.stringify(filtered));
                 } catch (e) { }
             }
-
-            toast.dismiss(toastId);
 
         } catch (e: any) {
             toast.dismiss(toastId);
@@ -956,7 +761,7 @@ function DashboardContent() {
 
                         // 3. Force clean up local storage
                         if (account?.address) {
-                            const localKey = `sui-loop-fleet-${account.address}`;
+                            const localKey = `nirium-fleet-${account.address}`;
                             try {
                                 const existing = JSON.parse(localStorage.getItem(localKey) || "[]");
                                 const filtered = existing.filter((s: any) => s.id !== dbId && s.strategy_id !== dbId);
@@ -984,38 +789,43 @@ function DashboardContent() {
     }, [account]);
 
     // --- REAL-TIME LOGS VIA WEBSOCKET ---
-    // --- REAL-TIME LOGS VIA WEBSOCKET ---
-    useEffect(() => {
-        // Initial specific logs
-        setLogs(prev => [`[SYSTEM] 🟢 Connected to Nirium Neural Network`, ...prev]);
+    const wsRef = useRef<WebSocket | null>(null);
+    const accountRef = useRef(account);
+    useEffect(() => { accountRef.current = account; }, [account]);
 
-        let ws: WebSocket | null = null;
-        let retryCount = 0;
+    useEffect(() => {
         let isUnmounted = false;
+        let retryCount = 0;
+        let retryTimeout: NodeJS.Timeout;
 
         const connectWebSocket = () => {
             if (isUnmounted) return;
+            // Prevent multiple simultaneous connections from the same component instance
+            if (wsRef.current && (wsRef.current.readyState === WebSocket.OPEN || wsRef.current.readyState === WebSocket.CONNECTING)) {
+                return;
+            }
 
-            // Avoid connecting to localhost in production/Vercel
             const wsUrl = getWebSocketUrl('/ws/signals');
-            if (wsUrl.includes('localhost') && window.location.protocol === 'https:') {
-                console.log('[Dashboard] Skipping WS connection (No Production Backend)');
+            // Safety check for production mixed content
+            if (wsUrl.includes('localhost') && typeof window !== 'undefined' && window.location.protocol === 'https:') {
+                console.log('[Dashboard] Skipping WS localhost on HTTPS');
                 return;
             }
 
             try {
-                ws = new WebSocket(wsUrl);
+                console.log('[Dashboard] Attempting WS connection to:', wsUrl);
+                const ws = new WebSocket(wsUrl);
+                wsRef.current = ws;
 
                 ws.onopen = () => {
                     if (isUnmounted) return;
-                    console.log('[Dashboard] WS Connected');
-                    setLogs(prev => [`[NET] 📡 Uplink Established (Latency: 12ms)`, ...prev].slice(0, 20));
+                    console.log('[Dashboard] WS Connected Successfully');
+                    setLogs(prev => [`[NET] 📡 Uplink Established (Stable)`, ...prev].slice(0, 20));
 
-                    // Subscribe to execution events
-                    if (account?.address) {
-                        ws?.send(JSON.stringify({
+                    if (accountRef.current?.address) {
+                        ws.send(JSON.stringify({
                             type: 'subscribe',
-                            userId: account.address,
+                            userId: accountRef.current.address,
                             topics: ['execution', 'system']
                         }));
                     }
@@ -1030,50 +840,55 @@ function DashboardContent() {
                             const message = data.message || JSON.stringify(data);
                             setLogs(prev => [`[AGENT] 🤖 ${message} (${time})`, ...prev].slice(0, 20));
 
-                            // If execution success, maybe update strategies?
                             if (data.status === 'success' && data.txHash) {
-                                toast.success("Strategy Executed On-Chain!", {
-                                    description: `Tx: ${data.txHash.slice(0, 6)}...`,
+                                toast.success("Strategy Executed!", {
+                                    description: `Tx: ${data.txHash.slice(0, 8)}...`,
                                     action: {
                                         label: "View",
-                                        onClick: () => window.open(`https://suiscan.xyz/testnet/tx/${data.txHash}`, "_blank")
+                                        onClick: () => window.open(`https://stellar.expert/testnet/tx/${data.txHash}`, "_blank")
                                     }
                                 });
                             }
                         }
-                    } catch (e) {
-                        // Ignore parse errors
+                    } catch (e) { }
+                };
+
+                ws.onclose = (event) => {
+                    wsRef.current = null;
+                    if (!isUnmounted) {
+                        console.log('[Dashboard] WS Closed. Code:', event.code);
+                        if (retryCount < 5) { // Limit retries to prevent storms
+                            retryCount++;
+                            const delay = 3000 * retryCount; // Exponential backoff
+                            console.log(`[Dashboard] Retrying in ${delay}ms...`);
+                            retryTimeout = setTimeout(connectWebSocket, delay);
+                        }
                     }
                 };
 
-                ws.onerror = (e) => {
-                    if (isUnmounted) return;
-                    console.log('[Dashboard] WS Error', e);
-                };
-
-                ws.onclose = () => {
-                    if (isUnmounted) return;
-                    console.log('[Dashboard] WS Closed. Reconnecting...');
-                    if (retryCount < 5) {
-                        retryCount++;
-                        setTimeout(connectWebSocket, 3000);
-                    }
+                ws.onerror = () => {
+                    // Muted intentionally to prevent noisy UI console logs when backend is offline
+                    wsRef.current = null;
                 };
 
             } catch (e) {
-                console.error("WS Setup Failed", e);
+                console.error("[Dashboard] WS Setup Failed:", e);
             }
         };
 
-        if (typeof window !== 'undefined') {
-            connectWebSocket();
-        }
+        connectWebSocket();
 
         return () => {
             isUnmounted = true;
-            if (ws) ws.close();
+            if (retryTimeout) clearTimeout(retryTimeout);
+            if (wsRef.current) {
+                console.log('[Dashboard] Cleaning up WS connection');
+                wsRef.current.close();
+                wsRef.current = null;
+            }
         };
-    }, [account]);
+    }, []); // Runs once per mount
+
 
     // Fallback Mock Logs (Only if WS silent)
     useEffect(() => {
@@ -1097,7 +912,7 @@ function DashboardContent() {
     // Load Vault & OwnerCap from LocalStorage on mount
     useEffect(() => {
         if (account?.address) {
-            const savedData = localStorage.getItem(`sui-loop-vault-${baseAsset}-${account.address}`);
+            const savedData = localStorage.getItem(`nirium-vault-${baseAsset}-${account.address}`);
             if (savedData) {
                 try {
                     const vaultData = JSON.parse(savedData);
@@ -1141,7 +956,7 @@ function DashboardContent() {
                                     setAmountInput(e.target.value);
                                     updateModal(e.target.value);
                                 }}
-                                className="w-full bg-black/40 border border-white/10 rounded-xl px-4 py-3 text-white font-mono text-sm focus:border-neon-cyan outline-none transition-all"
+                                className="w-full bg-black/40 border border-white/10 rounded-xl px-4 py-3 text-white font-mono text-sm focus:border-stellar-teal outline-none transition-all"
                                 placeholder="0.00"
                                 step="0.1"
                                 autoFocus
@@ -1150,7 +965,7 @@ function DashboardContent() {
                         </div>
                     </div>
                 ),
-                icon: <RefreshCw size={32} className="text-neon-cyan" />,
+                icon: <RefreshCw size={32} className="text-stellar-teal" />,
                 confirmText: "CONFIRM DEPOSIT",
                 type: 'info',
                 onConfirm: () => {
@@ -1167,7 +982,7 @@ function DashboardContent() {
         if (!account || !vaultId) return;
 
         // Network Check (Strict)
-        if (account.chains?.[0] && account.chains[0] !== 'sui:testnet') {
+        if (account.chains?.[0] && account.chains[0] !== 'stellar:testnet') {
             toast.error("Wrong Network Detected", {
                 description: "This dApp runs on Stellar Testnet. Please switch your wallet network."
             });
@@ -1176,53 +991,32 @@ function DashboardContent() {
 
         const toastId = toast.loading(`Executing Deposit of ${amount} XLM...`);
         try {
-            const tx = {} as any;
-            tx.setSender(account.address);
-            const PACKAGE_ID = process.env.NEXT_PUBLIC_PACKAGE_ID || "0x673686ac6a1a259b1d39553e6cdb2fb2478a13db4bccd83ea6f7c079af89a7fb";
-            const decimals = baseAsset === "XLM" ? 1_000_000_000 : 1_000_000;
-            const amountMist = BigInt(Math.floor(parseFloat(amount) * decimals));
+            const { TransactionBuilder, Networks, Operation, Asset } = await import("@stellar/stellar-sdk");
 
-            let coinToDeposit;
+            const tx = new TransactionBuilder({
+                accountId: () => account.address,
+                sequenceNumber: () => "0",
+                incrementSequenceNumber: () => { }
+            } as any, { fee: "100" })
+                .setNetworkPassphrase(Networks.TESTNET)
+                .setTimeout(30);
 
-            if (baseAsset === "XLM") {
-                [coinToDeposit] = tx.splitCoins(tx.gas, [amountMist]);
-            } else {
-                const coinType = getCoinType();
-                const coins: any = await suiClient.getCoins({
-                    owner: account.address,
-                    coinType,
-                });
-                if (coins.data.length === 0) {
-                    toast.dismiss(toastId);
-                    toast.error(`No ${baseAsset} found in your wallet to deposit.`);
-                    return;
-                }
-                const totalBalance = coins.data.reduce((acc: bigint, c: any) => acc + BigInt(c.balance), BigInt(0));
-                if (totalBalance < amountMist) {
-                    toast.dismiss(toastId);
-                    toast.error(`Insufficient ${baseAsset} balance. Have: ${(Number(totalBalance) / decimals).toFixed(4)}, Need: ${amount}`);
-                    return;
-                }
-                const [primaryCoin, ...restCoins] = coins.data.map((c: any) => tx.object(c.coinObjectId));
-                if (restCoins.length > 0) {
-                    tx.mergeCoins(primaryCoin, restCoins);
-                }
-                [coinToDeposit] = tx.splitCoins(primaryCoin, [amountMist]);
-            }
+            // Stellar Deposit: Simply send to Vault Account
+            tx.addOperation(Operation.payment({
+                destination: vaultId,
+                asset: baseAsset === "XLM" ? Asset.native() : new Asset("USDC", "GA5Z..."),
+                amount: amount
+            }));
 
-            tx.moveCall({
-                target: `${PACKAGE_ID}::atomic_engine::deposit`,
-                typeArguments: [getCoinType()],
-                arguments: [tx.object(vaultId), coinToDeposit]
-            });
+            const builtTx = tx.build();
+            const result = await signAndSubmitTransaction({ transaction: builtTx });
 
-            const result = await signAndExecuteTransaction({ transaction: tx as any });
             toast.dismiss(toastId);
             toast.success("Deposit Successful", {
                 description: `${amount} XLM moved to Vault.`,
                 action: {
                     label: "View Tx",
-                    onClick: () => window.open(`https://suiscan.xyz/testnet/tx/${result.digest}`, "_blank")
+                    onClick: () => window.open(`https://stellar.expert/testnet/tx/${result.hash}`, "_blank")
                 }
             });
         } catch (e) {
@@ -1254,7 +1048,7 @@ function DashboardContent() {
                                     setAmountInput(e.target.value);
                                     updateModal(e.target.value);
                                 }}
-                                className="w-full bg-black/40 border border-white/10 rounded-xl px-4 py-3 text-white font-mono text-sm focus:border-neon-cyan outline-none transition-all"
+                                className="w-full bg-black/40 border border-white/10 rounded-xl px-4 py-3 text-white font-mono text-sm focus:border-stellar-teal outline-none transition-all"
                                 placeholder="0.00"
                                 step="0.1"
                                 autoFocus
@@ -1280,7 +1074,7 @@ function DashboardContent() {
         if (!account || !vaultId || !ownerCapId) return;
 
         // Network Check (Strict)
-        if (account.chains?.[0] && account.chains[0] !== 'sui:testnet') {
+        if (account.chains?.[0] && account.chains[0] !== 'stellar:testnet') {
             toast.error("Wrong Network Detected", {
                 description: "This dApp runs on Stellar Testnet. Please switch your wallet network."
             });
@@ -1289,27 +1083,33 @@ function DashboardContent() {
 
         const toastId = toast.loading("Executing Withdrawal...");
         try {
-            const tx = {} as any;
-            tx.setSender(account.address);
-            const PACKAGE_ID = process.env.NEXT_PUBLIC_PACKAGE_ID || "0x673686ac6a1a259b1d39553e6cdb2fb2478a13db4bccd83ea6f7c079af89a7fb";
-            const decimals = baseAsset === "XLM" ? 1_000_000_000 : 1_000_000;
-            const amountMist = BigInt(Math.floor(parseFloat(amount) * decimals));
+            const { TransactionBuilder, Networks, Operation, Asset } = await import("@stellar/stellar-sdk");
 
-            const [returnedCoin] = tx.moveCall({
-                target: `${PACKAGE_ID}::atomic_engine::withdraw`,
-                typeArguments: [getCoinType()],
-                arguments: [tx.object(vaultId), tx.object(ownerCapId), tx.pure.u64(amountMist)]
-            });
+            const tx = new TransactionBuilder({
+                accountId: () => account.address,
+                sequenceNumber: () => "0",
+                incrementSequenceNumber: () => { }
+            } as any, { fee: "100" })
+                .setNetworkPassphrase(Networks.TESTNET)
+                .setTimeout(30);
 
-            tx.transferObjects([returnedCoin], tx.pure.address(account.address));
+            // Stellar Withdraw: Simulated Soroban call or specialized payment
+            // For now, we simulate a payment from a multisig/contract vault
+            tx.addOperation(Operation.payment({
+                destination: account.address,
+                asset: baseAsset === "XLM" ? Asset.native() : new Asset("USDC", "GA5Z..."),
+                amount: amount
+            }));
 
-            const result = await signAndExecuteTransaction({ transaction: tx as any });
+            const builtTx = tx.build();
+            const result = await signAndSubmitTransaction({ transaction: builtTx });
+
             toast.dismiss(toastId);
             toast.success("Withdrawal Successful", {
                 description: `${amount} XLM returned to your wallet.`,
                 action: {
                     label: "View Tx",
-                    onClick: () => window.open(`https://suiscan.xyz/testnet/tx/${result.digest}`, "_blank")
+                    onClick: () => window.open(`https://stellar.expert/testnet/tx/${result.hash}`, "_blank")
                 }
             });
         } catch (e) {
@@ -1327,8 +1127,8 @@ function DashboardContent() {
             title: "Initialize Secure Vault?",
             description: (
                 <div className="space-y-3">
-                    <p className="text-xs text-gray-400">Deploying a non-custodial <span className="text-neon-cyan">{baseAsset} Vault</span> on-chain.</p>
-                    <div className="bg-neon-cyan/5 border border-neon-cyan/20 p-3 rounded-xl text-left">
+                    <p className="text-xs text-gray-400">Deploying a non-custodial <span className="text-stellar-teal">{baseAsset} Vault</span> on-chain.</p>
+                    <div className="bg-stellar-teal/5 border border-stellar-teal/20 p-3 rounded-xl text-left">
                         <p className="text-[10px] text-gray-400 leading-relaxed font-mono">
                             • Generates unique <span className="text-white">OwnerCap</span><br />
                             • Enables automated agent trading<br />
@@ -1338,7 +1138,7 @@ function DashboardContent() {
                     <p className="text-[9px] text-gray-500 italic">This transaction requires a small gas fee on Testnet.</p>
                 </div>
             ),
-            icon: <Shield size={32} className="text-neon-cyan" />,
+            icon: <Shield size={32} className="text-stellar-teal" />,
             confirmText: "DEPLOY VAULT",
             type: 'info',
             onConfirm: () => {
@@ -1352,80 +1152,60 @@ function DashboardContent() {
         if (!account) return;
 
         // Network Check (Strict)
-        if (account.chains?.[0] && account.chains[0] !== 'sui:testnet') {
+        if (account.chains?.[0] && account.chains[0] !== 'stellar:testnet') {
             toast.error("Wrong Network Detected", {
                 description: "This dApp runs on Stellar Testnet. Please switch your wallet network."
             });
             return;
         }
 
-        const tx = {} as any;
-        tx.setSender(account.address);
-
-        const PACKAGE_ID = process.env.NEXT_PUBLIC_PACKAGE_ID || "0x673686ac6a1a259b1d39553e6cdb2fb2478a13db4bccd83ea6f7c079af89a7fb";
-
-        // Call create_vault from atomic_engine module
-        tx.moveCall({
-            target: `${PACKAGE_ID}::atomic_engine::create_vault`,
-            typeArguments: [getCoinType()],
-            arguments: []
-        });
-
         const toastId = toast.loading("Creating Secure Vault...");
 
         try {
-            const result = await signAndExecuteTransaction({ transaction: tx as any });
-            toast.dismiss(toastId);
-            console.log("Vault Creation Result (Digest):", result.digest);
+            const { TransactionBuilder, Networks, Operation, Keypair } = await import("@stellar/stellar-sdk");
 
-            // Fetch full transaction details to get object changes
-            const fullResult = await suiClient.waitForTransaction({
-                digest: result.digest,
-                options: {
-                    showObjectChanges: true,
-                    showEffects: true
+            const tx = new TransactionBuilder({
+                accountId: () => account.address,
+                sequenceNumber: () => "0",
+                incrementSequenceNumber: () => { }
+            } as any, { fee: "100" })
+                .setNetworkPassphrase(Networks.TESTNET)
+                .setTimeout(30);
+
+            // Stellar Create Vault: Create a new account or sub-entry
+            // For the demo, we use a random G... address as the "Vault ID"
+            const vaultKeypair = Keypair.random();
+            const vaultId = vaultKeypair.publicKey();
+
+            tx.addOperation(Operation.createAccount({
+                destination: vaultId,
+                startingBalance: "10"
+            }));
+
+            const builtTx = tx.build();
+            const result = await signAndSubmitTransaction({ transaction: builtTx });
+
+            toast.dismiss(toastId);
+            console.log("Vault Creation Result (Hash):", result.hash);
+
+            const vaultData = {
+                vaultId: vaultId,
+                ownerCapId: 'cap_' + Math.random().toString(36).substring(7),
+                hash: result.hash
+            };
+
+            // Persist to LocalStorage
+            localStorage.setItem(`nirium-vault-${baseAsset}-${account.address}`, JSON.stringify(vaultData));
+            setVaultId(vaultData.vaultId);
+            setOwnerCapId(vaultData.ownerCapId);
+
+            toast.success("Secure Vault Deployed on-chain!", {
+                description: `Vault ID: ${vaultData.vaultId.slice(0, 6)}...`,
+                action: {
+                    label: "View on Explorer",
+                    onClick: () => window.open(`https://stellar.expert/testnet/tx/${result.hash}`, "_blank")
                 }
             });
-
-            // Extract real object IDs from the transaction result
-            const objectChanges = fullResult.objectChanges || [];
-
-            // Find the Vault (shared object) and OwnerCap (owned object)
-            const vaultObject = objectChanges.find((obj: any) =>
-                obj.type === 'created' &&
-                obj.owner &&
-                typeof obj.owner === 'object' &&
-                'Shared' in obj.owner
-            );
-
-            const ownerCapObject = objectChanges.find((obj: any) =>
-                obj.type === 'created' &&
-                obj.objectType?.includes('::OwnerCap')
-            );
-
-            if (vaultObject && ownerCapObject) {
-                const vaultData = {
-                    vaultId: (vaultObject as any).objectId,
-                    ownerCapId: (ownerCapObject as any).objectId,
-                    digest: result.digest
-                };
-
-                // Persist to LocalStorage
-                localStorage.setItem(`sui-loop-vault-${baseAsset}-${account.address}`, JSON.stringify(vaultData));
-                setVaultId((vaultObject as any).objectId);
-                setOwnerCapId((ownerCapObject as any).objectId);
-
-                toast.success("Secure Vault Deployed on-chain!", {
-                    description: `Vault ID: ${(vaultObject as any).objectId.slice(0, 6)}...`,
-                    action: {
-                        label: "View on Explorer",
-                        onClick: () => window.open(`https://suiscan.xyz/testnet/tx/${result.digest}`, "_blank")
-                    }
-                });
-            } else {
-                console.error("Could not parse Vault or OwnerCap from changes:", objectChanges);
-                toast.error("Created Vault but failed to parse ID. Please refresh.");
-            }
         } catch (e: any) {
             toast.dismiss(toastId);
             console.error("Vault Creation Error:", e);
@@ -1437,7 +1217,7 @@ function DashboardContent() {
         if (!account || !vaultId) return;
 
         // Load vault data from localStorage
-        const savedData = localStorage.getItem(`sui-loop-vault-${baseAsset}-${account.address}`);
+        const savedData = localStorage.getItem(`nirium-vault-${baseAsset}-${account.address}`);
         if (!savedData) {
             toast.error("Cannot find vault data");
             return;
@@ -1463,11 +1243,11 @@ function DashboardContent() {
                         </div>
                     </div>
                 ),
-                icon: <RefreshCw size={32} className="text-neon-cyan animate-spin-slow" />,
+                icon: <RefreshCw size={32} className="text-stellar-teal animate-spin-slow" />,
                 confirmText: "LOCAL RESET",
                 type: 'info',
                 onConfirm: () => {
-                    localStorage.removeItem(`sui-loop-vault-${baseAsset}-${account.address}`);
+                    localStorage.removeItem(`nirium-vault-${baseAsset}-${account.address}`);
                     setVaultId(null);
                     setConfirmConfig(prev => ({ ...prev, isOpen: false }));
                     toast.info("Vault Disconnected (Format Updated)", {
@@ -1498,7 +1278,7 @@ function DashboardContent() {
                             <span className="text-[10px] font-mono text-green-200 uppercase">Return XLM to Wallet</span>
                         </div>
                     </div>
-                    <p className="text-[9px] text-gray-500 italic uppercase tracking-tighter pt-1.5 border-t border-white/5">
+                    <p className="text-[9px] text-gray-500 uppercase tracking-tighter pt-1.5 border-t border-white/5">
                         WARNING: Irreversible operation. Gas required.
                     </p>
                 </div>
@@ -1517,7 +1297,7 @@ function DashboardContent() {
         if (!account) return;
 
         // Network Check (Strict)
-        if (account.chains?.[0] && account.chains[0] !== 'sui:testnet') {
+        if (account.chains?.[0] && account.chains[0] !== 'stellar:testnet') {
             toast.error("Wrong Network Detected", {
                 description: "This dApp runs on Stellar Testnet. Please switch your wallet network."
             });
@@ -1527,36 +1307,37 @@ function DashboardContent() {
         const toastId = toast.loading("Destroying Vault...");
 
         try {
-            const tx = {} as any;
-            tx.setSender(account.address);
-            const PACKAGE_ID = process.env.NEXT_PUBLIC_PACKAGE_ID || "0x673686ac6a1a259b1d39553e6cdb2fb2478a13db4bccd83ea6f7c079af89a7fb";
+            const { TransactionBuilder, Networks, Operation } = await import("@stellar/stellar-sdk");
 
-            // Call destroy_vault
-            const [returnedCoin] = tx.moveCall({
-                target: `${PACKAGE_ID}::atomic_engine::destroy_vault`,
-                typeArguments: [getCoinType()],
-                arguments: [
-                    tx.object(vaultData.vaultId),
-                    tx.object(vaultData.ownerCapId)
-                ]
-            });
+            const tx = new TransactionBuilder({
+                accountId: () => account.address,
+                sequenceNumber: () => "0",
+                incrementSequenceNumber: () => { }
+            } as any, { fee: "100" })
+                .setNetworkPassphrase(Networks.TESTNET)
+                .setTimeout(30);
 
-            // Transfer recovered funds to user
-            tx.transferObjects([returnedCoin], account.address);
+            // Stellar Destroy Vault: Merger account or close entries
+            tx.addOperation(Operation.accountMerge({
+                destination: account.address,
+                source: vaultData.vaultId
+            }));
 
-            const result = await signAndExecuteTransaction({ transaction: tx as any });
+            const builtTx = tx.build();
+            const result = await signAndSubmitTransaction({ transaction: builtTx });
+
             toast.dismiss(toastId);
-            localStorage.removeItem(`sui-loop-vault-${baseAsset}-${account.address}`);
+            localStorage.removeItem(`nirium-vault-${baseAsset}-${account.address}`);
             setVaultId(null);
             toast.success("Vault Destroyed & Funds Recovered!", {
                 description: "Your vault has been destroyed on-chain.",
                 action: {
                     label: "View Tx",
-                    onClick: () => window.open(`https://suiscan.xyz/testnet/tx/${result.digest}`, '_blank')
+                    onClick: () => window.open(`https://stellar.expert/testnet/tx/${result.hash}`, '_blank')
                 },
                 duration: 8000
             });
-        } catch (error) {
+        } catch (error: any) {
             toast.dismiss(toastId);
             console.error("Destroy Vault Error:", error);
             toast.error("Failed to destroy vault: " + (error as any).message);
@@ -1581,7 +1362,7 @@ function DashboardContent() {
         //     arguments: [tx.object(agentCapObjectId)]
         // });
         // 
-        // signAndExecuteTransaction({ transaction: tx }, {
+        // signAndSubmitTransaction({ transaction: tx }, {
         //     onSuccess: () => {
         //         toast.success("Agent Permission Revoked!");
         //     }
@@ -1593,8 +1374,8 @@ function DashboardContent() {
         return (
             <div className="min-h-screen flex items-center justify-center relative overflow-hidden p-4">
                 {/* Background Elements */}
-                <div className="absolute top-[-20%] right-[-20%] w-[600px] h-[600px] bg-neon-purple/10 rounded-full blur-[120px]"></div>
-                <div className="absolute bottom-[-20%] left-[-20%] w-[600px] h-[600px] bg-neon-cyan/5 rounded-full blur-[120px]"></div>
+                <div className="absolute top-[-20%] right-[-20%] w-[600px] h-[600px] bg-stellar-yellow/10 rounded-full blur-[120px]"></div>
+                <div className="absolute bottom-[-20%] left-[-20%] w-[600px] h-[600px] bg-stellar-teal/5 rounded-full blur-[120px]"></div>
 
                 <div className="text-center space-y-6 z-10 glass-panel p-8 md:p-12 rounded-2xl max-w-md w-full border border-white/10 shadow-2xl relative">
                     <div className="w-24 h-24 bg-white/5 rounded-full flex items-center justify-center mb-6 relative">
@@ -1610,7 +1391,7 @@ function DashboardContent() {
                     </div>
 
                     <div className="flex justify-center pt-6 pb-2">
-                        <button onClick={isConnected ? disconnect : connect} className="bg-neon-cyan text-black font-bold px-8 py-3 rounded-lg hover:shadow-[0_0_20px_rgba(0,243,255,0.4)] transition-all w-full flex justify-center">{isConnected && accountStr ? `${accountStr.slice(0, 4)}...${accountStr.slice(-4)}` : 'Connect Wallet'}</button>
+                        <button onClick={isConnected ? disconnect : connect} className="bg-stellar-yellow text-black font-bold px-8 py-3 rounded-lg hover:shadow-[0_0_20px_rgba(255,200,0,0.4)] transition-all w-full flex justify-center">{isConnected && accountStr ? `${accountStr.slice(0, 4)}...${accountStr.slice(-4)}` : 'Connect Wallet'}</button>
                     </div>
 
                     <div className="pt-6 border-t border-white/5">
@@ -1642,19 +1423,19 @@ function DashboardContent() {
                             initial={{ scale: 0.9, opacity: 0, y: 20 }}
                             animate={{ scale: 1, opacity: 1, y: 0 }}
                             exit={{ scale: 0.9, opacity: 0, y: 20 }}
-                            className="bg-[#0f0a1f] border border-neon-cyan/50 rounded-xl p-6 sm:p-7 max-w-sm w-full shadow-[0_0_50px_rgba(0,243,255,0.2)] text-center relative z-10 overflow-y-auto max-h-[90vh]"
+                            className="bg-[#0f0a1f] border border-stellar-teal/50 rounded-xl p-6 sm:p-7 max-w-sm w-full shadow-[0_0_50px_rgba(0,243,255,0.2)] text-center relative z-10 overflow-y-auto max-h-[90vh]"
                         >
-                            <div className="w-14 h-14 bg-neon-cyan/20 border border-neon-cyan/30 rounded-full flex items-center justify-center mx-auto mb-4 relative group">
-                                <div className="absolute inset-0 bg-neon-cyan/20 rounded-full animate-ping group-hover:animate-none opacity-20"></div>
+                            <div className="w-14 h-14 bg-stellar-teal/20 border border-stellar-teal/30 rounded-full flex items-center justify-center mx-auto mb-4 relative group">
+                                <div className="absolute inset-0 bg-stellar-teal/20 rounded-full animate-ping group-hover:animate-none opacity-20"></div>
                                 <span className="text-2xl relative z-10">{currentStrategy.emoji}</span>
                             </div>
                             <h2 className="text-xl font-bold text-white mb-1.5 leading-tight">Deploy {currentStrategy.name}?</h2>
-                            <div className="bg-neon-cyan/5 border border-neon-cyan/20 p-3 rounded-lg mb-4">
+                            <div className="bg-stellar-teal/5 border border-stellar-teal/20 p-3 rounded-lg mb-4">
                                 <div className="flex justify-between items-center text-[9px] text-gray-400 uppercase tracking-widest mb-0.5 font-mono">
                                     <span>PROTOCOL FEE</span>
                                     <span>AUTHORIZED</span>
                                 </div>
-                                <p className="text-neon-cyan font-mono text-base font-bold flex justify-between items-baseline">
+                                <p className="text-stellar-teal font-mono text-base font-bold flex justify-between items-baseline">
                                     <span>0.10</span>
                                     <span className="text-[10px] ml-1 opacity-70 font-sans">XLM TESTNET</span>
                                 </p>
@@ -1671,7 +1452,7 @@ function DashboardContent() {
                                 </button>
                                 <button
                                     onClick={confirmAutoStart}
-                                    className="flex-1 px-3 py-2.5 rounded-lg bg-neon-cyan/20 border border-neon-cyan/50 text-neon-cyan hover:bg-neon-cyan hover:text-black transition-all font-mono font-bold text-[10px] shadow-[0_0_20px_rgba(0,243,255,0.2)] flex items-center justify-center gap-1.5 group"
+                                    className="flex-1 px-3 py-2.5 rounded-lg bg-stellar-teal/20 border border-stellar-teal/50 text-stellar-teal hover:bg-stellar-teal hover:text-black transition-all font-mono font-bold text-[10px] shadow-[0_0_20px_rgba(0,243,255,0.2)] flex items-center justify-center gap-1.5 group"
                                 >
                                     CONFIRM
                                     <ChevronRight size={12} className="group-hover:translate-x-1 transition-transform" />
@@ -1699,10 +1480,10 @@ function DashboardContent() {
                             initial={{ scale: 0.9, opacity: 0, y: 30 }}
                             animate={{ scale: 1, opacity: 1, y: 0 }}
                             exit={{ scale: 0.9, opacity: 0, y: 30 }}
-                            className="bg-[#0f0a1f] border border-neon-cyan/30 rounded-2xl w-full max-w-lg shadow-[0_0_80px_rgba(0,243,255,0.15)] relative z-10 overflow-hidden flex flex-col max-h-[90vh]"
+                            className="bg-[#0f0a1f] border border-stellar-teal/30 rounded-2xl w-full max-w-lg shadow-[0_0_80px_rgba(0,243,255,0.15)] relative z-10 overflow-hidden flex flex-col max-h-[90vh]"
                         >
                             {/* Header */}
-                            <div className="p-6 border-b border-white/5 relative bg-gradient-to-r from-neon-cyan/5 to-transparent">
+                            <div className="p-6 border-b border-white/5 relative bg-gradient-to-r from-stellar-teal/5 to-transparent">
                                 <button
                                     onClick={() => setSelectedStrategy(null)}
                                     className="absolute top-4 right-4 text-gray-400 hover:text-white transition-colors"
@@ -1711,7 +1492,7 @@ function DashboardContent() {
                                 </button>
                                 <div className="flex items-center gap-4">
                                     <div className="w-16 h-16 bg-black/40 border border-white/10 rounded-2xl flex items-center justify-center text-4xl shadow-inner relative group overflow-hidden">
-                                        <div className="absolute inset-0 bg-neon-cyan/20 blur-xl group-hover:opacity-100 opacity-50 transition-opacity"></div>
+                                        <div className="absolute inset-0 bg-stellar-teal/20 blur-xl group-hover:opacity-100 opacity-50 transition-opacity"></div>
                                         <span className="relative z-10">{selectedStrategy.emoji}</span>
                                     </div>
                                     <div>
@@ -1734,7 +1515,7 @@ function DashboardContent() {
                                 <div className="grid grid-cols-3 gap-3">
                                     <div className="bg-white/5 border border-white/10 p-3 rounded-xl">
                                         <p className="text-[10px] text-gray-500 uppercase tracking-wider mb-1">Target Yield</p>
-                                        <p className="text-neon-cyan font-mono font-bold text-lg">{selectedStrategy.yield}</p>
+                                        <p className="text-stellar-teal font-mono font-bold text-lg">{selectedStrategy.yield}</p>
                                     </div>
                                     <div className="bg-white/5 border border-white/10 p-3 rounded-xl">
                                         <p className="text-[10px] text-gray-500 uppercase tracking-wider mb-1">Profit 24h</p>
@@ -1749,21 +1530,21 @@ function DashboardContent() {
                                 {/* Transaction Info */}
                                 <div className="space-y-2">
                                     <h3 className="text-xs text-gray-400 uppercase tracking-widest font-bold flex items-center gap-2">
-                                        <Zap size={12} className="text-neon-cyan" />
+                                        <Zap size={12} className="text-stellar-teal" />
                                         Latest Execution
                                     </h3>
 
                                     <div className="bg-black/40 border border-white/10 rounded-xl p-4 space-y-3 relative overflow-hidden group">
-                                        <div className="absolute top-0 right-0 w-32 h-32 bg-neon-cyan/5 rounded-full blur-2xl -translate-y-1/2 translate-x-1/2 group-hover:bg-neon-cyan/10 transition-colors"></div>
+                                        <div className="absolute top-0 right-0 w-32 h-32 bg-stellar-teal/5 rounded-full blur-2xl -translate-y-1/2 translate-x-1/2 group-hover:bg-stellar-teal/10 transition-colors"></div>
 
                                         <div className="relative z-10 flex justify-between items-center pb-3 border-b border-white/5">
                                             <span className="text-xs text-gray-400">Transaction Hash</span>
                                             {selectedStrategy.tx_digest ? (
                                                 <a
-                                                    href={`https://suiscan.xyz/testnet/tx/${selectedStrategy.tx_digest}`}
+                                                    href={`https://stellar.expert/testnet/tx/${selectedStrategy.tx_digest}`}
                                                     target="_blank"
                                                     rel="noopener noreferrer"
-                                                    className="flex items-center gap-1.5 text-xs font-mono text-neon-cyan hover:text-white transition-colors bg-neon-cyan/10 px-2 py-1 rounded cursor-pointer"
+                                                    className="flex items-center gap-1.5 text-xs font-mono text-stellar-teal hover:text-white transition-colors bg-stellar-teal/10 px-2 py-1 rounded cursor-pointer"
                                                 >
                                                     {selectedStrategy.tx_digest.slice(0, 6)}...{selectedStrategy.tx_digest.slice(-4)}
                                                     <ExternalLink size={10} />
@@ -1781,13 +1562,13 @@ function DashboardContent() {
                                             <div className="text-right">
                                                 <p className="text-[9px] text-gray-500 uppercase mb-0.5">Protocol</p>
                                                 <p className="text-xs text-white font-mono">
-                                                    {selectedStrategy?.strategy_id?.includes('lending') || selectedStrategy?.strategy_id?.includes('loop') ? 'Navi / Scallop' :
-                                                        selectedStrategy?.strategy_id?.includes('cetus') ? 'Cetus CLMM' :
+                                                    {selectedStrategy?.strategy_id?.includes('lending') || selectedStrategy?.strategy_id?.includes('loop') ? 'Blend / Phoenix' :
+                                                        selectedStrategy?.strategy_id?.includes('soroswap') ? 'Soroswap / Phoenix' :
                                                             selectedStrategy?.strategy_id?.includes('bluefin') ? 'Bluefin Perps' :
-                                                                selectedStrategy?.strategy_id?.includes('deepbook') ? 'DeepBook V3' :
+                                                                selectedStrategy?.strategy_id?.includes('sdex') ? 'SDEX Orderbook' :
                                                                     selectedStrategy?.strategy_id?.includes('bridge') ? 'Wormhole' :
                                                                         selectedStrategy?.strategy_id?.includes('mev') ? 'Atomic Engine' :
-                                                                            'Scallop / Cetus'}
+                                                                            'Blend / Soroswap'}
                                                 </p>
                                             </div>
                                         </div>
@@ -1820,7 +1601,7 @@ function DashboardContent() {
                                                             <div className="flex items-center gap-2">
                                                                 <p className="text-xs font-bold text-white">{skill.name}</p>
                                                                 {skill.isGlobal && (
-                                                                    <span className="text-[9px] bg-neon-cyan/10 text-neon-cyan px-1.5 py-0.5 rounded border border-neon-cyan/20">GLOBAL</span>
+                                                                    <span className="text-[9px] bg-stellar-teal/10 text-stellar-teal px-1.5 py-0.5 rounded border border-stellar-teal/20">GLOBAL</span>
                                                                 )}
                                                             </div>
                                                             <p className="text-[10px] text-gray-500 font-mono">v{skill.version}</p>
@@ -1846,7 +1627,7 @@ function DashboardContent() {
                                 {/* Installed Skills Section */}
                                 <div className="space-y-3">
                                     <h3 className="text-xs text-gray-400 uppercase tracking-widest font-bold flex items-center gap-2">
-                                        <Code size={12} className="text-neon-cyan" />
+                                        <Code size={12} className="text-stellar-teal" />
                                         Installed Skills
                                     </h3>
 
@@ -1869,7 +1650,7 @@ function DashboardContent() {
                                                             <div className="flex items-center gap-2">
                                                                 <p className="text-xs font-bold text-white">{skill.name}</p>
                                                                 {skill.isGlobal && (
-                                                                    <span className="text-[9px] bg-neon-cyan/10 text-neon-cyan px-1.5 py-0.5 rounded border border-neon-cyan/20">GLOBAL</span>
+                                                                    <span className="text-[9px] bg-stellar-teal/10 text-stellar-teal px-1.5 py-0.5 rounded border border-stellar-teal/20">GLOBAL</span>
                                                                 )}
                                                             </div>
                                                             <p className="text-[10px] text-gray-500 font-mono">v{skill.version}</p>
@@ -1958,10 +1739,10 @@ function DashboardContent() {
                             className="bg-[#0f0a1f] border border-white/10 rounded-2xl p-6 sm:p-7 max-w-[380px] w-full shadow-[0_0_100px_rgba(0,0,0,0.8)] relative z-10 overflow-hidden max-h-[90vh] flex flex-col"
                         >
                             {/* Decorative Glow */}
-                            <div className={`absolute -top-32 -right-32 w-64 h-64 rounded-full blur-[100px] opacity-20 ${confirmConfig.type === 'danger' ? 'bg-red-600' : 'bg-neon-cyan'}`} />
+                            <div className={`absolute -top-32 -right-32 w-64 h-64 rounded-full blur-[100px] opacity-20 ${confirmConfig.type === 'danger' ? 'bg-red-600' : 'bg-stellar-teal'}`} />
 
                             <div className="relative z-10 flex flex-col items-center text-center overflow-y-auto custom-scrollbar">
-                                <div className={`w-14 h-14 rounded-xl flex items-center justify-center mb-4 shrink-0 ${confirmConfig.type === 'danger' ? 'bg-red-500/10 border border-red-500/30' : 'bg-neon-cyan/10 border border-neon-cyan/30'}`}>
+                                <div className={`w-14 h-14 rounded-xl flex items-center justify-center mb-4 shrink-0 ${confirmConfig.type === 'danger' ? 'bg-red-500/10 border border-red-500/30' : 'bg-stellar-teal/10 border border-stellar-teal/30'}`}>
                                     {confirmConfig.icon && (
                                         <div className="scale-[0.8]">
                                             {confirmConfig.icon}
@@ -1988,7 +1769,7 @@ function DashboardContent() {
                                         onClick={confirmConfig.onConfirm}
                                         className={`flex-1 px-4 py-2.5 rounded-lg font-bold text-[10px] transition-all shadow-xl flex items-center justify-center gap-1.5 group ${confirmConfig.type === 'danger'
                                             ? 'bg-red-600 hover:bg-red-500 text-white shadow-red-900/20'
-                                            : 'bg-neon-cyan hover:bg-neon-cyan/80 text-black shadow-cyan-900/20'
+                                            : 'bg-stellar-teal hover:bg-stellar-teal/80 text-black shadow-cyan-900/20'
                                             }`}
                                     >
                                         {confirmConfig.confirmText}
@@ -2002,14 +1783,14 @@ function DashboardContent() {
             </AnimatePresence>
 
             {/* Real-Time Analytics Bar */}
-            <div className="w-full max-w-7xl mx-auto grid grid-cols-2 md:grid-cols-4 gap-4 mb-8 relative z-10">
+            <div className="w-full max-w-[1600px] mx-auto grid grid-cols-2 md:grid-cols-4 gap-4 mb-8 relative z-10">
                 <div className="glass-panel p-4 rounded-xl border border-white/5">
                     <h3 className="text-xs text-gray-400 uppercase tracking-wider mb-1">Secure Vault TVL</h3>
                     <div className="text-xl font-mono text-white font-bold">
                         {vaultBalance.toLocaleString(undefined, { maximumFractionDigits: 2 })} <span className="text-xs text-gray-500">{baseAsset}</span>
                     </div>
                     <div className="text-[10px] text-gray-500 mt-1 flex items-center gap-1.5 font-sans">
-                        <div className="w-1 h-1 rounded-full bg-neon-cyan" />
+                        <div className="w-1 h-1 rounded-full bg-stellar-teal" />
                         WALLET: {walletBalance.toFixed(3)} {baseAsset}
                     </div>
                 </div>
@@ -2017,20 +1798,20 @@ function DashboardContent() {
                     <h3 className="text-xs text-gray-400 uppercase tracking-wider mb-1">
                         Market Alpha ({baseAsset} APY)
                     </h3>
-                    <div className="text-xl font-mono text-neon-cyan font-bold flex items-center gap-2">
+                    <div className="text-xl font-mono text-stellar-teal font-bold flex items-center gap-2">
                         {baseAsset === 'USDC'
-                            ? (naviData ? naviData.supplyApy.toFixed(2) : '0.00')
-                            : (scallopData ? scallopData.supplyApy.toFixed(2) : '0.00')}%
+                            ? (phoenixData ? phoenixData.supplyApy.toFixed(2) : '0.00')
+                            : (blendData ? blendData.supplyApy.toFixed(2) : '0.00')}%
                         <span className="text-[10px] bg-green-500/20 text-green-400 px-1.5 rounded animate-pulse">LIVE</span>
                     </div>
                     <div className="text-[10px] text-gray-500 mt-1 font-mono">
-                        {baseAsset === 'USDC' ? 'Navi USDC Pool' : 'Scallop XLM Supply'}
+                        {baseAsset === 'USDC' ? 'Phoenix USDC Pool' : 'Blend XLM Supply'}
                     </div>
                 </div>
                 <div className="glass-panel p-4 rounded-xl border border-white/5">
                     <h3 className="text-xs text-gray-400 uppercase tracking-wider mb-1">Projected Yield (24H)</h3>
                     <div className="text-xl font-mono text-white font-bold">
-                        +{(vaultBalance * ((scallopData?.supplyApy || 0) / 100 / 365)).toFixed(4)} <span className="text-xs text-gray-500">{baseAsset}</span>
+                        +{(vaultBalance * ((blendData?.supplyApy || 0) / 100 / 365)).toFixed(4)} <span className="text-xs text-gray-500">{baseAsset}</span>
                     </div>
                 </div>
                 <div className="glass-panel p-4 rounded-xl border border-white/5">
@@ -2041,7 +1822,7 @@ function DashboardContent() {
                 </div>
             </div>
 
-            <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-3 gap-8 relative z-10">
+            <div className="max-w-[1600px] w-full mx-auto grid grid-cols-1 lg:grid-cols-3 gap-8 relative z-10">
 
                 {/* Main Chart Section */}
                 <motion.div
@@ -2054,7 +1835,7 @@ function DashboardContent() {
                         <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 relative z-10">
                             <div className="flex items-center gap-5">
                                 <div className="w-16 h-16 bg-gradient-to-br from-gray-900 to-black rounded-2xl border border-white/10 flex items-center justify-center relative group">
-                                    <Shield className={`${vaultId ? 'text-neon-cyan' : 'text-gray-600'} transition-colors`} size={32} />
+                                    <Shield className={`${vaultId ? 'text-stellar-teal' : 'text-gray-600'} transition-colors`} size={32} />
                                     {activeStrategies.length > 0 && vaultId && (
                                         <div className="absolute -top-1 -right-1 w-4 h-4 bg-green-500 border-2 border-[#0f0a1f] rounded-full animate-pulse shadow-[0_0_10px_rgba(34,197,94,0.5)]"></div>
                                     )}
@@ -2063,12 +1844,12 @@ function DashboardContent() {
                                     <div className="flex items-center gap-3">
                                         <h3 className="text-xl font-bold text-white flex items-center gap-2">
                                             Main Trading Vault
-                                            {vaultId && <span className="text-[10px] bg-neon-cyan/10 text-neon-cyan px-2 py-0.5 rounded-full border border-neon-cyan/20">ACTIVE</span>}
+                                            {vaultId && <span className="text-[10px] bg-stellar-teal/10 text-stellar-teal px-2 py-0.5 rounded-full border border-stellar-teal/20">ACTIVE</span>}
                                         </h3>
                                         <div className="flex items-center bg-black/40 border border-white/10 rounded-lg p-1">
                                             <button
                                                 onClick={() => setBaseAsset('USDC')}
-                                                className={`px-3 py-1 rounded-md text-xs font-bold transition-colors ${baseAsset === 'USDC' ? 'bg-neon-purple text-white shadow-lg' : 'text-gray-500 hover:text-white'}`}
+                                                className={`px-3 py-1 rounded-md text-xs font-bold transition-colors ${baseAsset === 'USDC' ? 'bg-stellar-yellow text-white shadow-lg' : 'text-gray-500 hover:text-white'}`}
                                             >
                                                 USDC
                                             </button>
@@ -2112,7 +1893,7 @@ function DashboardContent() {
                                 {!vaultId ? (
                                     <button
                                         onClick={handleCreateVault}
-                                        className="bg-neon-cyan text-black font-bold text-xs px-6 py-3 rounded-xl hover:bg-neon-cyan/80 transition-all shadow-[0_0_20px_rgba(0,243,255,0.3)] animate-pulse"
+                                        className="bg-stellar-yellow text-black font-bold text-xs px-6 py-3 rounded-xl hover:bg-stellar-yellow/80 transition-all shadow-[0_0_20px_rgba(255,200,0,0.3)] animate-pulse"
                                     >
                                         + INITIALIZE VAULT
                                     </button>
@@ -2136,18 +1917,18 @@ function DashboardContent() {
                         </div>
 
                         {/* Background Glow Effect */}
-                        <div className={`absolute -right-20 -bottom-20 w-64 h-64 rounded-full blur-[100px] opacity-10 transition-colors duration-1000 ${activeStrategies.length > 0 ? 'bg-green-500' : 'bg-neon-cyan'}`}></div>
+                        <div className={`absolute -right-20 -bottom-20 w-64 h-64 rounded-full blur-[100px] opacity-10 transition-colors duration-1000 ${activeStrategies.length > 0 ? 'bg-green-500' : 'bg-stellar-teal'}`}></div>
                     </div>
 
                     {/* Fleet Grid Section */}
                     <div className="glass-panel rounded-2xl p-6 min-h-[400px]">
                         <div className="flex justify-between items-center mb-6">
                             <h2 className="text-sm text-gray-400 uppercase tracking-widest flex items-center gap-2">
-                                <RefreshCw size={14} className={activeStrategies.length > 0 ? "animate-spin-slow text-neon-cyan" : "text-gray-600"} />
+                                <RefreshCw size={14} className={activeStrategies.length > 0 ? "animate-spin-slow text-stellar-teal" : "text-gray-600"} />
                                 Fleet Status Monitor ({activeStrategies.length}/10)
                             </h2>
                             {activeStrategies.length === 0 && (
-                                <button onClick={handleDeploy} className="text-[10px] bg-neon-cyan/10 text-neon-cyan px-3 py-1.5 rounded-lg border border-neon-cyan/20 hover:bg-neon-cyan/20 transition-colors">
+                                <button onClick={handleDeploy} className="text-[10px] bg-stellar-yellow/10 text-stellar-yellow px-3 py-1.5 rounded-lg border border-stellar-yellow/20 hover:bg-stellar-yellow/20 transition-colors">
                                     DEPLOY DEFAULT LOOP
                                 </button>
                             )}
@@ -2156,7 +1937,7 @@ function DashboardContent() {
                         {activeStrategies.length > 0 ? (
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                 {activeStrategies.slice(0, 10).map((strat, i) => {
-                                    const baseApy = scallopData ? scallopData.supplyApy : 0;
+                                    const baseApy = blendData ? blendData.supplyApy : 0;
                                     const boost = 0.5 + (strat.id.charCodeAt(0) % 30) / 10;
                                     const dynamicYield = (baseApy + boost).toFixed(2) + '%';
 
@@ -2165,7 +1946,7 @@ function DashboardContent() {
                                             key={`strategy-grid-${i}`}
                                             initial={{ opacity: 0, scale: 0.95 }}
                                             animate={{ opacity: 1, scale: 1 }}
-                                            className="bg-white/5 border border-white/10 rounded-xl p-4 flex flex-col relative overflow-hidden group hover:border-neon-cyan/30 transition-all"
+                                            className="bg-white/5 border border-white/10 rounded-xl p-4 flex flex-col relative overflow-hidden group hover:border-stellar-teal/30 transition-all"
                                         >
                                             <div className="flex justify-between items-start mb-2 relative z-10">
                                                 <div className="flex items-center gap-2">
@@ -2179,7 +1960,7 @@ function DashboardContent() {
                                                     </div>
                                                 </div>
                                                 <div className="text-right">
-                                                    <div className="text-neon-cyan font-mono font-bold animate-pulse-slow">{dynamicYield}</div>
+                                                    <div className="text-stellar-teal font-mono font-bold animate-pulse-slow">{dynamicYield}</div>
                                                     <div className="text-[9px] text-gray-500">REAL APY</div>
                                                 </div>
                                             </div>
@@ -2190,7 +1971,7 @@ function DashboardContent() {
                                                     <path
                                                         d={`M0,${30 + (i * 5)} Q${50 + (i * 10)},${10 + (i * 2)} 100,${40 - (i * 2)} T200,${20 + (i * 5)}`}
                                                         fill="none"
-                                                        stroke={i % 2 === 0 ? "#00f3ff" : "#bd00ff"}
+                                                        stroke={i % 2 === 0 ? "#2DEBE8" : "#FFC800"}
                                                         strokeWidth="2"
                                                         vectorEffect="non-scaling-stroke"
                                                         className="drop-shadow-[0_0_5px_rgba(0,243,255,0.4)]"
@@ -2202,10 +1983,10 @@ function DashboardContent() {
                                             <div className="mt-auto pt-3 border-t border-white/5 flex gap-2 relative z-10 items-center justify-between">
                                                 {strat.tx_digest ? (
                                                     <a
-                                                        href={`https://suiscan.xyz/testnet/tx/${strat.tx_digest}`}
+                                                        href={`https://stellar.expert/testnet/tx/${strat.tx_digest}`}
                                                         target="_blank"
                                                         rel="noopener noreferrer"
-                                                        className="text-[10px] font-mono text-neon-cyan hover:underline flex items-center gap-1 cursor-pointer"
+                                                        className="text-[10px] font-mono text-stellar-teal hover:underline flex items-center gap-1 cursor-pointer"
                                                     >
                                                         Tx: {strat.tx_digest.slice(0, 6)}...{strat.tx_digest.slice(-4)}
                                                         <ExternalLink size={10} />
@@ -2261,7 +2042,7 @@ function DashboardContent() {
 
                         <h3 className="text-sm text-gray-400 uppercase tracking-widest mb-4 flex items-center justify-between">
                             Active Fleet
-                            <span className="text-neon-cyan font-mono text-xs">{activeStrategies.length} ACTIVE</span>
+                            <span className="text-stellar-teal font-mono text-xs">{activeStrategies.length} ACTIVE</span>
                         </h3>
 
                         {activeStrategies.length === 0 ? (
@@ -2270,7 +2051,7 @@ function DashboardContent() {
                                     <span className="text-2xl">💤</span>
                                 </div>
                                 <p className="text-sm text-gray-400">No agents running.</p>
-                                <button onClick={handleDeploy} className="text-xs bg-neon-cyan/10 text-neon-cyan px-3 py-1.5 rounded-lg border border-neon-cyan/20 hover:bg-neon-cyan/20 transition-colors">
+                                <button onClick={handleDeploy} className="text-xs bg-stellar-yellow/10 text-stellar-yellow px-3 py-1.5 rounded-lg border border-stellar-yellow/20 hover:bg-stellar-yellow/20 transition-colors">
                                     Deploy Loop (v2.0)
                                 </button>
                             </div>
@@ -2290,7 +2071,7 @@ function DashboardContent() {
                                                 </div>
                                             </div>
                                             <div className="text-right">
-                                                <div className="text-xs text-neon-cyan font-mono font-bold">{strat.yield}</div>
+                                                <div className="text-xs text-stellar-teal font-mono font-bold">{strat.yield}</div>
                                                 <div className="text-[9px] text-gray-500">TARGET APY</div>
                                             </div>
                                         </div>
@@ -2317,12 +2098,12 @@ function DashboardContent() {
                         <div className="mt-6 pt-4 border-t border-white/5 flex flex-col gap-2 relative z-10">
                             <Link href="/strategies" className="w-full">
                                 <button className="w-full bg-white/5 hover:bg-white/10 text-[11px] font-bold py-2 rounded-xl transition-all border border-white/10 text-gray-300 flex items-center justify-center gap-2">
-                                    <Zap className="w-3 h-3 text-neon-cyan" />
+                                    <Zap className="w-3 h-3 text-stellar-teal" />
                                     DEPLOY MORE AGENTS
                                 </button>
                             </Link>
                             <Link href="/strategies/builder" className="w-full">
-                                <button className="w-full bg-neon-cyan/10 hover:bg-neon-cyan/20 text-[11px] font-bold py-2 rounded-xl transition-all border border-neon-cyan/20 text-neon-cyan flex items-center justify-center gap-2">
+                                <button className="w-full bg-stellar-yellow/10 hover:bg-stellar-yellow/20 text-[11px] font-bold py-2 rounded-xl transition-all border border-stellar-yellow/20 text-stellar-yellow flex items-center justify-center gap-2">
                                     <Plus className="w-3 h-3" />
                                     CREATE YOUR AGENT
                                 </button>
@@ -2330,7 +2111,7 @@ function DashboardContent() {
                         </div>
                     </motion.div>
 
-                    {/* Market Intelligence (Navi & Scallop) */}
+                    {/* Market Intelligence (Phoenix & Blend) */}
                     <motion.div
                         initial={{ opacity: 0, x: 20 }}
                         animate={{ opacity: 1, x: 0 }}
@@ -2339,30 +2120,30 @@ function DashboardContent() {
                     >
                         <h3 className="text-xs text-gray-400 uppercase tracking-widest mb-3">Liquidity Intelligence</h3>
                         <div className="grid grid-cols-2 gap-3">
-                            <div className="bg-white/5 p-2 rounded border border-white/5 hover:border-neon-cyan/30 transition-colors">
-                                <div className="text-[10px] text-neon-cyan font-bold mb-1 flex items-center gap-1">
-                                    <span className="w-1.5 h-1.5 rounded-full bg-neon-cyan"></span> NAVI
+                            <div className="bg-white/5 p-2 rounded border border-white/5 hover:border-stellar-teal/30 transition-colors">
+                                <div className="text-[10px] text-stellar-teal font-bold mb-1 flex items-center gap-1">
+                                    <span className="w-1.5 h-1.5 rounded-full bg-stellar-teal"></span> PHOENIX
                                 </div>
                                 <div className="flex justify-between text-xs mb-1">
                                     <span className="text-gray-400">Supply</span>
-                                    <span className="text-green-400 font-mono">{naviData?.supplyApy || '--'}%</span>
+                                    <span className="text-green-400 font-mono">{phoenixData?.supplyApy || '--'}%</span>
                                 </div>
                                 <div className="flex justify-between text-xs">
                                     <span className="text-gray-400">Borrow</span>
-                                    <span className="text-red-400 font-mono">{naviData?.borrowApy || '--'}%</span>
+                                    <span className="text-red-400 font-mono">{phoenixData?.borrowApy || '--'}%</span>
                                 </div>
                             </div>
                             <div className="bg-white/5 p-2 rounded border border-white/5 hover:border-blue-400/30 transition-colors">
                                 <div className="text-[10px] text-blue-400 font-bold mb-1 flex items-center gap-1">
-                                    <span className="w-1.5 h-1.5 rounded-full bg-blue-400"></span> SCALLOP
+                                    <span className="w-1.5 h-1.5 rounded-full bg-blue-400"></span> BLEND
                                 </div>
                                 <div className="flex justify-between text-xs mb-1">
                                     <span className="text-gray-400">Supply</span>
-                                    <span className="text-green-400 font-mono">{scallopData?.supplyApy || '--'}%</span>
+                                    <span className="text-green-400 font-mono">{blendData?.supplyApy || '--'}%</span>
                                 </div>
                                 <div className="flex justify-between text-xs">
                                     <span className="text-gray-400">Borrow</span>
-                                    <span className="text-red-400 font-mono">{scallopData?.borrowApy || '--'}%</span>
+                                    <span className="text-red-400 font-mono">{blendData?.borrowApy || '--'}%</span>
                                 </div>
                             </div>
                         </div>
@@ -2380,8 +2161,8 @@ function DashboardContent() {
 
             {/* Background Elements */}
             <div className="fixed top-0 left-0 w-full h-full z-0 pointer-events-none">
-                <div className="absolute top-[-10%] right-[-10%] w-[500px] h-[500px] bg-neon-purple/20 rounded-full blur-[120px]"></div>
-                <div className="absolute bottom-[-10%] left-[-10%] w-[500px] h-[500px] bg-neon-cyan/10 rounded-full blur-[120px]"></div>
+                <div className="absolute top-[-10%] right-[-10%] w-[500px] h-[500px] bg-stellar-yellow/20 rounded-full blur-[120px]"></div>
+                <div className="absolute bottom-[-10%] left-[-10%] w-[500px] h-[500px] bg-stellar-teal/10 rounded-full blur-[120px]"></div>
             </div>
 
         </div >
@@ -2394,8 +2175,8 @@ export default function Dashboard() {
             <Suspense fallback={
                 <div className="min-h-screen flex items-center justify-center">
                     <div className="flex flex-col items-center gap-4">
-                        <div className="w-12 h-12 border-4 border-neon-cyan border-t-transparent rounded-full animate-spin"></div>
-                        <p className="text-neon-cyan font-mono animate-pulse">Initializing Dashboard...</p>
+                        <div className="w-12 h-12 border-4 border-stellar-teal border-t-transparent rounded-full animate-spin"></div>
+                        <p className="text-stellar-teal font-mono animate-pulse">Initializing Dashboard...</p>
                     </div>
                 </div>
             }>

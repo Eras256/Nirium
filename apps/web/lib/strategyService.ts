@@ -2,7 +2,7 @@ import { supabase } from './supabase';
 
 export interface ActiveStrategy {
     id?: string;
-    strategy_id: string; // The type (e.g., 'sui-usdc-loop')
+    strategy_id: string; // The type (e.g., 'nirium-usdc-loop')
     name: string;
     emoji: string;
     status: string;
@@ -15,7 +15,7 @@ export interface ActiveStrategy {
 
 // ─── localStorage helpers (offline fallback) ────────────────────────────────
 
-const LS_KEY = (wallet: string) => `sui_loop_strategies_${wallet}`;
+const LS_KEY = (wallet: string) => `nirium_strategies_${wallet}`;
 
 function lsGet(wallet: string): ActiveStrategy[] {
     try {

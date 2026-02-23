@@ -9,7 +9,7 @@ export function useAgent() {
     useEffect(() => {
         const interval = setInterval(() => {
             const thoughts = [
-                "Scanning SUI/USDC spread...",
+                "Scanning XLM/USDC spread...",
                 "Calculating flash loan fees...",
                 "DeepBook depth adequate.",
                 "Waiting for opportunity...",

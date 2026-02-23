@@ -1,21 +1,22 @@
 import type { Metadata } from "next";
-import { Inter } from "next/font/google";
+import { Inter, Inconsolata } from "next/font/google";
 import { Toaster } from "sonner";
 import "./globals.css";
 import { Providers } from "./providers";
 import Footer from "@/components/layout/Footer";
 
-const inter = Inter({ subsets: ["latin"] });
+const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
+const inconsolata = Inconsolata({ subsets: ["latin"], variable: "--font-inconsolata" });
 
 export const metadata: Metadata = {
-    title: "Nirium | Institutional AI Intelligence Protocol",
-    description: "The first Atomic Intelligence Protocol on Stellar. Orchestrate mission-critical DeFi operations with autonomous agents powered by ElizaOS and DeepBook V3 flash vectors.",
+    title: "Nirium | Institutional Autonomous Intelligence Protocol",
+    description: "The first Atomic Intelligence Protocol on Stellar. Orchestrate mission-critical DeFi operations with autonomous agents powered by Soroban Smart Contracts and Stellar's native atomic primitives.",
     openGraph: {
-        images: [{ url: "/logo-seo.jpg" }],
+        images: [{ url: "/og-image.png" }],
     },
     twitter: {
         card: "summary_large_image",
-        images: ["/logo-seo.jpg"],
+        images: ["/og-image.png"],
     },
 };
 
@@ -26,12 +27,12 @@ export default function RootLayout({
 }>) {
     return (
         <html lang="en">
-            <body className={`${inter.className} bg-[#030014] text-white min-h-screen selection:bg-neon-cyan/30`}>
+            <body className={`${inter.variable} ${inconsolata.variable} font-sans bg-[#050505] text-white min-h-screen selection:bg-stellar-teal/30 scroll-smooth overflow-x-hidden`}>
                 <Providers>
-                    {/* Neural Grid Background Overlay */}
-                    <div className="fixed inset-0 z-[-1] bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-20"></div>
-                    <div className="fixed inset-0 z-[-2] bg-gradient-radial from-indigo-900/20 to-black"></div>
-                    <div className="bg-noise" />
+                    {/* Background Layers */}
+                    <div className="fixed inset-0 z-[-1] bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-[0.03] pointer-events-none"></div>
+                    <div className="fixed inset-0 z-[-2] bg-gradient-to-br from-[#050505] via-[#0A0A0A] to-[#050505] pointer-events-none"></div>
+                    <div className="fixed inset-0 z-[-3] bg-[radial-gradient(circle_at_50%_50%,rgba(138,43,226,0.05),transparent_50%)] pointer-events-none"></div>
 
                     {children}
                     <Footer />

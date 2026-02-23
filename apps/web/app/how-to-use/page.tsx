@@ -22,20 +22,20 @@ import Footer from "@/components/layout/Footer";
 
 export default function HowToUsePage() {
     return (
-        <main className="min-h-screen bg-black text-white font-sans selection:bg-neon-cyan/30">
+        <main className="min-h-screen bg-black text-white font-sans selection:bg-stellar-teal/30">
             <Navbar />
 
             {/* Background Effects */}
             <div className="fixed inset-0 z-0">
-                <div className="absolute top-0 right-0 w-full h-[600px] bg-gradient-to-b from-neon-cyan/10 to-transparent opacity-50" />
-                <div className="absolute bottom-0 left-0 w-[600px] h-[600px] bg-neon-purple/5 blur-[150px] rounded-full" />
+                <div className="absolute top-0 right-0 w-full h-[600px] bg-gradient-to-b from-stellar-teal/10 to-transparent opacity-50" />
+                <div className="absolute bottom-0 left-0 w-[600px] h-[600px] bg-stellar-yellow/5 blur-[150px] rounded-full" />
             </div>
 
             <div className="relative z-10 pt-40 pb-20">
                 <div className="max-w-5xl mx-auto px-6">
                     {/* Header */}
                     <div className="text-center mb-20 section-lift">
-                        <div className="inline-flex items-center gap-2 px-3 py-1 bg-neon-cyan/10 border border-neon-cyan/30 rounded-full text-neon-cyan text-xs font-mono mb-6">
+                        <div className="inline-flex items-center gap-2 px-3 py-1 bg-stellar-teal/10 border border-stellar-teal/30 rounded-full text-stellar-teal text-xs font-mono mb-6">
                             <BookOpen size={14} />
                             OPERATIONS MANUAL v0.0.7
                         </div>
@@ -65,7 +65,7 @@ export default function HowToUsePage() {
                                     </div>
                                     <div className="flex-1">
                                         <div className="flex items-center gap-3 mb-4">
-                                            <span className="text-neon-cyan font-mono text-sm tracking-widest uppercase opacity-50">Step {i + 1}</span>
+                                            <span className="text-stellar-teal font-mono text-sm tracking-widest uppercase opacity-50">Step {i + 1}</span>
                                             <h2 className="text-2xl font-bold">{step.title}</h2>
                                         </div>
                                         <p className="text-gray-400 leading-relaxed mb-6">
@@ -75,7 +75,7 @@ export default function HowToUsePage() {
                                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                             {step.features.map((feature, idx) => (
                                                 <div key={idx} className="flex items-center gap-3 text-sm text-gray-300">
-                                                    <CheckCircle2 size={16} className="text-neon-cyan shrink-0" />
+                                                    <CheckCircle2 size={16} className="text-stellar-teal shrink-0" />
                                                     {feature}
                                                 </div>
                                             ))}
@@ -84,7 +84,7 @@ export default function HowToUsePage() {
                                         {step.actionLabel && (
                                             <Link
                                                 href={step.actionHref}
-                                                className="inline-flex items-center gap-2 mt-8 text-neon-cyan font-bold hover:gap-3 transition-all"
+                                                className="inline-flex items-center gap-2 mt-8 text-stellar-teal font-bold hover:gap-3 transition-all"
                                             >
                                                 {step.actionLabel} <ArrowRight size={18} />
                                             </Link>
@@ -97,34 +97,34 @@ export default function HowToUsePage() {
 
                     {/* Pro Tips Section */}
                     <div className="mt-32 section-lift">
-                        <div className="glass-panel p-12 rounded-3xl border border-neon-purple/20 bg-gradient-to-br from-neon-purple/5 to-transparent relative overflow-hidden">
+                        <div className="glass-panel p-12 rounded-3xl border border-stellar-yellow/20 bg-gradient-to-br from-stellar-yellow/5 to-transparent relative overflow-hidden">
                             <div className="absolute top-0 right-0 p-8 opacity-10">
-                                <Zap size={120} className="text-neon-purple" />
+                                <Zap size={120} className="text-stellar-yellow" />
                             </div>
 
                             <h3 className="text-3xl font-bold mb-8 flex items-center gap-4">
-                                <Settings className="text-neon-purple" />
+                                <Settings className="text-stellar-yellow" />
                                 ADVANCED PROTOCOLS
                             </h3>
 
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                                 <div className="space-y-4">
                                     <h4 className="text-white font-bold flex items-center gap-2">
-                                        <Shield size={18} className="text-neon-cyan" />
+                                        <Shield size={18} className="text-stellar-teal" />
                                         Non-Custodial Safety
                                     </h4>
                                     <p className="text-sm text-gray-400 leading-relaxed">
-                                        Nirium uses a dual-cap system. Your <span className="text-white font-bold">OwnerCap</span> never leaves your cold wallet, meaning only you can withdraw funds. The <span className="text-neon-purple font-bold">AgentCap</span> only authorizes execution, preventing any unauthorized outflows.
+                                        Nirium uses a dual-auth system. Your <span className="text-white font-bold">Owner Key</span> never leaves your cold wallet, meaning only you can withdraw funds. The <span className="text-stellar-yellow font-bold">Agent Auth</span> only authorizes execution, preventing any unauthorized outflows.
                                     </p>
                                 </div>
                                 <div className="space-y-4">
                                     <h4 className="text-white font-bold flex items-center gap-2">
-                                        <Terminal size={18} className="text-neon-purple" />
+                                        <Terminal size={18} className="text-stellar-yellow" />
                                         Developer Uplink
                                     </h4>
                                     <p className="text-sm text-gray-400 leading-relaxed">
-                                        Power users can scaffold custom units using our CLI. Run <code className="bg-white/5 px-1 rounded text-neon-cyan">npx nirium create-unit</code> to inject custom Move kernels or Python/Node.js logic directly into the Neural Matrix.
-                                        All agent decisions are cryptographically signed and uploaded to <span className="text-white font-bold">Stellar Walrus</span> for tamper-proof forensic auditing.
+                                        Power users can scaffold custom units using our CLI. Run <code className="bg-white/5 px-1 rounded text-stellar-teal">npx nirium create-unit</code> to inject custom Soroban kernels or Python/Node.js logic directly into the Neural Matrix.
+                                        All agent decisions are cryptographically signed and archived for tamper-proof forensic auditing.
                                     </p>
                                 </div>
                             </div>
@@ -137,13 +137,13 @@ export default function HowToUsePage() {
                         <div className="flex flex-wrap justify-center gap-6">
                             <Link
                                 href="/strategies"
-                                className="bg-neon-cyan text-black font-bold px-10 py-4 rounded-full hover:shadow-[0_0_30px_rgba(0,243,255,0.4)] transition-all flex items-center gap-2"
+                                className="bg-stellar-yellow text-black font-bold px-10 py-4 rounded-full hover:shadow-[0_0_30px_rgba(255,200,0,0.4)] transition-all flex items-center gap-2"
                             >
                                 <Zap size={20} /> Deploy Now
                             </Link>
                             <Link
                                 href="/agents"
-                                className="border border-neon-purple/40 text-neon-purple font-bold px-10 py-4 rounded-full hover:bg-neon-purple/10 transition-all"
+                                className="border border-stellar-yellow/40 text-stellar-yellow font-bold px-10 py-4 rounded-full hover:bg-stellar-yellow/10 transition-all"
                             >
                                 Agents Console
                             </Link>
@@ -158,7 +158,6 @@ export default function HowToUsePage() {
                 </div>
             </div>
 
-            <Footer />
         </main>
     );
 }
@@ -166,28 +165,28 @@ export default function HowToUsePage() {
 const STEPS = [
     {
         title: "Uplink Session",
-        description: "Connect your Stellar wallet to establish an encrypted session. Nirium supports all major Stellar wallets (Stellar Wallet, OKX, Surf) with persistent session restoration and auto-reconnect.",
+        description: "Connect your Stellar wallet to establish an encrypted session. Nirium supports all major Stellar wallets (Freighter, Albedo, xBull) with persistent session restoration and auto-reconnect.",
         icon: Wallet,
         color: "from-blue-400 to-cyan-400",
         features: [
-            "Support for Stellar Wallet & OKX",
+            "Support for Freighter & Albedo",
             "Hardware wallet compatible",
             "Auto-restores session",
-            "DeepBook V3 Integration"
+            "Phoenix & SDEX Integration"
         ],
         actionLabel: "Connect Now",
         actionHref: "/dashboard"
     },
     {
         title: "Deploy Core Unit",
-        description: "Deploy your autonomous agent base. This Move-native contract generates your OwnerCap, ensuring only you can withdraw funds while the AgentCap delegates execution rights.",
+        description: "Deploy your autonomous agent base. This Soroban-native contract grants your account withdrawal control, ensuring only you can withdraw funds while the Agent Auth delegates execution rights.",
         icon: Shield,
-        color: "from-neon-cyan to-teal-500",
+        color: "from-stellar-teal to-teal-500",
         features: [
             "Single-block deployment",
-            "OwnerCap Withdrawal Control",
+            "Withdrawal Control",
             "Non-custodial by design",
-            "Move Hot Potato Safety"
+            "Soroban Atomic Safety"
         ],
         actionLabel: "Initialize Agent",
         actionHref: "/dashboard"
@@ -196,7 +195,7 @@ const STEPS = [
         title: "Skill Integration",
         description: "Empower your agent via the Neural Marketplace. Install modular skills like 'Atomic Flash Loan', 'Price Monitor', or 'Whale Tracker' to customize your unit's intelligence.",
         icon: Cpu, // Changed icon to represent modular chips/skills
-        color: "from-neon-purple to-purple-600",
+        color: "from-stellar-yellow to-purple-600",
         features: [
             "Modular Skill Architecture",
             "One-Click Installation",
@@ -208,12 +207,12 @@ const STEPS = [
     },
     {
         title: "Strategy Builder",
-        description: "Design custom logic loops in the Visual Editor. Connect 6 node categories including the Atomic Engine (Flash Loans, Execute Loop), AI Intelligence, and Trading & Swap connectors. Select XLM or USDC vault asset before compiling your kernel.",
+        description: "Design custom logic loops in the Visual Editor. Connect 6 node categories including the Atomic Engine (Path Payments, Execute Tx), AI Intelligence, and Trading & Swap connectors. Select XLM or USDC vault asset before compiling your kernel.",
         icon: MousePointer2,
         color: "from-pink-500 to-rose-500",
         features: [
             "Visual Node Editor (drag & drop)",
-            "Atomic Engine: FLASH_LOAN, EXECUTE_LOOP",
+            "Atomic Engine: PATH_PAYMENT, EXECUTE_TX",
             "XLM / USDC asset selector",
             "Export Schema as JSON"
         ],
@@ -222,14 +221,14 @@ const STEPS = [
     },
     {
         title: "Live Monitoring",
-        description: "Watch your fleet in action. The Command Center and Agents Console provide real-time telemetry, RPC latency, transaction traces, and forensic logs backed by decentralized Walrus storage.",
+        description: "Watch your fleet in action. The Command Center and Agents Console provide real-time telemetry, Horizon latency, transaction traces, and forensic logs backed by decentralized IPFS storage.",
         icon: Terminal,
         color: "from-amber-400 to-orange-500",
         features: [
-            "Real-Time Telemetry & RPC Latency",
-            "Walrus Forensic Logs (immutable)",
+            "Real-Time Telemetry & Horizon Latency",
+            "Neural Archive Logs (immutable)",
             "Decentralized Auditing",
-            "Stop-Loss Triggers"
+            "Circuit Breaker Triggers"
         ],
         actionLabel: "Agents Console",
         actionHref: "/agents"
