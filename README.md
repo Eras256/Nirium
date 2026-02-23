@@ -1,94 +1,109 @@
-# 🌪️ Nirium v2.5: The Neural Liquidity Layer
+# 🧠 Nirium: Autonomous Institutional Intelligence Protocol
 
-> **"Finance is no longer a static ledger; it's a living, breathing field of data."**
-> Nirium merges the raw power of **Stellar Protocol 25** with an immersive **Neural GPGPU Interface** and **Institutional-Grade ZK-Privacy**.
+<div align="center">
+  <img src="https://img.shields.io/badge/Stellar-Network-7C3AED?style=for-the-badge&logo=stellar&color=black&labelColor=2DEBE8" alt="Stellar Network" />
+  <img src="https://img.shields.io/badge/Soroban-Smart_Contracts-06B6D4?style=for-the-badge&logo=rust&color=black&labelColor=FFC800" alt="Soroban" />
+  <img src="https://img.shields.io/badge/Next.js-16-000000?style=for-the-badge&logo=nextdotjs&color=black&labelColor=white" alt="Next.js" />
+  <img src="https://img.shields.io/badge/AI-Autonomous_Agents-blue?style=for-the-badge&logo=openai&color=black&labelColor=white" alt="AI Agents" />
+</div>
 
-[![Stellar Protocol 25](https://img.shields.io/badge/Stellar-Protocol%2025-7C3AED?style=for-the-badge&logo=stellar)](https://stellar.org)
-[![Soroban Smart Contracts](https://img.shields.io/badge/Soroban-Rust-06B6D4?style=for-the-badge&logo=rust)](https://soroban.stellar.org)
-[![Next.js 16](https://img.shields.io/badge/Next.js-16-000000?style=for-the-badge&logo=nextdotjs)](https://nextjs.org)
-[![Three.js GPGPU](https://img.shields.io/badge/Three.js-GPGPU-white?style=for-the-badge&logo=threedotjs)](https://threejs.org)
-
----
-
-## 🎭 The Story: A Sovereign Future
-In the landscape of 2026, capital is fast, autonomous, and increasingly driven by AI agents. Traditional interfaces fail to capture the complexity of high-frequency liquidity. **Nirium** was built to solve this. 
-
-We didn't just build a dashboard; we built a **Neural Field**. Every particle in our UI represents real-time liquidity flowing through the Stellar network. When you see a vortex, you aren't looking at a chart—you are looking at the heartbeat of the market. Combined with **Zk-SNARKs**, Nirium ensures that while the market is transparent, your identity remains your own.
+> **"Finance is no longer a static ledger; it's a living, breathing field of data reacting in milliseconds."**
+> Nirium is the premier gateway for deploying autonomous AI liquidity agents on the **Stellar Network**.
 
 ---
 
-## 🌪️ Core Pillars
+## 🌌 The Story: The Dawn of Sovereign AI
+In the landscape of modern DeFi, capital is fast, autonomous, and increasingly driven by artificial intelligence. Traditional human-in-the-loop interfaces fail to capture the complexity and speed required for multi-hop arbitrage, flash loans, and high-frequency portfolio management. **Nirium** was built to bridge this gap.
 
-### 1. Market Vortex (GPGPU Engine)
-Forget static bars. Our **Market Vortex** uses 16,384 GPU-accelerated particles to visualize the Order Book. 
-- **Cyan Currents**: Upward-flowing Bids.
-- **Magenta Currents**: Downward-flowing Asks.
-- **Collision Point**: The Spot Price, generating visual "bloom" and turbulence where trades happen.
+We didn't just build a dashboard; we built an **Institutional Neural Matrix**. Nirium allows users to deploy advanced LLM-powered agents that read market conditions, execute Soroban smart contracts, and leverage Stellar's native atomic multi-operation transactions automatically. From harvesting funding rates on perpetuals to cross-chain spread capture—Nirium puts institutional-grade algorithmic trading in your hands.
 
-### 2. Neural ZK-Privacy
-Nirium implements a native Mixer & Identity Pool using **Groth16 ZK-SNARKs**. 
-- **Zero-Knowledge**: Prove you have funds without revealing your wallet history.
-- **Protocol 25 Native**: Leverages Stellar's latest BN254 curve precompiles for ultra-fast verification.
+---
 
-### 3. Agentic Economy (x402)
-Built for the machine-to-machine era. Nirium supports the **x402 protocol**, allowing AI agents to discover, pay for, and consume compute resources autonomously.
+## ⚡ Core Pillars
+
+### 1. 🤖 Autonomous Agent Execution Layer
+Forget manual trading. Nirium deploys persistent background workers (Loop Executors) that track dynamic market shifts.
+- **Continuous Logic Loop**: Agents evaluate market ticks every 5 seconds.
+- **AI Decision Engine**: Powered by deep neural networks evaluating sentiment, liquidity depth, and spreads.
+- **Atomic Reliability**: Every trade request is grouped into Stellar's native multi-operation structures, guaranteeing that either the entire strategy executes, or everything reverts safely.
+
+### 2. 🔐 Vaults & Secure Enclaves
+Nirium incorporates security at the protocol level. Users deploy logic into isolated "Vaults".
+- **Asset Separation**: Your XLM and USDC remain in your control within audited Soroban Vaults.
+- **Failover Safequards**: The protocol implements Stop-Loss Guardians and Emergency Liquidators to protect collateral under extreme volatility.
+
+### 3. 🧩 Strategy Builder & Action Marketplace
+Built for the machine-to-machine era. Nirium supports a visual Matrix Builder.
+- **Drag-and-Drop Architecture**: Connect triggers, deep analytics, and execution nodes without coding.
+- **Community Skills**: Inject new abilities into your agent (like Telegram alerts, Discord Webhooks, or Pyth Oracle Snipers) via our one-click Skill Marketplace.
 
 ---
 
 ## 🛠️ Technology Stack
 
-| Logic & Chains | Visuals & FX | Infrastructure |
+| Logic & Chains | AI & Backend Architecture | Frontend & Visuals |
 |:---:|:---:|:---:|
-| <img src="https://raw.githubusercontent.com/devicons/devicon/master/icons/rust/rust-original.svg" width="30" title="Rust"/> **Rust / Soroban** | <img src="https://raw.githubusercontent.com/devicons/devicon/master/icons/threejs/threejs-original.svg" width="30" title="Three.js"/> **Three.js / R3F** | <img src="https://raw.githubusercontent.com/devicons/devicon/master/icons/nextjs/nextjs-original-wordmark.svg" width="40" title="Next.js"/> **Next.js 16** |
-| <img src="https://raw.githubusercontent.com/devicons/devicon/master/icons/typescript/typescript-original.svg" width="30" title="TypeScript"/> **TypeScript** | <img src="https://raw.githubusercontent.com/devicons/devicon/master/icons/opengl/opengl-original.svg" width="30" title="GLSL"/> **GLSL Shaders** | <img src="https://raw.githubusercontent.com/devicons/devicon/master/icons/tailwindcss/tailwindcss-original.svg" width="30" title="Tailwind"/> **Tailwind CSS** |
-| <img src="https://raw.githubusercontent.com/devicons/devicon/master/icons/nodejs/nodejs-original.svg" width="30" title="Node.js"/> **Node.js 20+** | <img src="https://raw.githubusercontent.com/devicons/devicon/master/icons/amazonwebservices/amazonwebservices-plain-wordmark.svg" width="30" title="Vercel"/> **Vercel Edge** | <img src="https://raw.githubusercontent.com/devicons/devicon/master/icons/git/git-original.svg" width="30" title="Git"/> **GitHub Actions** |
+| <img src="https://raw.githubusercontent.com/devicons/devicon/master/icons/rust/rust-original.svg" width="30" title="Rust"/> **Rust / Soroban** <br> For low-latency smart contracts and yield vaults. | <img src="https://raw.githubusercontent.com/devicons/devicon/master/icons/nodejs/nodejs-original.svg" width="30" title="Node.js"/> **Node.js (Agent Engine)** <br> Powers the continuous evaluation loop. | <img src="https://raw.githubusercontent.com/devicons/devicon/master/icons/nextjs/nextjs-original-wordmark.svg" width="40" title="Next.js"/> **Next.js 16** <br> The Neural Matrix Dashboard. |
+| <img src="https://img.shields.io/badge/Stellar-Network-white?logo=stellar" height="25" title="Stellar"/> **Stellar Horizon** <br> Real-time blockchain indexing. | <img src="https://raw.githubusercontent.com/devicons/devicon/master/icons/typescript/typescript-original.svg" width="30" title="TypeScript"/> **TypeScript** <br> End-to-end type safety. | <img src="https://raw.githubusercontent.com/devicons/devicon/master/icons/tailwindcss/tailwindcss-original.svg" width="30" title="Tailwind"/> **Tailwind CSS** <br> Glassmorphism & Neon UI. |
+| <img src="https://raw.githubusercontent.com/devicons/devicon/master/icons/postgresql/postgresql-original.svg" width="30" title="PostgreSQL"/> **Supabase** <br> High-availability metrics and persistence. | <img src="https://upload.wikimedia.org/wikipedia/commons/0/04/ChatGPT_logo.svg" width="30" title="LLM"/> **LLM Intelligence** <br> Natural language strategy compilation. | <img src="https://raw.githubusercontent.com/devicons/devicon/master/icons/framermotion/framermotion-original.svg" width="30" title="Framer Motion"/> **Framer Motion** <br> Fluid UX micro-animations. |
 
 ---
 
-## 🪐 Deployed Contracts (Testnet)
+## 🏗️ Project Architecture (Monorepo)
 
-| Contract | Purpose | Contract ID |
-|----------|---------|-------------|
-| **🛡️ Sentinel** | Hub, Yield & Treasury | `CDWCUIDKAOD7AK4M2B2O4YELJ2ZZPHQHVH4A2VVWJHEQLQPK5O2YUA47` |
-| **🔐 Verifier** | ZK-SNARK Groth16 Logic | `CDMQZ4E2AOKG4XYKVEX674A6JEGO3QPY3TAOBLJD77QAZXPTFXEIZA5W` |
-| **🆔 Identity** | Privacy Mixer & Merkle Tree | `CCE5LK3SWBEJO45L66SQ3US4SZYECS7K3Z2WKQ4LLUGJX7OFXXPNLYBK` |
-| **🎟️ Payment Gate** | x402 Machine Payments | `CBPAUF54AXBMBSXDW5KJN7IY6OOWQKQ4DPBI63QCTTFJSQMB3UX4HJCF` |
-
----
-
-## 🚀 Experience the Lab
-
-```bash
-# Clone the repository
-git clone https://github.com/Eras256/Nirium.git
-
-# Install & Launch
-pnpm install
-pnpm dev
-```
-
-Visit `localhost:3000/lab` to access the **Neural Console**—a playground for testing x402 payments and raw Soroban hex transactions.
-
----
-
-## 🧠 The Architecture
+Nirium is structured as a scalable Turborepo workspace:
 
 ```
 Nirium
-├── 🎨 apps/web/        # Next.js + Three.js + GPGPU Shaders
-├── 🦀 contracts/       # Soroban Rust Contracts (Sentinel, Verifier, Pool)
-├── 🔐 circuits/        # Snarkjs (Circom) ZK-SNARK logic
-└── 📜 docs/            # Full Technical Whitepaper
+├── 🎨 apps/
+│   └── web/            # Main Next.js Dashboard (The Neural Matrix)
+├── 🤖 packages/
+│   ├── agent/          # Autonomous AI Executor Loop & Service Workers
+│   ├── cli/            # Developer CLI for testing and terminal deployment
+│   ├── contracts/      # Soroban Rust Contracts (Vaults, Routing, Enclaves)
+│   └── sdk/            # TypeScript SDK interacting with Stellar & Soroban
+└── 📜 docs/            # Protocol documentation and technical specs
 ```
+
+---
+
+## 🚀 Experience the Matrix
+
+### 1. Prerequisites
+Ensure you have the latest stable versions of:
+- [Node.js (v20+)](https://nodejs.org/)
+- [pnpm](https://pnpm.io/)
+- [Rust & Soroban CLI](https://soroban.stellar.org/docs/getting-started/setup)
+
+### 2. Launching Locally
+```bash
+# Clone the repository
+git clone https://github.com/Eras256/Nirium.git
+cd Nirium
+
+# Install Workspace Dependencies
+pnpm install
+
+# Build the SDK and Agent packages
+pnpm build
+
+# Launch the Application
+pnpm dev
+```
+
+Visit `http://localhost:3000` to access the **Neural Console**. 
+> *Tip: Ensure you have the [Freighter Wallet](https://www.freighter.app/) installed and set to Stellar Testnet to interact with deployments.*
 
 ---
 
 ## 👥 Meet the Architects
 
-- **Vaiosx** — *Core Engineering & Smart Contracts*
+- **Vaiosx** — *Core Engineering, AI Systems & Smart Contracts*
 - **M0nsxx** — *UX/UI Design & Neural Visuals*
 - **Maux** — *Growth & Ecosystem Strategy*
 
 ---
 
-**Built with 💜 for the Stellar ecosystem. The future is sovereign. The future is Neural.**
+<div align="center">
+  <strong>Built with 🩵 and 💛 for the Stellar ecosystem. The future is autonomous. The future is Nirium.</strong>
+</div>
