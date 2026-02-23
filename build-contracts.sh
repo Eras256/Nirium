@@ -13,11 +13,8 @@ rustup target add wasm32-unknown-unknown
 cd contracts
 
 # Build all members
-echo "📦 Compiling Verifier (ZK-SNARK)..."
-cargo build --release --target wasm32-unknown-unknown --package verifier
-
-echo "📦 Compiling Identity Pool..."
-cargo build --release --target wasm32-unknown-unknown --package identity-pool
+echo "📦 Compiling Sentinel (Hub)..."
+cargo build --release --target wasm32-unknown-unknown --package sentinel
 
 echo "📦 Compiling Payment Gate (x402)..."
 cargo build --release --target wasm32-unknown-unknown --package payment-gate
@@ -29,14 +26,13 @@ mkdir -p ../out
 echo "✨ Optimizing WASM files..."
 
 if command -v stellar >/dev/null 2>&1; then
-    stellar contract optimize --wasm target/wasm32-unknown-unknown/release/verifier.wasm --wasm-out ../out/verifier.optimized.wasm
-    stellar contract optimize --wasm target/wasm32-unknown-unknown/release/identity_pool.wasm --wasm-out ../out/identity_pool.optimized.wasm
+    stellar contract optimize --wasm target/wasm32-unknown-unknown/release/sentinel.wasm --wasm-out ../out/sentinel.optimized.wasm
     stellar contract optimize --wasm target/wasm32-unknown-unknown/release/payment_gate.wasm --wasm-out ../out/payment_gate.optimized.wasm
     echo "✅ Optimization complete. Files in /out"
 else
     cp target/wasm32-unknown-unknown/release/*.wasm ../out/
-    echo "⚠️  Stellar/Soroban CLI not found. Unoptimized WASM copied to /out"
-    echo "   Install with: cargo install stellar-cli"
+    echo "⚠️  Stellar CLI not found. Unoptimized WASM copied to /out"
+    echo "   Install with: curl -sSl https://raw.githubusercontent.com/stellar/stellar-cli/main/install.sh | sh"
 fi
 
 echo "🚀 Build finished successfully!"

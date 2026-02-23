@@ -37,6 +37,15 @@ Built for the machine-to-machine era. Nirium supports a visual Matrix Builder.
 - **Drag-and-Drop Architecture**: Connect triggers, deep analytics, and execution nodes without coding.
 - **Community Skills**: Inject new abilities into your agent (like Telegram alerts, Discord Webhooks, or Pyth Oracle Snipers) via our one-click Skill Marketplace.
 
+## 🟢 Live on Testnet (Deployed Contracts)
+
+The core infrastructure of Nirium is fully functional and deployed on the **Stellar Testnet**:
+
+- **[Sentinel (Treasury Hub)](https://stellar.expert/explorer/testnet/contract/CBMI6CTXJUEGBDCCPHZVH7VJPEBDWEOBUJDB2VJ3RVF4AHO2THKDQRB4)**: `CBMI6CTXJUEGBDCCPHZVH7VJPEBDWEOBUJDB2VJ3RVF4AHO2THKDQRB4` (The central liquidity manager and secure vault).
+- **[Payment Gate (x402)](https://stellar.expert/explorer/testnet/contract/CCRZKETZFQA2UWNJMSXKOPS7QXRRBRW2J5Q32QQRQ6JHHEOLZWB5SWIH)**: `CCRZKETZFQA2UWNJMSXKOPS7QXRRBRW2J5Q32QQRQ6JHHEOLZWB5SWIH` (Manages subscriptions and monetizes API access).
+
+*(Note: Ensure your Freighter wallet is connected to the Stellar Testnet to interact with these contracts).*
+
 ---
 
 ## 🛠️ Technology Stack

@@ -83,7 +83,7 @@ export default function Home() {
                             v0.1.0 // STELLAR TESTNET LIVE
                         </div>
 
-                        <h1 className="text-6xl md:text-8xl font-black tracking-tighter leading-[0.85]">
+                        <h1 className="text-5xl sm:text-6xl md:text-8xl font-black tracking-tighter leading-[0.9] sm:leading-[0.85] break-words">
                             AUTONOMOUS <br />
                             <span className="text-transparent bg-clip-text bg-gradient-to-r from-stellar-teal to-stellar-yellow">INTELLIGENCE</span>
                         </h1>
@@ -92,10 +92,10 @@ export default function Home() {
                             Deploy AI agents that execute path arbitrage, flash loans, and yield farming — secured by <strong>Soroban Smart Contracts</strong> and Stellar&apos;s native <strong>atomic multi-operation transactions</strong>.
                         </p>
 
-                        <div className="flex flex-col sm:flex-row gap-4 pt-4">
+                        <div className="flex flex-col sm:flex-row gap-4 pt-4 w-full">
                             <button
                                 onClick={handleLaunch}
-                                className="group relative px-8 py-4 bg-stellar-yellow text-black font-black rounded-lg transition-all hover:shadow-[0_0_30px_rgba(255,200,0,0.5)] active:scale-95"
+                                className="w-full sm:w-auto group relative px-6 sm:px-8 py-4 bg-stellar-yellow text-black font-black rounded-lg transition-all hover:shadow-[0_0_30px_rgba(255,200,0,0.5)] active:scale-95 flex justify-center"
                             >
                                 <span className="flex items-center gap-2">
                                     LAUNCH DASHBOARD <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
@@ -103,7 +103,7 @@ export default function Home() {
                             </button>
                             <Link
                                 href="/docs"
-                                className="px-8 py-4 bg-white/5 border border-white/10 text-white font-bold rounded-lg hover:bg-white/10 transition-all text-center"
+                                className="w-full sm:w-auto px-6 sm:px-8 py-4 bg-white/5 border border-white/10 text-white font-bold rounded-lg hover:bg-white/10 transition-all text-center flex justify-center items-center"
                             >
                                 READ PROTOCOL
                             </Link>
@@ -149,7 +149,7 @@ export default function Home() {
             <section className="py-20 border-y border-white/5 bg-black/50">
                 <div className="container mx-auto px-4">
                     <h3 className="text-center text-[10px] font-mono text-gray-500 mb-12 tracking-[0.4em] uppercase">Built for the Stellar Ecosystem</h3>
-                    <div className="flex flex-wrap justify-center gap-12 md:gap-24 items-center grayscale opacity-50 hover:grayscale-0 hover:opacity-100 transition-all duration-700">
+                    <div className="flex flex-wrap justify-center gap-6 sm:gap-12 md:gap-24 items-center grayscale opacity-50 hover:grayscale-0 hover:opacity-100 transition-all duration-700">
                         <ProtocolItem icon={Landmark} name="BLEND Protocol" />
                         <ProtocolItem icon={Zap} name="SOROSWAP" />
                         <ProtocolItem icon={ChevronRight} name="PHOENIX DEX" />
@@ -198,7 +198,7 @@ export default function Home() {
             <section className="py-32 bg-black/40 border-t border-white/5">
                 <div className="container mx-auto px-4 grid lg:grid-cols-2 gap-16 items-center">
                     <div className="space-y-6">
-                        <h3 className="text-3xl md:text-5xl font-black leading-tight tracking-tighter">PROGRAMMABLE <br /><span className="text-stellar-yellow">AUTONOMY</span></h3>
+                        <h3 className="text-4xl md:text-5xl font-black leading-tight tracking-tighter break-words">PROGRAMMABLE <br /><span className="text-stellar-yellow">AUTONOMY</span></h3>
                         <p className="text-gray-400 text-lg">Scaffold a combat-ready agent in seconds using our SDKs. Full parity between TypeScript and Python for institutional quants.</p>
 
                         <div className="bg-[#0A0A0A] border border-white/10 rounded-xl p-6 font-mono text-sm group relative overflow-hidden">
@@ -210,7 +210,7 @@ export default function Home() {
                                 </div>
                                 <Activity className="w-4 h-4 text-stellar-teal" />
                             </div>
-                            <code className="text-white block">
+                            <code className="text-white block overflow-x-auto whitespace-nowrap text-xs sm:text-sm custom-scrollbar pb-2">
                                 <span className="text-purple-400">import</span> {"{"} Agent {"}"} <span className="text-purple-400">from</span> <span className="text-green-400">&apos;@nirium/sdk&apos;</span>;<br />
                                 <span className="text-blue-400">const</span> bot = <span className="text-blue-400">new</span> Agent(<span className="text-yellow-300">&quot;sk_live_...&quot;</span>);<br />
                                 <span className="text-gray-500">// Subscribe to Path Arb signals</span><br />
@@ -232,17 +232,17 @@ export default function Home() {
             {/* Final CTA */}
             <section className="py-40 text-center relative">
                 <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_100%,rgba(138,43,226,0.1),transparent_50%)]" />
-                <h2 className="text-5xl md:text-8xl font-black mb-12 tracking-tighter">IGNITE THE <span className="text-stellar-teal font-bold">LOOP</span></h2>
-                <div className="flex flex-wrap justify-center gap-6 relative z-10">
+                <h2 className="text-4xl sm:text-5xl md:text-8xl font-black mb-12 tracking-tighter">IGNITE THE <span className="text-stellar-teal font-bold">LOOP</span></h2>
+                <div className="flex flex-col sm:flex-row flex-wrap justify-center gap-4 sm:gap-6 relative z-10 w-full px-4 max-w-2xl mx-auto">
                     <button
                         onClick={handleLaunch}
-                        className="px-12 py-5 bg-gradient-to-r from-stellar-teal to-stellar-yellow text-black font-black text-xl rounded-full transition-all hover:scale-105 hover:shadow-[0_0_50px_rgba(255,200,0,0.4)] active:scale-95"
+                        className="w-full sm:w-auto px-6 sm:px-12 py-4 sm:py-5 bg-gradient-to-r from-stellar-teal to-stellar-yellow text-black font-black text-base sm:text-xl rounded-full transition-all hover:scale-105 hover:shadow-[0_0_50px_rgba(255,200,0,0.4)] active:scale-95"
                     >
                         ENTER NEURAL MATRIX
                     </button>
                     <Link
                         href="/strategies"
-                        className="px-12 py-5 border border-white/20 text-white font-bold text-xl rounded-full hover:bg-white/5 transition-all"
+                        className="w-full sm:w-auto px-6 sm:px-12 py-4 sm:py-5 border border-white/20 text-white font-bold text-base sm:text-xl rounded-full hover:bg-white/5 transition-all text-center"
                     >
                         BROWSE AGENTS
                     </Link>
