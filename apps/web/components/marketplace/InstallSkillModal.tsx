@@ -46,8 +46,14 @@ export default function InstallSkillModal({ skill, isOpen, onClose, onInstall, i
                         status: s.status || "Unknown"
                     }));
 
-                    // Combine Global + Real Agents
-                    setActiveAgents([GLOBAL_AGENT, ...agents]);
+                    // Prevent infinite loop by checking if state actually changed
+                    setActiveAgents((prev) => {
+                        const newAgents = [GLOBAL_AGENT, ...agents];
+                        if (JSON.stringify(prev) !== JSON.stringify(newAgents)) {
+                            return newAgents;
+                        }
+                        return prev;
+                    });
 
                     // Default to first real agent if available, otherwise global
                     if (agents.length > 0) {
@@ -56,6 +62,7 @@ export default function InstallSkillModal({ skill, isOpen, onClose, onInstall, i
                         setSelectedAgent(GLOBAL_AGENT.id);
                     }
                 } else {
+                    setActiveAgents((prev) => prev.length === 1 && prev[0].id === GLOBAL_AGENT.id ? prev : [GLOBAL_AGENT]);
                     setSelectedAgent(GLOBAL_AGENT.id);
                 }
             } catch (e) {
@@ -63,7 +70,7 @@ export default function InstallSkillModal({ skill, isOpen, onClose, onInstall, i
                 setSelectedAgent(GLOBAL_AGENT.id);
             }
         }
-    }, [isOpen, account]);
+    }, [isOpen, account?.address]);
 
     if (!isOpen || !skill) return null;
 
