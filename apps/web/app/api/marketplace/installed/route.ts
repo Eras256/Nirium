@@ -1,10 +1,7 @@
 import { NextResponse } from 'next/server';
 
-// Skills that are always pre-installed in Nirium (core plugins)
-const DEFAULT_INSTALLED = [
-    { id: 'neural-blackbox', slug: 'neural-blackbox', name: 'Neural Blackbox', version: '0.0.7' },
-    { id: 'usdc-vault-manager', slug: 'usdc-vault-manager', name: 'USDC Vault Manager', version: '0.0.7' },
-];
+// Agents start with zero skills by default. They must be explicitly installed.
+const DEFAULT_INSTALLED: any[] = [];
 
 export async function GET() {
     try {
