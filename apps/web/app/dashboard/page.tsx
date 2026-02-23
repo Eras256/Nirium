@@ -588,6 +588,12 @@ function DashboardContent() {
                 amount: "0.0001"
             }));
 
+            // 3. Descriptive Data Entry (makes it explicit on Stellar Expert)
+            tx.addOperation(Operation.manageData({
+                name: "strategy_deployed",
+                value: String(currentStrategy.name).slice(0, 64)
+            }));
+
             const builtTx = tx.build();
             const result = await signAndSubmitTransaction({ transaction: builtTx });
             const txHash = result.hash;
