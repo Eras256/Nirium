@@ -6,14 +6,14 @@ import { useFreighter } from "@/hooks/useFreighter";
 import {
     LayoutDashboard, Compass, BarChart2, FileText,
     Menu, X, Zap, Bot, Package, Cpu, Shield, Activity,
-    House, Wrench
+    House, Wrench, LogOut
 } from "lucide-react";
 import { useState, useEffect, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 
 export default function Navbar() {
     const pathname = usePathname();
-    const { address, isConnected, connect } = useFreighter();
+    const { address, isConnected, connect, disconnect } = useFreighter();
     const [isScrolled, setIsScrolled] = useState(false);
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
@@ -91,9 +91,14 @@ export default function Navbar() {
                                     {address?.slice(0, 4)}...{address?.slice(-4)}
                                 </span>
                             </div>
-                            <div className="w-8 h-8 rounded-lg bg-stellar-teal/10 border border-stellar-teal/30 flex items-center justify-center">
-                                <Shield className="w-4 h-4 text-stellar-teal" />
-                            </div>
+                            <button
+                                onClick={() => disconnect()}
+                                title="Disconnect Wallet"
+                                className="w-8 h-8 rounded-lg bg-stellar-teal/10 border border-stellar-teal/30 flex items-center justify-center hover:bg-red-500/20 hover:border-red-500/50 hover:text-red-400 text-stellar-teal transition-all group"
+                            >
+                                <Shield className="w-4 h-4 group-hover:hidden" />
+                                <LogOut className="w-4 h-4 hidden group-hover:block" />
+                            </button>
                         </div>
                     ) : (
                         <button
@@ -142,7 +147,17 @@ export default function Navbar() {
                                     </Link>
                                 );
                             })}
-                            {!isConnected && (
+                            {isConnected ? (
+                                <button
+                                    onClick={() => {
+                                        disconnect();
+                                        setIsMobileMenuOpen(false);
+                                    }}
+                                    className="mt-2 w-full bg-red-500/10 text-red-500 border border-red-500/20 p-4 rounded-xl font-black tracking-tighter hover:bg-red-500/20"
+                                >
+                                    Disconnect Matrix
+                                </button>
+                            ) : (
                                 <button
                                     onClick={() => {
                                         connect();
