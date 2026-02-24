@@ -14,7 +14,7 @@ export async function writeLog(
     if (!url || !key) return; // Silently skip if not configured
 
     try {
-        await fetch(`${url}/rest/v1/logs`, {
+        await fetch(`${url}/rest/v1/nirium_logs`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',

@@ -64,7 +64,7 @@ export const StrategyService = {
             try {
                 console.log('[StrategyService] Fetching kernels for:', walletAddress);
                 const { data, error } = await supabase
-                    .from('strategies')
+                    .from('nirium_strategies')
                     .select('*')
                     .eq('user_id', walletAddress)
                     .order('created_at', { ascending: false });
@@ -126,7 +126,7 @@ export const StrategyService = {
         try {
             // Check if a record with the same name already exists for this user
             const { data: existing } = await supabase
-                .from('strategies')
+                .from('nirium_strategies')
                 .select('id')
                 .eq('user_id', walletAddress)
                 .eq('name', strategy.strategy_id)
@@ -134,7 +134,7 @@ export const StrategyService = {
 
             if (existing) {
                 const { data, error } = await (supabase
-                    .from('strategies') as any)
+                    .from('nirium_strategies') as any)
                     .update({
                         status: strategy.status || 'RUNNING',
                         config: {
@@ -159,7 +159,7 @@ export const StrategyService = {
 
             // Insert new record
             const { data, error } = await supabase
-                .from('strategies')
+                .from('nirium_strategies')
                 .insert({
                     user_id: walletAddress,
                     name: strategy.strategy_id,
@@ -204,7 +204,7 @@ export const StrategyService = {
 
         try {
             const { error } = await supabase
-                .from('strategies')
+                .from('nirium_strategies')
                 .delete()
                 .eq('id', dbId);
 
