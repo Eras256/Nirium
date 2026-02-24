@@ -747,6 +747,12 @@ function DashboardContent() {
                 }
             });
 
+            writeLog(
+                `AGENT TERMINATED: Deployment removed from the fleet | tx: ${result.hash.slice(0, 12)}...`,
+                'warn',
+                account?.address
+            );
+
             // Step 2: Clean up locally
             setActiveStrategies(prev => prev.filter(s => s.id !== dbId));
 
@@ -799,6 +805,7 @@ function DashboardContent() {
                             } catch (err) { }
                         }
                         toast.success("Agent forced out of fleet and database cleaned");
+                        writeLog(`AGENT TERMINATED: Force cleaned from logic gates.`, 'error', account?.address);
                     }
                 }
             });
@@ -1229,6 +1236,12 @@ function DashboardContent() {
                     onClick: () => window.open(`https://stellar.expert/explorer/testnet/tx/${result.hash}`, "_blank")
                 }
             });
+
+            writeLog(
+                `VAULT INITIALIZED: ${baseAsset} Secure Enclave created | tx: ${result.hash.slice(0, 12)}...`,
+                'system',
+                account?.address
+            );
         } catch (e: any) {
             toast.dismiss(toastId);
             console.error("Vault Creation Error:", e);
@@ -1356,6 +1369,12 @@ function DashboardContent() {
                 },
                 duration: 8000
             });
+
+            writeLog(
+                `VAULT DESTROYED: ${baseAsset} Enclave terminated and funds returned | tx: ${result.hash.slice(0, 12)}...`,
+                'warn',
+                account?.address
+            );
         } catch (error: any) {
             toast.dismiss(toastId);
             console.error("Destroy Vault Error:", error);
