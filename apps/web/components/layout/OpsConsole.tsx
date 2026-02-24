@@ -29,7 +29,7 @@ export default function OpsConsole({ isExpanded, onToggleExpand, walletAddress }
                     .limit(30);
 
                 if (walletAddress) {
-                    query = query.eq('agentid', walletAddress);
+                    query = query.or(`agentid.eq.${walletAddress},agentid.eq.global,agentid.is.null`);
                 }
 
                 const { data, error } = await query;
@@ -53,8 +53,17 @@ export default function OpsConsole({ isExpanded, onToggleExpand, walletAddress }
             .channel(`realtime-logs-${walletAddress || 'global'}`)
             .on(
                 'postgres_changes',
-                { event: 'INSERT', schema: 'public', table: 'nirium_logs', filter: filterString },
+                { event: 'INSERT', schema: 'public', table: 'nirium_logs' },
                 (payload) => {
+                    // Client-side filtering to support OR logic
+                    const newLog = payload.new as any;
+                    const isRelevant = !walletAddress ||
+                        newLog.agentid === walletAddress ||
+                        newLog.agentid === 'global' ||
+                        !newLog.agentid;
+
+                    if (!isRelevant) return;
+
                     setLogs(prev => {
                         // Deduplicate: skip if same id already exists
                         const exists = prev.some(l => l.id === payload.new.id);
@@ -67,7 +76,7 @@ export default function OpsConsole({ isExpanded, onToggleExpand, walletAddress }
                 if (s === 'SUBSCRIBED') {
                     setStatus('online');
                     // Write a real system log so the console shows activity on connect
-                    writeLog('Nirium Neural Matrix ONLINE — Realtime feed active', 'system');
+                    writeLog('Nirium Neural Matrix ONLINE — Realtime feed active', 'system', walletAddress);
                 } else if (s === 'CLOSED' || s === 'CHANNEL_ERROR') {
                     setStatus('unavailable');
                 }

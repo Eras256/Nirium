@@ -325,7 +325,7 @@ function DashboardContent() {
 
             // Log to Ops Console
             const skillName = installedSkills.find(s => s.slug === slug)?.name || slug;
-            writeLog(`PLUGIN REMOVED: ${skillName} — uninstalled from agent ${agentId}`, 'warn', agentId);
+            writeLog(`PLUGIN REMOVED: ${skillName} — uninstalled from agent ${agentId}`, 'warn', account?.address);
         } catch (error) {
             toast.error(`Failed to uninstall: ${String(error)}`, { id: toastId });
         }
