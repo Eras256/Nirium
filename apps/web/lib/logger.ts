@@ -25,7 +25,7 @@ export async function writeLog(
             body: JSON.stringify({
                 message,
                 level,
-                agent_id: agentId ?? null,
+                agentid: agentId ?? null,
             }),
         });
     } catch (e) {
