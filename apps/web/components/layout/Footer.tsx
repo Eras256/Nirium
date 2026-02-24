@@ -88,7 +88,7 @@ export default function Footer() {
                             <Cpu className="w-full h-full text-stellar-teal" />
                         </div>
                         <div className="flex flex-col">
-                            <span className="font-black text-white tracking-tighter text-xl leading-none group-hover:text-stellar-teal transition-colors uppercase tracking-tighter">NIRIUM</span>
+                            <span className="font-black text-white text-xl leading-none group-hover:text-stellar-teal transition-colors uppercase tracking-tighter">NIRIUM</span>
                             <span className="text-[9px] text-gray-500 font-mono tracking-widest leading-none uppercase">Neural Matrix</span>
                         </div>
                     </Link>
