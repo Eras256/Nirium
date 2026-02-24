@@ -564,10 +564,10 @@ export default function MarketplacePage() {
                 }
 
                 toast.success(`${skill.name} installed successfully!`, {
-                    description: "The skill is now available in your agent and ready to use. Check the Agents Console for logs.",
+                    description: "The skill is now available in your agent and ready to use. Check the Dashboard for logs.",
                     action: {
-                        label: "View Logs",
-                        onClick: () => window.location.href = "/agents"
+                        label: "View Dashboard",
+                        onClick: () => window.location.href = "/dashboard"
                     }
                 });
             } else {
