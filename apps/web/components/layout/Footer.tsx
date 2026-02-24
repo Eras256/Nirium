@@ -17,7 +17,7 @@ const INTEL_LINKS = [
     { label: "Developer Docs", href: "/docs" },
     {
         label: "Soroban Source",
-        href: "https://stellar.expert/explorer/testnet",
+        href: process.env.NEXT_PUBLIC_CONTRACT_SENTINEL ? `https://stellar.expert/explorer/testnet/contract/${process.env.NEXT_PUBLIC_CONTRACT_SENTINEL}` : "https://stellar.expert/explorer/testnet",
         external: true,
     },
 ];
