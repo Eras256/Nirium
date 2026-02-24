@@ -6,7 +6,7 @@ import { motion } from 'framer-motion';
 import { supabase } from '@/lib/supabase';
 import { writeLog } from '@/lib/logger';
 
-export default function OpsConsole({ isExpanded, onToggleExpand }: { isExpanded: boolean, onToggleExpand: () => void }) {
+export default function OpsConsole({ isExpanded, onToggleExpand, walletAddress }: { isExpanded: boolean, onToggleExpand: () => void, walletAddress?: string }) {
     const [logs, setLogs] = useState<any[]>([]);
     const [status, setStatus] = useState<'connecting' | 'online' | 'unavailable'>('connecting');
     const logsEndRef = useRef<HTMLDivElement>(null);
@@ -22,11 +22,17 @@ export default function OpsConsole({ isExpanded, onToggleExpand }: { isExpanded:
         // Initial fetch of recent logs
         const fetchInitialLogs = async () => {
             try {
-                const { data, error } = await db
+                let query = db
                     .from('nirium_logs')
                     .select('*')
                     .order('timestamp', { ascending: false })
                     .limit(30);
+
+                if (walletAddress) {
+                    query = query.eq('agentid', walletAddress);
+                }
+
+                const { data, error } = await query;
 
                 if (data && !error) {
                     setLogs(data.reverse()); // oldest first
@@ -38,11 +44,16 @@ export default function OpsConsole({ isExpanded, onToggleExpand }: { isExpanded:
         fetchInitialLogs();
 
         // Realtime subscription for new logs
+        let filterString = undefined;
+        if (walletAddress) {
+            filterString = `agentid=eq.${walletAddress}`;
+        }
+
         const channel = db
-            .channel('realtime-logs')
+            .channel(`realtime-logs-${walletAddress || 'global'}`)
             .on(
                 'postgres_changes',
-                { event: 'INSERT', schema: 'public', table: 'nirium_logs' },
+                { event: 'INSERT', schema: 'public', table: 'nirium_logs', filter: filterString },
                 (payload) => {
                     setLogs(prev => {
                         // Deduplicate: skip if same id already exists
@@ -65,7 +76,7 @@ export default function OpsConsole({ isExpanded, onToggleExpand }: { isExpanded:
         return () => {
             db.removeChannel(channel);
         };
-    }, []);
+    }, [walletAddress]);
 
     // Auto-scroll to bottom when new logs arrive
     useEffect(() => {

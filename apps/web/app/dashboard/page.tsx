@@ -2173,6 +2173,7 @@ function DashboardContent() {
                         <OpsConsole
                             isExpanded={expandConsole}
                             onToggleExpand={() => setExpandConsole(!expandConsole)}
+                            walletAddress={account?.address}
                         />
                     </div>
                 </div>
