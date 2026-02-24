@@ -274,7 +274,7 @@ export default function PluginsPage() {
             setInstalledSkills(prev => ({ ...prev, [selectedPlugin.slug]: true }));
 
             // Write install log to Supabase Ops Console
-            writeLog(`PLUGIN INSTALLED: ${selectedPlugin.name} → agent ${agentId}`, 'success', agentId);
+            await writeLog(`PLUGIN INSTALLED: ${selectedPlugin.name} → agent ${agentId}`, 'success', accountStr || agentId);
 
             // Plugin-specific bootup activity logs (delayed for realism)
             const PLUGIN_BOOT_LOGS: Record<string, Array<{ msg: string; level: 'info' | 'system' | 'success' | 'warn' }>> = {
@@ -297,7 +297,7 @@ export default function PluginsPage() {
             if (bootLogs) {
                 bootLogs.forEach((entry, i) => {
                     setTimeout(() => {
-                        writeLog(entry.msg, entry.level, agentId);
+                        writeLog(entry.msg, entry.level, accountStr || agentId);
                     }, (i + 1) * 1500);
                 });
             }

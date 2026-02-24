@@ -11,6 +11,7 @@ import Link from "next/link";
 import { useState, useEffect } from "react";
 import { toast } from "sonner";
 import { writeLog } from "@/lib/logger";
+import { useFreighter } from "@/hooks/useFreighter";
 import InstallSkillModal from "@/components/marketplace/InstallSkillModal";
 
 // Types
@@ -57,6 +58,7 @@ const CATEGORY_COLORS: Record<string, string> = {
 };
 
 export default function MarketplacePage() {
+    const { address: userWallet } = useFreighter();
     const [skills, setSkills] = useState<MarketplaceSkill[]>([]);
     const [categories, setCategories] = useState<Category[]>([]);
     const [featuredSkills, setFeaturedSkills] = useState<MarketplaceSkill[]>([]);
@@ -526,7 +528,7 @@ export default function MarketplacePage() {
                 setInstalledSkills(prev => ({ ...prev, [skill.id]: true, [skill.slug]: true }));
 
                 // Log the install event to Supabase (shows in Ops Console)
-                writeLog(`SKILL INSTALLED: ${skill.name} → agent ${agentId}`, 'success', agentId);
+                await writeLog(`SKILL INSTALLED: ${skill.name} → agent ${agentId}`, 'success', userWallet || agentId);
 
                 // Skill-specific bootup logs (sequential, simulates skill activating)
                 const SKILL_BOOT_LOGS: Record<string, Array<{ msg: string; level: 'info' | 'success' | 'warn' }>> = {
@@ -558,7 +560,7 @@ export default function MarketplacePage() {
                 if (bootLogs) {
                     bootLogs.forEach((entry, i) => {
                         setTimeout(() => {
-                            writeLog(entry.msg, entry.level, agentId);
+                            writeLog(entry.msg, entry.level, userWallet || agentId);
                         }, (i + 1) * 1500);
                     });
                 }
