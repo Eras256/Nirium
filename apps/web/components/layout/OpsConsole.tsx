@@ -23,7 +23,7 @@ export default function OpsConsole({ isExpanded, onToggleExpand }: { isExpanded:
         const fetchInitialLogs = async () => {
             try {
                 const { data, error } = await db
-                    .from('logs')
+                    .from('nirium_logs')
                     .select('*')
                     .order('timestamp', { ascending: false })
                     .limit(30);
@@ -42,7 +42,7 @@ export default function OpsConsole({ isExpanded, onToggleExpand }: { isExpanded:
             .channel('realtime-logs')
             .on(
                 'postgres_changes',
-                { event: 'INSERT', schema: 'public', table: 'logs' },
+                { event: 'INSERT', schema: 'public', table: 'nirium_logs' },
                 (payload) => {
                     setLogs(prev => {
                         // Deduplicate: skip if same id already exists

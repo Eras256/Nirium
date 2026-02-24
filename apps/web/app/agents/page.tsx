@@ -71,7 +71,7 @@ export default function AgentsPage() {
         // Fetch recent logs on mount
         const fetchInitialLogs = async () => {
             const { data } = await db
-                .from('logs')
+                .from('nirium_logs')
                 .select('*')
                 .order('timestamp', { ascending: false })
                 .limit(30);
@@ -82,7 +82,7 @@ export default function AgentsPage() {
         // Subscribe to new logs in real time
         const channel = db
             .channel('agents-realtime-logs')
-            .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'logs' }, (payload) => {
+            .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'nirium_logs' }, (payload) => {
                 setLogs(prev => {
                     const exists = prev.some(l => l.id === payload.new.id);
                     if (exists) return prev;
