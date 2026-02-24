@@ -508,6 +508,10 @@ export default function MarketplacePage() {
                 },
                 body: JSON.stringify({ targetAgent: agentId }) // Send agent ID
             });
+            if (!response.ok) {
+                const errText = await response.text();
+                throw new Error(`Server returned ${response.status}: ${errText.slice(0, 50)}`);
+            }
 
             const data = await response.json();
 
