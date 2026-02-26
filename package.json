@@ -7,9 +7,13 @@
 		"start": "pnpm --filter nirium-web start"
 	},
 	"dependencies": {
-		"next": "16.1.6",
+		"next": "15.5.12",
 		"react": "19.2.3",
 		"react-dom": "19.2.3"
+	},
+	"packageManager": "pnpm@10.27.0",
+	"engines": {
+		"node": "20.x"
 	},
 	"devDependencies": {
 		"snarkjs": "^0.7.6"
