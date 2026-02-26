@@ -83,7 +83,7 @@ export default function Home() {
                             v0.1.0 // STELLAR TESTNET LIVE
                         </div>
 
-                        <h1 className="text-5xl sm:text-6xl md:text-8xl font-black tracking-tighter leading-[0.9] sm:leading-[0.85] break-words">
+                        <h1 className="text-4xl sm:text-6xl md:text-7xl lg:text-8xl font-black tracking-tighter leading-[0.9] lg:leading-[0.85]">
                             AUTONOMOUS <br />
                             <span className="text-transparent bg-clip-text bg-gradient-to-r from-stellar-teal to-stellar-yellow">INTELLIGENCE</span>
                         </h1>
@@ -198,7 +198,7 @@ export default function Home() {
             <section className="py-32 bg-black/40 border-t border-white/5">
                 <div className="container mx-auto px-4 grid lg:grid-cols-2 gap-16 items-center">
                     <div className="space-y-6">
-                        <h3 className="text-4xl md:text-5xl font-black leading-tight tracking-tighter break-words">PROGRAMMABLE <br /><span className="text-stellar-yellow">AUTONOMY</span></h3>
+                        <h3 className="text-3xl md:text-5xl font-black leading-tight tracking-tighter">PROGRAMMABLE <br /><span className="text-stellar-yellow">AUTONOMY</span></h3>
                         <p className="text-gray-400 text-lg">Scaffold a combat-ready agent in seconds using our SDKs. Full parity between TypeScript and Python for institutional quants.</p>
 
                         <div className="bg-[#0A0A0A] border border-white/10 rounded-xl p-6 font-mono text-sm group relative overflow-hidden">
