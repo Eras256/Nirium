@@ -1903,7 +1903,7 @@ function DashboardContent() {
                                         {vaultId ? `ID: ${vaultId.slice(0, 6)}...${vaultId.slice(-4)}` : 'Vault ID: Not Created'} • {vaultBalance.toFixed(2)} {baseAsset} Locked
                                     </p>
                                     <div className="flex items-center gap-2 pt-1">
-                                        {activeStrategies.length > 0 && vaultId ? (
+                                        {vaultId ? (
                                             <span className="text-[10px] font-bold text-green-400 flex items-center gap-1.5 bg-green-500/5 px-2 py-1 rounded-lg border border-green-500/10">
                                                 <RefreshCw size={10} className="animate-spin-slow" />
                                                 AGENT ACCESS: GRANTED 🔓
