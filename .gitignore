@@ -30,8 +30,11 @@ yarn-error.log*
 next-env.d.ts
 
 # Rust / Soroban
-/contracts/target/
+/target/
+target/
+**/target/
 Cargo.lock
+*.wasm
 
 # ZK
 /circuits/WithdrawProof_js/
