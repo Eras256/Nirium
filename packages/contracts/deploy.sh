@@ -5,7 +5,7 @@
 # ═══════════════════════════════════════════════════════════════
 #
 # Prerequisites:
-#   - soroban CLI installed: cargo install soroban-cli
+#   - stellar CLI installed: cargo install soroban-cli
 #   - Funded Testnet account: https://laboratory.stellar.org/#account-creator?network=test
 #   - Environment variables: STELLAR_SECRET_KEY, STELLAR_PUBLIC_KEY
 #
@@ -21,7 +21,7 @@ set -euo pipefail
 NETWORK="testnet"
 SOROBAN_RPC_URL="https://soroban-testnet.stellar.org"
 SOROBAN_NETWORK_PASSPHRASE="Test SDF Network ; September 2015"
-WASM_DIR="target/wasm32-unknown-unknown/release"
+WASM_DIR="../../target/wasm32v1-none/release"
 
 RED='\033[0;31m'
 GREEN='\033[0;32m'
@@ -37,8 +37,8 @@ error() { echo -e "${RED}[✗]${NC} $1"; exit 1; }
 # ─── Pre-flight Checks ──────────────────────────────────────
 log "Starting Nirium deployment to Stellar ${NETWORK}..."
 
-if ! command -v soroban &> /dev/null; then
-    error "soroban CLI not found. Install with: cargo install soroban-cli"
+if ! command -v stellar &> /dev/null; then
+    error "stellar CLI not found. Install with: cargo install soroban-cli"
 fi
 
 if [ -z "${STELLAR_SECRET_KEY:-}" ]; then
@@ -60,7 +60,7 @@ success "Account verified and funded."
 
 # ─── Step 1: Build Contracts ────────────────────────────────
 log "Building Soroban contracts..."
-soroban contract build 2>&1 || error "Contract build failed."
+stellar contract build 2>&1 || error "Contract build failed."
 success "Contracts built successfully."
 
 # Verify WASM output exists
@@ -73,7 +73,7 @@ log "WASM binary size: ${WASM_SIZE} bytes"
 
 # ─── Step 2: Deploy NiriumVault ─────────────────────────────
 log "Deploying NiriumVault contract..."
-VAULT_ID=$(soroban contract deploy \
+VAULT_ID=$(stellar contract deploy \
     --wasm "${WASM_DIR}/nirium_contracts.wasm" \
     --source "${STELLAR_SECRET_KEY}" \
     --rpc-url "${SOROBAN_RPC_URL}" \
@@ -86,7 +86,7 @@ success "NiriumVault deployed: ${VAULT_ID}"
 
 # ─── Step 3: Initialize the Vault ───────────────────────────
 log "Initializing NiriumVault..."
-INIT_RESULT=$(soroban contract invoke \
+INIT_RESULT=$(stellar contract invoke \
     --id "${VAULT_ID}" \
     --source "${STELLAR_SECRET_KEY}" \
     --rpc-url "${SOROBAN_RPC_URL}" \
@@ -104,7 +104,7 @@ fi
 
 # ─── Step 4: Verify Deployment ──────────────────────────────
 log "Verifying deployment..."
-VAULT_COUNT=$(soroban contract invoke \
+VAULT_COUNT=$(stellar contract invoke \
     --id "${VAULT_ID}" \
     --source "${STELLAR_SECRET_KEY}" \
     --rpc-url "${SOROBAN_RPC_URL}" \

@@ -1,0 +1,272 @@
+[0;36m[Nirium][0m Starting Nirium deployment to Stellar testnet...
+[0;36m[Nirium][0m Verifying account GBJRFWVFN4...H3V2O4 on Testnet...
+[0;32m[✓][0m Account verified and funded.
+[0;36m[Nirium][0m Building Soroban contracts...
+ℹ️  CARGO_BUILD_RUSTFLAGS=--remap-path-prefix=/home/vaiosvaios/.cargo/registry/src= cargo rustc --manifest-path=Cargo.toml --crate-type=cdylib --target=wasm32v1-none --release
+warning: profiles for the non root package will be ignored, specify profiles at the workspace root:
+package:   /home/vaiosvaios/Nirium/packages/contracts/Cargo.toml
+workspace: /home/vaiosvaios/Nirium/Cargo.toml
+warning: failed to auto-clean cache data
+
+failed to clean entries from the global cache
+
+Caused by:
+  failed to remove file `/home/vaiosvaios/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/compiler_builtins-0.1.143/LICENSE.txt`
+
+Caused by:
+  Permission denied (os error 13)
+warning: unused import: `Vec`
+  --> packages/contracts/src/nirium_vault.rs:16:78
+   |
+16 | ...l_short, token, Address, Env, Vec,
+   |                                  ^^^
+   |
+   = note: `#[warn(unused_imports)]` (part of `#[warn(unused)]`) on by default
+
+warning: unused import: `Env`
+ --> packages/contracts/src/interfaces/sdex_interface.rs:8:42
+  |
+8 | use soroban_sdk::{contracttype, Address, Env};
+  |                                          ^^^
+
+warning: unused import: `Env`
+  --> packages/contracts/src/interfaces/path_payment_interface.rs:10:42
+   |
+10 | use soroban_sdk::{contracttype, Address, Env, Vec};
+   |                                          ^^^
+
+warning: unused import: `Env`
+ --> packages/contracts/src/mock/mock_pool.rs:6:33
+  |
+6 | use soroban_sdk::{contracttype, Env};
+  |                                 ^^^
+
+warning: constant `E_INSUFFICIENT_PROFIT` is never used
+  --> packages/contracts/src/nirium_vault.rs:23:7
+   |
+23 | const E_INSUFFICIENT_PROFIT: u32 = 1;
+   |       ^^^^^^^^^^^^^^^^^^^^^
+   |
+   = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: constant `E_INSUFFICIENT_FEE` is never used
+  --> packages/contracts/src/nirium_vault.rs:24:7
+   |
+24 | const E_INSUFFICIENT_FEE: u32 = 2;
+   |       ^^^^^^^^^^^^^^^^^^
+
+warning: constant `E_POOL_INSUFFICIENT_LIQUIDITY` is never used
+  --> packages/contracts/src/nirium_vault.rs:25:7
+   |
+25 | const E_POOL_INSUFFICIENT_LIQUIDITY: u32 = 3;
+   |       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: constant `E_INVALID_REPAYMENT` is never used
+  --> packages/contracts/src/nirium_vault.rs:26:7
+   |
+26 | const E_INVALID_REPAYMENT: u32 = 4;
+   |       ^^^^^^^^^^^^^^^^^^^
+
+warning: constant `E_INSUFFICIENT_BALANCE` is never used
+  --> packages/contracts/src/nirium_vault.rs:27:7
+   |
+27 | const E_INSUFFICIENT_BALANCE: u32 = 5;
+   |       ^^^^^^^^^^^^^^^^^^^^^^
+
+warning: constant `E_AGENT_NOT_DELEGATED` is never used
+  --> packages/contracts/src/nirium_vault.rs:28:7
+   |
+28 | const E_AGENT_NOT_DELEGATED: u32 = 6;
+   |       ^^^^^^^^^^^^^^^^^^^^^
+
+warning: constant `E_PATH_PAYMENT_FAILED` is never used
+  --> packages/contracts/src/nirium_vault.rs:29:7
+   |
+29 | const E_PATH_PAYMENT_FAILED: u32 = 7;
+   |       ^^^^^^^^^^^^^^^^^^^^^
+
+warning: constant `E_VAULT_NOT_FOUND` is never used
+  --> packages/contracts/src/nirium_vault.rs:30:7
+   |
+30 | const E_VAULT_NOT_FOUND: u32 = 8;
+   |       ^^^^^^^^^^^^^^^^^
+
+warning: constant `E_OVERFLOW` is never used
+  --> packages/contracts/src/nirium_vault.rs:31:7
+   |
+31 | const E_OVERFLOW: u32 = 9;
+   |       ^^^^^^^^^^
+
+warning: constant `E_ALREADY_INITIALIZED` is never used
+  --> packages/contracts/src/nirium_vault.rs:32:7
+   |
+32 | const E_ALREADY_INITIALIZED: u32 = 10;
+   |       ^^^^^^^^^^^^^^^^^^^^^
+
+warning: constant `DEFAULT_FLASH_LOAN_FEE_BPS` is never used
+  --> packages/contracts/src/nirium_vault.rs:45:7
+   |
+45 | const DEFAULT_FLASH_LOAN_FEE_BPS: u32 = 30;
+   |       ^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: fields `pool_id`, `borrowed_amount`, `min_repay_amount`, and `borrower` are never read
+   --> packages/contracts/src/nirium_vault.rs:103:5
+    |
+102 | struct FlashLoanState {
+    |        -------------- fields in this struct
+103 |     pool_id: u64,
+    |     ^^^^^^^
+104 |     borrowed_amount: i128,
+    |     ^^^^^^^^^^^^^^^
+105 |     min_repay_amount: i128,
+    |     ^^^^^^^^^^^^^^^^
+106 |     borrower: Address,
+    |     ^^^^^^^^
+
+warning: trait `BlendLendingPool` is never used
+  --> packages/contracts/src/interfaces/blend_interface.rs:11:11
+   |
+11 | pub trait BlendLendingPool {
+   |           ^^^^^^^^^^^^^^^^
+
+warning: trait `SoroswapDex` is never used
+  --> packages/contracts/src/interfaces/soroswap_interface.rs:11:11
+   |
+11 | pub trait SoroswapDex {
+   |           ^^^^^^^^^^^
+
+warning: function `calculate_spread_bps` is never used
+  --> packages/contracts/src/interfaces/sdex_interface.rs:54:8
+   |
+54 | pub fn calculate_spread_bps(bid_n: i128, bid_d: i128, ask_n: i128,...
+   |        ^^^^^^^^^^^^^^^^^^^^
+
+warning: function `is_spread_exploitable` is never used
+  --> packages/contracts/src/interfaces/sdex_interface.rs:72:8
+   |
+72 | pub fn is_spread_exploitable(spread_bps: u32, min_profit_bps: u32)...
+   |        ^^^^^^^^^^^^^^^^^^^^^
+
+warning: function `calculate_path_profit` is never used
+  --> packages/contracts/src/interfaces/path_payment_interface.rs:68:8
+   |
+68 | pub fn calculate_path_profit(source_amount: i128, received_amount:...
+   |        ^^^^^^^^^^^^^^^^^^^^^
+
+warning: function `is_path_profitable` is never used
+  --> packages/contracts/src/interfaces/path_payment_interface.rs:74:8
+   |
+74 | pub fn is_path_profitable(
+   |        ^^^^^^^^^^^^^^^^^^
+
+warning: `nirium-contracts` (lib) generated 22 warnings (run `cargo fix --lib -p nirium-contracts` to apply 4 suggestions)
+    Finished `release` profile [optimized] target(s) in 0.15s
+ℹ️  Build Summary:
+    Wasm File: /home/vaiosvaios/Nirium/target/wasm32v1-none/release/nirium_contracts.wasm (23910 bytes)
+    Wasm Hash: 4e137f7dab76d6f2d4d01e11cab6dd495ee999cbbc7fd891eabe24e09639d2dc
+    Wasm Size: 23910 bytes
+    Exported Functions: 19 found
+      • _
+      • create_pool
+      • create_vault
+      • delegate_agent
+      • deposit
+      • execute_blend_yield
+      • execute_cross_dex
+      • execute_path_arbitrage
+      • execute_soroswap_swap
+      • flash_loan_execute
+      • get_agent_delegation
+      • get_pool
+      • get_pool_count
+      • get_total_fees
+      • get_vault
+      • get_vault_count
+      • initialize
+      • revoke_agent
+      • withdraw
+✅ Build Complete
+
+[0;32m[✓][0m Contracts built successfully.
+[0;36m[Nirium][0m WASM binary size: 23910 bytes
+[0;36m[Nirium][0m Deploying NiriumVault contract...
+[0;32m[✓][0m NiriumVault deployed: ℹ️  Skipping install because wasm already installed
+ℹ️  Using wasm hash 4e137f7dab76d6f2d4d01e11cab6dd495ee999cbbc7fd891eabe24e09639d2dc
+ℹ️  Simulating deploy transaction…
+ℹ️  Transaction hash is 177c0086930663e8a7779906c6459bc5daa85cf9e5dac994efad1562272658b0
+🔗 https://stellar.expert/explorer/testnet/tx/177c0086930663e8a7779906c6459bc5daa85cf9e5dac994efad1562272658b0
+ℹ️  Signing transaction: 177c0086930663e8a7779906c6459bc5daa85cf9e5dac994efad1562272658b0
+🌎 Submitting deploy transaction…
+🔗 https://lab.stellar.org/r/testnet/contract/CDVBAMGONYS3PB3TAN7KHRMROHWAGZJ2OOTLPGQWRRXITC4GBA6SXMAY
+✅ Deployed!
+CDVBAMGONYS3PB3TAN7KHRMROHWAGZJ2OOTLPGQWRRXITC4GBA6SXMAY
+[0;36m[Nirium][0m Initializing NiriumVault...
+[1;33m[!][0m Initialization returned: ❌ error: contract not found: ℹ️  Skipping install because wasm already installed
+ℹ️  Using wasm hash 4e137f7dab76d6f2d4d01e11cab6dd495ee999cbbc7fd891eabe24e09639d2dc
+ℹ️  Simulating deploy transaction…
+ℹ️  Transaction hash is 177c0086930663e8a7779906c6459bc5daa85cf9e5dac994efad1562272658b0
+🔗 https://stellar.expert/explorer/testnet/tx/177c0086930663e8a7779906c6459bc5daa85cf9e5dac994efad1562272658b0
+ℹ️  Signing transaction: 177c0086930663e8a7779906c6459bc5daa85cf9e5dac994efad1562272658b0
+🌎 Submitting deploy transaction…
+🔗 https://lab.stellar.org/r/testnet/contract/CDVBAMGONYS3PB3TAN7KHRMROHWAGZJ2OOTLPGQWRRXITC4GBA6SXMAY
+✅ Deployed!
+CDVBAMGONYS3PB3TAN7KHRMROHWAGZJ2OOTLPGQWRRXITC4GBA6SXMAY
+[1;33m[!][0m Contract may already be initialized. Continuing...
+[0;36m[Nirium][0m Verifying deployment...
+[0;36m[Nirium][0m Vault count: ❌ error: contract not found: ℹ️  Skipping install because wasm already installed
+ℹ️  Using wasm hash 4e137f7dab76d6f2d4d01e11cab6dd495ee999cbbc7fd891eabe24e09639d2dc
+ℹ️  Simulating deploy transaction…
+ℹ️  Transaction hash is 177c0086930663e8a7779906c6459bc5daa85cf9e5dac994efad1562272658b0
+🔗 https://stellar.expert/explorer/testnet/tx/177c0086930663e8a7779906c6459bc5daa85cf9e5dac994efad1562272658b0
+ℹ️  Signing transaction: 177c0086930663e8a7779906c6459bc5daa85cf9e5dac994efad1562272658b0
+🌎 Submitting deploy transaction…
+🔗 https://lab.stellar.org/r/testnet/contract/CDVBAMGONYS3PB3TAN7KHRMROHWAGZJ2OOTLPGQWRRXITC4GBA6SXMAY
+✅ Deployed!
+CDVBAMGONYS3PB3TAN7KHRMROHWAGZJ2OOTLPGQWRRXITC4GBA6SXMAY
+
+[0;32m═══════════════════════════════════════════════════════════════[0m
+[0;32m Nirium Deployment Complete![0m
+[0;32m═══════════════════════════════════════════════════════════════[0m
+
+  Network:       [0;36mtestnet[0m
+  Vault ID:      [0;36mℹ️  Skipping install because wasm already installed
+ℹ️  Using wasm hash 4e137f7dab76d6f2d4d01e11cab6dd495ee999cbbc7fd891eabe24e09639d2dc
+ℹ️  Simulating deploy transaction…
+ℹ️  Transaction hash is 177c0086930663e8a7779906c6459bc5daa85cf9e5dac994efad1562272658b0
+🔗 https://stellar.expert/explorer/testnet/tx/177c0086930663e8a7779906c6459bc5daa85cf9e5dac994efad1562272658b0
+ℹ️  Signing transaction: 177c0086930663e8a7779906c6459bc5daa85cf9e5dac994efad1562272658b0
+🌎 Submitting deploy transaction…
+🔗 https://lab.stellar.org/r/testnet/contract/CDVBAMGONYS3PB3TAN7KHRMROHWAGZJ2OOTLPGQWRRXITC4GBA6SXMAY
+✅ Deployed!
+CDVBAMGONYS3PB3TAN7KHRMROHWAGZJ2OOTLPGQWRRXITC4GBA6SXMAY[0m
+  Admin:         [0;36mGBJRFWVFN4...H3V2O4[0m
+
+[1;33mAdd these to your .env.local:[0m
+
+  NEXT_PUBLIC_CONTRACT_ID=ℹ️  Skipping install because wasm already installed
+ℹ️  Using wasm hash 4e137f7dab76d6f2d4d01e11cab6dd495ee999cbbc7fd891eabe24e09639d2dc
+ℹ️  Simulating deploy transaction…
+ℹ️  Transaction hash is 177c0086930663e8a7779906c6459bc5daa85cf9e5dac994efad1562272658b0
+🔗 https://stellar.expert/explorer/testnet/tx/177c0086930663e8a7779906c6459bc5daa85cf9e5dac994efad1562272658b0
+ℹ️  Signing transaction: 177c0086930663e8a7779906c6459bc5daa85cf9e5dac994efad1562272658b0
+🌎 Submitting deploy transaction…
+🔗 https://lab.stellar.org/r/testnet/contract/CDVBAMGONYS3PB3TAN7KHRMROHWAGZJ2OOTLPGQWRRXITC4GBA6SXMAY
+✅ Deployed!
+CDVBAMGONYS3PB3TAN7KHRMROHWAGZJ2OOTLPGQWRRXITC4GBA6SXMAY
+  NEXT_PUBLIC_STELLAR_NETWORK=testnet
+  NEXT_PUBLIC_SOROBAN_RPC_URL=https://soroban-testnet.stellar.org
+  NEXT_PUBLIC_HORIZON_URL=https://horizon-testnet.stellar.org
+
+[1;33mExplorer:[0m
+  https://stellar.expert/explorer/testnet/contract/ℹ️  Skipping install because wasm already installed
+ℹ️  Using wasm hash 4e137f7dab76d6f2d4d01e11cab6dd495ee999cbbc7fd891eabe24e09639d2dc
+ℹ️  Simulating deploy transaction…
+ℹ️  Transaction hash is 177c0086930663e8a7779906c6459bc5daa85cf9e5dac994efad1562272658b0
+🔗 https://stellar.expert/explorer/testnet/tx/177c0086930663e8a7779906c6459bc5daa85cf9e5dac994efad1562272658b0
+ℹ️  Signing transaction: 177c0086930663e8a7779906c6459bc5daa85cf9e5dac994efad1562272658b0
+🌎 Submitting deploy transaction…
+🔗 https://lab.stellar.org/r/testnet/contract/CDVBAMGONYS3PB3TAN7KHRMROHWAGZJ2OOTLPGQWRRXITC4GBA6SXMAY
+✅ Deployed!
+CDVBAMGONYS3PB3TAN7KHRMROHWAGZJ2OOTLPGQWRRXITC4GBA6SXMAY
+
+[0;32m[✓][0m Contract IDs saved to .contract-ids.env

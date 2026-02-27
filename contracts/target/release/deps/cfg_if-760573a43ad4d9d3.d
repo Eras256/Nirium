@@ -1,7 +1,0 @@
-/home/vaiosvaios/Nirium/contracts/target/release/deps/cfg_if-760573a43ad4d9d3.d: /home/vaiosvaios/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/cfg-if-1.0.4/src/lib.rs
-
-/home/vaiosvaios/Nirium/contracts/target/release/deps/libcfg_if-760573a43ad4d9d3.rlib: /home/vaiosvaios/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/cfg-if-1.0.4/src/lib.rs
-
-/home/vaiosvaios/Nirium/contracts/target/release/deps/libcfg_if-760573a43ad4d9d3.rmeta: /home/vaiosvaios/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/cfg-if-1.0.4/src/lib.rs
-
-/home/vaiosvaios/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/cfg-if-1.0.4/src/lib.rs:
