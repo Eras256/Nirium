@@ -216,8 +216,8 @@ export default function Footer() {
                         <span className="text-stellar-teal">ENCRYPTED PROTOCOL</span>
                     </div>
                     <div className="flex items-center gap-6">
-                        <a href="#" className="hover:text-white transition-colors">Private Mode</a>
-                        <a href="#" className="hover:text-white transition-colors">Terms of Matrix</a>
+                        <Link href="/risk-disclosure" className="hover:text-red-400 transition-colors">Risk Disclosure</Link>
+                        <Link href="/terms" className="hover:text-white transition-colors">Terms of Service</Link>
                         <span className="text-gray-400">v0.1.0-STABLE</span>
                     </div>
                 </div>

@@ -10,12 +10,15 @@ import {
 } from "lucide-react";
 import { useState, useEffect, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import { useLanguage } from "../../context/LanguageContext";
+import { Globe } from "lucide-react";
 
 export default function Navbar() {
     const pathname = usePathname();
     const { address, isConnected, connect, disconnect } = useFreighter();
     const [isScrolled, setIsScrolled] = useState(false);
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+    const { language, setLanguage, t } = useLanguage();
 
     const handleScroll = useCallback(() => {
         setIsScrolled(window.scrollY > 20);
@@ -28,10 +31,11 @@ export default function Navbar() {
 
     const navLinks = [
         { name: "Home", href: "/", icon: House },
-        { name: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
+        { name: t.nav.dashboard, href: "/dashboard", icon: LayoutDashboard },
         { name: "Strategies", href: "/strategies", icon: Compass },
-        { name: "Builder", href: "/strategies/builder", icon: Wrench },
-        { name: "Marketplace", href: "/marketplace", icon: Package },
+        { name: t.nav.builder, href: "/strategies/builder", icon: Wrench },
+        { name: t.nav.marketplace, href: "/marketplace", icon: Package },
+        { name: t.nav.leaderboard || "Leaderboard", href: "/leaderboard", icon: Activity },
         { name: "Plugins", href: "/plugins", icon: Zap },
         { name: "Agents", href: "/agents", icon: Bot },
         { name: "Analytics", href: "/analytics", icon: BarChart2 },
@@ -83,6 +87,19 @@ export default function Navbar() {
 
                 {/* Right Actions */}
                 <div className="flex items-center gap-4">
+                    <div className="hidden sm:flex items-center gap-1.5 bg-white/5 border border-white/10 rounded-lg p-1">
+                        <Globe className="w-4 h-4 text-gray-400 ml-1" />
+                        <select 
+                            value={language}
+                            onChange={(e) => setLanguage(e.target.value as any)}
+                            className="bg-transparent text-xs text-gray-300 font-bold focus:outline-none cursor-pointer p-1"
+                        >
+                            <option value="en">EN</option>
+                            <option value="es">ES</option>
+                            <option value="zh">ZH</option>
+                        </select>
+                    </div>
+
                     {isConnected ? (
                         <div className="hidden sm:flex items-center gap-3">
                             <div className="flex flex-col items-end">

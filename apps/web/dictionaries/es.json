@@ -1,0 +1,24 @@
+{
+    "nav": {
+        "dashboard": "Panel Central",
+        "builder": "Constructor",
+        "marketplace": "Mercado",
+        "leaderboard": "Clasificación"
+    },
+    "leaderboard": {
+        "title": "CLASIFICACIÓN GLOBAL SENTINEL",
+        "subtitle": "Rastrea los algoritmos y creadores con mejor rendimiento en el ecosistema Nirium.",
+        "columns": {
+            "rank": "RANGO",
+            "sentinel": "SENTINEL / CREADOR",
+            "winRate": "TASA VICTORIAS",
+            "elo": "PUNT. ELO",
+            "volume": "VOL OPERADO"
+        },
+        "tiers": {
+            "matrix": "Nivel Matrix",
+            "gold": "Nivel Oro",
+            "silver": "Nivel Plata"
+        }
+    }
+}

@@ -510,7 +510,22 @@ impl NiriumVaultContract {
             panic!("net profit below minimum threshold — transaction reverted");
         }
 
-        // 7. Repay pool (with fee included)
+        // ─── LEVEL 6: METAVERSION 1% MATRIX FEE ───
+        // The protocol captures 1% exclusively from the realized profit.
+        let matrix_fee = net_profit / 100;
+        let user_profit = net_profit.checked_sub(matrix_fee).expect("fee underflow");
+
+        // Update Global Treasury (Fees Collected)
+        let prev_fees: i128 = env
+            .storage()
+            .instance()
+            .get(&DataKey::TotalFeesCollected)
+            .unwrap_or(0);
+        env.storage()
+            .instance()
+            .set(&DataKey::TotalFeesCollected, &(prev_fees + matrix_fee));
+
+        // 7. Repay pool (with loan fee included)
         pool.base_balance = pool
             .base_balance
             .checked_add(min_repay)
@@ -525,11 +540,11 @@ impl NiriumVaultContract {
             .persistent()
             .set(&DataKey::Pool(pool_id), &pool);
 
-        // 8. Update agent delegation stats
+        // 8. Update agent delegation stats with User Profit only
         delegation.executions_count += 1;
         delegation.total_profit = delegation
             .total_profit
-            .checked_add(net_profit)
+            .checked_add(user_profit)
             .expect("profit tracking overflow");
         env.storage().persistent().set(
             &DataKey::AgentDelegation(vault_id, agent.clone()),
@@ -539,10 +554,10 @@ impl NiriumVaultContract {
         // 9. Emit event
         env.events().publish(
             (symbol_short!("flash"), symbol_short!("executed")),
-            (borrow_amount, min_repay, net_profit, agent),
+            (borrow_amount, min_repay, user_profit, matrix_fee),
         );
 
-        net_profit
+        user_profit
     }
 
     // ─── STELLAR-NATIVE AGENT FUNCTIONS ──────────────────────

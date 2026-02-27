@@ -1,0 +1,24 @@
+{
+    "nav": {
+        "dashboard": "Dashboard",
+        "builder": "Visual Builder",
+        "marketplace": "Marketplace",
+        "leaderboard": "Leaderboard"
+    },
+    "leaderboard": {
+        "title": "GLOBAL SENTINEL LEADERBOARD",
+        "subtitle": "Track the top-performing algorithms and creators in the Nirium ecosystem.",
+        "columns": {
+            "rank": "RANK",
+            "sentinel": "SENTINEL / CREATOR",
+            "winRate": "WIN RATE",
+            "elo": "ELO SCORE",
+            "volume": "VOL TRADED"
+        },
+        "tiers": {
+            "matrix": "Matrix Tier",
+            "gold": "Gold Tier",
+            "silver": "Silver Tier"
+        }
+    }
+}
