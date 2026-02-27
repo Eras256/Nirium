@@ -25,7 +25,7 @@ interface MarketplaceSkill {
     category: string;
     tags: string[];
     downloads: number;
-    rating: number;
+    elo: number;
     reviewCount: number;
     isVerified: boolean;
     isFeatured: boolean;
@@ -65,7 +65,7 @@ export default function MarketplacePage() {
     const [loading, setLoading] = useState(true);
     const [searchQuery, setSearchQuery] = useState("");
     const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
-    const [sortBy, setSortBy] = useState<"downloads" | "rating" | "newest">("downloads");
+    const [sortBy, setSortBy] = useState<"downloads" | "elo" | "newest">|sortBy, setSortBy] = useState<"downloads" | "elo" | "newest">|sortBy, setSortBy] = useState<"downloads" | "elo" | "newest">("downloads");
     const [installedSkills, setInstalledSkills] = useState<{ [key: string]: boolean }>({});
     const [stats, setStats] = useState({ totalSkills: 0, totalDownloads: 0 });
     const [selectedSkillToInstall, setSelectedSkillToInstall] = useState<MarketplaceSkill | null>(null);
@@ -90,8 +90,7 @@ export default function MarketplacePage() {
                         category: 'trading',
                         tags: ['flash-loan', 'stellar', 'atomic'],
                         downloads: 12453,
-                        rating: 4.8,
-                        reviewCount: 234,
+                        elo: 1920,
                         isVerified: true,
                         isFeatured: true
                     },
@@ -105,8 +104,7 @@ export default function MarketplacePage() {
                         category: 'data',
                         tags: ['oracle', 'price', 'data'],
                         downloads: 8932,
-                        rating: 4.6,
-                        reviewCount: 156,
+                        elo: 1839,
                         isVerified: true,
                         isFeatured: true
                     },
@@ -120,8 +118,7 @@ export default function MarketplacePage() {
                         category: 'notification',
                         tags: ['telegram', 'alerts', 'bot'],
                         downloads: 15678,
-                        rating: 4.9,
-                        reviewCount: 412,
+                        elo: 1960,
                         isVerified: true,
                         isFeatured: true
                     },
@@ -135,8 +132,7 @@ export default function MarketplacePage() {
                         category: 'analysis',
                         tags: ['whale', 'tracking', 'analysis'],
                         downloads: 6234,
-                        rating: 4.5,
-                        reviewCount: 89,
+                        elo: 1800,
 
                         isVerified: true,
                         isFeatured: false,
@@ -154,8 +150,7 @@ export default function MarketplacePage() {
                         category: 'trading',
                         tags: ['lst', 'arbitrage', 'automation'],
                         downloads: 4521,
-                        rating: 4.4,
-                        reviewCount: 67,
+                        elo: 1760,
                         isVerified: true,
                         isFeatured: false
                     },
@@ -169,8 +164,7 @@ export default function MarketplacePage() {
                         category: 'trading',
                         tags: ['blend', 'lending', 'yield'],
                         downloads: 7845,
-                        rating: 4.7,
-                        reviewCount: 134,
+                        elo: 1880,
                         isVerified: true,
                         isFeatured: false
                     },
@@ -184,8 +178,7 @@ export default function MarketplacePage() {
                         category: 'integration',
                         tags: ['discord', 'bot', 'integration'],
                         downloads: 9123,
-                        rating: 4.6,
-                        reviewCount: 178,
+                        elo: 1839,
                         isVerified: true,
                         isFeatured: false
                     },
@@ -199,8 +192,7 @@ export default function MarketplacePage() {
                         category: 'analysis',
                         tags: ['portfolio', 'tracking', 'analytics'],
                         downloads: 5678,
-                        rating: 4.3,
-                        reviewCount: 92,
+                        elo: 1720,
                         isVerified: false,
                         isFeatured: false
                     },
@@ -214,8 +206,7 @@ export default function MarketplacePage() {
                         category: 'data',
                         tags: ['pyth', 'oracle', 'price'],
                         downloads: 9876,
-                        rating: 4.9,
-                        reviewCount: 234,
+                        elo: 1960,
                         isVerified: true,
                         isFeatured: true
                     },
@@ -229,8 +220,7 @@ export default function MarketplacePage() {
                         category: 'analysis',
                         tags: ['twitter', 'sentiment', 'ai'],
                         downloads: 8765,
-                        rating: 4.6,
-                        reviewCount: 145,
+                        elo: 1839,
                         isVerified: true,
                         isFeatured: true
                     },
@@ -244,8 +234,7 @@ export default function MarketplacePage() {
                         category: 'trading',
                         tags: ['soroswap', 'lp', 'liquidity'],
                         downloads: 6789,
-                        rating: 4.5,
-                        reviewCount: 112,
+                        elo: 1800,
                         isVerified: true,
                         isFeatured: false
                     },
@@ -259,8 +248,7 @@ export default function MarketplacePage() {
                         category: 'utility',
                         tags: ['gas', 'optimization', 'cost'],
                         downloads: 3421,
-                        rating: 4.2,
-                        reviewCount: 45,
+                        elo: 1680,
                         isVerified: false,
                         isFeatured: false
                     },
@@ -274,8 +262,7 @@ export default function MarketplacePage() {
                         category: 'trading',
                         tags: ['phoenix', 'lending', 'health-factor'],
                         downloads: 5230,
-                        rating: 4.6,
-                        reviewCount: 98,
+                        elo: 1839,
                         isVerified: true,
                         isFeatured: true
                     },
@@ -289,8 +276,7 @@ export default function MarketplacePage() {
                         category: 'trading',
                         tags: ['sdex', 'market-making', 'limit-orders'],
                         downloads: 3870,
-                        rating: 4.4,
-                        reviewCount: 61,
+                        elo: 1760,
                         isVerified: true,
                         isFeatured: false
                     },
@@ -304,8 +290,7 @@ export default function MarketplacePage() {
                         category: 'utility',
                         tags: ['stop-loss', 'risk', 'protection', 'sdex'],
                         downloads: 11230,
-                        rating: 4.8,
-                        reviewCount: 203,
+                        elo: 1920,
                         isVerified: true,
                         isFeatured: true
                     },
@@ -319,8 +304,7 @@ export default function MarketplacePage() {
                         category: 'analysis',
                         tags: ['eliza', 'ai', 'decision-engine'],
                         downloads: 7654,
-                        rating: 4.7,
-                        reviewCount: 127,
+                        elo: 1880,
                         isVerified: true,
                         isFeatured: true
                     },
@@ -334,8 +318,7 @@ export default function MarketplacePage() {
                         category: 'utility',
                         tags: ['ipfs', 'storage', 'logs', 'audit'],
                         downloads: 2980,
-                        rating: 4.3,
-                        reviewCount: 44,
+                        elo: 1720,
                         isVerified: true,
                         isFeatured: false
                     },
@@ -349,8 +332,7 @@ export default function MarketplacePage() {
                         category: 'trading',
                         tags: ['dex', 'aggregator', 'swap', 'routing'],
                         downloads: 14320,
-                        rating: 4.9,
-                        reviewCount: 298,
+                        elo: 1960,
                         isVerified: true,
                         isFeatured: true
                     },
@@ -364,8 +346,7 @@ export default function MarketplacePage() {
                         category: 'analysis',
                         tags: ['pnl', 'reporting', 'analytics'],
                         downloads: 4560,
-                        rating: 4.5,
-                        reviewCount: 78,
+                        elo: 1800,
                         isVerified: true,
                         isFeatured: false
                     },
@@ -379,8 +360,7 @@ export default function MarketplacePage() {
                         category: 'integration',
                         tags: ['webhook', 'trigger', 'external', 'automation'],
                         downloads: 6780,
-                        rating: 4.6,
-                        reviewCount: 115,
+                        elo: 1839,
                         isVerified: true,
                         isFeatured: false
                     },
@@ -394,8 +374,7 @@ export default function MarketplacePage() {
                         category: 'utility',
                         tags: ['archive', 'logs', 'audit', 'decentralized', 'forensic'],
                         downloads: 3100,
-                        rating: 4.7,
-                        reviewCount: 52,
+                        elo: 1880,
                         isVerified: true,
                         isFeatured: true
                     },
@@ -409,8 +388,7 @@ export default function MarketplacePage() {
                         category: 'trading',
                         tags: ['usdc', 'vault', 'multi-asset', 'phoenix', 'blend'],
                         downloads: 4200,
-                        rating: 4.6,
-                        reviewCount: 71,
+                        elo: 1839,
                         isVerified: true,
                         isFeatured: false
                     }
@@ -485,7 +463,7 @@ export default function MarketplacePage() {
         .sort((a, b) => {
             switch (sortBy) {
                 case "downloads": return b.downloads - a.downloads;
-                case "rating": return b.rating - a.rating;
+                case "elo": return b.elo - a.elo;
                 case "newest": return 0; // In production, compare dates
                 default: return 0;
             }
@@ -720,7 +698,7 @@ export default function MarketplacePage() {
                                             </span>
                                             <span className="flex items-center gap-1">
                                                 <Star className="w-4 h-4 text-yellow-400 fill-yellow-400" />
-                                                {skill.rating}
+                                                {skill.elo} ELO
                                             </span>
                                         </div>
 
@@ -819,7 +797,7 @@ export default function MarketplacePage() {
                             className="bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:ring-2 focus:ring-stellar-teal/50"
                         >
                             <option value="downloads">Most Downloads</option>
-                            <option value="rating">Highest Rated</option>
+                            <option value="elo">Highest ELO</option>
                             <option value="newest">Newest</option>
                         </select>
                     </div>
@@ -900,7 +878,7 @@ export default function MarketplacePage() {
                                                 </span>
                                                 <span className="flex items-center gap-1">
                                                     <Star className="w-4 h-4 text-yellow-400 fill-yellow-400" />
-                                                    {skill.rating} ({skill.reviewCount})
+                                                {skill.elo} ELO ({skill.reviewCount})
                                                 </span>
                                             </div>
 

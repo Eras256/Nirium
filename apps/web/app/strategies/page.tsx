@@ -17,7 +17,8 @@ const BASE_STRATEGIES = [
         risk: "Low",
         tags: ["Stable", "Blue Chip"],
         color: "from-blue-500 to-cyan-500",
-        baseApy: 14.2
+        baseApy: 14.2,
+        elo: 2127
     },
     {
         id: "turbo-sniper",
@@ -26,7 +27,8 @@ const BASE_STRATEGIES = [
         risk: "High",
         tags: ["Degen", "High Yield"],
         color: "from-purple-500 to-pink-500",
-        baseApy: 420.69
+        baseApy: 420.69,
+        elo: 1541
     },
     {
         id: "liquid-staking-arb",
@@ -35,7 +37,8 @@ const BASE_STRATEGIES = [
         risk: "Very Low",
         tags: ["Safe", "Institutional"],
         color: "from-green-500 to-emerald-500",
-        baseApy: 8.5
+        baseApy: 8.5,
+        elo: 1454
     },
     {
         id: "eliza-sentiment",
@@ -44,7 +47,8 @@ const BASE_STRATEGIES = [
         risk: "Medium",
         tags: ["AI Agent", "Social"],
         color: "from-orange-500 to-red-500",
-        baseApy: 45.2
+        baseApy: 45.2,
+        elo: 1609
     },
     {
         id: "lending-loop-max",
@@ -53,7 +57,8 @@ const BASE_STRATEGIES = [
         risk: "Medium",
         tags: ["Leverage", "Lending"],
         color: "from-indigo-500 to-blue-600",
-        baseApy: 22.4
+        baseApy: 22.4,
+        elo: 2037
     },
     {
         id: "blue-chip-dca",
@@ -62,7 +67,8 @@ const BASE_STRATEGIES = [
         risk: "Low",
         tags: ["Savings", "Long Term"],
         color: "from-gray-700 to-gray-500",
-        baseApy: 12.1
+        baseApy: 12.1,
+        elo: 2104
     },
     {
         id: "stable-yield-agg",
@@ -71,7 +77,8 @@ const BASE_STRATEGIES = [
         risk: "Very Low",
         tags: ["Stablecoin", "Savings"],
         color: "from-teal-500 to-cyan-600",
-        baseApy: 18.5
+        baseApy: 18.5,
+        elo: 1427
     },
     {
         id: "soroswap-amm-active",
@@ -80,7 +87,8 @@ const BASE_STRATEGIES = [
         risk: "High",
         tags: ["Liquidity", "High Yield"],
         color: "from-pink-500 to-rose-500",
-        baseApy: 65.4
+        baseApy: 65.4,
+        elo: 1660
     },
     {
         id: "phoenix-delta-neutral",
@@ -89,7 +97,8 @@ const BASE_STRATEGIES = [
         risk: "Low",
         tags: ["Hedging", "Complex"],
         color: "from-slate-800 to-blue-900",
-        baseApy: 28.3
+        baseApy: 28.3,
+        elo: 2167
     },
     {
         id: "mev-capture",
@@ -98,7 +107,8 @@ const BASE_STRATEGIES = [
         risk: "High",
         tags: ["MEV", "Degen"],
         color: "from-orange-600 to-red-700",
-        baseApy: 112.5
+        baseApy: 112.5,
+        elo: 1892
     },
     {
         id: "perp-funding-arb",
@@ -107,7 +117,8 @@ const BASE_STRATEGIES = [
         risk: "Low",
         tags: ["Derivatives", "Safe"],
         color: "from-violet-700 to-indigo-800",
-        baseApy: 32.8
+        baseApy: 32.8,
+        elo: 1987
     },
     {
         id: "pyth-oracle-sniper",
@@ -116,7 +127,8 @@ const BASE_STRATEGIES = [
         risk: "Medium",
         tags: ["Oracle", "Technical"],
         color: "from-emerald-600 to-teal-700",
-        baseApy: 58.1
+        baseApy: 58.1,
+        elo: 1469
     },
     {
         id: "dual-yield-compounder",
@@ -125,7 +137,8 @@ const BASE_STRATEGIES = [
         risk: "Very Low",
         tags: ["Savings", "Staking"],
         color: "from-cyan-600 to-blue-700",
-        baseApy: 19.3
+        baseApy: 19.3,
+        elo: 1897
     },
     {
         id: "liquidation-hunter",
@@ -134,7 +147,8 @@ const BASE_STRATEGIES = [
         risk: "High",
         tags: ["Liquidation", "High Yield"],
         color: "from-red-700 to-rose-800",
-        baseApy: 87.4
+        baseApy: 87.4,
+        elo: 1573
     },
     {
         id: "cross-chain-bridge-arb",
@@ -143,7 +157,8 @@ const BASE_STRATEGIES = [
         risk: "Medium",
         tags: ["Bridge", "Arbitrage"],
         color: "from-fuchsia-600 to-purple-700",
-        baseApy: 41.7
+        baseApy: 41.7,
+        elo: 1584
     },
 ];
 
@@ -347,6 +362,21 @@ export default function StrategiesPage() {
                                     <div className="text-[10px] text-gray-500 uppercase tracking-widest mb-1">Alpha Coefficient</div>
                                     <div className="text-xl font-mono text-stellar-teal animate-pulse-slow">{strat.apy}</div>
                                 </div>
+                            {/* ELO & MATRIX FEE SUMMARY */}
+                            <div className="bg-[#111] border border-white/5 rounded-lg p-3 mb-6">
+                                <div className="flex justify-between items-center mb-1">
+                                    <span className="text-[10px] text-gray-400 font-bold uppercase tracking-wider">CREATOR ELO</span>
+                                    <span className={`text-xs font-bold px-2 py-0.5 rounded ${strat.elo >= 2000 ? "bg-purple-500/20 text-purple-400" : strat.elo >= 1800 ? "bg-yellow-500/20 text-yellow-500" : "bg-slate-500/20 text-slate-400"}`}>
+                                        {strat.elo >= 2000 ? "Matrix Tier" : strat.elo >= 1800 ? "Gold Tier" : "Silver Tier"}
+                                    </span>
+                                </div>
+                                <div className="text-sm font-mono text-white mb-2">{strat.elo}</div>
+                                
+                                <div className="flex justify-between items-center pt-2 border-t border-white/5">
+                                    <span className="text-[10px] text-gray-500 uppercase tracking-widest">PROTOCOL FEE</span>
+                                    <span className="text-xs text-stellar-teal font-mono">1% ON PROFITS</span>
+                                </div>
+                            </div>
                                 <div className="bg-[#111] border border-white/5 rounded-lg p-3">
                                     <div className="text-[10px] text-gray-500 uppercase tracking-widest mb-1">Liquidity Depth</div>
                                     <div className="text-xl font-mono text-white">{strat.tvl}</div>
