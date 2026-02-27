@@ -15,6 +15,7 @@ import { ExternalLink, Shield, X, AlertTriangle, Trash2, Info, ChevronRight, Ref
 import OpsConsole from "@/components/layout/OpsConsole";
 import { writeLog } from "@/lib/logger";
 import { stellarClient } from "@/lib/stellarClient";
+import { useVault, useEloReputation } from "@/hooks/useNiriumContracts";
 import { getWebSocketUrl } from "@/lib/constants";
 
 // WebSocket hook removed as it was unused and redundant
@@ -111,6 +112,32 @@ function DashboardContent() {
     const [blendData, setBlendData] = useState<{ supplyApy: number, borrowApy: number } | null>(null);
     const [phoenixData, setPhoenixData] = useState<{ supplyApy: number, borrowApy: number } | null>(null);
     const [walletBalance, setWalletBalance] = useState<number>(0);
+    const [onChainVaultCount, setOnChainVaultCount] = useState<number | null>(null);
+    const [onChainTotalFees, setOnChainTotalFees] = useState<number | null>(null);
+    const [onChainElo, setOnChainElo] = useState<number | null>(null);
+    const vault = useVault();
+    const elo = useEloReputation();
+
+    // Fetch live on-chain data from Soroban RPC
+    useEffect(() => {
+        const fetchOnChainData = async () => {
+            try {
+                const [count, fees] = await Promise.all([
+                    vault.getVaultCount(),
+                    vault.getTotalFees(),
+                ]);
+                setOnChainVaultCount(count);
+                setOnChainTotalFees(fees);
+                if (accountStr) {
+                    const score = await elo.getScore(accountStr);
+                    setOnChainElo(score);
+                }
+            } catch (e) {
+                console.warn('[Dashboard] On-chain data fetch failed:', e);
+            }
+        };
+        fetchOnChainData();
+    }, [accountStr]);
     const [vaultBalance, setVaultBalance] = useState<number>(0);
     const [vaultId, setVaultId] = useState<string | null>(null);
     const [ownerCapId, setOwnerCapId] = useState<string | null>(null);
