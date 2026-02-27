@@ -92,8 +92,20 @@ Write a Soroban contract in `#![no_std]` implementing:
 - **Dashboard (`app/dashboard/page.tsx`):** Vault Panel, Execution Logs, Active Strategies. Must display Matrix Fee (1%) on all executing strategies.
 - **Marketplace (`app/marketplace/page.tsx`):** Display plugins AND User-Published Strategies. Filter and sort by **Creator ELO** and APY.
 - **Strategies Builder (`app/strategies/builder/page.tsx`):** UI Drag-and-drop ReactFlow. Include a button to **"Publish Strategy to Marketplace"** to earn Reputation (ELO). Categories: STELLAR ATOMIC ENGINE (Path Payment, Flash Loan, SDEX Offer), SIGNAL DETECTION, AI INTELLIGENCE, DeFi PROTOCOLS, SECURITY.
+- **Global Leaderboard (`app/leaderboard/page.tsx`):** The competitive heart of the ELO system. A raw ranking of "Top Sentinels" (Users and Agents) showing Win Rate %, ELO Score, and Total Traded Volume.
+- **Legal & Compliance (`app/terms/page.tsx` & `app/risk-disclosure/page.tsx`):** Crucial institutional-grade shields. Users must accept that the open-source software is used at their own risk with no financial guarantees.
 
-### 5.3 Supabase Database Schema 
+### 5.3 Global i18n Context
+- **Multi-language Support:** Implement a `LanguageContext.tsx` with JSON dictionaries (`en.json`, `es.json`, `zh.json`) so the entire application (including the Leaderboard and Navbar) switches between English, Spanish, and Chinese dynamically.
+
+---
+
+## 6. COMPONENT 4: IPFS BLACKBOX (DECENTRALIZED LOGS)
+### 6.1 Pinata / IPFS Integration
+- Instead of relying solely on centralized databases for agent decisions, the Node.js backend MUST integrate with Pinata/IPFS.
+- Every 5 minutes, the AI's execution history, trades, and logic branches (The "Blackbox") must be uploaded to IPFS. The resulting CID (Hash) is returned and displayed on the Frontend Dashboard for immutable auditing.
+
+### 6.2 Supabase Database Schema 
 Include tables for ELO and published marketplace strategies:
 ```sql
 CREATE TABLE strategies (
