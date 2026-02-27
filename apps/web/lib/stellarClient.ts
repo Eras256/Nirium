@@ -1,6 +1,6 @@
 /**
  * Nirium — Stellar Transaction & Data Client (Mock)
- * This replaces the legacy SuiClient during the migration phase.
+ * This acts as the standard client during development and testing.
  */
 export const stellarClient = {
     // Stellar uses 7 decimals for most assets, 9 for stroops/native
@@ -38,11 +38,7 @@ export const stellarClient = {
         successful: true
     }),
 
-    // Legacy compatibility for dashboard (mapping to submitTransaction)
-    executeTransactionBlock: async (...args: any[]) => ({
-        digest: 'stellar_' + Math.random().toString(36).substring(7),
-        status: { status: 'success' }
-    }),
+
 
     waitForTransaction: async (...args: any[]) => ({
         status: 'success',
