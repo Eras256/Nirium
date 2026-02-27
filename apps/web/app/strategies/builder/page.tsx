@@ -31,6 +31,8 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { useFreighter } from "@/hooks/useFreighter";
 import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
+import { useMarketplace } from '@/hooks/useNiriumContracts';
+
 
 import CustomNode from './CustomNode';
 
@@ -137,6 +139,7 @@ function StrategyBuilderInner() {
 
     const { address: accountStr, isConnected } = useFreighter();
     const account = isConnected ? { address: accountStr, chains: ['stellar:testnet'] } : null;
+    const marketplace = useMarketplace();
     const router = useRouter();
 
     useEffect(() => { setMounted(true); }, []);
@@ -272,6 +275,40 @@ function StrategyBuilderInner() {
         URL.revokeObjectURL(url);
         document.body.removeChild(a);
         toast.success('Schema exported as .json');
+    };
+
+    const handlePublishOnChain = async () => {
+        if (!account?.address) {
+            toast.error("Connect Wallet to Authorize Protocol Registration");
+            return;
+        }
+
+        const toastId = toast.loading("Publishing Strategy to Soroban Registry...");
+        try {
+            // In a real app we'd upload schema to IPFS first. 
+            // Here we use a dummy CID for the demo.
+            const dummyCid = `QmNirium${Math.random().toString(36).substring(7)}`;
+            const subscriptionFee = BigInt(10000000); // 1.0 USDC (7 decimals assume)
+
+            const result = await marketplace.publishStrategy(
+                account.address,
+                strategyName,
+                dummyCid,
+                subscriptionFee
+            );
+
+            if (result.success) {
+                toast.success("Strategy Published On-Chain!", {
+                    description: `Registry ID updated. Tx: ${result.txHash?.slice(0, 10)}...`
+                });
+            } else {
+                toast.error(`Publication Failed: ${result.error}`);
+            }
+        } catch (e: any) {
+            toast.error(`Soroban Error: ${e.message}`);
+        } finally {
+            toast.dismiss(toastId);
+        }
     };
 
     const handleSave = async (deploy = false) => {
@@ -607,6 +644,15 @@ function StrategyBuilderInner() {
                             <span className="hidden sm:inline">COMPILE KERNEL</span>
                             <span className="sm:hidden">RUN</span>
                         </button>
+                        {isConnected && (
+                            <button
+                                onClick={handlePublishOnChain}
+                                className="bg-stellar-yellow px-4 md:px-6 py-2.5 rounded-xl font-mono text-[11px] font-black tracking-widest text-black hover:bg-yellow-400 shadow-[0_0_20px_rgba(255,190,0,0.3)] transition-all flex items-center gap-2"
+                            >
+                                <Share2 size={14} />
+                                <span className="hidden sm:inline">PUBLISH TO REGISTRY</span>
+                            </button>
+                        )}
                     </Panel>
 
                     {/* Bottom-right: history + export */}

@@ -13,6 +13,8 @@ import { toast } from "sonner";
 import { writeLog } from "@/lib/logger";
 import { useFreighter } from "@/hooks/useFreighter";
 import InstallSkillModal from "@/components/marketplace/InstallSkillModal";
+import { useMarketplace } from "@/hooks/useNiriumContracts";
+
 
 // Types
 interface MarketplaceSkill {
@@ -70,6 +72,21 @@ export default function MarketplacePage() {
     const [stats, setStats] = useState({ totalSkills: 0, totalDownloads: 0 });
     const [selectedSkillToInstall, setSelectedSkillToInstall] = useState<MarketplaceSkill | null>(null);
     const [selectedSkillToExecute, setSelectedSkillToExecute] = useState<MarketplaceSkill | null>(null);
+    const marketplace = useMarketplace();
+    const [onChainStrategyCount, setOnChainStrategyCount] = useState<number | null>(null);
+
+    // Fetch on-chain marketplace stats
+    useEffect(() => {
+        const fetchOnChainStats = async () => {
+            try {
+                const count = await marketplace.getStrategyCount();
+                setOnChainStrategyCount(count);
+            } catch (e) {
+                console.warn('[Marketplace] On-chain fetch failed:', e);
+            }
+        };
+        fetchOnChainStats();
+    }, []);
 
     // Fetch marketplace data
     useEffect(() => {
@@ -616,7 +633,13 @@ export default function MarketplacePage() {
                         <div className="flex justify-center gap-8 mt-8">
                             <div className="text-center">
                                 <div className="text-4xl font-black font-mono text-stellar-teal animate-pulse-slow">{stats.totalSkills}</div>
-                                <div className="text-[10px] text-gray-500 uppercase tracking-widest font-bold mt-1">Skills</div>
+                                <div className="text-[10px] text-gray-500 uppercase tracking-widest font-bold mt-1">Local Skills</div>
+                            </div>
+                            <div className="text-center">
+                                <div className="text-4xl font-black font-mono text-stellar-teal animate-pulse-slow">
+                                    {onChainStrategyCount !== null ? onChainStrategyCount : "..."}
+                                </div>
+                                <div className="text-[10px] text-stellar-yellow uppercase tracking-widest font-bold mt-1">On-Chain Registry</div>
                             </div>
                             <div className="text-center">
                                 <div className="text-4xl font-black font-mono text-stellar-teal animate-pulse-slow">

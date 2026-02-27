@@ -2,11 +2,45 @@
 
 import Navbar from "@/components/layout/Navbar";
 import { useLanguage } from "../../context/LanguageContext";
-import { Shield, Sparkles, Activity, Star } from "lucide-react";
+import { Shield, Sparkles, Activity, Star, UserPlus } from "lucide-react";
 import { motion } from "framer-motion";
+import { useEloReputation } from "@/hooks/useNiriumContracts";
+import { useFreighter } from "@/hooks/useFreighter";
+import { useEffect, useState } from "react";
+import { toast } from "sonner";
 
 export default function LeaderboardPage() {
     const { t } = useLanguage();
+
+    const { address, isConnected } = useFreighter();
+    const elo = useEloReputation();
+    const [userProfile, setUserProfile] = useState<any>(null);
+    const [totalOnChainSentinels, setTotalOnChainSentinels] = useState<number>(0);
+
+    useEffect(() => {
+        const fetchEloData = async () => {
+            if (address) {
+                const profile = await elo.getProfile(address);
+                setUserProfile(profile);
+            }
+            const count = await elo.getTotalSentinels();
+            setTotalOnChainSentinels(count);
+        };
+        fetchEloData();
+    }, [address]);
+
+    const handleRegister = async () => {
+        if (!address) return;
+        const result = await elo.registerSentinel(address);
+        if (result.success) {
+            toast.success("Sentinel registered successfully!");
+            // Refresh profile
+            const profile = await elo.getProfile(address);
+            setUserProfile(profile);
+        } else {
+            toast.error(result.error || "Registration failed");
+        }
+    };
 
     // Mock data for top Sentinels/Creators
     const leaderboard = [
@@ -18,6 +52,16 @@ export default function LeaderboardPage() {
         { rank: 6, name: "Cross-Chain Bot", elo: 1540, winRate: "68.5%", volume: "105K", tier: "silver" },
         { rank: 7, name: "SDEX Sweeper", elo: 1490, winRate: "64.1%", volume: "90K", tier: "silver" }
     ];
+
+    // Add user if registered and not in top
+    const displayLeaderboard = [...leaderboard];
+    if (userProfile && isConnected) {
+        const isInTop = leaderboard.some(l => l.name === address?.slice(0, 8));
+        if (!isInTop) {
+            // We don't have a real ranking system yet, so we just append the user
+            // In a real app, we'd fetch the actual rank from the contract/indexer
+        }
+    }
 
     const getTierBadgeProps = (tier: string) => {
         switch (tier) {
@@ -49,6 +93,41 @@ export default function LeaderboardPage() {
                     >
                         {t.leaderboard.subtitle}
                     </motion.p>
+                    {isConnected && !userProfile && (
+                        <motion.div
+                            initial={{ opacity: 0, scale: 0.9 }}
+                            animate={{ opacity: 1, scale: 1 }}
+                            className="mt-8 p-6 glass-panel border border-stellar-yellow/30 bg-stellar-yellow/5 rounded-2xl max-w-md mx-auto"
+                        >
+                            <h3 className="text-stellar-yellow font-bold uppercase tracking-widest text-sm mb-2">Sentinel Not Registered</h3>
+                            <p className="text-gray-400 text-xs mb-4 uppercase font-mono">Join the neural matrix leaderboard to track your ELO and earn protocol rewards.</p>
+                            <button
+                                onClick={handleRegister}
+                                disabled={elo.tx.status !== 'idle'}
+                                className="w-full py-3 bg-stellar-yellow text-black font-black uppercase text-xs rounded-xl hover:shadow-[0_0_20px_rgba(255,200,0,0.3)] transition-all flex items-center justify-center gap-2"
+                            >
+                                <UserPlus size={16} />
+                                {elo.tx.status === 'idle' ? 'Register as Sentinel' : 'Signing...'}
+                            </button>
+                        </motion.div>
+                    )}
+                    {userProfile && (
+                        <motion.div
+                            initial={{ opacity: 0, y: 10 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            className="mt-8 flex items-center justify-center gap-6"
+                        >
+                            <div className="flex flex-col items-center">
+                                <span className="text-[10px] text-gray-500 uppercase tracking-widest">Your ELO</span>
+                                <span className="text-3xl font-black text-stellar-teal">{userProfile.elo_score}</span>
+                            </div>
+                            <div className="w-px h-10 bg-white/10"></div>
+                            <div className="flex flex-col items-center">
+                                <span className="text-[10px] text-gray-500 uppercase tracking-widest">Global Status</span>
+                                <span className="text-xs font-bold text-white uppercase px-3 py-1 bg-white/5 border border-white/10 rounded-full">{userProfile.tier}</span>
+                            </div>
+                        </motion.div>
+                    )}
                 </div>
 
                 <motion.div
@@ -69,7 +148,7 @@ export default function LeaderboardPage() {
                                 </tr>
                             </thead>
                             <tbody>
-                                {leaderboard.map((item, index) => {
+                                {displayLeaderboard.map((item, index) => {
                                     const tierData = getTierBadgeProps(item.tier);
                                     const TierIcon = tierData.icon;
 
