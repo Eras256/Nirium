@@ -10,10 +10,10 @@
         "agents": "Agentes",
         "analytics": "Analítica",
         "docs": "Docs",
-        "auth_matrix": "Autenticar Matriz",
+        "auth_matrix": "Conectar Wallet",
         "disconnect": "Desconectar",
         "stellar_connected": "Stellar Conectado",
-        "login_matrix": "Iniciar en la Matriz",
+        "login_matrix": "Conectar Wallet",
         "disconnect_matrix": "Desconectar Matriz",
         "status": "Estado"
     },

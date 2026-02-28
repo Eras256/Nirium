@@ -10,10 +10,10 @@
         "agents": "代理",
         "analytics": "分析",
         "docs": "文档",
-        "auth_matrix": "矩阵认证",
+        "auth_matrix": "连接 钱包",
         "disconnect": "断开连接",
         "stellar_connected": "Stellar 已连接",
-        "login_matrix": "登录矩阵",
+        "login_matrix": "连接钱包",
         "disconnect_matrix": "断开矩阵连接",
         "status": "状态"
     },
