@@ -650,7 +650,7 @@ pnpm --filter @nirium/agent dev "Loop 10 USDC"
 📝 Signing transaction...
 ✅ Transaction Successful: 5X6TDFkYvjvCb2LS...
 🔗 View on StellarExpert: https://stellar.expert/explorer/testnet/tx/...
-⬆  Forensic log archived to IPFS (hash: Qm3x...)`}
+⬆  Forensic log archived to Pinata IPFS (hash: Qm3x...)`}
                 </pre>
             </section>
         </div>
@@ -695,7 +695,7 @@ function BuilderSection() {
                             Either all actions succeed, or the entire transaction fails — protecting your capital with Stellar&apos;s atomic primitives.
                         </p>
                         <ul className="space-y-1 text-sm text-gray-400">
-                            <li className="flex items-center gap-2"><span className="text-stellar-teal">⬆</span> Kernel schema archived to <strong className="text-white">IPFS</strong> after deploy</li>
+                            <li className="flex items-center gap-2"><span className="text-stellar-teal">⬆</span> Kernel schema archived to <strong className="text-white">Pinata IPFS</strong> after deploy</li>
                             <li className="flex items-center gap-2"><span className="text-[#4ca2ff]">💾</span> <strong className="text-white">Export Schema</strong> button downloads the flow as JSON</li>
                             <li className="flex items-center gap-2"><span className="text-stellar-yellow">🪙</span> <strong className="text-white">XLM / USDC</strong> asset selector sets vault type before deploy</li>
                         </ul>
@@ -901,23 +901,25 @@ function ApiSection() {
                             <span className="text-sm font-mono text-gray-400">packages/web/.env.local</span>
                         </div>
                         <pre className="p-4 text-sm font-mono text-gray-300">
-                            {`NEXT_PUBLIC_CONTRACT_ID=C...contract_id
-NEXT_PUBLIC_XLM_NETWORK=testnet
+                            {`NEXT_PUBLIC_STELLAR_NETWORK=testnet
+NEXT_PUBLIC_API_URL=http://localhost:3001
 NEXT_PUBLIC_SUPABASE_URL=your_supabase_url
-NEXT_PUBLIC_SUPABASE_ANON_KEY=your_supabase_anon_key`}
+NEXT_PUBLIC_SUPABASE_ANON_KEY=your_supabase_anon_key
+
+# IPFS Pinata
+PINATA_JWT=your_pinata_jwt_token
+NEXT_PUBLIC_GATEWAY_URL=your_pinata_gateway_url`}
                         </pre>
                     </div>
 
                     <div className="bg-[#0A0A0A] border border-white/10 rounded-xl overflow-hidden">
                         <div className="px-4 py-2 bg-white/5 border-b border-white/10">
-                            <span className="text-sm font-mono text-gray-400">packages/agent/.env</span>
+                            <span className="text-sm font-mono text-gray-400">Next.js API Routes</span>
                         </div>
-                        <pre className="p-4 text-sm font-mono text-gray-300">
-                            {`STELLAR_PRIVATE_KEY=S...private_key
-STELLAR_CONTRACT_ID=C...contract_id
-SUPABASE_URL=your_supabase_url
-SUPABASE_SERVICE_KEY=your_service_role_key`}
-                        </pre>
+                        <ul className="p-4 space-y-2 text-sm text-gray-300">
+                            <li><code className="text-stellar-teal">/api/feed</code> : Server-Sent Events (SSE) telemetry feed for Live Logs</li>
+                            <li><code className="text-stellar-teal">/api/pinata</code> : Secure proxy endpoint to upload JSON Kernel schemas to IPFS without exposing keys</li>
+                        </ul>
                     </div>
                 </div>
             </section>

@@ -694,6 +694,10 @@ function DashboardContent() {
     };
 
     const stopStrategy = (dbId: string) => {
+        if (!account) {
+            toast.error("Please connect your Stellar Wallet first");
+            return;
+        }
         const foundStrategy = activeStrategies.find(s => s.id === dbId || s.strategy_id === dbId);
         if (!foundStrategy) return;
 
@@ -1188,7 +1192,10 @@ function DashboardContent() {
     };
 
     const handleCreateVault = () => {
-        if (!account) return;
+        if (!account) {
+            toast.error("Please connect your Stellar Wallet first");
+            return;
+        }
 
         setConfirmConfig({
             isOpen: true,
@@ -1282,7 +1289,11 @@ function DashboardContent() {
     };
 
     const handleDestroyVault = async () => {
-        if (!account || !vaultId) return;
+        if (!account) {
+            toast.error("Please connect your Stellar Wallet first");
+            return;
+        }
+        if (!vaultId) return;
 
         // Load vault data from localStorage
         const savedData = localStorage.getItem(`nirium-vault-${baseAsset}-${account.address}`);
@@ -1439,40 +1450,7 @@ function DashboardContent() {
         // });
     };
 
-    // --- ACCESS GUARD: Require Wallet Connection ---
-    if (!account) {
-        return (
-            <div className="min-h-screen flex items-center justify-center relative overflow-hidden p-4">
-                {/* Background Elements */}
-                <div className="absolute top-[-20%] right-[-20%] w-[600px] h-[600px] bg-stellar-yellow/10 rounded-full blur-[120px]"></div>
-                <div className="absolute bottom-[-20%] left-[-20%] w-[600px] h-[600px] bg-stellar-teal/5 rounded-full blur-[120px]"></div>
-
-                <div className="text-center space-y-6 z-10 glass-panel p-8 md:p-12 rounded-2xl max-w-md w-full border border-white/10 shadow-2xl relative">
-                    <div className="w-24 h-24 bg-white/5 rounded-full flex items-center justify-center mb-6 relative">
-                        <div className="absolute inset-0 bg-red-500/20 rounded-full animate-ping opacity-20"></div>
-                        <Shield className="text-gray-500" size={48} suppressHydrationWarning aria-hidden="true" />
-                    </div>
-
-                    <div className="space-y-2">
-                        <h2 className="text-3xl font-bold tracking-tighter text-white">SECURE ENCLAVE LOCKED</h2>
-                        <p className="text-gray-400 text-sm font-light leading-relaxed max-w-sm mx-auto">
-                            Encrypted fleet management. Biometric signature required via <strong>zkLogin</strong> or <strong>Stellar Wallet</strong> to decrypt active strategies.
-                        </p>
-                    </div>
-
-                    <div className="flex justify-center pt-6 pb-2">
-                        <button onClick={isConnected ? disconnect : connect} className="bg-stellar-yellow text-black font-bold px-8 py-3 rounded-lg hover:shadow-[0_0_20px_rgba(255,200,0,0.4)] transition-all w-full flex justify-center">{isConnected && accountStr ? `${accountStr.slice(0, 4)}...${accountStr.slice(-4)}` : 'Connect Wallet'}</button>
-                    </div>
-
-                    <div className="pt-6 border-t border-white/5">
-                        <Link href="/" className="text-xs text-gray-500 hover:text-white transition-colors flex items-center justify-center gap-2 group">
-                            <span className="group-hover:-translate-x-1 transition-transform">←</span> Return to Home
-                        </Link>
-                    </div>
-                </div>
-            </div>
-        );
-    }
+    // --- ACCESS GUARD (Removed for guest viewing) ---
 
     return (
         <div className="min-h-screen bg-nirium-obsidian pt-36 pb-12 px-4 md:px-8 relative overflow-hidden">

@@ -357,29 +357,30 @@ export default function StrategiesPage() {
                                 ))}
                             </div>
 
-                            <div className="grid grid-cols-2 gap-4 mb-6">
+                            <div className="grid grid-cols-2 gap-4 mb-4">
                                 <div className="bg-[#111] border border-white/5 rounded-lg p-3 group-hover:border-stellar-teal/20 transition-colors">
                                     <div className="text-[10px] text-gray-500 uppercase tracking-widest mb-1">Alpha Coefficient</div>
                                     <div className="text-xl font-mono text-stellar-teal animate-pulse-slow">{strat.apy}</div>
                                 </div>
+                                <div className="bg-[#111] border border-white/5 rounded-lg p-3 group-hover:border-white/10 transition-colors">
+                                    <div className="text-[10px] text-gray-500 uppercase tracking-widest mb-1">Liquidity Depth</div>
+                                    <div className="text-xl font-mono text-white">{strat.tvl}</div>
+                                </div>
+                            </div>
+
                             {/* ELO & MATRIX FEE SUMMARY */}
-                            <div className="bg-[#111] border border-white/5 rounded-lg p-3 mb-6">
-                                <div className="flex justify-between items-center mb-1">
+                            <div className="bg-[#111] border border-white/5 rounded-lg p-3 mb-6 group-hover:border-white/10 transition-colors relative overflow-hidden">
+                                <div className="flex justify-between items-center mb-1 relative z-10">
                                     <span className="text-[10px] text-gray-400 font-bold uppercase tracking-wider">CREATOR ELO</span>
-                                    <span className={`text-xs font-bold px-2 py-0.5 rounded ${strat.elo >= 2000 ? "bg-purple-500/20 text-purple-400" : strat.elo >= 1800 ? "bg-yellow-500/20 text-yellow-500" : "bg-slate-500/20 text-slate-400"}`}>
+                                    <span className={`text-[10px] font-bold px-2 py-0.5 rounded ${strat.elo >= 2000 ? "bg-purple-500/20 text-purple-400" : strat.elo >= 1800 ? "bg-yellow-500/20 text-yellow-500" : "bg-slate-500/20 text-slate-400"}`}>
                                         {strat.elo >= 2000 ? "Matrix Tier" : strat.elo >= 1800 ? "Gold Tier" : "Silver Tier"}
                                     </span>
                                 </div>
-                                <div className="text-sm font-mono text-white mb-2">{strat.elo}</div>
-                                
-                                <div className="flex justify-between items-center pt-2 border-t border-white/5">
+                                <div className="text-sm font-mono text-white mb-2 relative z-10 font-bold">{strat.elo}</div>
+
+                                <div className="flex justify-between items-center pt-2 border-t border-white/5 relative z-10">
                                     <span className="text-[10px] text-gray-500 uppercase tracking-widest">PROTOCOL FEE</span>
-                                    <span className="text-xs text-stellar-teal font-mono">1% ON PROFITS</span>
-                                </div>
-                            </div>
-                                <div className="bg-[#111] border border-white/5 rounded-lg p-3">
-                                    <div className="text-[10px] text-gray-500 uppercase tracking-widest mb-1">Liquidity Depth</div>
-                                    <div className="text-xl font-mono text-white">{strat.tvl}</div>
+                                    <span className="text-[10px] text-stellar-teal font-mono font-bold">1% ON PROFITS</span>
                                 </div>
                             </div>
 

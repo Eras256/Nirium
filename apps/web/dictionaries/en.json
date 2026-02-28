@@ -68,7 +68,7 @@
         "built_for_stellar": "Built for the Stellar Ecosystem",
         "atomic_capabilities_title": "Atomic",
         "atomic_capabilities_span": "Capabilities",
-        "atomic_capabilities_subtitle": "Four architectural pillars enabling absolute autonomy in the Stellar neural matrix.",
+        "atomic_capabilities_subtitle": "Powerful architecture engineered to empower HUMANS and autonomous AGENTS.",
         "features": {
             "path_arb": {
                 "title": "Atomic Path Arbs",
@@ -90,7 +90,8 @@
         "sdk_title_1": "PROGRAMMABLE",
         "sdk_title_2": "AUTONOMY",
         "sdk_subtitle": "Scaffold a combat-ready agent in seconds using our SDKs. Full parity between TypeScript and Python for institutional quants.",
-        "ignite_the_loop": "IGNITE THE LOOP",
+        "ignite_the_loop_part1": "IGNITE THE",
+        "ignite_the_loop_part2": "LOOP",
         "enter_matrix": "ENTER NEURAL MATRIX",
         "browse_agents": "BROWSE AGENTS"
     },
@@ -117,7 +118,8 @@
         "categories": {
             "atomic_engine": "Atomic Engine",
             "signal_inputs": "Signal Inputs",
-            "ai_intelligence": "AI Intelligence"
+            "ai_intelligence": "AI Intelligence",
+            "trading_swaps": "Trading & Swaps"
         },
         "search_placeholder": "Search neural components...",
         "asset_selector": "Select Base Asset",

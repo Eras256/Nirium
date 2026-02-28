@@ -19,23 +19,30 @@ export default function OpsConsole({ isExpanded, onToggleExpand, walletAddress }
         }
         const db = supabase;
 
-        // Initial fetch of recent logs
+        // Initial fetch of recent logs from the unified protocol records table
         const fetchInitialLogs = async () => {
             try {
                 let query = db
-                    .from('nirium_logs')
+                    .from('nirium_protocol_records')
                     .select('*')
-                    .order('timestamp', { ascending: false })
+                    .eq('record_type', 'LOG')
+                    .order('created_at', { ascending: false })
                     .limit(30);
 
                 if (walletAddress) {
-                    query = query.or(`agentid.eq.${walletAddress},agentid.eq.global,agentid.is.null`);
+                    // Filter for logs relevant to this user or global logs
+                    query = query.or(`tx_hash.eq.${walletAddress},owner_address.eq.UI_CLIENT`);
                 }
 
                 const { data, error } = await query;
 
                 if (data && !error) {
-                    setLogs(data.reverse()); // oldest first
+                    // Map created_at to timestamp for UI compatibility
+                    const mappedData = data.map((d: any) => ({
+                        ...d,
+                        timestamp: d.created_at
+                    }));
+                    setLogs(mappedData.reverse()); // oldest first
                 }
             } catch (e) {
                 console.error("Failed to fetch initial logs", e);
@@ -43,40 +50,45 @@ export default function OpsConsole({ isExpanded, onToggleExpand, walletAddress }
         };
         fetchInitialLogs();
 
-        // Realtime subscription for new logs
-        let filterString = undefined;
-        if (walletAddress) {
-            filterString = `agentid=eq.${walletAddress}`;
-        }
-
+        // Realtime subscription for new logs in the protocol records table
         const channel = db
-            .channel(`realtime-logs-${walletAddress || 'global'}`)
+            .channel(`realtime-ops-console-${walletAddress || 'global'}`)
             .on(
                 'postgres_changes',
-                { event: 'INSERT', schema: 'public', table: 'nirium_logs' },
+                {
+                    event: 'INSERT',
+                    schema: 'public',
+                    table: 'nirium_protocol_records',
+                    filter: 'record_type=eq.LOG'
+                },
                 (payload) => {
-                    // Client-side filtering to support OR logic
                     const newLog = payload.new as any;
+
+                    // Client-side filtering check for relevance
                     const isRelevant = !walletAddress ||
-                        newLog.agentid === walletAddress ||
-                        newLog.agentid === 'global' ||
-                        !newLog.agentid;
+                        newLog.tx_hash === walletAddress ||
+                        newLog.owner_address === 'UI_CLIENT';
 
                     if (!isRelevant) return;
 
+                    // Map created_at to timestamp
+                    const logWithTimestamp = {
+                        ...newLog,
+                        timestamp: newLog.created_at
+                    };
+
                     setLogs(prev => {
-                        // Deduplicate: skip if same id already exists
                         const exists = prev.some(l => l.id === payload.new.id);
                         if (exists) return prev;
-                        return [...prev, payload.new].slice(-50);
+                        return [...prev, logWithTimestamp].slice(-50);
                     });
                 }
             )
             .subscribe((s) => {
                 if (s === 'SUBSCRIBED') {
                     setStatus('online');
-                    // Write a real system log so the console shows activity on connect
-                    writeLog('Nirium Neural Matrix ONLINE — Realtime feed active', 'system', walletAddress);
+                    // Write a system log to indicate connection
+                    writeLog('Neural Matrix Uplink Active — Monitoring Protocol Records', 'system', walletAddress);
                 } else if (s === 'CLOSED' || s === 'CHANNEL_ERROR') {
                     setStatus('unavailable');
                 }

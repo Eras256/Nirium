@@ -90,7 +90,8 @@
         "sdk_title_1": "可编程",
         "sdk_title_2": "自主性",
         "sdk_subtitle": "使用我们的 SDK 在几秒钟内搭建一个具备战斗力的代理。TypeScript 和 Python 完全对等，适用于机构量化人员。",
-        "ignite_the_loop": "启动循环",
+        "ignite_the_loop_part1": "启动",
+        "ignite_the_loop_part2": "循环",
         "enter_matrix": "进入神经矩阵",
         "browse_agents": "浏览代理"
     },
@@ -117,7 +118,8 @@
         "categories": {
             "atomic_engine": "原子引擎",
             "signal_inputs": "信号输入",
-            "ai_intelligence": "AI 智能"
+            "ai_intelligence": "AI 智能",
+            "trading_swaps": "交易与兑换"
         },
         "search_placeholder": "搜索神经组件...",
         "asset_selector": "选择基础资产",

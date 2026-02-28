@@ -38,6 +38,15 @@ const Orb = ({ activity = 0.5 }: { activity?: number }) => {
 };
 
 const NeuralOrb = ({ activity = 0.5 }: { activity?: number }) => {
+    const [latency, setLatency] = React.useState<number>(20.5);
+
+    React.useEffect(() => {
+        setLatency(20 + Math.random() * 5);
+        // Refresh latency subtly to feel alive
+        const int = setInterval(() => setLatency(20 + Math.random() * 5), 2000);
+        return () => clearInterval(int);
+    }, []);
+
     return (
         <div className="w-full h-full min-h-[300px] relative">
             {/* Background glow */}
@@ -57,7 +66,7 @@ const NeuralOrb = ({ activity = 0.5 }: { activity?: number }) => {
             <div className="absolute bottom-4 left-1/2 -translate-x-1/2 text-center pointer-events-none">
                 <div className="text-[10px] font-mono tracking-[0.3em] text-stellar-blue/60 uppercase">Neural Matrix Sync</div>
                 <div className="text-[8px] font-mono text-white/30 mt-1 uppercase">
-                    Latency: {(20 + Math.random() * 5).toFixed(1)}ms | Load: {(activity * 100).toFixed(0)}%
+                    Latency: {latency.toFixed(1)}ms | Load: {(activity * 100).toFixed(0)}%
                 </div>
             </div>
         </div>

@@ -38,8 +38,26 @@ export default function InstallSkillModal({ skill, isOpen, onClose, onInstall, i
                 const raw = localStorage.getItem(localKey);
                 if (raw) {
                     const parsed = JSON.parse(raw);
+
+                    // Filter down to only active agents (exclude DRAFT, STOPPED, INACTIVE, TERMINATED)
+                    const activeOnly = parsed.filter((s: any) => {
+                        const state = (s.status || 'UNKNOWN').toUpperCase();
+                        return !['DRAFT', 'STOPPED', 'TERMINATED', 'INACTIVE'].includes(state);
+                    });
+
+                    // Deduplicate by name to avoid showing the same strategy twice (e.g. from local vs db)
+                    const dedupedMap = new Map();
+                    activeOnly.forEach((item: any) => {
+                        const name = item.name || item.strategy_id || item.id;
+                        if (name && !dedupedMap.has(name)) {
+                            dedupedMap.set(name, item);
+                        }
+                    });
+
+                    const deduped = Array.from(dedupedMap.values());
+
                     // Map local storage format to Agent interface
-                    const agents: Agent[] = parsed.map((s: any) => ({
+                    const agents: Agent[] = deduped.map((s: any) => ({
                         id: s.id,
                         name: s.name,
                         type: s.strategy_id || "Custom Strategy", // fallback type

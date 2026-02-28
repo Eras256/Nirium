@@ -34,28 +34,24 @@ export default function Home() {
         router.push("/dashboard");
     };
 
-    // Simulation of Nirium Neural Feed
+    // Real-time connection to Nirium Neural Feed via SSE
     useEffect(() => {
-        const logs = [
-            "Initializing Nirium Neural Kernel v0.1.0...",
-            "Establishing Stellar Horizon Uplink... [OK]",
-            "Soroban RPC Handshake: COMPLETED",
-            "Market Scanner: DEPLOYED (XLM/USDC Vectors)",
-            "Path Payment Router: OPTIMIZED — 12ms latency",
-            "Multi-Op Transaction Engine: ARMED",
-            "Flash Loan Callback Hook: VALIDATED (Mathematical Safety)",
-            "Scanning live SDEX vs Soroswap spreads...",
-            "Anomaly detected: 0.12% Arb opportunity found.",
-            "Uplink Status: OPERATIONAL — All systems nominal."
-        ];
-        let i = 0;
-        const interval = setInterval(() => {
-            if (i < logs.length) {
-                setAgentLog(prev => [...prev, logs[i]].slice(-8));
-                i++;
-            }
-        }, 1500);
-        return () => clearInterval(interval);
+        const eventSource = new EventSource('/api/feed');
+
+        eventSource.onmessage = (event) => {
+            const newLogs = JSON.parse(event.data);
+            setAgentLog(prev => {
+                const updated = [...prev, ...newLogs];
+                return updated.slice(-8); // Keep last 8 messages
+            });
+        };
+
+        eventSource.onerror = () => {
+            console.error("Neural Feed Uplink lost");
+            eventSource.close();
+        };
+
+        return () => eventSource.close();
     }, []);
 
     return (
@@ -223,11 +219,13 @@ export default function Home() {
                         </div>
                     </div>
 
-                    <div className="grid grid-cols-2 gap-6">
+                    <div className="grid grid-cols-2 md:grid-cols-3 gap-6">
                         <SDKCard name="Nirium CLI" lang="Commander" command="npx nirium create" icon={TerminalIcon} />
                         <SDKCard name="Python SDK" lang="v0.1.0" command="pip install nirium" icon={Shield} />
                         <SDKCard name="Companion App" lang="Tauri v2" command="GitHub Downloads" icon={Download} />
+                        <SDKCard name="Nirium MCP" lang="Claude & Grok" command="npm run start" icon={Bot} />
                         <SDKCard name="Market Docs" lang="API REST" command="GET /api/market" icon={Cpu} />
+                        <SDKCard name="Web Studio" lang="Visual GUI" command="No Code Needed" icon={Layers} />
                     </div>
                 </div>
             </section>
@@ -236,7 +234,7 @@ export default function Home() {
             <section className="py-40 text-center relative">
                 <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_100%,rgba(138,43,226,0.1),transparent_50%)]" />
                 <h2 className="text-4xl sm:text-5xl md:text-8xl font-black mb-12 tracking-tighter">
-                    {t.home.ignite_the_loop.split(' ')[0]} {t.home.ignite_the_loop.split(' ')[1]} <span className="text-stellar-teal font-bold">{t.home.ignite_the_loop.split(' ')[2]}</span>
+                    {t.home.ignite_the_loop_part1} <span className="text-stellar-teal font-bold">{t.home.ignite_the_loop_part2}</span>
                 </h2>
                 <div className="flex flex-col sm:flex-row flex-wrap justify-center gap-4 sm:gap-6 relative z-10 w-full px-4 max-w-2xl mx-auto">
                     <button

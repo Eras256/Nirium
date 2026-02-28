@@ -113,7 +113,7 @@ function StrategyBuilderInner() {
             ]
         },
         {
-            category: 'TRADING & SWAPS',
+            category: t.builder.categories.trading_swaps,
             color: 'from-blue-400 to-cyan-500',
             items: [
                 { type: 'action', label: 'SOROSWAP_SWAP', icon: 'RefreshCw', desc: 'Atomic swap on Soroswap AMM' },
@@ -303,15 +303,52 @@ function StrategyBuilderInner() {
             return;
         }
 
-        const toastId = toast.loading("Publishing Strategy to Soroban Registry...");
+        const toastId = toast.loading("Publishing Strategy to Soroban Registry via IPFS...");
         try {
-            const dummyCid = `QmNirium${Math.random().toString(36).substring(7)}`;
-            const subscriptionFee = BigInt(10000000);
+            if (!reactFlowInstance) {
+                toast.error("No valid flow to publish");
+                return;
+            }
+
+            const flow = reactFlowInstance.toObject();
+            const schema = {
+                version: '0.0.7',
+                exported_at: new Date().toISOString(),
+                kernel_name: strategyName,
+                kernel_id: strategyId || `custom-${Date.now()}`,
+                asset: selectedAsset,
+                node_count: flow.nodes?.length || 0,
+                edge_count: flow.edges?.length || 0,
+                flow,
+            };
+
+            // 1. Upload to Pinata IPFS
+            toast.loading("Uploading Kernel Schema to IPFS...", { id: toastId });
+            const ipfsResponse = await fetch('/api/pinata', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(schema)
+            });
+
+            if (!ipfsResponse.ok) {
+                throw new Error("Failed to upload to IPFS (Pinata)");
+            }
+
+            const { IpfsHash } = await ipfsResponse.json();
+
+            if (!IpfsHash) {
+                throw new Error("Did not receive a valid IPFS Hash from Pinata");
+            }
+
+            toast.loading(`IPFS Uploaded: ${IpfsHash}. Registering on-chain...`, { id: toastId });
+
+            // 2. Publish to Soroban Registry with Real CID 
+            const subscriptionFee = BigInt(10000000); // 1.0 XLM default fee
 
             const result = await marketplace.publishStrategy(
                 account.address,
                 strategyName,
-                dummyCid,
+                IpfsHash, // Use Real CID instead of Dummy!
                 subscriptionFee
             );
 
@@ -532,9 +569,15 @@ function StrategyBuilderInner() {
                         <button
                             onClick={() => handleSave(true)}
                             disabled={isSaving}
-                            className="bg-stellar-teal px-8 py-3.5 rounded-2xl font-mono text-[10px] font-black tracking-[0.2em] text-black hover:scale-105 active:scale-95 shadow-[0_0_30px_rgba(45,235,232,0.4)] transition-all flex items-center gap-3"
+                            className="bg-stellar-teal px-4 md:px-8 py-3.5 rounded-2xl font-mono text-[10px] font-black tracking-[0.2em] text-black hover:scale-105 active:scale-95 shadow-[0_0_30px_rgba(45,235,232,0.4)] transition-all flex items-center gap-2 md:gap-3"
                         >
                             <Play size={16} fill="currentColor" /> COMPILE_KERNEL
+                        </button>
+                        <button
+                            onClick={handlePublishOnChain}
+                            className="bg-purple-500/20 text-purple-400 border border-purple-500/50 px-4 md:px-8 py-3.5 rounded-2xl font-mono text-[10px] font-black tracking-[0.2em] hover:bg-purple-500 hover:text-white shadow-[0_0_30px_rgba(168,85,247,0.2)] hover:shadow-[0_0_40px_rgba(168,85,247,0.6)] transition-all flex items-center gap-2 md:gap-3"
+                        >
+                            <Database size={16} /> PUBLISH_CHAIN
                         </button>
                     </Panel>
 
