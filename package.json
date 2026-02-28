@@ -3,7 +3,7 @@
 	"private": true,
 	"scripts": {
 		"dev": "pnpm --parallel --filter nirium-web --filter @nirium/agent run dev",
-		"build": "pnpm --parallel run build",
+		"build": "pnpm --filter nirium-web --filter @nirium/agent run build",
 		"start": "pnpm --filter nirium-web start"
 	},
 	"dependencies": {
