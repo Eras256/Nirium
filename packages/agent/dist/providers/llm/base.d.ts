@@ -1,26 +1,22 @@
-import { AIDecision, MarketState } from '../../types/database.types.js';
+import { MarketState, AIDecision } from '../../types/database.types.js';
+export interface LLMConfig {
+    apiKey?: string;
+    model?: string;
+    temperature?: number;
+    maxTokens?: number;
+}
 export declare abstract class LLMProvider {
+    protected config: LLMConfig;
     abstract name: string;
     abstract model: string;
+    constructor(config?: LLMConfig);
     /**
-     * Analyze market data and return an AI decision.
+     * Analyze a market state and return a structured decision.
      */
-    abstract analyze(marketSnapshot: MarketState, context: string): Promise<AIDecision>;
+    abstract analyze(market: MarketState, context?: string): Promise<AIDecision>;
     /**
-     * Generate a system prompt for market analysis.
+     * Internal helper to parse structured JSON from LLM responses.
      */
-    protected buildSystemPrompt(): string;
-    /**
-     * Build the user prompt with current market data.
-     */
-    protected buildUserPrompt(market: MarketState, context: string): string;
-    /**
-     * Parse and validate an AI response into a structured decision.
-     */
-    protected parseDecision(raw: string): AIDecision;
-    /**
-     * Return a safe fallback decision when parsing fails.
-     */
-    protected fallbackDecision(reason: string): AIDecision;
+    protected parseDecision(text: string): AIDecision;
 }
 //# sourceMappingURL=base.d.ts.map

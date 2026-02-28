@@ -1,26 +1,14 @@
-import { Webhook, WebhookEventType } from '../types/database.types.js';
-/**
- * Register a new webhook.
- */
-export declare function registerWebhook(userId: string, url: string, events: WebhookEventType[], secret?: string): Webhook;
-/**
- * Get all webhooks for a user.
- */
-export declare function getUserWebhooks(userId: string): Webhook[];
-/**
- * Delete a webhook.
- */
-export declare function deleteWebhook(webhookId: string): boolean;
-/**
- * Dispatch a webhook event to all matching subscribers.
- */
-export declare function dispatchWebhookEvent(event: WebhookEventType, payload: Record<string, unknown>): Promise<void>;
-/**
- * Send a test payload to a specific webhook.
- */
-export declare function testWebhook(webhookId: string): Promise<{
-    success: boolean;
-    statusCode?: number;
-    error?: string;
+export declare function registerWebhook(userId: string, url: string, events: string[], secret?: string): Promise<{
+    id: string;
+    url: string;
+    events: string[];
+    active: boolean;
 }>;
+export declare function getUserWebhooks(userId: string): never[];
+export declare function deleteWebhook(id: string): boolean;
+export declare function testWebhook(id: string): Promise<{
+    success: boolean;
+    message: string;
+}>;
+export declare function dispatchWebhookEvent(event: string, payload: any): Promise<void>;
 //# sourceMappingURL=webhookService.d.ts.map

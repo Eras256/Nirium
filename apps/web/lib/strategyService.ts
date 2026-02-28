@@ -62,11 +62,12 @@ export const StrategyService = {
 
         if (reachable && supabase) {
             try {
-                console.log('[StrategyService] Fetching kernels for:', walletAddress);
+                console.log('[StrategyService] Fetching kernels from unified records for:', walletAddress);
                 const { data, error } = await supabase
-                    .from('nirium_strategies')
+                    .from('nirium_protocol_records')
                     .select('*')
-                    .eq('user_id', walletAddress)
+                    .eq('owner_address', walletAddress)
+                    .eq('record_type', 'STRATEGY')
                     .order('created_at', { ascending: false });
 
                 if (error) {
@@ -74,13 +75,12 @@ export const StrategyService = {
                 } else {
                     const remote = data.map((row: any) => ({
                         id: row.id,
-                        strategy_id: row.name,
-                        name: row.config?.displayName || row.name,
-                        emoji: row.config?.emoji || '🤖',
+                        strategy_id: row.name, // Mapping old field name to new table column usage
+                        name: row.name,
+                        emoji: row.emoji || '🤖',
                         status: row.status,
-                        yield: row.config?.yield || '0%',
-                        asset: (row.config?.asset as 'XLM' | 'USDC') || 'XLM',
-                        tx_digest: row.config?.txDigest,
+                        yield: row.yield_text || '0%',
+                        asset: (row.asset as 'XLM' | 'USDC') || 'XLM',
                         created_at: row.created_at,
                         config: row.config
                     }));
@@ -116,7 +116,7 @@ export const StrategyService = {
         }
         lsSet(walletAddress, local);
 
-        // Attempt Supabase (non-blocking; failures are swallowed)
+        // Attempt Supabase (non-blocking)
         const reachable = await isSupabaseReachable();
         if (!reachable || !supabase) {
             console.warn('[StrategyService] Supabase offline – strategy saved to localStorage only.');
@@ -126,64 +126,55 @@ export const StrategyService = {
         try {
             // Check if a record with the same name already exists for this user
             const { data: existing } = await supabase
-                .from('nirium_strategies')
+                .from('nirium_protocol_records')
                 .select('id')
-                .eq('user_id', walletAddress)
+                .eq('owner_address', walletAddress)
+                .eq('record_type', 'STRATEGY')
                 .eq('name', strategy.strategy_id)
                 .single();
 
+            const payload = {
+                owner_address: walletAddress,
+                record_type: 'STRATEGY',
+                name: strategy.strategy_id,
+                emoji: strategy.emoji || '🤖',
+                asset: strategy.asset || 'XLM',
+                status: strategy.status || 'RUNNING',
+                yield_text: strategy.yield || '0.00%',
+                config: strategy.config || {},
+                updated_at: new Date().toISOString()
+            };
+
             if (existing) {
                 const { data, error } = await (supabase
-                    .from('nirium_strategies') as any)
-                    .update({
-                        status: strategy.status || 'RUNNING',
-                        config: {
-                            displayName: strategy.name,
-                            emoji: strategy.emoji,
-                            yield: strategy.yield,
-                            asset: strategy.asset || 'XLM',
-                            txDigest: strategy.tx_digest,
-                            ...strategy.config
-                        }
-                    } as any)
+                    .from('nirium_protocol_records') as any)
+                    .update(payload)
                     .eq('id', (existing as any).id)
                     .select()
                     .single();
 
                 if (error) {
-                    console.warn('[StrategyService] Supabase update failed (localStorage used):', error.message);
+                    console.warn('[StrategyService] Supabase update failed:', error.message);
                     return entry;
                 }
                 return data;
             }
 
             // Insert new record
-            const { data, error } = await supabase
-                .from('nirium_strategies')
-                .insert({
-                    user_id: walletAddress,
-                    name: strategy.strategy_id,
-                    status: strategy.status || 'RUNNING',
-                    config: {
-                        displayName: strategy.name,
-                        emoji: strategy.emoji,
-                        yield: strategy.yield,
-                        asset: strategy.asset || 'XLM',
-                        txDigest: strategy.tx_digest,
-                        ...strategy.config
-                    }
-                } as any)
+            const { data, error } = await (supabase
+                .from('nirium_protocol_records') as any)
+                .insert(payload)
                 .select()
                 .single();
 
             if (error) {
-                console.warn('[StrategyService] Supabase insert failed (localStorage used):', error.message);
+                console.warn('[StrategyService] Supabase insert failed:', error.message);
                 return entry;
             }
             return data;
 
         } catch (err) {
-            console.warn('[StrategyService] Network error during deployStrategy (localStorage used):', err);
+            console.warn('[StrategyService] Network error during deployStrategy:', err);
             return entry;
         }
     },
@@ -204,7 +195,7 @@ export const StrategyService = {
 
         try {
             const { error } = await supabase
-                .from('nirium_strategies')
+                .from('nirium_protocol_records')
                 .delete()
                 .eq('id', dbId);
 

@@ -1,6 +1,3 @@
 import { Request, Response, NextFunction } from 'express';
-/**
- * Create a rate limiter middleware with the specified tier.
- */
-export declare function createRateLimiter(tier?: 'standard' | 'aggressive' | 'admin'): (req: Request, res: Response, next: NextFunction) => void;
+export declare function createRateLimiter(type: 'standard' | 'aggressive'): (req: Request, res: Response, next: NextFunction) => void | Response<any, Record<string, any>>;
 //# sourceMappingURL=rateLimit.d.ts.map

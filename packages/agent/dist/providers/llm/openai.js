@@ -1,52 +1,34 @@
-// ═══════════════════════════════════════════════════════════════
-// Nirium — OpenAI GPT-4o / o1 Provider
-// ═══════════════════════════════════════════════════════════════
 import { LLMProvider } from './base.js';
+import axios from 'axios';
 export class OpenAIProvider extends LLMProvider {
     name = 'openai';
-    model;
-    apiKey;
-    baseUrl = 'https://api.openai.com/v1';
-    constructor(apiKey, model) {
-        super();
-        this.apiKey = apiKey || process.env.OPENAI_API_KEY || '';
-        this.model = model || 'gpt-4o';
-    }
-    async analyze(marketSnapshot, context) {
-        if (!this.apiKey) {
-            return this.fallbackDecision('OpenAI API key not configured');
-        }
+    model = process.env.OPENAI_MODEL || 'gpt-4o-mini';
+    apiKey = process.env.OPENAI_API_KEY;
+    async analyze(market, context) {
+        if (!this.apiKey)
+            throw new Error('OpenAI API key missing');
+        const prompt = `
+Analyze Stellar market state. Response in JSON format: {"action": "buy"|"sell"|"hold", "confidence": float, "reasoning": "string"}
+
+DATA:
+- XLM: $${market.xlmPrice}
+- SDEX Spread: ${market.sdexSpread}
+- Blend Supply APY: ${market.blendApy.supply}%
+Context: ${context}
+`;
         try {
-            const response = await fetch(`${this.baseUrl}/chat/completions`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    Authorization: `Bearer ${this.apiKey}`,
-                },
-                body: JSON.stringify({
-                    model: this.model,
-                    messages: [
-                        { role: 'system', content: this.buildSystemPrompt() },
-                        { role: 'user', content: this.buildUserPrompt(marketSnapshot, context) },
-                    ],
-                    response_format: { type: 'json_object' },
-                    temperature: 0.3,
-                    max_tokens: 1000,
-                }),
+            const res = await axios.post('https://api.openai.com/v1/chat/completions', {
+                model: this.model,
+                messages: [{ role: 'user', content: prompt }],
+                response_format: { type: 'json_object' }
+            }, {
+                headers: { 'Authorization': `Bearer ${this.apiKey}` }
             });
-            if (!response.ok) {
-                const error = await response.text();
-                return this.fallbackDecision(`OpenAI API error: ${response.status} — ${error}`);
-            }
-            const data = await response.json();
-            const content = data.choices[0]?.message?.content;
-            if (!content) {
-                return this.fallbackDecision('Empty response from OpenAI');
-            }
-            return this.parseDecision(content);
+            return this.parseDecision(res.data.choices[0].message.content);
         }
         catch (error) {
-            return this.fallbackDecision(`OpenAI request failed: ${error}`);
+            console.error('[OpenAI] Error:', error);
+            throw error;
         }
     }
 }

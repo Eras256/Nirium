@@ -24,7 +24,7 @@ import * as skillManager from './services/skillManager.js';
 import { uploadToIpfs, PINATA_GATEWAY } from './services/ipfsService.js';
 import { routeExecution } from './execution/router.js';
 import { fetchMarketState, checkHorizonHealth, checkSorobanHealth, NETWORK } from './providers/stellarProvider.js';
-import { getLLMProvider, getAvailableProviders } from './providers/llm/index.js';
+import { getLLMProvider, getAvailableProviders, resetProvider } from './providers/llm/index.js';
 const PORT = parseInt(process.env.AGENT_PORT || '3001');
 const VERSION = '0.1.0';
 const startTime = Date.now();
@@ -344,6 +344,52 @@ app.get('/api/system/health', async (_req, res) => {
         ipfs: { gateway: PINATA_GATEWAY },
         llm: { provider: getLLMProvider().name, model: getLLMProvider().model },
     });
+});
+app.post('/api/config/llm', (req, res) => {
+    const { provider, model, apiKey, ollamaUrl } = req.body;
+    // In a real production environment, these would be validated and encrypted
+    // For Nirium v1.0, we update the runtime configuration
+    if (provider)
+        process.env.ACTIVE_LLM_PROVIDER = provider;
+    if (model) {
+        if (provider === 'openai')
+            process.env.OPENAI_MODEL = model;
+        if (provider === 'anthropic')
+            process.env.ANTHROPIC_MODEL = model;
+        if (provider === 'ollama')
+            process.env.OLLAMA_MODEL = model;
+        if (provider === 'minimax')
+            process.env.MINIMAX_MODEL = model;
+        if (provider === 'gemini')
+            process.env.GEMINI_MODEL = model;
+        if (provider === 'grok')
+            process.env.GROK_MODEL = model;
+        if (provider === 'bedrock')
+            process.env.BEDROCK_MODEL = model;
+        if (provider === 'openrouter')
+            process.env.OPENROUTER_MODEL = model;
+    }
+    if (apiKey) {
+        if (provider === 'openai')
+            process.env.OPENAI_API_KEY = apiKey;
+        if (provider === 'anthropic')
+            process.env.ANTHROPIC_API_KEY = apiKey;
+        if (provider === 'minimax')
+            process.env.MINIMAX_API_KEY = apiKey;
+        if (provider === 'gemini')
+            process.env.GEMINI_API_KEY = apiKey;
+        if (provider === 'grok')
+            process.env.XAI_API_KEY = apiKey;
+        if (provider === 'bedrock')
+            process.env.AWS_ACCESS_KEY_ID = apiKey; // Simplified
+        if (provider === 'openrouter')
+            process.env.OPENROUTER_API_KEY = apiKey;
+    }
+    if (ollamaUrl)
+        process.env.OLLAMA_URL = ollamaUrl;
+    resetProvider();
+    broadcastLog('system', `[Config] LLM Provider shifted to ${provider} (${model})`);
+    res.json({ success: true, message: `Neural Link shifted to ${provider}` });
 });
 // ═══════════════════════════════════════════════════════════════
 // SERVER INITIALIZATION

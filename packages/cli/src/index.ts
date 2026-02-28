@@ -139,11 +139,11 @@ async function main() {
     process.exit(1);
   }
 
-  // Get market data
+  // Get market data (real from Horizon)
   const market = await agent.getMarket();
   console.log(\`📊 XLM Price: \$\${market.xlmPrice.toFixed(4)}\`);
   console.log(\`⚡ Base Fee: \${market.baseFee} stroops\`);
-  console.log(\`📈 Blend APY: \${market.blendApy.supply.toFixed(2)}%\`);
+  console.log(\`📉 SDEX Spread: \${market.sdexSpread.toFixed(1)} bps\`);
 
   // Start the autonomous loop
   const loopResult = await agent.startLoop({
@@ -154,18 +154,18 @@ async function main() {
 
   // Subscribe to real-time signals
   agent.subscribe((signal) => {
-    console.log(\`\\n⚡ SIGNAL: \${signal.type}\`);
+    console.log(\`\\n⚡ SIGNAL: \${signal.signal_type}\`);
     console.log(\`   Pair: \${signal.pair}\`);
     console.log(\`   Confidence: \${(signal.data.confidence * 100).toFixed(0)}%\`);
     console.log(\`   Details: \${signal.data.details}\`);
 
     // Auto-execute high-confidence opportunities
-    if (signal.data.confidence > 0.75 && signal.type === 'path_arbitrage_opportunity') {
+    if (signal.data.confidence > 0.75 && signal.signal_type === 'path_arbitrage_opportunity') {
       console.log('🎯 High confidence path arbitrage detected! Executing...');
-      agent.execute('path-vector', 'XLM-USDC', { amount: 1000 })
+      agent.execute('path-arbitrage', 'XLM-USDC', { amount: 1000 })
         .then(result => {
           if (result.success) {
-            console.log(\`✅ Profit: +\${result.profit?.toFixed(4)} XLM\`);
+            console.log(\`✅ Profit: +\${result.profit} stroops\`);
           } else {
             console.log(\`❌ Execution failed: \${result.error}\`);
           }
@@ -206,18 +206,18 @@ agent = Agent(
 
 def on_signal(signal: dict) -> None:
     """Handle incoming signals."""
-    print(f"\\n⚡ SIGNAL: {signal.get('type')}")
+    print(f"\\n⚡ SIGNAL: {signal.get('signal_type')}")
     print(f"   Pair: {signal.get('pair')}")
     print(f"   Confidence: {signal.get('data', {}).get('confidence', 0) * 100:.0f}%")
     print(f"   Details: {signal.get('data', {}).get('details')}")
 
     # Auto-execute high-confidence opportunities
     confidence = signal.get("data", {}).get("confidence", 0)
-    if confidence > 0.75 and signal.get("type") == "path_arbitrage_opportunity":
+    if confidence > 0.75 and signal.get("signal_type") == "path_arbitrage_opportunity":
         print("🎯 High confidence path arbitrage! Executing...")
-        result = agent.execute("path-vector", "XLM-USDC", {"amount": 1000})
+        result = agent.execute("path-arbitrage", "XLM-USDC", {"amount": 1000})
         if result.get("success"):
-            print(f"✅ Profit: +{result.get('profit', 0):.4f} XLM")
+            print(f"✅ Profit: +{result.get('profit', 0)} stroops")
         else:
             print(f"❌ Failed: {result.get('error')}")
 

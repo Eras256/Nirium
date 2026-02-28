@@ -1,9 +1,47 @@
 {
     "nav": {
+        "home": "Home",
         "dashboard": "Dashboard",
+        "strategies": "Strategies",
         "builder": "Visual Builder",
         "marketplace": "Marketplace",
-        "leaderboard": "Leaderboard"
+        "leaderboard": "Leaderboard",
+        "plugins": "Plugins",
+        "agents": "Agents",
+        "analytics": "Analytics",
+        "docs": "Docs",
+        "auth_matrix": "Auth Matrix",
+        "disconnect": "Disconnect",
+        "stellar_connected": "Stellar Connected",
+        "login_matrix": "Login to Matrix",
+        "disconnect_matrix": "Disconnect Matrix",
+        "status": "Status"
+    },
+    "footer": {
+        "protocol": "Protocol",
+        "intel_hub": "Intel Hub",
+        "metrics": "Metrics",
+        "neural_matrix": "Neural Matrix",
+        "market_analytics": "Market Analytics",
+        "signal_pool": "Signal Pool",
+        "matrix_builder": "Matrix Builder",
+        "neural_plugins": "Neural Plugins",
+        "agents_control": "Agents Control",
+        "protocol_manifesto": "Protocol Manifesto",
+        "mission_manual": "Mission Manual",
+        "developer_docs": "Developer Docs",
+        "soroban_source": "Soroban Source",
+        "active_nodes": "Active Nodes",
+        "matrix_tier": "Matrix Tier",
+        "net_health": "Net Health",
+        "arb_vectors": "Arb Vectors",
+        "locked": "Locked",
+        "optimal": "Optimal",
+        "ignite_matrix": "Ignite Matrix",
+        "uplink_established": "UPLINK ESTABLISHED",
+        "soroban_verified": "SOROBAN VERIFIED",
+        "testnet_live": "STELLAR TESTNET LIVE",
+        "rights": "ALL RIGHTS RESERVED"
     },
     "leaderboard": {
         "title": "GLOBAL SENTINEL LEADERBOARD",
@@ -20,5 +58,85 @@
             "gold": "Gold Tier",
             "silver": "Silver Tier"
         }
+    },
+    "home": {
+        "hero_title_1": "AUTONOMOUS",
+        "hero_title_2": "INTELLIGENCE",
+        "hero_subtitle": "Deploy AI agents that execute path arbitrage, flash loans, and yield farming — secured by Soroban Smart Contracts and Stellar's native atomic multi-operation transactions.",
+        "launch_dashboard": "LAUNCH DASHBOARD",
+        "read_protocol": "READ PROTOCOL",
+        "built_for_stellar": "Built for the Stellar Ecosystem",
+        "atomic_capabilities_title": "Atomic",
+        "atomic_capabilities_span": "Capabilities",
+        "atomic_capabilities_subtitle": "Four architectural pillars enabling absolute autonomy in the Stellar neural matrix.",
+        "features": {
+            "path_arb": {
+                "title": "Atomic Path Arbs",
+                "desc": "Utilize Stellar's native PathPaymentStrictReceive for zero-contract, multi-hop arbitrage routes with instant finality."
+            },
+            "vaults": {
+                "title": "Soroban Vaults",
+                "desc": "Institutional non-custodial vaults with Control Key/Agent Auth delegation logic. Absolute security for your XLM & USDC."
+            },
+            "bundling": {
+                "title": "Multi-Op Bundling",
+                "desc": "Chain up to 100 Stellar operations atomically. Borrow, swap, hedge, and repay in a single transaction unit."
+            },
+            "archive": {
+                "title": "Neural Archive",
+                "desc": "Every agent decision is etched into the forensic blackbox archived via IPFS. Indestructible proof of automated integrity."
+            }
+        },
+        "sdk_title_1": "PROGRAMMABLE",
+        "sdk_title_2": "AUTONOMY",
+        "sdk_subtitle": "Scaffold a combat-ready agent in seconds using our SDKs. Full parity between TypeScript and Python for institutional quants.",
+        "ignite_the_loop": "IGNITE THE LOOP",
+        "enter_matrix": "ENTER NEURAL MATRIX",
+        "browse_agents": "BROWSE AGENTS"
+    },
+    "common": {
+        "neural_matrix": "Neural Matrix",
+        "atomic_execution": "Atomic Execution",
+        "liquidity_sentinel": "Liquidity Sentinel",
+        "path_payment_vector": "Path-Payment Vector",
+        "dashboard": "Dashboard",
+        "strategies": "Strategies",
+        "marketplace": "Marketplace",
+        "analytics": "Analytics"
+    },
+    "dashboard": {
+        "fleet_status": "Fleet Operational Status",
+        "active_agents": "Active Neural Agents",
+        "total_profit": "Total Secured Profit",
+        "ops_console": "Quantum Ops Console"
+    },
+    "builder": {
+        "drag_n_drop": "Drag & Drop Nodes into Matrix",
+        "simulate": "Simulate Resource Footprint",
+        "publish": "Deploy to Stellar Mainnet",
+        "categories": {
+            "atomic_engine": "Atomic Engine",
+            "signal_inputs": "Signal Inputs",
+            "ai_intelligence": "AI Intelligence"
+        },
+        "search_placeholder": "Search neural components...",
+        "asset_selector": "Select Base Asset",
+        "collapse": "Collapse Interface"
+    },
+    "settings": {
+        "ai_providers": {
+            "title": "Neural Intelligence Providers",
+            "gemini": "Google Gemini",
+            "grok": "xAI Grok",
+            "minimax": "MiniMax (China)",
+            "openai": "OpenAI",
+            "anthropic": "Anthropic"
+        }
+    },
+    "toasts": {
+        "compiling": "Compiling Neural Logic...",
+        "archiving": "Archiving to Neural Archive (IPFS)...",
+        "broadcast_success": "Transmission Successful",
+        "broadcast_failed": "Uplink Error"
     }
 }

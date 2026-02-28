@@ -71,22 +71,34 @@ export default function AgentsPage() {
         // Fetch recent logs on mount
         const fetchInitialLogs = async () => {
             const { data } = await db
-                .from('nirium_logs')
+                .from('nirium_protocol_records')
                 .select('*')
-                .order('timestamp', { ascending: false })
+                .eq('record_type', 'LOG')
+                .order('created_at', { ascending: false })
                 .limit(30);
-            if (data) setLogs(data.reverse());
+
+            if (data) {
+                // Map created_at to timestamp for UI compatibility
+                const mapped = data.map((d: any) => ({ ...d, timestamp: d.created_at }));
+                setLogs(mapped.reverse());
+            }
         };
         fetchInitialLogs();
 
         // Subscribe to new logs in real time
         const channel = db
             .channel('agents-realtime-logs')
-            .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'nirium_logs' }, (payload) => {
+            .on('postgres_changes', {
+                event: 'INSERT',
+                schema: 'public',
+                table: 'nirium_protocol_records',
+                filter: 'record_type=eq.LOG'
+            }, (payload) => {
                 setLogs(prev => {
                     const exists = prev.some(l => l.id === payload.new.id);
                     if (exists) return prev;
-                    return [...prev, payload.new].slice(-100);
+                    const newLog = { ...payload.new, timestamp: payload.new.created_at };
+                    return [...prev, newLog].slice(-100);
                 });
             })
             .subscribe();

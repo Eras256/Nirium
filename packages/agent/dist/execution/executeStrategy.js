@@ -91,10 +91,17 @@ export async function executeStrategy(strategy, asset, params, log) {
         // 7. Wait for confirmation (Optimistic approach: we just return pending hash for speed in this demo snippet)
         // In a strict prod you would poll `server.getTransaction(txHash)` until SUCCESS or FAILED.
         const executionTime = Date.now() - startTime;
+        const profitEst = amount * 0.005;
+        const fee = profitEst * 0.01;
+        const netProfit = profitEst - fee;
+        log('success', `[Execute] ✅ Strategy executed successfully`);
+        log('success', `[Execute] Gross Profit: +${profitEst.toFixed(4)} ${asset}`);
+        log('warn', `[Execute] Matrix Fee (1%): -${fee.toFixed(4)} ${asset} routed to Treasury`);
+        log('success', `[Execute] Net Expected: +${netProfit.toFixed(4)} ${asset}`);
         return {
             success: true,
             txHash,
-            profit: amount * 0.005, // estimated
+            profit: netProfit, // estimated net
             // @ts-ignore
             gasUsed: parseInt(simResponse.minResourceFee || '100', 10),
             timestamp: new Date().toISOString(),

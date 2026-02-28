@@ -6,12 +6,18 @@ import { AnthropicProvider } from './anthropic.js';
 import { GeminiProvider } from './gemini.js';
 import { GrokProvider } from './grok.js';
 import { OllamaProvider } from './ollama.js';
+import { MiniMaxProvider } from './minimax.js';
+import { BedrockProvider } from './bedrock.js';
+import { OpenRouterProvider } from './openrouter.js';
 const PROVIDER_CONSTRUCTORS = {
     openai: () => new OpenAIProvider(),
     anthropic: () => new AnthropicProvider(),
     gemini: () => new GeminiProvider(),
     grok: () => new GrokProvider(),
     ollama: () => new OllamaProvider(),
+    minimax: () => new MiniMaxProvider(),
+    bedrock: () => new BedrockProvider(),
+    openrouter: () => new OpenRouterProvider(),
 };
 let cachedProvider = null;
 let cachedProviderName = null;
@@ -55,4 +61,7 @@ export { AnthropicProvider } from './anthropic.js';
 export { GeminiProvider } from './gemini.js';
 export { GrokProvider } from './grok.js';
 export { OllamaProvider } from './ollama.js';
+export { MiniMaxProvider } from './minimax.js';
+export { BedrockProvider } from './bedrock.js';
+export { OpenRouterProvider } from './openrouter.js';
 //# sourceMappingURL=index.js.map

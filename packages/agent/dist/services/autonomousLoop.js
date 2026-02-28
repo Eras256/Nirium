@@ -154,7 +154,7 @@ async function checkOpportunities(market) {
 function emitSignal(type, pair, data) {
     const signal = {
         id: uuidv4(),
-        type,
+        signal_type: type,
         pair,
         data,
         timestamp: new Date().toISOString(),
@@ -162,6 +162,26 @@ function emitSignal(type, pair, data) {
     };
     broadcastLog('success', `[Signal] ${type}: ${data.details}`);
     broadcastSignal(signal);
+    // PERSIST TO SUPABASE (Analytics) - Fail silently if not configured
+    const supabaseUrl = process.env.SUPABASE_URL;
+    const supabaseKey = process.env.SUPABASE_ANON_KEY;
+    if (supabaseUrl && supabaseKey) {
+        fetch(`${supabaseUrl}/rest/v1/nirium_signals`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'apikey': supabaseKey,
+                'Authorization': `Bearer ${supabaseKey}`,
+                'Prefer': 'return=minimal',
+            },
+            body: JSON.stringify({
+                type,
+                pair,
+                data,
+                timestamp: signal.timestamp,
+            }),
+        }).catch(() => { });
+    }
 }
 /**
  * Start the autonomous scanning loop.

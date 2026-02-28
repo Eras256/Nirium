@@ -17,6 +17,13 @@ import { writeLog } from "@/lib/logger";
 import { stellarClient } from "@/lib/stellarClient";
 import { useVault, useEloReputation } from "@/hooks/useNiriumContracts";
 import { getWebSocketUrl } from "@/lib/constants";
+import { simulateSorobanTx } from "@/lib/stellarSim";
+import { handleWalletError } from "@/components/wallet/WalletErrorHandler";
+import MarketTicker from "@/components/dashboard/MarketTicker";
+import NeuralOrb from "@/components/dashboard/NeuralOrb";
+import StatusBadge from "@/components/ui/StatusBadge";
+import { useLanguage } from "@/context/LanguageContext";
+import { useSecurityKillSwitch } from "@/lib/securityHooks";
 
 // WebSocket hook removed as it was unused and redundant
 
@@ -43,8 +50,10 @@ function NeuralOrbSmall() {
 }
 
 function DashboardContent() {
+    const { t } = useLanguage();
     const router = useRouter();
     const searchParams = useSearchParams();
+    const { isLocked } = useSecurityKillSwitch();
     const { address: accountStr, isConnected, connect, disconnect } = useFreighter();
     const account = useMemo(() => isConnected && accountStr ? { address: accountStr, chains: ['stellar:testnet'] } : null, [isConnected, accountStr]);
     // Helper: Sign transaction with Freighter and submit to Horizon.
@@ -622,6 +631,17 @@ function DashboardContent() {
             }));
 
             const builtTx = tx.build();
+            const xdr = builtTx.toXDR();
+
+            // PRE-FLIGHT SIMULATION
+            toast.loading("Simulating Soroban Pre-flight...", { id: toastId });
+            const sim = await simulateSorobanTx(xdr);
+            if (!sim.success) {
+                throw new Error(sim.error || "Simulation failed");
+            }
+
+            toast.loading(`Simulated: CPU ${sim.resources?.cpu_instructions} | Mem ${sim.resources?.mem_bytes}. Awaiting signature...`, { id: toastId });
+
             const result = await signAndSubmitTransaction({ transaction: builtTx });
             const txHash = result.hash;
 
@@ -690,7 +710,7 @@ function DashboardContent() {
         } catch (err: any) {
             console.error("Deploy Error:", err);
             toast.dismiss(toastId);
-            toast.error(`Deploy Failed: ${err.message || 'Unknown error'}`);
+            handleWalletError(err);
         }
     };
 
@@ -913,6 +933,12 @@ function DashboardContent() {
                                     }
                                 });
                             }
+                        }
+
+                        // Tauri Tray Trigger
+                        if (data.type === 'signal' && (window as any).__TAURI_INTERNALS__) {
+                            const { invoke } = require('@tauri-apps/api/core');
+                            invoke('update_tray_status', { active: true });
                         }
                     } catch (e) { }
                 };
@@ -1470,7 +1496,7 @@ function DashboardContent() {
     }
 
     return (
-        <div className="min-h-screen pt-36 pb-12 px-4 md:px-8 relative overflow-hidden">
+        <div className="min-h-screen bg-nirium-obsidian pt-36 pb-12 px-4 md:px-8 relative overflow-hidden">
             <Navbar />
 
             {/* Auto-Start Confirmation Modal */}
@@ -1563,10 +1589,7 @@ function DashboardContent() {
                                     <div>
                                         <div className="flex items-center gap-2 mb-1">
                                             <h2 className="text-xl font-bold text-white tracking-tight">{selectedStrategy.name}</h2>
-                                            <span className="px-2 py-0.5 rounded-full bg-green-500/10 border border-green-500/20 text-[10px] text-green-400 font-mono flex items-center gap-1">
-                                                <span className="w-1.5 h-1.5 rounded-full bg-green-400 animate-pulse"></span>
-                                                RUNNING
-                                            </span>
+                                            <StatusBadge status="active" label={t.common.atomic_execution} />
                                         </div>
                                         <p className="text-xs text-gray-400 font-mono">ID: {selectedStrategy.id.slice(0, 8)}...{selectedStrategy.id.slice(-4)}</p>
                                     </div>
@@ -2096,13 +2119,8 @@ function DashboardContent() {
                         transition={{ delay: 0.1 }}
                         className="glass-panel p-6 rounded-2xl relative overflow-hidden min-h-[220px]"
                     >
-                        <div className="absolute -right-10 -top-10 h-32 w-32 opacity-30 pointer-events-none">
-                            <Canvas>
-                                <Suspense fallback={null}>
-                                    <NeuralOrbSmall />
-                                    <Environment preset="city" />
-                                </Suspense>
-                            </Canvas>
+                        <div className="absolute -right-4 -top-4 h-48 w-48 opacity-40 pointer-events-none">
+                            <NeuralOrb activity={activeStrategies.length > 0 ? 0.8 : 0.2} />
                         </div>
 
                         <h3 className="text-sm text-gray-400 uppercase tracking-widest mb-4 flex items-center justify-between">
@@ -2129,10 +2147,7 @@ function DashboardContent() {
                                                 <span className="text-lg">{strat.emoji}</span>
                                                 <div>
                                                     <h4 className="text-xs font-bold text-white">{strat.name}</h4>
-                                                    <span className="text-[10px] text-green-400 flex items-center gap-1 font-mono">
-                                                        <span className="w-1.5 h-1.5 bg-green-400 rounded-full animate-pulse"></span>
-                                                        RUNNING
-                                                    </span>
+                                                    <StatusBadge status="active" label="SYNCED" />
                                                 </div>
                                             </div>
                                             <div className="text-right">
@@ -2143,10 +2158,16 @@ function DashboardContent() {
                                         <div className="flex gap-2 mt-2">
                                             <button
                                                 onClick={(e) => { e.stopPropagation(); setSelectedStrategy(strat); }}
-                                                className="flex-1 bg-white/5 hover:bg-white/10 text-[10px] py-1.5 rounded transition-colors text-gray-300 border border-transparent hover:border-white/10"
+                                                className="flex-1 py-1.5 rounded bg-white/5 border border-white/10 text-[9px] font-bold text-gray-400 hover:text-white transition-colors"
                                             >
                                                 DETAILS
                                             </button>
+                                            <div className="flex items-center gap-1.5 px-2 py-1 rounded bg-stellar-blue/5 border border-stellar-blue/20">
+                                                <Shield size={10} className="text-stellar-blue" />
+                                                <span className="text-[8px] font-bold text-stellar-blue whitespace-nowrap uppercase tracking-tighter">
+                                                    {t.common.atomic_execution} — AUDITED
+                                                </span>
+                                            </div>
                                             <button
                                                 onClick={() => stopStrategy(strat.id)}
                                                 className="px-3 bg-red-500/10 hover:bg-red-500/20 text-[10px] py-1.5 rounded transition-colors text-red-400 border border-red-500/20"

@@ -2,7 +2,14 @@
 // Nirium Agent — Entry Point
 // ═══════════════════════════════════════════════════════════════
 
-import 'dotenv/config';
+import dotenv from 'dotenv';
+import path from 'path';
+
+// Load .env.local from project root first, then .env
+dotenv.config({ path: path.resolve(process.cwd(), '../../.env.local') });
+dotenv.config({ path: path.resolve(process.cwd(), '.env.local') });
+dotenv.config();
+
 import { createAppServer, PORT, VERSION } from './server.js';
 
 const { server } = createAppServer();

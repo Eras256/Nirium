@@ -24,8 +24,8 @@ export async function uploadToIpfs(
     metadata?: Record<string, string>
 ): Promise<IpfsUploadResult> {
     if (!PINATA_API_KEY || !PINATA_SECRET_KEY) {
-        // Simulate IPFS upload for development
-        return simulateIpfsUpload(logs);
+        console.warn('[IPFS] Pinata API keys not configured. Upload skipped.');
+        return { success: false, error: 'PINATA_API_KEY and PINATA_SECRET_KEY required for IPFS uploads.' };
     }
 
     try {

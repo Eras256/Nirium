@@ -16,16 +16,18 @@ import dynamic from 'next/dynamic';
 const NeuralCanvas = dynamic(() => import('@/components/3d/NeuralCanvas').then((mod) => mod.NeuralCanvas), { ssr: false });
 import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
+import { useLanguage } from "@/context/LanguageContext";
 
 export default function Home() {
+    const { t } = useLanguage();
     const router = useRouter();
     const { address: accountStr, isConnected } = useFreighter();
     const [agentLog, setAgentLog] = useState<string[]>([]);
 
     const handleLaunch = () => {
         if (!isConnected) {
-            toast.error("Bridge Connection Required", {
-                description: "Please connect your Freighter wallet to access the Neural Matrix."
+            toast.error(t.nav.auth_matrix, {
+                description: t.nav.stellar_connected
             });
             return;
         }
@@ -84,12 +86,12 @@ export default function Home() {
                         </div>
 
                         <h1 className="text-4xl sm:text-6xl md:text-7xl lg:text-8xl font-black tracking-tighter leading-[0.9] lg:leading-[0.85]">
-                            AUTONOMOUS <br />
-                            <span className="text-transparent bg-clip-text bg-gradient-to-r from-stellar-teal to-stellar-yellow">INTELLIGENCE</span>
+                            {t.home.hero_title_1} <br />
+                            <span className="text-transparent bg-clip-text bg-gradient-to-r from-stellar-teal to-stellar-yellow">{t.home.hero_title_2}</span>
                         </h1>
 
                         <p className="text-gray-400 text-lg md:text-xl max-w-xl leading-relaxed">
-                            Deploy AI agents that execute path arbitrage, flash loans, and yield farming — secured by <strong>Soroban Smart Contracts</strong> and Stellar&apos;s native <strong>atomic multi-operation transactions</strong>.
+                            {t.home.hero_subtitle}
                         </p>
 
                         <div className="flex flex-col sm:flex-row gap-4 pt-4 w-full">
@@ -98,14 +100,14 @@ export default function Home() {
                                 className="w-full sm:w-auto group relative px-6 sm:px-8 py-4 bg-stellar-yellow text-black font-black rounded-lg transition-all hover:shadow-[0_0_30px_rgba(255,200,0,0.5)] active:scale-95 flex justify-center"
                             >
                                 <span className="flex items-center gap-2">
-                                    LAUNCH DASHBOARD <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+                                    {t.home.launch_dashboard} <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
                                 </span>
                             </button>
                             <Link
                                 href="/docs"
                                 className="w-full sm:w-auto px-6 sm:px-8 py-4 bg-white/5 border border-white/10 text-white font-bold rounded-lg hover:bg-white/10 transition-all text-center flex justify-center items-center"
                             >
-                                READ PROTOCOL
+                                {t.home.read_protocol}
                             </Link>
                         </div>
                     </motion.div>
@@ -148,7 +150,7 @@ export default function Home() {
             {/* Protocol Integrations */}
             <section className="py-20 border-y border-white/5 bg-black/50">
                 <div className="container mx-auto px-4">
-                    <h3 className="text-center text-[10px] font-mono text-gray-500 mb-12 tracking-[0.4em] uppercase">Built for the Stellar Ecosystem</h3>
+                    <h3 className="text-center text-[10px] font-mono text-gray-500 mb-12 tracking-[0.4em] uppercase">{t.home.built_for_stellar}</h3>
                     <div className="flex flex-wrap justify-center gap-6 sm:gap-12 md:gap-24 items-center grayscale opacity-50 hover:grayscale-0 hover:opacity-100 transition-all duration-700">
                         <ProtocolItem icon={Landmark} name="BLEND Protocol" />
                         <ProtocolItem icon={Zap} name="SOROSWAP" />
@@ -162,33 +164,33 @@ export default function Home() {
             {/* Features Matrix */}
             <section className="py-32 container mx-auto px-4">
                 <div className="text-center mb-20 space-y-4">
-                    <h2 className="text-4xl md:text-6xl font-black tracking-tighter">Atomic <span className="text-stellar-teal">Capabilities</span></h2>
-                    <p className="text-gray-400 max-w-2xl mx-auto text-lg">Four architectural pillars enabling absolute autonomy in the Stellar neural matrix.</p>
+                    <h2 className="text-4xl md:text-6xl font-black tracking-tighter">{t.home.atomic_capabilities_title} <span className="text-stellar-teal">{t.home.atomic_capabilities_span}</span></h2>
+                    <p className="text-gray-400 max-w-2xl mx-auto text-lg">{t.home.atomic_capabilities_subtitle}</p>
                 </div>
 
                 <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
                     <FeatureCard
                         icon={Zap}
-                        title="Atomic Path Arbs"
-                        desc="Utilize Stellar's native PathPaymentStrictReceive for zero-contract, multi-hop arbitrage routes with instant finality."
+                        title={t.home.features.path_arb.title}
+                        desc={t.home.features.path_arb.desc}
                         color="cyan"
                     />
                     <FeatureCard
                         icon={Shield}
-                        title="Soroban Vaults"
-                        desc="Institutional non-custodial vaults with Control Key/Agent Auth delegation logic. Absolute security for your XLM & USDC."
+                        title={t.home.features.vaults.title}
+                        desc={t.home.features.vaults.desc}
                         color="purple"
                     />
                     <FeatureCard
                         icon={Workflow}
-                        title="Multi-Op Bundling"
-                        desc="Chain up to 100 Stellar operations atomically. Borrow, swap, hedge, and repay in a single transaction unit."
+                        title={t.home.features.bundling.title}
+                        desc={t.home.features.bundling.desc}
                         color="blue"
                     />
                     <FeatureCard
                         icon={Database}
-                        title="Neural Archive"
-                        desc="Every agent decision is etched into the forensic blackbox archived via IPFS. Indestructible proof of automated integrity."
+                        title={t.home.features.archive.title}
+                        desc={t.home.features.archive.desc}
                         color="pink"
                     />
                 </div>
@@ -198,9 +200,10 @@ export default function Home() {
             <section className="py-32 bg-black/40 border-t border-white/5">
                 <div className="container mx-auto px-4 grid lg:grid-cols-2 gap-16 items-center">
                     <div className="space-y-6">
-                        <h3 className="text-3xl md:text-5xl font-black leading-tight tracking-tighter">PROGRAMMABLE <br /><span className="text-stellar-yellow">AUTONOMY</span></h3>
-                        <p className="text-gray-400 text-lg">Scaffold a combat-ready agent in seconds using our SDKs. Full parity between TypeScript and Python for institutional quants.</p>
-
+                        <h3 className="text-3xl md:text-5xl font-black leading-tight tracking-tighter">{t.home.sdk_title_1} <br /><span className="text-stellar-yellow">{t.home.sdk_title_2}</span></h3>
+                        <p className="text-gray-400 text-lg">{t.home.sdk_subtitle}</p>
+// ... (omitting intermediate code if possible, but replace_file_content needs contiguous block)
+                        // I'll copy the whole block between Features and end of RootLayout
                         <div className="bg-[#0A0A0A] border border-white/10 rounded-xl p-6 font-mono text-sm group relative overflow-hidden">
                             <div className="flex justify-between items-center mb-4">
                                 <div className="flex gap-2">
@@ -232,19 +235,21 @@ export default function Home() {
             {/* Final CTA */}
             <section className="py-40 text-center relative">
                 <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_100%,rgba(138,43,226,0.1),transparent_50%)]" />
-                <h2 className="text-4xl sm:text-5xl md:text-8xl font-black mb-12 tracking-tighter">IGNITE THE <span className="text-stellar-teal font-bold">LOOP</span></h2>
+                <h2 className="text-4xl sm:text-5xl md:text-8xl font-black mb-12 tracking-tighter">
+                    {t.home.ignite_the_loop.split(' ')[0]} {t.home.ignite_the_loop.split(' ')[1]} <span className="text-stellar-teal font-bold">{t.home.ignite_the_loop.split(' ')[2]}</span>
+                </h2>
                 <div className="flex flex-col sm:flex-row flex-wrap justify-center gap-4 sm:gap-6 relative z-10 w-full px-4 max-w-2xl mx-auto">
                     <button
                         onClick={handleLaunch}
                         className="w-full sm:w-auto px-6 sm:px-12 py-4 sm:py-5 bg-gradient-to-r from-stellar-teal to-stellar-yellow text-black font-black text-base sm:text-xl rounded-full transition-all hover:scale-105 hover:shadow-[0_0_50px_rgba(255,200,0,0.4)] active:scale-95"
                     >
-                        ENTER NEURAL MATRIX
+                        {t.home.enter_matrix}
                     </button>
                     <Link
                         href="/strategies"
                         className="w-full sm:w-auto px-6 sm:px-12 py-4 sm:py-5 border border-white/20 text-white font-bold text-base sm:text-xl rounded-full hover:bg-white/5 transition-all text-center"
                     >
-                        BROWSE AGENTS
+                        {t.home.browse_agents}
                     </Link>
                 </div>
             </section>

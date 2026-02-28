@@ -1,29 +1,32 @@
 {
-    "name": "@nirium/cli",
-    "version": "0.1.0",
-    "description": "CLI scaffolding tool for creating Nirium bot projects",
-    "bin": {
-        "nirium": "./bin/nirium.js"
-    },
-    "main": "dist/index.js",
-    "scripts": {
-        "build": "tsc",
-        "dev": "tsx src/index.ts",
-        "lint": "eslint src/"
-    },
-    "dependencies": {
-        "commander": "^13.0.0"
-    },
-    "devDependencies": {
-        "@types/node": "^22.0.0",
-        "tsx": "^4.19.0",
-        "typescript": "^5.7.0"
-    },
-    "keywords": [
-        "nirium",
-        "cli",
-        "stellar",
-        "bot",
-        "scaffold"
-    ]
+  "name": "@nirium/cli",
+  "version": "1.0.0",
+  "description": "Nirium Autonomous Agent CLI",
+  "main": "bin/nirium.js",
+  "type": "module",
+  "bin": {
+    "nirium": "bin/nirium.js"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "nirium",
+    "cli",
+    "agent",
+    "stellar"
+  ],
+  "author": "Nirium Team",
+  "license": "MIT",
+  "dependencies": {
+    "@types/uuid": "^10.0.0",
+    "axios": "^1.13.6",
+    "commander": "^11.0.0",
+    "package-json-type": "^1.1.2",
+    "uuid": "^11.1.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.19.30",
+    "typescript": "^5.0.0"
+  }
 }

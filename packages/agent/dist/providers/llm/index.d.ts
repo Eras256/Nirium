@@ -1,5 +1,5 @@
 import { LLMProvider } from './base.js';
-export type ProviderName = 'openai' | 'anthropic' | 'gemini' | 'grok' | 'ollama';
+export type ProviderName = 'openai' | 'anthropic' | 'gemini' | 'grok' | 'ollama' | 'minimax' | 'bedrock' | 'openrouter';
 /**
  * Get the active LLM provider based on environment configuration.
  * Caches the provider instance for reuse.
@@ -19,4 +19,7 @@ export { AnthropicProvider } from './anthropic.js';
 export { GeminiProvider } from './gemini.js';
 export { GrokProvider } from './grok.js';
 export { OllamaProvider } from './ollama.js';
+export { MiniMaxProvider } from './minimax.js';
+export { BedrockProvider } from './bedrock.js';
+export { OpenRouterProvider } from './openrouter.js';
 //# sourceMappingURL=index.d.ts.map

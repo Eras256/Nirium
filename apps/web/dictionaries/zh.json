@@ -1,24 +1,142 @@
 {
     "nav": {
-        "dashboard": "仪表板",
-        "builder": "可视化构建器",
+        "home": "首页",
+        "dashboard": "控制面板",
+        "strategies": "策略",
+        "builder": "视觉构建器",
         "marketplace": "市场",
-        "leaderboard": "排行榜"
+        "leaderboard": "排行榜",
+        "plugins": "插件",
+        "agents": "代理",
+        "analytics": "分析",
+        "docs": "文档",
+        "auth_matrix": "矩阵认证",
+        "disconnect": "断开连接",
+        "stellar_connected": "Stellar 已连接",
+        "login_matrix": "登录矩阵",
+        "disconnect_matrix": "断开矩阵连接",
+        "status": "状态"
+    },
+    "footer": {
+        "protocol": "协议",
+        "intel_hub": "情报中心",
+        "metrics": "指标",
+        "neural_matrix": "神经矩阵",
+        "market_analytics": "市场分析",
+        "signal_pool": "信号库",
+        "matrix_builder": "矩阵构建器",
+        "neural_plugins": "神经插件",
+        "agents_control": "代理控制",
+        "protocol_manifesto": "协议宣言",
+        "mission_manual": "任务手册",
+        "developer_docs": "开发文档",
+        "soroban_source": "Soroban 源码",
+        "active_nodes": "活跃节点",
+        "matrix_tier": "矩阵层级",
+        "net_health": "网络健康度",
+        "arb_vectors": "套利向量",
+        "locked": "已锁定",
+        "optimal": "最佳",
+        "ignite_matrix": "启动矩阵",
+        "uplink_established": "上行链路已建立",
+        "soroban_verified": "SOROBAN 已验证",
+        "testnet_live": "STELLAR 测试网在线",
+        "rights": "版权所有"
     },
     "leaderboard": {
         "title": "全球哨兵排行榜",
-        "subtitle": "追踪 Nirium 生态系统中表现最好的算法和创作者。",
+        "subtitle": "追踪 Nirium 生态中表现最佳的算法和创建者。",
         "columns": {
             "rank": "排名",
-            "sentinel": "哨兵 / 创作者",
+            "sentinel": "哨兵 / 创建者",
             "winRate": "胜率",
-            "elo": "ELO 分数",
+            "elo": "ELO 评分",
             "volume": "交易量"
         },
         "tiers": {
-            "matrix": "矩阵级",
-            "gold": "黄金级",
-            "silver": "白银级"
+            "matrix": "矩阵层级",
+            "gold": "黄金层级",
+            "silver": "白银层级"
         }
+    },
+    "home": {
+        "hero_title_1": "自主",
+        "hero_title_2": "人工智能",
+        "hero_subtitle": "部署执行路径套利、闪电贷和收益耕作的 AI 代理——由 Soroban 智能合约和 Stellar 原生原子多操作交易提供安全保障。",
+        "launch_dashboard": "启动控制面板",
+        "read_protocol": "阅读协议",
+        "built_for_stellar": "为 Stellar 生态系统构建",
+        "atomic_capabilities_title": "原子级",
+        "atomic_capabilities_span": "功能",
+        "atomic_capabilities_subtitle": "在 Stellar 神经矩阵中实现绝对自主的四个架构支柱。",
+        "features": {
+            "path_arb": {
+                "title": "原子路径套利",
+                "desc": "利用 Stellar 原生的 PathPaymentStrictReceive 实现零合约、多跳套利路径，实现即时最终性。"
+            },
+            "vaults": {
+                "title": "Soroban 金库",
+                "desc": "具有控制密钥/代理身份验证委托逻辑的机构非托管金库。为您的 XLM 和 USDC 提供绝对安全。"
+            },
+            "bundling": {
+                "title": "多操作捆绑",
+                "desc": "原位原子链接多达 100 个 Stellar 操作。在单次交易单元中完成借贷、交换、对冲和偿还。"
+            },
+            "archive": {
+                "title": "神经档案",
+                "desc": "代理的每个决策都刻在通过 IPFS 归档的取证黑匣子中。自动诚信的坚不可摧的证据。"
+            }
+        },
+        "sdk_title_1": "可编程",
+        "sdk_title_2": "自主性",
+        "sdk_subtitle": "使用我们的 SDK 在几秒钟内搭建一个具备战斗力的代理。TypeScript 和 Python 完全对等，适用于机构量化人员。",
+        "ignite_the_loop": "启动循环",
+        "enter_matrix": "进入神经矩阵",
+        "browse_agents": "浏览代理"
+    },
+    "common": {
+        "neural_matrix": "神经矩阵",
+        "atomic_execution": "原子执行",
+        "liquidity_sentinel": "流动性哨兵",
+        "path_payment_vector": "路径支付向量",
+        "dashboard": "控制面板",
+        "strategies": "策略",
+        "marketplace": "市场",
+        "analytics": "数据分析"
+    },
+    "dashboard": {
+        "fleet_status": "舰队运行状态",
+        "active_agents": "活跃神经代理",
+        "total_profit": "总担保利润",
+        "ops_console": "量子操作控制台"
+    },
+    "builder": {
+        "drag_n_drop": "将节点拖入矩阵",
+        "simulate": "模拟资源占用",
+        "publish": "部署到 Stellar 主网",
+        "categories": {
+            "atomic_engine": "原子引擎",
+            "signal_inputs": "信号输入",
+            "ai_intelligence": "AI 智能"
+        },
+        "search_placeholder": "搜索神经组件...",
+        "asset_selector": "选择基础资产",
+        "collapse": "折叠界面"
+    },
+    "settings": {
+        "ai_providers": {
+            "title": "神经智能提供商",
+            "gemini": "Google Gemini",
+            "grok": "xAI Grok",
+            "minimax": "MiniMax (中国)",
+            "openai": "OpenAI",
+            "anthropic": "Anthropic"
+        }
+    },
+    "toasts": {
+        "compiling": "正在编译神经逻辑...",
+        "archiving": "正在归档至神经档案 (IPFS)...",
+        "broadcast_success": "传输成功",
+        "broadcast_failed": "上行链路错误"
     }
 }

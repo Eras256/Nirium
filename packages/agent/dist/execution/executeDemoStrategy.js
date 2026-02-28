@@ -47,8 +47,12 @@ export async function executeDemoStrategy(strategy, asset, params, log) {
         };
     }
     const txHash = `testnet_${Date.now().toString(36)}_${Math.random().toString(36).substring(2, 8)}`;
+    const fee = profit * 0.01;
+    const netProfit = profit - fee;
     log('success', `[Demo] ✅ Strategy executed successfully`);
-    log('success', `[Demo] Profit: +${profit.toFixed(4)} ${asset} (${(profitPercentage * 100).toFixed(2)}%)`);
+    log('success', `[Demo] Gross Profit: +${profit.toFixed(4)} ${asset}`);
+    log('warn', `[Demo] Matrix Fee (1%): -${fee.toFixed(4)} ${asset} routed to Treasury`);
+    log('success', `[Demo] Net Expected: +${netProfit.toFixed(4)} ${asset} (${(profitPercentage * 100).toFixed(2)}%)`);
     log('info', `[Demo] TX: ${txHash}`);
     log('info', `[Demo] Gas: ${gasUsed} stroops | Time: ${Date.now() - startTime}ms`);
     return {

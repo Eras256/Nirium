@@ -1,51 +1,24 @@
-// ═══════════════════════════════════════════════════════════════
-// Nirium — xAI Grok Provider
-// ═══════════════════════════════════════════════════════════════
 import { LLMProvider } from './base.js';
+import axios from 'axios';
 export class GrokProvider extends LLMProvider {
     name = 'grok';
-    model;
-    apiKey;
-    baseUrl = 'https://api.x.ai/v1';
-    constructor(apiKey, model) {
-        super();
-        this.apiKey = apiKey || process.env.XAI_API_KEY || '';
-        this.model = model || 'grok-2';
-    }
-    async analyze(marketSnapshot, context) {
-        if (!this.apiKey) {
-            return this.fallbackDecision('xAI API key not configured');
-        }
+    model = process.env.GROK_MODEL || 'grok-1';
+    apiKey = process.env.XAI_API_KEY;
+    async analyze(market, context) {
+        if (!this.apiKey)
+            throw new Error('X.AI API key missing');
         try {
-            const response = await fetch(`${this.baseUrl}/chat/completions`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    Authorization: `Bearer ${this.apiKey}`,
-                },
-                body: JSON.stringify({
-                    model: this.model,
-                    messages: [
-                        { role: 'system', content: this.buildSystemPrompt() },
-                        { role: 'user', content: this.buildUserPrompt(marketSnapshot, context) },
-                    ],
-                    temperature: 0.3,
-                    max_tokens: 1000,
-                }),
+            const res = await axios.post('https://api.x.ai/v1/chat/completions', {
+                model: this.model,
+                messages: [{ role: 'user', content: `Analyze Stellar market. JSON: {"action": "...", "confidence": ..., "reasoning": "..."}. Data: ${JSON.stringify(market)}` }]
+            }, {
+                headers: { 'Authorization': `Bearer ${this.apiKey}` }
             });
-            if (!response.ok) {
-                const error = await response.text();
-                return this.fallbackDecision(`Grok API error: ${response.status} — ${error}`);
-            }
-            const data = await response.json();
-            const content = data.choices[0]?.message?.content;
-            if (!content) {
-                return this.fallbackDecision('Empty response from Grok');
-            }
-            return this.parseDecision(content);
+            return this.parseDecision(res.data.choices[0].message.content);
         }
         catch (error) {
-            return this.fallbackDecision(`Grok request failed: ${error}`);
+            console.error('[Grok] Error:', error);
+            throw error;
         }
     }
 }

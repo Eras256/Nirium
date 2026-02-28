@@ -20,6 +20,8 @@ export const metadata: Metadata = {
     },
 };
 
+import MarketTicker from "@/components/dashboard/MarketTicker";
+
 export default function RootLayout({
     children,
 }: Readonly<{
@@ -29,6 +31,7 @@ export default function RootLayout({
         <html lang="en">
             <body className={`${inter.variable} ${inconsolata.variable} font-sans bg-[#050505] text-white min-h-screen selection:bg-stellar-teal/30 scroll-smooth overflow-x-hidden`}>
                 <Providers>
+                    <MarketTicker />
                     {/* Background Layers */}
                     <div className="fixed inset-0 z-[-1] bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-[0.03] pointer-events-none"></div>
                     <div className="fixed inset-0 z-[-2] bg-gradient-to-br from-[#050505] via-[#0A0A0A] to-[#050505] pointer-events-none"></div>

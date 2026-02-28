@@ -1,24 +1,142 @@
 {
     "nav": {
-        "dashboard": "Panel Central",
-        "builder": "Constructor",
+        "home": "Inicio",
+        "dashboard": "Panel",
+        "strategies": "Estrategias",
+        "builder": "Constructor Visual",
         "marketplace": "Mercado",
-        "leaderboard": "Clasificación"
+        "leaderboard": "Clasificación",
+        "plugins": "Complementos",
+        "agents": "Agentes",
+        "analytics": "Analítica",
+        "docs": "Docs",
+        "auth_matrix": "Autenticar Matriz",
+        "disconnect": "Desconectar",
+        "stellar_connected": "Stellar Conectado",
+        "login_matrix": "Iniciar en la Matriz",
+        "disconnect_matrix": "Desconectar Matriz",
+        "status": "Estado"
+    },
+    "footer": {
+        "protocol": "Protocolo",
+        "intel_hub": "Centro de Inteligencia",
+        "metrics": "Métricas",
+        "neural_matrix": "Matriz Neural",
+        "market_analytics": "Analítica de Mercado",
+        "signal_pool": "Fondo de Señales",
+        "matrix_builder": "Constructor de Matriz",
+        "neural_plugins": "Complementos Neurales",
+        "agents_control": "Control de Agentes",
+        "protocol_manifesto": "Manifiesto del Protocolo",
+        "mission_manual": "Manual de Misión",
+        "developer_docs": "Docs de Desarrollador",
+        "soroban_source": "Código Soroban",
+        "active_nodes": "Nodos Activos",
+        "matrix_tier": "Nivel de Matriz",
+        "net_health": "Salud de Red",
+        "arb_vectors": "Vectores Arb",
+        "locked": "Bloqueado",
+        "optimal": "Óptimo",
+        "ignite_matrix": "Iniciar Matriz",
+        "uplink_established": "ENLACE ESTABLECIDO",
+        "soroban_verified": "SOROBAN VERIFICADO",
+        "testnet_live": "STELLAR TESTNET ACTIVO",
+        "rights": "TODOS LOS DERECHOS RESERVADOS"
     },
     "leaderboard": {
-        "title": "CLASIFICACIÓN GLOBAL SENTINEL",
-        "subtitle": "Rastrea los algoritmos y creadores con mejor rendimiento en el ecosistema Nirium.",
+        "title": "TABLA DE CLASIFICACIÓN GLOBAL",
+        "subtitle": "Sigue los algoritmos y creadores con mejor rendimiento en el ecosistema Nirium.",
         "columns": {
             "rank": "RANGO",
             "sentinel": "SENTINEL / CREADOR",
-            "winRate": "TASA VICTORIAS",
-            "elo": "PUNT. ELO",
-            "volume": "VOL OPERADO"
+            "winRate": "% DE VICTORIA",
+            "elo": "PUNTUACIÓN ELO",
+            "volume": "VOL TRADED"
         },
         "tiers": {
             "matrix": "Nivel Matrix",
             "gold": "Nivel Oro",
             "silver": "Nivel Plata"
         }
+    },
+    "home": {
+        "hero_title_1": "INTELIGENCIA",
+        "hero_title_2": "AUTÓNOMA",
+        "hero_subtitle": "Despliegue agentes de IA que ejecutan arbitraje de rutas, préstamos rápidos y agricultura de rendimiento — asegurados por Smart Contracts de Soroban y transacciones atómicas de Stellar.",
+        "launch_dashboard": "INICIAR PANEL",
+        "read_protocol": "LEER PROTOCOLO",
+        "built_for_stellar": "Creado para el Ecosistema Stellar",
+        "atomic_capabilities_title": "Capacidades",
+        "atomic_capabilities_span": "Atómicas",
+        "atomic_capabilities_subtitle": "Cuatro pilares arquitectónicos que permiten la autonomía absoluta en la matriz neural de Stellar.",
+        "features": {
+            "path_arb": {
+                "title": "Arbs de Ruta Atómica",
+                "desc": "Utilice PathPaymentStrictReceive nativo de Stellar para rutas de arbitraje multi-salto sin contratos y con finalidad instantánea."
+            },
+            "vaults": {
+                "title": "Bóvedas Soroban",
+                "desc": "Bóvedas institucionales no custodiales con lógica de delegación Control Key/Agent Auth. Seguridad absoluta para su XLM y USDC."
+            },
+            "bundling": {
+                "title": "Agrupación Multi-Op",
+                "desc": "Encadene hasta 100 operaciones de Stellar atómicamente. Tome prestado, intercambie y pague en una sola unidad de transacción."
+            },
+            "archive": {
+                "title": "Archivo Neural",
+                "desc": "Cada decisión del agente se graba en la caja negra forense archivada vía IPFS. Prueba indestructible de integridad automatizada."
+            }
+        },
+        "sdk_title_1": "AUTONOMÍA",
+        "sdk_title_2": "PROGRAMABLE",
+        "sdk_subtitle": "Cree un agente listo para el combate en segundos usando nuestros SDKs. Paridad total entre TypeScript y Python para quants institucionales.",
+        "ignite_the_loop": "INICIAR EL BUCLE",
+        "enter_matrix": "ENTRAR EN LA MATRIZ",
+        "browse_agents": "EXPLORAR AGENTES"
+    },
+    "common": {
+        "neural_matrix": "Matriz Neural",
+        "atomic_execution": "Ejecución Atómica",
+        "liquidity_sentinel": "Centinela de Liquidez",
+        "path_payment_vector": "Vector de Pago de Ruta",
+        "dashboard": "Panel de Control",
+        "strategies": "Estrategias",
+        "marketplace": "Mercado",
+        "analytics": "Analíticas"
+    },
+    "dashboard": {
+        "fleet_status": "Estado Operativo de Flota",
+        "active_agents": "Agentes Neurales Activos",
+        "total_profit": "Beneficio Total Asegurado",
+        "ops_console": "Consola de Operaciones Quantum"
+    },
+    "builder": {
+        "drag_n_drop": "Arrastra Nodos a la Matriz",
+        "simulate": "Simular Huella de Recursos",
+        "publish": "Desplegar en Stellar Mainnet",
+        "categories": {
+            "atomic_engine": "Motor Atómico",
+            "signal_inputs": "Entradas de Señal",
+            "ai_intelligence": "Inteligencia IA"
+        },
+        "search_placeholder": "Buscar componentes neurales...",
+        "asset_selector": "Seleccionar Activo Base",
+        "collapse": "Colapsar Interfaz"
+    },
+    "settings": {
+        "ai_providers": {
+            "title": "Proveedores de Inteligencia Neural",
+            "gemini": "Google Gemini",
+            "grok": "xAI Grok",
+            "minimax": "MiniMax (China)",
+            "openai": "OpenAI",
+            "anthropic": "Anthropic"
+        }
+    },
+    "toasts": {
+        "compiling": "Compilando Lógica Neural...",
+        "archiving": "Archivando en Archivo Neural (IPFS)...",
+        "broadcast_success": "Transmisión Exitosa",
+        "broadcast_failed": "Error de Enlace"
     }
 }

@@ -1,36 +1,47 @@
 // ═══════════════════════════════════════════════════════════════
-// Nirium — Webhook Service with HMAC Signing + Retry Logic
+// Nirium — Webhook Service (Real Implementation)
 // ═══════════════════════════════════════════════════════════════
 
-import { v4 as uuidv4 } from 'uuid';
 import crypto from 'crypto';
-import { Webhook, WebhookEventType } from '../types/database.types.js';
 
+export interface Webhook {
+    id: string;
+    userId: string;
+    url: string;
+    events: string[];
+    secret: string;
+    active: boolean;
+    createdAt: string;
+    lastTriggeredAt?: string;
+    failureCount: number;
+}
+
+// In-memory store (persisted per agent session; for production, use Supabase)
 const webhooks = new Map<string, Webhook>();
-const MAX_RETRIES = 3;
-const RETRY_DELAYS = [1000, 5000, 30000]; // 1s, 5s, 30s
-const MAX_CONSECUTIVE_FAILURES = 10;
 
 /**
- * Register a new webhook.
+ * Register a new webhook endpoint.
  */
-export function registerWebhook(
+export async function registerWebhook(
     userId: string,
     url: string,
-    events: WebhookEventType[],
+    events: string[],
     secret?: string
-): Webhook {
+): Promise<Webhook> {
+    const id = crypto.randomUUID();
     const webhook: Webhook = {
-        id: uuidv4(),
-        user_id: userId,
+        id,
+        userId,
         url,
         events,
         secret: secret || crypto.randomBytes(32).toString('hex'),
-        is_active: true,
-        failure_count: 0,
-        created_at: new Date().toISOString(),
+        active: true,
+        createdAt: new Date().toISOString(),
+        failureCount: 0,
     };
-    webhooks.set(webhook.id, webhook);
+
+    webhooks.set(id, webhook);
+    console.log(`[Webhook] Registered: ${url} for events: [${events.join(', ')}]`);
     return webhook;
 }
 
@@ -38,143 +49,108 @@ export function registerWebhook(
  * Get all webhooks for a user.
  */
 export function getUserWebhooks(userId: string): Webhook[] {
-    return Array.from(webhooks.values()).filter(w => w.user_id === userId);
+    return Array.from(webhooks.values()).filter(w => w.userId === userId);
 }
 
 /**
  * Delete a webhook.
  */
-export function deleteWebhook(webhookId: string): boolean {
-    return webhooks.delete(webhookId);
+export function deleteWebhook(id: string): boolean {
+    const existed = webhooks.has(id);
+    webhooks.delete(id);
+    if (existed) console.log(`[Webhook] Deleted: ${id}`);
+    return existed;
 }
 
 /**
- * Sign a payload with HMAC-SHA256.
+ * Send a test event to a webhook.
  */
-function signPayload(payload: string, secret: string): string {
-    return crypto.createHmac('sha256', secret).update(payload).digest('hex');
-}
-
-/**
- * Dispatch a webhook event to all matching subscribers.
- */
-export async function dispatchWebhookEvent(
-    event: WebhookEventType,
-    payload: Record<string, unknown>
-): Promise<void> {
-    const matchingWebhooks = Array.from(webhooks.values()).filter(
-        w => w.is_active && w.events.includes(event)
-    );
-
-    const promises = matchingWebhooks.map(webhook =>
-        deliverWebhook(webhook, event, payload)
-    );
-
-    await Promise.allSettled(promises);
-}
-
-/**
- * Deliver a webhook with retry logic.
- */
-async function deliverWebhook(
-    webhook: Webhook,
-    event: WebhookEventType,
-    payload: Record<string, unknown>
-): Promise<void> {
-    const body = JSON.stringify({
-        event,
-        payload,
-        webhook_id: webhook.id,
-        timestamp: new Date().toISOString(),
-        delivery_id: uuidv4(),
-    });
-
-    const signature = signPayload(body, webhook.secret);
-
-    for (let attempt = 0; attempt <= MAX_RETRIES; attempt++) {
-        try {
-            const response = await fetch(webhook.url, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-Nirium-Signature': signature,
-                    'X-Nirium-Event': event,
-                    'X-Nirium-Delivery': uuidv4(),
-                    'User-Agent': 'Nirium-Webhook/0.1.0',
-                },
-                body,
-                signal: AbortSignal.timeout(10_000), // 10s timeout
-            });
-
-            if (response.ok) {
-                // Reset failure count on success
-                webhook.failure_count = 0;
-                webhook.last_triggered_at = new Date().toISOString();
-                webhooks.set(webhook.id, webhook);
-                return;
-            }
-
-            console.warn(`[Webhook] ${webhook.url} returned ${response.status} (attempt ${attempt + 1})`);
-        } catch (error) {
-            console.warn(`[Webhook] ${webhook.url} failed (attempt ${attempt + 1}): ${error}`);
-        }
-
-        // Wait before retry (except on last attempt)
-        if (attempt < MAX_RETRIES) {
-            await new Promise(resolve => setTimeout(resolve, RETRY_DELAYS[attempt]));
-        }
-    }
-
-    // All retries exhausted — increment failure count
-    webhook.failure_count++;
-    if (webhook.failure_count >= MAX_CONSECUTIVE_FAILURES) {
-        webhook.is_active = false;
-        console.error(`[Webhook] ${webhook.url} disabled after ${MAX_CONSECUTIVE_FAILURES} consecutive failures`);
-    }
-    webhooks.set(webhook.id, webhook);
-}
-
-/**
- * Send a test payload to a specific webhook.
- */
-export async function testWebhook(webhookId: string): Promise<{
-    success: boolean;
-    statusCode?: number;
-    error?: string;
-}> {
-    const webhook = webhooks.get(webhookId);
+export async function testWebhook(id: string): Promise<{ success: boolean; message: string; statusCode?: number }> {
+    const webhook = webhooks.get(id);
     if (!webhook) {
-        return { success: false, error: 'Webhook not found' };
+        return { success: false, message: 'Webhook not found' };
     }
 
-    const testPayload = {
-        event: 'health.warning' as WebhookEventType,
-        payload: {
-            message: 'This is a test webhook delivery from Nirium',
-            test: true,
-            timestamp: new Date().toISOString(),
-        },
-    };
+    return deliverPayload(webhook, {
+        event: 'test',
+        timestamp: new Date().toISOString(),
+        data: { message: 'Nirium webhook test — if you receive this, your endpoint is configured correctly.' },
+    });
+}
 
-    const body = JSON.stringify(testPayload);
-    const signature = signPayload(body, webhook.secret);
+/**
+ * Dispatch a real event to all matching webhooks.
+ */
+export async function dispatchWebhookEvent(event: string, payload: any): Promise<void> {
+    const matching = Array.from(webhooks.values()).filter(
+        w => w.active && w.events.includes(event)
+    );
+
+    if (matching.length === 0) return;
+
+    console.log(`[Webhook] Dispatching "${event}" to ${matching.length} endpoint(s)`);
+
+    const deliveries = matching.map(webhook =>
+        deliverPayload(webhook, {
+            event,
+            timestamp: new Date().toISOString(),
+            data: payload,
+        }).catch(err => {
+            console.error(`[Webhook] Delivery failed for ${webhook.url}:`, err);
+        })
+    );
+
+    await Promise.allSettled(deliveries);
+}
+
+/**
+ * Deliver a payload to a single webhook with HMAC signature.
+ */
+async function deliverPayload(
+    webhook: Webhook,
+    body: Record<string, unknown>
+): Promise<{ success: boolean; message: string; statusCode?: number }> {
+    const bodyStr = JSON.stringify(body);
+
+    // Sign payload with HMAC-SHA256
+    const signature = crypto
+        .createHmac('sha256', webhook.secret)
+        .update(bodyStr)
+        .digest('hex');
 
     try {
-        const response = await fetch(webhook.url, {
+        const res = await fetch(webhook.url, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
-                'X-Nirium-Signature': signature,
-                'X-Nirium-Event': 'health.warning',
-                'X-Nirium-Test': 'true',
-                'User-Agent': 'Nirium-Webhook/0.1.0',
+                'X-Nirium-Signature': `sha256=${signature}`,
+                'X-Nirium-Event': String(body.event),
+                'X-Nirium-Delivery': crypto.randomUUID(),
+                'User-Agent': 'Nirium-Webhook/1.0',
             },
-            body,
-            signal: AbortSignal.timeout(10_000),
+            body: bodyStr,
+            signal: AbortSignal.timeout(10000),
         });
 
-        return { success: response.ok, statusCode: response.status };
+        webhook.lastTriggeredAt = new Date().toISOString();
+
+        if (res.ok) {
+            webhook.failureCount = 0;
+            return { success: true, message: `Delivered (${res.status})`, statusCode: res.status };
+        } else {
+            webhook.failureCount++;
+            // Auto-disable after 10 consecutive failures
+            if (webhook.failureCount >= 10) {
+                webhook.active = false;
+                console.warn(`[Webhook] Auto-disabled ${webhook.url} after 10 consecutive failures.`);
+            }
+            return { success: false, message: `HTTP ${res.status}`, statusCode: res.status };
+        }
     } catch (error) {
-        return { success: false, error: String(error) };
+        webhook.failureCount++;
+        if (webhook.failureCount >= 10) {
+            webhook.active = false;
+        }
+        return { success: false, message: `Delivery error: ${error}` };
     }
 }

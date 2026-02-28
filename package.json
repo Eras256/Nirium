@@ -3,7 +3,7 @@
 	"private": true,
 	"scripts": {
 		"dev": "pnpm --parallel --filter nirium-web --filter @nirium/agent run dev",
-		"build": "pnpm --filter nirium-web build",
+		"build": "pnpm --parallel run build",
 		"start": "pnpm --filter nirium-web start"
 	},
 	"dependencies": {
@@ -16,6 +16,10 @@
 	},
 	"packageManager": "pnpm@9.15.9",
 	"devDependencies": {
-		"snarkjs": "^0.7.6"
+		"@types/node": "^20.11.0",
+		"@types/react": "^19.0.0",
+		"@types/react-dom": "^19.0.0",
+		"snarkjs": "^0.7.6",
+		"typescript": "^5.7.0"
 	}
 }

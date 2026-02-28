@@ -1,52 +1,28 @@
-// ═══════════════════════════════════════════════════════════════
-// Nirium — Anthropic Claude Provider
-// ═══════════════════════════════════════════════════════════════
 import { LLMProvider } from './base.js';
+import axios from 'axios';
 export class AnthropicProvider extends LLMProvider {
     name = 'anthropic';
-    model;
-    apiKey;
-    baseUrl = 'https://api.anthropic.com/v1';
-    constructor(apiKey, model) {
-        super();
-        this.apiKey = apiKey || process.env.ANTHROPIC_API_KEY || '';
-        this.model = model || 'claude-3-5-sonnet-20241022';
-    }
-    async analyze(marketSnapshot, context) {
-        if (!this.apiKey) {
-            return this.fallbackDecision('Anthropic API key not configured');
-        }
+    model = process.env.ANTHROPIC_MODEL || 'claude-3-5-sonnet-latest';
+    apiKey = process.env.ANTHROPIC_API_KEY;
+    async analyze(market, context) {
+        if (!this.apiKey)
+            throw new Error('Anthropic API key missing');
         try {
-            const response = await fetch(`${this.baseUrl}/messages`, {
-                method: 'POST',
+            const res = await axios.post('https://api.anthropic.com/v1/messages', {
+                model: this.model,
+                max_tokens: 1024,
+                messages: [{ role: 'user', content: `Analyze Stellar market. JSON output: {"action": "...", "confidence": ..., "reasoning": "..."}. Data: ${JSON.stringify(market)}` }]
+            }, {
                 headers: {
-                    'Content-Type': 'application/json',
                     'x-api-key': this.apiKey,
-                    'anthropic-version': '2023-06-01',
-                },
-                body: JSON.stringify({
-                    model: this.model,
-                    max_tokens: 1000,
-                    system: this.buildSystemPrompt(),
-                    messages: [
-                        { role: 'user', content: this.buildUserPrompt(marketSnapshot, context) },
-                    ],
-                    temperature: 0.3,
-                }),
+                    'anthropic-version': '2023-06-01'
+                }
             });
-            if (!response.ok) {
-                const error = await response.text();
-                return this.fallbackDecision(`Anthropic API error: ${response.status} — ${error}`);
-            }
-            const data = await response.json();
-            const content = data.content?.[0]?.text;
-            if (!content) {
-                return this.fallbackDecision('Empty response from Anthropic');
-            }
-            return this.parseDecision(content);
+            return this.parseDecision(res.data.content[0].text);
         }
         catch (error) {
-            return this.fallbackDecision(`Anthropic request failed: ${error}`);
+            console.error('[Anthropic] Error:', error);
+            throw error;
         }
     }
 }

@@ -188,7 +188,7 @@ export function broadcastSignal(signal: Signal): void {
         recentSignals.splice(0, recentSignals.length - MAX_RECENT_SIGNALS);
     }
 
-    const payload = JSON.stringify({ messageType: 'signal', ...signal });
+    const payload = JSON.stringify({ type: 'signal', ...signal });
     clients.forEach((client) => {
         if (client.ws.readyState === WebSocket.OPEN) {
             client.ws.send(payload);
