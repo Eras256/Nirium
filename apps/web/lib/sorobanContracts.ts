@@ -86,18 +86,17 @@ export async function invokeContract({
 
         const transaction = transactionBuilder.build();
 
-        // 3. Simulate to get footprint and soroban data
-        const simResult = await server.simulateTransaction(transaction);
-
-        if (SorobanRpc.Api.isSimulationError(simResult)) {
-            return { success: false, error: `Simulation error: ${simResult.error}` };
+        // 3. Prepare the transaction (combines simulation & resource assembly)
+        let preparedTx;
+        try {
+            preparedTx = await server.prepareTransaction(transaction);
+        } catch (simErr) {
+            return { success: false, error: `Simulation failed: ${simErr instanceof Error ? simErr.message : String(simErr)}` };
         }
 
-        // 4. Assemble the transaction with simulation data
-        const assembledTx = SorobanRpc.assembleTransaction(transaction, simResult).build();
-        const txXdr = assembledTx.toXDR();
+        const txXdr = preparedTx.toXDR();
 
-        // 5. Sign with Freighter
+        // 4. Sign with Freighter
         const signedResult = await signTransaction(txXdr, {
             networkPassphrase: NETWORK_PASSPHRASE,
         });
