@@ -25,6 +25,7 @@ import {
     scValToNative,
     BASE_FEE,
     Keypair,
+    Memo,
 } from '@stellar/stellar-sdk';
 import { signTransaction } from '@stellar/freighter-api';
 
@@ -49,12 +50,12 @@ export function getRpcServer(): SorobanRpc.Server {
     return new SorobanRpc.Server(RPC_URL, { allowHttp: false });
 }
 
-// ─── Build + Sign + Submit via Freighter ─────────────────────────────
 interface InvokeParams {
     contractId: string;
     method: string;
     args: ReturnType<typeof nativeToScVal>[];
     callerAddress: string;
+    memo?: string;
 }
 
 export async function invokeContract({
@@ -62,6 +63,7 @@ export async function invokeContract({
     method,
     args,
     callerAddress,
+    memo,
 }: InvokeParams): Promise<{ success: boolean; result?: unknown; txHash?: string; error?: string }> {
     const server = getRpcServer();
 
@@ -71,13 +73,18 @@ export async function invokeContract({
 
         // 2. Build the transaction
         const contract = new Contract(contractId);
-        const transaction = new TransactionBuilder(account, {
+        const transactionBuilder = new TransactionBuilder(account, {
             fee: BASE_FEE,
             networkPassphrase: NETWORK_PASSPHRASE,
         })
             .addOperation(contract.call(method, ...args))
-            .setTimeout(30)
-            .build();
+            .setTimeout(30);
+
+        if (memo) {
+            transactionBuilder.addMemo(Memo.text(memo));
+        }
+
+        const transaction = transactionBuilder.build();
 
         // 3. Simulate to get footprint and soroban data
         const simResult = await server.simulateTransaction(transaction);
@@ -198,7 +205,7 @@ export async function vaultGetVaultCount(): Promise<number> {
 /**
  * Create a new vault position
  */
-export async function vaultCreate(callerAddress: string, tokenAddress: string) {
+export async function vaultCreate(callerAddress: string, tokenAddress: string, memo?: string) {
     return invokeContract({
         contractId: CONTRACT_IDS.VAULT,
         method: 'create_vault',
@@ -207,6 +214,7 @@ export async function vaultCreate(callerAddress: string, tokenAddress: string) {
             Address.fromString(tokenAddress).toScVal(),
         ],
         callerAddress,
+        memo,
     });
 }
 
