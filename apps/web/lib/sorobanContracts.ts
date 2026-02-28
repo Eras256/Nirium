@@ -206,6 +206,18 @@ export async function vaultGetVaultCount(): Promise<number> {
 }
 
 /**
+ * Get detailed vault info including real on-chain balance
+ */
+export async function vaultGetVault(vaultId: number): Promise<any> {
+    const result = await simulateContractRead({
+        contractId: CONTRACT_IDS.VAULT,
+        method: 'get_vault',
+        args: [nativeToScVal(vaultId, { type: 'u64' })],
+    });
+    return result;
+}
+
+/**
  * Create a new vault position with a name
  */
 export async function vaultCreate(callerAddress: string, tokenAddress: string, name: string) {

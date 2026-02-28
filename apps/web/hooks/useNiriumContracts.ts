@@ -14,6 +14,7 @@ import {
     vaultGetTotalFees,
     vaultGetVaultCount,
     vaultCreate,
+    vaultGetVault,
     vaultDeposit,
     vaultWithdraw,
     eloGetScore,
@@ -55,6 +56,7 @@ export function useVault() {
 
     const getTotalFees = useCallback(() => vaultGetTotalFees(), []);
     const getVaultCount = useCallback(() => vaultGetVaultCount(), []);
+    const getVault = useCallback((id: number) => vaultGetVault(id), []);
 
     const createVault = useCallback(async (callerAddress: string, tokenAddress: string, name: string) => {
         begin();
@@ -113,6 +115,7 @@ export function useVault() {
         contractId: CONTRACT_IDS.VAULT,
         getTotalFees,
         getVaultCount,
+        getVault,
         createVault,
         deposit,
         withdraw,

@@ -183,7 +183,7 @@ function DashboardContent() {
         const fetchBalance = async () => {
             try {
                 const { stellarClient } = await import("../../lib/stellarClient");
-                const decimals = baseAsset === "XLM" ? 10_000_000 : 1_000_000;
+                const decimals = 10_000_000; // All Stellar / Soroban SAC assets use 7 decimals
                 const coinType = baseAsset === "XLM"
                     ? "XLM"
                     : "USDC";
@@ -209,7 +209,16 @@ function DashboardContent() {
 
         const fetchVaultBalance = async () => {
             try {
-                // Read from local storage to keep demo state across refreshes
+                if (vaultId) {
+                    const vData = await vault.getVault(Number(vaultId));
+                    if (vData && vData.balance !== undefined) {
+                        const realBalance = Number(BigInt(vData.balance)) / 10_000_000;
+                        setVaultBalance(realBalance);
+                        return;
+                    }
+                }
+
+                // Fallback: Read from local storage to keep demo state across refreshes if contract not ready
                 const storedBalance = localStorage.getItem(`nirium-vault-balance-${vaultId}-${baseAsset}`);
                 if (storedBalance) {
                     setVaultBalance(parseFloat(storedBalance));

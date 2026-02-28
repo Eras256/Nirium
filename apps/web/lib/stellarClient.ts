@@ -4,22 +4,33 @@
  */
 export const stellarClient = {
     // Stellar uses 7 decimals (1 XLM = 10,000,000 stroops)
+    // Stellar Assets use 7 decimals internally (1 unit = 10,000,000 subunits)
     getBalance: async ({ owner, coinType }: { owner: string, coinType?: string }) => {
         try {
             const resp = await fetch(`https://horizon-testnet.stellar.org/accounts/${owner}`);
             if (!resp.ok) throw new Error("Account not found");
             const data = await resp.json();
-            const nativeBalance = data.balances.find((b: { asset_type: string }) => b.asset_type === 'native');
-            // Convert XLM balance string to stroops (BigInt) for consistency
-            const stroops = BigInt(Math.floor(Number(nativeBalance?.balance || "0") * 10_000_000));
+
+            let targetBalance;
+            if (coinType === 'USDC') {
+                const USDC_ISSUER_TESTNET = 'GBBD47IF6LWK7P7MDEVSCWR7DPUWV3NY3DTQEVFL4NAT4AQH3ZLLFLA5';
+                targetBalance = data.balances.find((b: { asset_code?: string, asset_issuer?: string }) =>
+                    b.asset_code === 'USDC' && b.asset_issuer === USDC_ISSUER_TESTNET
+                );
+            } else {
+                targetBalance = data.balances.find((b: { asset_type: string }) => b.asset_type === 'native');
+            }
+
+            // Convert string balance to raw integer units (BigInt)
+            const raw = BigInt(Math.floor(Number(targetBalance?.balance || "0") * 10_000_000));
             return {
-                totalBalance: stroops.toString(),
-                asset: 'native'
+                totalBalance: raw.toString(),
+                asset: coinType || 'native'
             };
         } catch (e) {
             console.error("Error fetching balance:", e);
-            // Default 10k XLM fallback if fetch fails or account new
-            return { totalBalance: "100000000000", asset: 'native' };
+            // Return 0 if account not found or network error occurs (Safe Institutional Fallback)
+            return { totalBalance: "0", asset: coinType || 'native' };
         }
     },
 
