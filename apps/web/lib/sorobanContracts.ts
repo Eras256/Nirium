@@ -58,6 +58,9 @@ interface InvokeParams {
     memo?: string;
 }
 
+const networks = Networks;
+const SOROBAN_BASE_FEE = '100000'; // 0.01 XLM base safety
+
 export async function invokeContract({
     contractId,
     method,
@@ -74,27 +77,33 @@ export async function invokeContract({
         // 2. Build the transaction
         const contract = new Contract(contractId);
         const transactionBuilder = new TransactionBuilder(account, {
-            fee: BASE_FEE,
+            fee: SOROBAN_BASE_FEE,
             networkPassphrase: NETWORK_PASSPHRASE,
         })
             .addOperation(contract.call(method, ...args))
-            .setTimeout(30);
+            .setTimeout(60);
 
         if (memo) {
-            transactionBuilder.addMemo(Memo.text(memo));
+            // Text memos are limited to 28 bytes
+            const safeMemo = memo.slice(0, 28);
+            transactionBuilder.addMemo(Memo.text(safeMemo));
         }
 
         const transaction = transactionBuilder.build();
 
-        // 3. Prepare the transaction (combines simulation & resource assembly)
-        let preparedTx;
-        try {
-            preparedTx = await server.prepareTransaction(transaction);
-        } catch (simErr) {
-            return { success: false, error: `Simulation failed: ${simErr instanceof Error ? simErr.message : String(simErr)}` };
+        // 3. Simulate to get footprint and soroban data
+        const simResult = await server.simulateTransaction(transaction);
+
+        if (SorobanRpc.Api.isSimulationError(simResult)) {
+            console.error('Simulation result:', simResult);
+            return { success: false, error: `Simulation failed: ${simResult.error}` };
         }
 
-        const txXdr = preparedTx.toXDR();
+        // 4. Assemble the transaction with simulation data
+        // We increase the base fee explicitly for Soroban overhead
+        const assembledTxBuilder = SorobanRpc.assembleTransaction(transaction, simResult);
+        const assembledTx = assembledTxBuilder.build();
+        const txXdr = assembledTx.toXDR();
 
         // 4. Sign with Freighter
         const signedResult = await signTransaction(txXdr, {
