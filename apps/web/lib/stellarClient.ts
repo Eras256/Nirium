@@ -3,11 +3,25 @@
  * This acts as the standard client during development and testing.
  */
 export const stellarClient = {
-    // Stellar uses 7 decimals for most assets, 9 for stroops/native
-    getBalance: async ({ owner, coinType }: { owner: string, coinType: string }) => ({
-        totalBalance: "10000000000",
-        asset: coinType === 'XLM' ? 'native' : 'USDC'
-    }),
+    // Stellar uses 7 decimals (1 XLM = 10,000,000 stroops)
+    getBalance: async ({ owner, coinType }: { owner: string, coinType?: string }) => {
+        try {
+            const resp = await fetch(`https://horizon-testnet.stellar.org/accounts/${owner}`);
+            if (!resp.ok) throw new Error("Account not found");
+            const data = await resp.json();
+            const nativeBalance = data.balances.find((b: { asset_type: string }) => b.asset_type === 'native');
+            // Convert XLM balance string to stroops (BigInt) for consistency
+            const stroops = BigInt(Math.floor(Number(nativeBalance?.balance || "0") * 10_000_000));
+            return {
+                totalBalance: stroops.toString(),
+                asset: 'native'
+            };
+        } catch (e) {
+            console.error("Error fetching balance:", e);
+            // Default 10k XLM fallback if fetch fails or account new
+            return { totalBalance: "100000000000", asset: 'native' };
+        }
+    },
 
     // Equivalent to getting account or contract data
     getObject: async ({ id }: { id: string }) => ({

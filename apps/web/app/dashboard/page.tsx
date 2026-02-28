@@ -183,7 +183,7 @@ function DashboardContent() {
         const fetchBalance = async () => {
             try {
                 const { stellarClient } = await import("../../lib/stellarClient");
-                const decimals = baseAsset === "XLM" ? 1_000_000_000 : 1_000_000;
+                const decimals = baseAsset === "XLM" ? 10_000_000 : 1_000_000;
                 const coinType = baseAsset === "XLM"
                     ? "XLM"
                     : "USDC";
@@ -593,7 +593,7 @@ function DashboardContent() {
             // Check Native XLM Balance for Transaction Gas + Fee Requirements
             let requiredStellarAmount = REQUIRED_BALANCE;
             const { stellarClient } = await import("../../lib/stellarClient");
-            const nativeBalance = await stellarClient.getBalance({ owner: account.address, coinType: 'XLM' }).then(b => Number(BigInt(b.totalBalance)) / 1_000_000_000);
+            const nativeBalance = await stellarClient.getBalance({ owner: account.address, coinType: 'XLM' }).then(b => Number(BigInt(b.totalBalance)) / 10_000_000);
 
             if (nativeBalance < REQUIRED_BALANCE) {
                 toast.error(`Insufficient Balance: You need at least ${REQUIRED_BALANCE} XLM for license fee + gas`, {
