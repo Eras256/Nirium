@@ -604,7 +604,7 @@ function DashboardContent() {
 
             // REAL INSTITUTIONAL SOROBAN CALL
             toast.loading("Invoking NiriumVault.create_vault...", { id: toastId });
-            const result = await vault.createVault(account.address, NATIVE_ASSET_ID, currentStrategy.name);
+            const result = await vault.createVault(account.address, NATIVE_ASSET_ID);
 
             if (!result.success || !result.txHash) {
                 toast.dismiss(toastId);
