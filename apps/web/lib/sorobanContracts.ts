@@ -40,7 +40,7 @@ export const CONTRACT_IDS = {
 } as const;
 
 // Soroban Native Token Address (XLM) on Stellar Testnet
-export const NATIVE_ASSET_ID = 'CAS3J7GYCCXG3Y3NGAYODXF6SOWDY37BCYSDX3S6S6SN3H3SRMAO6LCF';
+export const NATIVE_ASSET_ID = 'CDLZFC3SYJYDZT7K67VZ75HPJVIEUVNIXF47ZG2FB2RMQQVU2HHGCYSC';
 
 export type ContractName = keyof typeof CONTRACT_IDS;
 
@@ -203,8 +203,8 @@ export async function vaultCreate(callerAddress: string, tokenAddress: string) {
         contractId: CONTRACT_IDS.VAULT,
         method: 'create_vault',
         args: [
-            nativeToScVal(callerAddress, { type: 'address' }),
-            nativeToScVal(tokenAddress, { type: 'address' }),
+            Address.fromString(callerAddress).toScVal(),
+            Address.fromString(tokenAddress).toScVal(),
         ],
         callerAddress,
     });
@@ -251,7 +251,7 @@ export async function eloGetScore(sentinelAddress: string): Promise<number> {
     const result = await simulateContractRead({
         contractId: CONTRACT_IDS.ELO,
         method: 'get_elo',
-        args: [nativeToScVal(sentinelAddress, { type: 'address' })],
+        args: [Address.fromString(sentinelAddress).toScVal()],
     });
     return Number(result ?? 0);
 }
@@ -281,7 +281,7 @@ export async function eloGetProfile(sentinelAddress: string): Promise<{
     const result = await simulateContractRead({
         contractId: CONTRACT_IDS.ELO,
         method: 'get_profile',
-        args: [nativeToScVal(sentinelAddress, { type: 'address' })],
+        args: [Address.fromString(sentinelAddress).toScVal()],
     }) as Record<string, unknown> | null;
 
     if (!result) return null;
@@ -301,7 +301,7 @@ export async function eloRegisterSentinel(callerAddress: string) {
     return invokeContract({
         contractId: CONTRACT_IDS.ELO,
         method: 'register_sentinel',
-        args: [nativeToScVal(callerAddress, { type: 'address' })],
+        args: [Address.fromString(callerAddress).toScVal()],
         callerAddress,
     });
 }
@@ -369,7 +369,7 @@ export async function marketplacePublishStrategy(
         contractId: CONTRACT_IDS.MARKETPLACE,
         method: 'publish_strategy',
         args: [
-            nativeToScVal(callerAddress, { type: 'address' }),
+            Address.fromString(callerAddress).toScVal(),
             nativeToScVal(name, { type: 'string' }),
             nativeToScVal(ipfsCid, { type: 'string' }),
             nativeToScVal(subscriptionFeeUsdc, { type: 'i128' }),
@@ -390,9 +390,9 @@ export async function marketplaceSubscribe(
         contractId: CONTRACT_IDS.MARKETPLACE,
         method: 'subscribe',
         args: [
-            nativeToScVal(callerAddress, { type: 'address' }),
+            Address.fromString(callerAddress).toScVal(),
             nativeToScVal(strategyId, { type: 'u64' }),
-            nativeToScVal(usdcTokenAddress, { type: 'address' }),
+            Address.fromString(usdcTokenAddress).toScVal(),
         ],
         callerAddress,
     });
