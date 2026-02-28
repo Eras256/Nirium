@@ -78,13 +78,19 @@ export async function invokeContract({
 
         // 2. Build the initial transaction for simulation
         const contract = new Contract(contractId);
-        const transaction = new TransactionBuilder(account, {
+        const transactionBuilder = new TransactionBuilder(account, {
             fee: SOROBAN_BASE_FEE,
             networkPassphrase: NETWORK_PASSPHRASE,
         })
             .addOperation(contract.call(method, ...args))
-            .setTimeout(60)
-            .build();
+            .setTimeout(60);
+
+        if (memo) {
+            // Stellar text memos are limited to 28 bytes
+            transactionBuilder.addMemo(Memo.text(memo.slice(0, 28)));
+        }
+
+        const transaction = transactionBuilder.build();
 
         // 3. Simulate to get footprint and soroban data
         const simResult = await server.simulateTransaction(transaction);
