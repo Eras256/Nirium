@@ -35,7 +35,7 @@ const NETWORK_PASSPHRASE = Networks.TESTNET;
 const HORIZON_URL = process.env.NEXT_PUBLIC_HORIZON_URL || 'https://horizon-testnet.stellar.org';
 
 export const CONTRACT_IDS = {
-    VAULT: process.env.NEXT_PUBLIC_CONTRACT_SENTINEL || 'CCSPRXZNSMY5EEDT43L22IH2H76K7WAPGOTYHCRXINHZLED44KSP3LGN',
+    VAULT: process.env.NEXT_PUBLIC_CONTRACT_SENTINEL || 'CAEXPP7HO3BNCFUGZ4ESEMGDVE77FRP53RLSYES46XWCGW3PBR4NJHNZ',
     ELO: process.env.NEXT_PUBLIC_CONTRACT_ELO || 'CB4RCN4YHLCX2SIFMEJJSMDBWO6NPJHMDLSSKA4CT4HRTD2TFCU6XW4H',
     MARKETPLACE: process.env.NEXT_PUBLIC_CONTRACT_MARKETPLACE || 'CCUDDIF6BIIA6NZNSDD63KNWMEAPYTB5WHRDMU2IGOATBCZF6KV6BLEN',
 } as const;
@@ -201,15 +201,16 @@ export async function vaultGetVaultCount(): Promise<number> {
 }
 
 /**
- * Create a new vault position
+ * Create a new vault position with a name
  */
-export async function vaultCreate(callerAddress: string, tokenAddress: string) {
+export async function vaultCreate(callerAddress: string, tokenAddress: string, name: string) {
     return invokeContract({
         contractId: CONTRACT_IDS.VAULT,
         method: 'create_vault',
         args: [
             Address.fromString(callerAddress).toScVal(),
             Address.fromString(tokenAddress).toScVal(),
+            nativeToScVal(name, { type: 'string' }),
         ],
         callerAddress,
     });

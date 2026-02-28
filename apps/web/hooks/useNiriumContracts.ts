@@ -56,10 +56,10 @@ export function useVault() {
     const getTotalFees = useCallback(() => vaultGetTotalFees(), []);
     const getVaultCount = useCallback(() => vaultGetVaultCount(), []);
 
-    const createVault = useCallback(async (callerAddress: string, tokenAddress: string, memo?: string) => {
+    const createVault = useCallback(async (callerAddress: string, tokenAddress: string, name: string) => {
         begin();
         try {
-            const result = await vaultCreate(callerAddress, tokenAddress, memo);
+            const result = await vaultCreate(callerAddress, tokenAddress, name);
             if (result.success && result.txHash) {
                 confirm(result.txHash);
             } else {

@@ -13,7 +13,7 @@
 //! 3. Single-Invocation Flash Loans — this contract's pattern
 
 use soroban_sdk::{
-    contract, contractimpl, contracttype, symbol_short, token, Address, Env, Vec,
+    contract, contractimpl, contracttype, symbol_short, token, Address, Env, String, Vec,
 };
 
 // ═══════════════════════════════════════════════════════════════
@@ -80,6 +80,7 @@ pub struct Vault {
     pub balance: i128,
     pub created_at: u64,
     pub is_active: bool,
+    pub name: String,
 }
 
 /// Agent delegation record stored in persistent storage.
@@ -150,7 +151,7 @@ impl NiriumVaultContract {
 
     /// Create a new vault. The caller becomes the owner.
     /// A deployment fee is collected and sent to the treasury.
-    pub fn create_vault(env: Env, owner: Address, token_address: Address) -> Vault {
+    pub fn create_vault(env: Env, owner: Address, token_address: Address, name: String) -> Vault {
         owner.require_auth();
 
         let treasury: Address = env.storage().instance().get(&DataKey::Treasury).unwrap();
@@ -180,6 +181,7 @@ impl NiriumVaultContract {
             balance: 0,
             created_at: env.ledger().timestamp(),
             is_active: true,
+            name: name.clone(),
         };
 
         env.storage()
@@ -192,7 +194,7 @@ impl NiriumVaultContract {
 
         env.events().publish(
             (symbol_short!("vault"), symbol_short!("created")),
-            (vault_id, owner),
+            (vault_id, owner, name),
         );
 
         vault
