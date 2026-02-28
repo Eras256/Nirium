@@ -1,18 +1,26 @@
 // ═══════════════════════════════════════════════════════════════
-// Nirium — Live Mainnet Soroban Transaction Builder
+// Nirium — Live Soroban Transaction Builder (100% Real)
 // ═══════════════════════════════════════════════════════════════
 import * as StellarSdk from '@stellar/stellar-sdk';
+// Map strategy names to actual deployed contract functions
+const STRATEGY_TO_CONTRACT_FN = {
+    'flash-loan-arb': 'flash_loan_execute',
+    'flash-loan': 'flash_loan_execute',
+    'path-arbitrage': 'execute_path_arbitrage',
+    'path-vector': 'execute_path_arbitrage',
+    'cross-dex': 'execute_cross_dex',
+    'blend-yield': 'execute_blend_yield',
+    'soroswap-swap': 'execute_soroswap_swap',
+};
 /**
- * Execute a strategy on Stellar mainnet/testnet.
- * Builds real XDR transaction envelopes, submits to Horizon, and awaits confirmation.
+ * Execute a strategy on Stellar testnet/mainnet.
+ * Builds real XDR transaction envelopes, submits to Soroban RPC, and awaits confirmation.
  */
 export async function executeStrategy(strategy, asset, params, log) {
     const startTime = Date.now();
     try {
-        log('info', `[Execute] Building XDR for strategy: ${strategy}`);
         const secretKey = process.env.STELLAR_SECRET_KEY;
         const contractId = process.env.CONTRACT_ID;
-        // Use testnet by default unless explicitly connected to mainnet
         const network = process.env.STELLAR_NETWORK === 'mainnet' ? 'mainnet' : 'testnet';
         const rpcUrl = process.env.SOROBAN_RPC_URL || 'https://soroban-testnet.stellar.org';
         const networkPassphrase = network === 'mainnet'
@@ -23,37 +31,66 @@ export async function executeStrategy(strategy, asset, params, log) {
         }
         const sourceKeypair = StellarSdk.Keypair.fromSecret(secretKey);
         const server = new StellarSdk.rpc.Server(rpcUrl);
-        log('info', `[Execute] Contract: ${contractId.substring(0, 12)}...`);
-        log('info', `[Execute] Asset: ${asset}`);
-        log('info', `[Execute] Network: ${network} using ${rpcUrl}`);
         const amount = params.amount || 1000;
-        // 1. Fetch source account sequence
-        log('info', `[Execute] Fetching account details for ${sourceKeypair.publicKey().substring(0, 12)}...`);
+        // Resolve the contract function to call
+        const method = STRATEGY_TO_CONTRACT_FN[strategy] || 'flash_loan_execute';
+        log('info', `[Execute] Strategy: ${strategy} → Contract fn: ${method}`);
+        log('info', `[Execute] Contract: ${contractId.substring(0, 16)}...`);
+        log('info', `[Execute] Network: ${network} | Asset: ${asset} | Amount: ${amount}`);
+        // 1. Fetch source account
+        log('info', `[Execute] Loading account ${sourceKeypair.publicKey().substring(0, 12)}...`);
         const account = await server.getAccount(sourceKeypair.publicKey());
-        // 2. Build the Contract Invocation (e.g. sweep_to_yield placeholder for now)
-        // Note: For a real strategy, the method name and arguments would map exactly to your Rust contract.
-        // We'll use a generic "execute" or similar method, or just build the structure.
-        // For the sake of this functional bot, we will call a method like 'sweep_to_yield' 
-        // assuming Sentinel or generic contract structure.
-        // Here we build a mock argument list for demo purposes if exact method isn't known, 
-        // but it's a real XDR format.
-        let method = 'execute_strategy';
-        let contractArgs = [
-            StellarSdk.nativeToScVal(strategy, { type: 'string' }),
-            StellarSdk.nativeToScVal(amount, { type: 'i128' })
-        ];
-        // If it's a Sentinel specific known function, map it instead
-        if (strategy === 'blend-yield' || strategy === 'path-arbitrage') {
-            method = 'sweep_to_yield';
-            // Placeholder tokens, in production these come from params or config
-            const tokenAddr = 'CDLZFC3SYJYDZT7K67VZ75HPJVIEUVNIXF47ZG2FB2RMQQVU2HHGCYSC'; // native testnet
-            const dexAddr = 'CDLZFC3SYJYDZT7K67VZ75HPJVIEUVNIXF47ZG2FB2RMQQVU2HHGCYSC';
+        // 2. Build contract invocation args based on strategy type
+        let contractArgs;
+        if (method === 'flash_loan_execute') {
+            // flash_loan_execute(agent, vault_id, pool_id, borrow_amount, min_profit)
             contractArgs = [
-                new StellarSdk.Address(tokenAddr).toScVal(),
-                new StellarSdk.Address(dexAddr).toScVal(),
-                StellarSdk.nativeToScVal(amount, { type: 'i128' })
+                new StellarSdk.Address(sourceKeypair.publicKey()).toScVal(),
+                StellarSdk.nativeToScVal(1, { type: 'u64' }), // vault_id
+                StellarSdk.nativeToScVal(1, { type: 'u64' }), // pool_id
+                StellarSdk.nativeToScVal(amount, { type: 'i128' }),
+                StellarSdk.nativeToScVal(0, { type: 'i128' }), // min_profit
             ];
         }
+        else if (method === 'execute_path_arbitrage') {
+            // execute_path_arbitrage(agent, vault_id, path_length, amount, min_output)
+            contractArgs = [
+                new StellarSdk.Address(sourceKeypair.publicKey()).toScVal(),
+                StellarSdk.nativeToScVal(1, { type: 'u64' }),
+                StellarSdk.nativeToScVal(3, { type: 'u32' }), // path_length
+                StellarSdk.nativeToScVal(amount, { type: 'i128' }),
+                StellarSdk.nativeToScVal(Math.floor(amount * 1.001), { type: 'i128' }),
+            ];
+        }
+        else if (method === 'execute_cross_dex') {
+            // execute_cross_dex(agent, vault_id, amount, expected_sdex_output, expected_amm_output)
+            contractArgs = [
+                new StellarSdk.Address(sourceKeypair.publicKey()).toScVal(),
+                StellarSdk.nativeToScVal(1, { type: 'u64' }),
+                StellarSdk.nativeToScVal(amount, { type: 'i128' }),
+                StellarSdk.nativeToScVal(Math.floor(amount * 0.998), { type: 'i128' }),
+                StellarSdk.nativeToScVal(Math.floor(amount * 1.002), { type: 'i128' }),
+            ];
+        }
+        else if (method === 'execute_blend_yield') {
+            // execute_blend_yield(agent, vault_id, is_supply, amount)
+            contractArgs = [
+                new StellarSdk.Address(sourceKeypair.publicKey()).toScVal(),
+                StellarSdk.nativeToScVal(1, { type: 'u64' }),
+                StellarSdk.nativeToScVal(true, { type: 'bool' }),
+                StellarSdk.nativeToScVal(amount, { type: 'i128' }),
+            ];
+        }
+        else {
+            // execute_soroswap_swap(agent, vault_id, amount_in, min_amount_out)
+            contractArgs = [
+                new StellarSdk.Address(sourceKeypair.publicKey()).toScVal(),
+                StellarSdk.nativeToScVal(1, { type: 'u64' }),
+                StellarSdk.nativeToScVal(amount, { type: 'i128' }),
+                StellarSdk.nativeToScVal(Math.floor(amount * 0.995), { type: 'i128' }),
+            ];
+        }
+        // 3. Build the operation
         const operation = StellarSdk.Operation.invokeContractFunction({
             contract: contractId,
             function: method,
@@ -66,20 +103,32 @@ export async function executeStrategy(strategy, asset, params, log) {
             .addOperation(operation)
             .setTimeout(30)
             .build();
-        log('info', '[Execute] Simulating transaction...');
-        // 3. Simulate the transaction
+        // 4. Simulate
+        log('info', '[Execute] Simulating transaction on Soroban RPC...');
         const simResponse = await server.simulateTransaction(transaction);
         if (StellarSdk.rpc.Api.isSimulationError(simResponse)) {
             throw new Error(`Simulation failed: ${simResponse.error}`);
         }
-        log('info', '[Execute] Transaction simulated successfully, assembling...');
-        // 4. Assemble with fee and resources from simulation
+        log('info', '[Execute] ✅ Simulation successful, assembling transaction...');
+        // Extract return value from simulation (this is the real profit for flash_loan_execute)
+        let simulatedProfit = null;
+        if (StellarSdk.rpc.Api.isSimulationSuccess(simResponse) && simResponse.result) {
+            try {
+                const retVal = StellarSdk.scValToNative(simResponse.result.retval);
+                simulatedProfit = Number(retVal);
+                log('info', `[Execute] Simulated return value: ${simulatedProfit}`);
+            }
+            catch {
+                log('warn', '[Execute] Could not parse simulation return value');
+            }
+        }
+        // 5. Assemble with fee
         // @ts-ignore
         transaction = StellarSdk.rpc.assembleTransaction(transaction, networkPassphrase, simResponse).build();
-        // 5. Sign with the secret key
+        // 6. Sign
         log('info', '[Execute] Signing transaction...');
         transaction.sign(sourceKeypair);
-        // 6. Submit to Soroban RPC
+        // 7. Submit
         log('info', '[Execute] Submitting to network...');
         const sendResponse = await server.sendTransaction(transaction);
         if (sendResponse.status === 'ERROR') {
@@ -87,28 +136,46 @@ export async function executeStrategy(strategy, asset, params, log) {
             throw new Error(`Submit failed: ${JSON.stringify(sendResponse.errorResult)}`);
         }
         const txHash = sendResponse.hash;
-        log('info', `[Execute] Transaction submitted! Hash: ${txHash}`);
-        // 7. Wait for confirmation (Optimistic approach: we just return pending hash for speed in this demo snippet)
-        // In a strict prod you would poll `server.getTransaction(txHash)` until SUCCESS or FAILED.
+        log('info', `[Execute] Submitted! Hash: ${txHash}`);
+        // 8. Poll for confirmation
+        let finalProfit = simulatedProfit;
+        let attempts = 0;
+        while (attempts < 10) {
+            await new Promise(r => setTimeout(r, 2000));
+            const pollResult = await server.getTransaction(txHash);
+            if (pollResult.status === StellarSdk.rpc.Api.GetTransactionStatus.SUCCESS) {
+                log('success', `[Execute] ✅ Confirmed on-chain!`);
+                // Extract actual return value if available
+                if (pollResult.returnValue) {
+                    try {
+                        finalProfit = Number(StellarSdk.scValToNative(pollResult.returnValue));
+                    }
+                    catch { /* use simulated */ }
+                }
+                break;
+            }
+            if (pollResult.status === StellarSdk.rpc.Api.GetTransactionStatus.FAILED) {
+                throw new Error('Transaction failed on-chain');
+            }
+            attempts++;
+        }
         const executionTime = Date.now() - startTime;
-        const profitEst = amount * 0.005;
-        const fee = profitEst * 0.01;
-        const netProfit = profitEst - fee;
-        log('success', `[Execute] ✅ Strategy executed successfully`);
-        log('success', `[Execute] Gross Profit: +${profitEst.toFixed(4)} ${asset}`);
-        log('warn', `[Execute] Matrix Fee (1%): -${fee.toFixed(4)} ${asset} routed to Treasury`);
-        log('success', `[Execute] Net Expected: +${netProfit.toFixed(4)} ${asset}`);
+        // @ts-ignore
+        const gasUsed = parseInt(simResponse.minResourceFee || '100', 10);
+        log('success', `[Execute] TX Hash: ${txHash}`);
+        log('success', `[Execute] Profit: ${finalProfit ?? 'pending confirmation'}`);
+        log('info', `[Execute] Gas: ${gasUsed} stroops | Time: ${executionTime}ms`);
         return {
             success: true,
             txHash,
-            profit: netProfit, // estimated net
-            // @ts-ignore
-            gasUsed: parseInt(simResponse.minResourceFee || '100', 10),
+            profit: finalProfit ?? 0,
+            gasUsed,
             timestamp: new Date().toISOString(),
             network,
             details: {
                 strategy,
                 asset,
+                method,
                 executionTime,
                 contractId,
             },

@@ -1,10 +1,10 @@
 import { LLMProvider } from './base.js';
 export type ProviderName = 'openai' | 'anthropic' | 'gemini' | 'grok' | 'ollama' | 'minimax' | 'bedrock' | 'openrouter';
 /**
- * Get the active LLM provider based on environment configuration.
- * Caches the provider instance for reuse.
+ * Get the active LLM provider based on environment configuration or explicit config.
+ * Caches the provider instance for reuse unless new config is provided.
  */
-export declare function getLLMProvider(): LLMProvider;
+export declare function getLLMProvider(config?: any): LLMProvider;
 /**
  * Get all available provider names.
  */

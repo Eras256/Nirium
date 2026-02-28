@@ -4,6 +4,13 @@ export class LLMProvider {
         this.config = config;
     }
     /**
+     * Override provider configuration (BYOK support).
+     */
+    overrideConfig(newConfig) {
+        this.config = { ...this.config, ...newConfig };
+        return this;
+    }
+    /**
      * Internal helper to parse structured JSON from LLM responses.
      */
     parseDecision(text) {

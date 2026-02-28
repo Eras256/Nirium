@@ -11,6 +11,10 @@ export declare abstract class LLMProvider {
     abstract model: string;
     constructor(config?: LLMConfig);
     /**
+     * Override provider configuration (BYOK support).
+     */
+    overrideConfig(newConfig: LLMConfig): this;
+    /**
      * Analyze a market state and return a structured decision.
      */
     abstract analyze(market: MarketState, context?: string): Promise<AIDecision>;

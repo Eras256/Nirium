@@ -1,7 +1,9 @@
 /**
  * Archive recent logs to IPFS to ensure immutable audit trails.
- * Runs every 5 minutes capturing "system" and "success" execution levels.
+ * Reads from the unified `nirium_protocol_records` table.
+ * Runs every 5 minutes capturing "LOG" records.
  */
-export declare function archiveLogsToIPFS(): Promise<any>;
+export declare function archiveLogsToIPFS(): Promise<string | undefined>;
 export declare function startArchiver(): void;
+export declare function stopArchiver(): void;
 //# sourceMappingURL=ipfsArchive.d.ts.map

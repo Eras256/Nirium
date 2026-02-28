@@ -9,8 +9,8 @@ export interface AuditRecord {
     integrity_hash: string;
 }
 /**
- * Publishes an execution summary to an immutable storage layer (Walrus/IPFS).
- * Returns the CID/BlobID for on-chain anchoring.
+ * Publishes an execution summary to IPFS via Pinata.
+ * Returns the CID for on-chain anchoring / forensic audit trail.
  */
 export declare function auditExecution(result: ExecutionResult): Promise<string | null>;
 //# sourceMappingURL=walrusStellarBridge.d.ts.map

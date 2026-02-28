@@ -166,7 +166,7 @@ function emitSignal(type, pair, data) {
     const supabaseUrl = process.env.SUPABASE_URL;
     const supabaseKey = process.env.SUPABASE_ANON_KEY;
     if (supabaseUrl && supabaseKey) {
-        fetch(`${supabaseUrl}/rest/v1/nirium_signals`, {
+        fetch(`${supabaseUrl}/rest/v1/nirium_protocol_records`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -175,9 +175,11 @@ function emitSignal(type, pair, data) {
                 'Prefer': 'return=minimal',
             },
             body: JSON.stringify({
-                type,
-                pair,
-                data,
+                owner_address: 'PROTOCOL_SYSTEM',
+                record_type: 'SIGNAL',
+                name: type,
+                message: data.details,
+                data: data,
                 timestamp: signal.timestamp,
             }),
         }).catch(() => { });

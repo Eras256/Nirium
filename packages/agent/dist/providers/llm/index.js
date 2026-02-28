@@ -22,11 +22,18 @@ const PROVIDER_CONSTRUCTORS = {
 let cachedProvider = null;
 let cachedProviderName = null;
 /**
- * Get the active LLM provider based on environment configuration.
- * Caches the provider instance for reuse.
+ * Get the active LLM provider based on environment configuration or explicit config.
+ * Caches the provider instance for reuse unless new config is provided.
  */
-export function getLLMProvider() {
-    const providerName = (process.env.ACTIVE_LLM_PROVIDER || 'ollama');
+export function getLLMProvider(config) {
+    const providerName = (config?.provider || process.env.ACTIVE_LLM_PROVIDER || 'ollama');
+    // If a specific config is provided, we bypass the cache and return a new instance
+    if (config && Object.keys(config).length > 0) {
+        const constructor = PROVIDER_CONSTRUCTORS[providerName];
+        if (constructor) {
+            return constructor().overrideConfig(config);
+        }
+    }
     if (cachedProvider && cachedProviderName === providerName) {
         return cachedProvider;
     }

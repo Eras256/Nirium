@@ -1,8 +1,9 @@
 import { ExecutionResult } from '../types/database.types.js';
 type LogFn = (level: string, message: string, details?: Record<string, unknown>) => void;
 /**
- * Execute a strategy in demo/testnet mode.
- * Generates realistic mock results with 0.3%-1.2% profit yields.
+ * Execute a strategy in demo mode using REAL Soroban simulation (dry-run).
+ * Does NOT submit the transaction — only simulates it to verify it would succeed.
+ * This lets users see realistic results without spending any testnet funds.
  */
 export declare function executeDemoStrategy(strategy: string, asset: string, params: Record<string, unknown>, log: LogFn): Promise<ExecutionResult>;
 export {};
