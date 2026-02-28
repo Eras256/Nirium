@@ -95,18 +95,23 @@ export async function invokeContract({
         const assembledTx = SorobanRpc.assembleTransaction(transaction, simResult).build();
         const txXdr = assembledTx.toXDR();
 
-        // 4. Sign with Freighter
+        // 4. Sign with Freighter (handles both string and object with error)
         const signedResult = await signTransaction(txXdr, {
             networkPassphrase: NETWORK_PASSPHRASE,
         });
 
-        if (signedResult.error || !signedResult.signedTxXdr) {
-            return { success: false, error: signedResult.error || 'Freighter signing failed' };
+        if (signedResult && typeof signedResult === 'object' && ('error' in signedResult)) {
+            return { success: false, error: (signedResult as any).error as string };
+        }
+
+        const signedXdr = typeof signedResult === 'string' ? signedResult : (signedResult as any).signedTxXdr;
+        if (!signedXdr) {
+            return { success: false, error: 'Freighter signing failed' };
         }
 
         // 6. Submit signed transaction
         const submitResult = await server.sendTransaction(
-            TransactionBuilder.fromXDR(signedResult.signedTxXdr, NETWORK_PASSPHRASE) as Parameters<typeof server.sendTransaction>[0]
+            TransactionBuilder.fromXDR(signedXdr, NETWORK_PASSPHRASE) as any
         );
 
         if (submitResult.status === 'ERROR') {
