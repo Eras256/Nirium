@@ -34,9 +34,10 @@ Apply the following strict business logic across all contracts, backend services
 - **Copy-Trading / Subscription:** Other users can subscribe their capital to follow these published strategies.
 - The UI must include a specific section in `app/marketplace` for finding top-performing community strategies (ranked by their Creator's ELO and historical APY backtests).
 
-### 2.4 Protocol Monetization (The 1% Profit Share Matrix)
-- **Performance Fee (NOT a flat fee):** The protocol captures value through a strict **1% embedded fee on profits realized** (not on the principal).
-- **Soroban Implementation:** In `flash_loan_execute` and other execution contracts in Rust, if the trade yields a profit of $X, the smart contract automatically deducts 1% of the net profit and routes it to the `TREASURY` address before returning the remaining 99% to the user/agent.
+### 2.4 Protocol Monetization (Fees & Profit Share)
+- **Deployment Fee (Institutional Filter):** To prevent spam and cover infrastructure costs, a flat fee of **12.5 XLM** (approx. 100 MXN / 5 USD) is charged for every new vault/agent deployment.
+- **Performance Fee:** The protocol captures value through a strict **1% embedded fee on profits realized** (not on the principal).
+- **Strategy Marketplace:** Creators keep **100% of their subscription revenue** to incentivize the ecosystem.
 - **UI Transparency:** Every strategy card, execution receipt, and the Ops Console must proudly display the net profit vs the fee. Example: "Gross Profit: +100 USDC | Matrix Fee (1%): -1.00 USDC | Net Expected: +99.00 USDC". Use this to build trust.
 
 ---

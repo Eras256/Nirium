@@ -14,6 +14,7 @@ import {
     vaultGetTotalFees,
     vaultGetVaultCount,
     vaultCreate,
+    vaultDeposit,
     vaultWithdraw,
     eloGetScore,
     eloGetProfile,
@@ -55,10 +56,10 @@ export function useVault() {
     const getTotalFees = useCallback(() => vaultGetTotalFees(), []);
     const getVaultCount = useCallback(() => vaultGetVaultCount(), []);
 
-    const createVault = useCallback(async (callerAddress: string, amountXlm: bigint) => {
+    const createVault = useCallback(async (callerAddress: string, tokenAddress: string) => {
         begin();
         try {
-            const result = await vaultCreate(callerAddress, amountXlm);
+            const result = await vaultCreate(callerAddress, tokenAddress);
             if (result.success && result.txHash) {
                 confirm(result.txHash);
             } else {
@@ -72,10 +73,27 @@ export function useVault() {
         }
     }, []);
 
-    const withdraw = useCallback(async (callerAddress: string, vaultId: number) => {
+    const deposit = useCallback(async (callerAddress: string, vaultId: number, amount: bigint) => {
         begin();
         try {
-            const result = await vaultWithdraw(callerAddress, vaultId);
+            const result = await vaultDeposit(callerAddress, vaultId, amount);
+            if (result.success && result.txHash) {
+                confirm(result.txHash);
+            } else {
+                fail(result.error ?? 'Unknown error');
+            }
+            return result;
+        } catch (e: unknown) {
+            const msg = e instanceof Error ? e.message : String(e);
+            fail(msg);
+            return { success: false, error: msg };
+        }
+    }, []);
+
+    const withdraw = useCallback(async (callerAddress: string, vaultId: number, amount: bigint) => {
+        begin();
+        try {
+            const result = await vaultWithdraw(callerAddress, vaultId, amount);
             if (result.success && result.txHash) {
                 confirm(result.txHash);
             } else {
@@ -96,6 +114,7 @@ export function useVault() {
         getTotalFees,
         getVaultCount,
         createVault,
+        deposit,
         withdraw,
     };
 }

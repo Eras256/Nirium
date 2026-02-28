@@ -10,9 +10,9 @@
  * Read-only calls go directly to the Soroban RPC.
  *
  * Contracts:
- *  - NiriumVault:     CDVBAMGONYS3PB3TAN7KHRMROHWAGZJ2OOTLPGQWRRXITC4GBA6SXMAY
- *  - ELO Reputation:  CCDTPOOGRUOTQZPDGSCA2EJGMZHWYD4FMHAINXXSE5VFM6T2FXSPV7BA
- *  - Marketplace:     CCAFXJOVJW7JH4JVDCEBACVHIW764MKFZNWMH63UARUJLHDKWAIVXAPP
+ *  - NiriumVault:     CCSPRXZNSMY5EEDT43L22IH2H76K7WAPGOTYHCRXINHZLED44KSP3LGN
+ *  - ELO Reputation:  CB4RCN4YHLCX2SIFMEJJSMDBWO6NPJHMDLSSKA4CT4HRTD2TFCU6XW4H
+ *  - Marketplace:     CCUDDIF6BIIA6NZNSDD63KNWMEAPYTB5WHRDMU2IGOATBCZF6KV6BLEN
  */
 
 import {
@@ -34,10 +34,13 @@ const NETWORK_PASSPHRASE = Networks.TESTNET;
 const HORIZON_URL = process.env.NEXT_PUBLIC_HORIZON_URL || 'https://horizon-testnet.stellar.org';
 
 export const CONTRACT_IDS = {
-    VAULT: process.env.NEXT_PUBLIC_CONTRACT_SENTINEL || 'CDVBAMGONYS3PB3TAN7KHRMROHWAGZJ2OOTLPGQWRRXITC4GBA6SXMAY',
-    ELO: process.env.NEXT_PUBLIC_CONTRACT_ELO || 'CCDTPOOGRUOTQZPDGSCA2EJGMZHWYD4FMHAINXXSE5VFM6T2FXSPV7BA',
-    MARKETPLACE: process.env.NEXT_PUBLIC_CONTRACT_MARKETPLACE || 'CCAFXJOVJW7JH4JVDCEBACVHIW764MKFZNWMH63UARUJLHDKWAIVXAPP',
+    VAULT: process.env.NEXT_PUBLIC_CONTRACT_SENTINEL || 'CCSPRXZNSMY5EEDT43L22IH2H76K7WAPGOTYHCRXINHZLED44KSP3LGN',
+    ELO: process.env.NEXT_PUBLIC_CONTRACT_ELO || 'CB4RCN4YHLCX2SIFMEJJSMDBWO6NPJHMDLSSKA4CT4HRTD2TFCU6XW4H',
+    MARKETPLACE: process.env.NEXT_PUBLIC_CONTRACT_MARKETPLACE || 'CCUDDIF6BIIA6NZNSDD63KNWMEAPYTB5WHRDMU2IGOATBCZF6KV6BLEN',
 } as const;
+
+// Soroban Native Token Address (XLM) on Stellar Testnet
+export const NATIVE_ASSET_ID = 'CAS3J7GYCCXG3Y3NGAYODXF6SOWDY37BCYSDX3S6S6SN3H3SRMAO6LCF';
 
 export type ContractName = keyof typeof CONTRACT_IDS;
 
@@ -195,13 +198,28 @@ export async function vaultGetVaultCount(): Promise<number> {
 /**
  * Create a new vault position
  */
-export async function vaultCreate(callerAddress: string, amountXlm: bigint) {
+export async function vaultCreate(callerAddress: string, tokenAddress: string) {
     return invokeContract({
         contractId: CONTRACT_IDS.VAULT,
         method: 'create_vault',
         args: [
             new Address(callerAddress).toScVal(),
-            nativeToScVal(amountXlm, { type: 'i128' }),
+            new Address(tokenAddress).toScVal(),
+        ],
+        callerAddress,
+    });
+}
+
+/**
+ * Deposit into vault
+ */
+export async function vaultDeposit(callerAddress: string, vaultId: number, amount: bigint) {
+    return invokeContract({
+        contractId: CONTRACT_IDS.VAULT,
+        method: 'deposit',
+        args: [
+            nativeToScVal(vaultId, { type: 'u64' }),
+            nativeToScVal(amount, { type: 'i128' }),
         ],
         callerAddress,
     });
@@ -210,13 +228,13 @@ export async function vaultCreate(callerAddress: string, amountXlm: bigint) {
 /**
  * Withdraw from vault
  */
-export async function vaultWithdraw(callerAddress: string, vaultId: number) {
+export async function vaultWithdraw(callerAddress: string, vaultId: number, amount: bigint) {
     return invokeContract({
         contractId: CONTRACT_IDS.VAULT,
         method: 'withdraw',
         args: [
-            new Address(callerAddress).toScVal(),
-            nativeToScVal(vaultId, { type: 'u32' }),
+            nativeToScVal(vaultId, { type: 'u64' }),
+            nativeToScVal(amount, { type: 'i128' }),
         ],
         callerAddress,
     });

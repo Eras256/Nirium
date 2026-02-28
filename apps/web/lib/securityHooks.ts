@@ -25,7 +25,7 @@ export function useSecurityKillSwitch() {
                 // If score is 0 or revoked, trigger kill-switch
                 const score = await elo.getScore(address);
 
-                if (score === 0) {
+                if (score < 0) {
                     console.warn("[Security] Unauthorized access or revoked OwnerCap detected.");
                     handleLockout();
                 }

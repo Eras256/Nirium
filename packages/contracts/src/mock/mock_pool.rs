@@ -9,7 +9,7 @@ pub struct MockPool;
 #[contractimpl]
 impl MockPool {
     /// Initialize the pool with XLM and USDC addresses.
-    pub fn initialize(e: Env, token_a: Address, token_b: Address) {
+    pub fn pool_initialize(e: Env, token_a: Address, token_b: Address) {
         e.storage().instance().set(&symbol_short!("token_a"), &token_a);
         e.storage().instance().set(&symbol_short!("token_b"), &token_b);
     }
@@ -22,9 +22,9 @@ impl MockPool {
         let token_b: Address = e.storage().instance().get(&symbol_short!("token_b")).unwrap();
 
         let (token_out, is_a_in) = if token_in == token_a {
-            (token_b, true)
+            (token_b.clone(), true)
         } else {
-            (token_a, false)
+            (token_a.clone(), false)
         };
 
         let client_in = token::Client::new(&e, &token_in);
@@ -64,7 +64,7 @@ impl MockPool {
     }
 
     /// Deposit liquidity (Testing only: direct transfer fallback)
-    pub fn deposit(e: Env, from: Address, amount_a: i128, amount_b: i128) {
+    pub fn pool_deposit(e: Env, from: Address, amount_a: i128, amount_b: i128) {
         from.require_auth();
         let token_a: Address = e.storage().instance().get(&symbol_short!("token_a")).unwrap();
         let token_b: Address = e.storage().instance().get(&symbol_short!("token_b")).unwrap();

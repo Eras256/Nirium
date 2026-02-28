@@ -11,7 +11,7 @@ import { useFreighter } from "@/hooks/useFreighter";
 import { TransactionBuilder, Networks, Asset, Operation, Keypair } from "@stellar/stellar-sdk";
 import { toast } from "sonner";
 import { useRouter, useSearchParams } from "next/navigation";
-import { ExternalLink, Shield, X, AlertTriangle, Trash2, Info, ChevronRight, RefreshCw, Zap, Plus, Code, Cpu } from "lucide-react";
+import { ExternalLink, Shield, X, AlertTriangle, Trash2, Info, ChevronRight, RefreshCw, Zap, Plus, Code, Cpu, Brain, Filter, Download, Activity, StopCircle, Database, Globe } from "lucide-react";
 import OpsConsole from "@/components/layout/OpsConsole";
 import { writeLog } from "@/lib/logger";
 import { stellarClient } from "@/lib/stellarClient";
@@ -19,6 +19,7 @@ import { useVault, useEloReputation } from "@/hooks/useNiriumContracts";
 import { getWebSocketUrl } from "@/lib/constants";
 import { simulateSorobanTx } from "@/lib/stellarSim";
 import { handleWalletError } from "@/components/wallet/WalletErrorHandler";
+import { NATIVE_ASSET_ID } from "@/lib/sorobanContracts";
 import MarketTicker from "@/components/dashboard/MarketTicker";
 import NeuralOrb from "@/components/dashboard/NeuralOrb";
 import StatusBadge from "@/components/ui/StatusBadge";
@@ -573,10 +574,10 @@ function DashboardContent() {
 
         const toastId = toast.loading(`🤖 AI Agent: Initializing ${currentStrategy.name}...`);
 
-        // Determine Mode: V2 (AgentCap) or V1 (Script)
+        // determine Mode: V2 (AgentCap) or V1 (Script)
         const useAgentCap = !!(vaultId && ownerCapId);
-        // User requested 0.1 XLM fee override (Standard Testnet Fee)
-        const REQUIRED_FEE: string = "100000000"; // 0.1 XLM
+        // Updated License fee: 12.5 XLM (approx. 100 MXN / 5 USD)
+        const REQUIRED_FEE_LO: string = "125000000"; // 12.5 XLM in stroops
 
         // Network Check (Strict)
         if (account.chains?.[0] && account.chains[0] !== 'stellar:testnet') {
@@ -585,71 +586,40 @@ function DashboardContent() {
             });
             return;
         }
-        const REQUIRED_BALANCE = 0.2; // 0.1 Fee + 0.1 Gas
+        const REQUIRED_BALANCE = 15.0; // 12.5 Fee + Gas Buffer
 
         try {
             // 0. Check Balance
             // Check Native XLM Balance for Transaction Gas + Fee Requirements
-            // We just do a pure XLM balance check because standard deployment costs ~0.2 XLM minimum 
             let requiredStellarAmount = REQUIRED_BALANCE;
             const { stellarClient } = await import("../../lib/stellarClient");
             const nativeBalance = await stellarClient.getBalance({ owner: account.address, coinType: 'XLM' }).then(b => Number(BigInt(b.totalBalance)) / 1_000_000_000);
 
-            if (nativeBalance < 0.2) {
-                toast.error(`Insufficient Balance: You need at least 0.2 XLM for license fee + gas`, {
+            if (nativeBalance < REQUIRED_BALANCE) {
+                toast.error(`Insufficient Balance: You need at least ${REQUIRED_BALANCE} XLM for license fee + gas`, {
                     description: `Detected: ${nativeBalance.toFixed(4)} XLM.`
                 });
                 return;
             }
 
-            const TREASURY_ADDR = account.address; // Mock treasury (self to save funds on Testnet)
+            // REAL INSTITUTIONAL SOROBAN CALL
+            toast.loading("Invoking NiriumVault.create_vault...", { id: toastId });
+            const result = await vault.createVault(account.address, NATIVE_ASSET_ID);
 
-            // Create Stellar Transaction
-            // Using a dummy account object for the builder; real signing happens via Freighter
-
-
-            const tx = await buildStellarTransaction(account.address);
-
-            // 1. License Fee Payment
-            tx.addOperation(Operation.payment({
-                destination: TREASURY_ADDR,
-                asset: Asset.native(),
-                amount: (parseInt(REQUIRED_FEE) / 10 ** 7).toString()
-            }));
-
-            // 2. Execution Funds Simulation
-            tx.addOperation(Operation.payment({
-                destination: account.address, // Pay back to self as dummy op
-                asset: Asset.native(),
-                amount: "0.0001"
-            }));
-
-            // 3. Descriptive Data Entry (makes it explicit on Stellar Expert)
-            tx.addOperation(Operation.manageData({
-                name: "strategy_deployed",
-                value: String(currentStrategy.name).slice(0, 64)
-            }));
-
-            const builtTx = tx.build();
-            const xdr = builtTx.toXDR();
-
-            // PRE-FLIGHT SIMULATION
-            toast.loading("Simulating Soroban Pre-flight...", { id: toastId });
-            const sim = await simulateSorobanTx(xdr);
-            if (!sim.success) {
-                throw new Error(sim.error || "Simulation failed");
+            if (!result.success || !result.txHash) {
+                toast.dismiss(toastId);
+                toast.error("Deployment Failed", {
+                    description: result.error || "Check Freighter for details."
+                });
+                return;
             }
 
-            toast.loading(`Simulated: CPU ${sim.resources?.cpu_instructions} | Mem ${sim.resources?.mem_bytes}. Awaiting signature...`, { id: toastId });
-
-            const result = await signAndSubmitTransaction({ transaction: builtTx });
-            const txHash = result.hash;
-
+            const txHash = result.txHash;
             toast.dismiss(toastId);
-            toast.success(`${currentStrategy.emoji} ${currentStrategy.name} Executed!`, {
-                description: "Strategy Ran (Stellar Atomic Multi-Op confirmed)",
+            toast.success(`${currentStrategy.emoji} ${currentStrategy.name} Active!`, {
+                description: "Institutional Soroban Vault created.",
                 action: {
-                    label: "View Tx",
+                    label: "Verify on Explorer",
                     onClick: () => window.open(`https://stellar.expert/explorer/testnet/tx/${txHash}`, "_blank")
                 }
             });

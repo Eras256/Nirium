@@ -4,7 +4,7 @@
 //!
 //! Permissionless registry for published trading strategies.
 //! Creators publish strategies with IPFS CID.
-//! Users can subscribe; a subscription fee goes 90% to creator, 10% to treasury.
+//! Users can subscribe; a subscription fee goes 100% to the creator.
 
 #![no_std]
 
@@ -42,8 +42,8 @@ pub enum DataKey {
     StrategyCount,
 }
 
-const CREATOR_SHARE_BPS: i128 = 9000; // 90%
-const TREASURY_SHARE_BPS: i128 = 1000; // 10%
+const CREATOR_SHARE_BPS: i128 = 10000; // 100%
+// Treasury share removed to avoid being classified as a financial institution in Mexico.
 
 #[contract]
 pub struct StrategyMarketplaceContract;
@@ -124,16 +124,9 @@ impl StrategyMarketplaceContract {
         let treasury: Address = env.storage().instance()
             .get(&DataKey::Treasury).expect("Not initialized");
 
-        // Transfer fee from subscriber
+        // Transfer fee from subscriber (100% to creator)
         let token_client = token::Client::new(&env, &usdc_token);
-
-        let creator_amount = fee * CREATOR_SHARE_BPS / 10000;
-        let treasury_amount = fee - creator_amount;
-
-        // 90% to creator
-        token_client.transfer(&subscriber, &listing.creator, &creator_amount);
-        // 10% to treasury
-        token_client.transfer(&subscriber, &treasury, &treasury_amount);
+        token_client.transfer(&subscriber, &listing.creator, &fee);
 
         // Update listing stats
         listing.subscriber_count += 1;

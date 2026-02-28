@@ -35,8 +35,8 @@ const E_ALREADY_INITIALIZED: u32 = 10;
 // CONSTANTS
 // ═══════════════════════════════════════════════════════════════
 
-/// Deployment fee: 0.5 XLM in stroops (1 XLM = 10^7 stroops)
-const DEPLOYMENT_FEE: i128 = 5_000_000;
+/// Deployment fee: 12.5 XLM in stroops (approx. $100 MXN / $5 USD)
+const DEPLOYMENT_FEE: i128 = 125_000_000;
 
 /// Maximum flash loan fee in basis points (5%)
 const MAX_FLASH_LOAN_FEE_BPS: u32 = 500;
