@@ -26,6 +26,7 @@ import {
     BASE_FEE,
     Keypair,
     Memo,
+    Transaction,
 } from '@stellar/stellar-sdk';
 import { signTransaction } from '@stellar/freighter-api';
 
@@ -59,7 +60,7 @@ interface InvokeParams {
 }
 
 const networks = Networks;
-const SOROBAN_BASE_FEE = '100000'; // 0.01 XLM base safety
+const SOROBAN_BASE_FEE = '500000'; // Higher safety fee for Soroban resource overhead
 
 export async function invokeContract({
     contractId,
@@ -69,40 +70,32 @@ export async function invokeContract({
     memo,
 }: InvokeParams): Promise<{ success: boolean; result?: unknown; txHash?: string; error?: string }> {
     const server = getRpcServer();
+    console.log(`[Soroban] Invoking ${method} on contract ${contractId} with args:`, args);
 
     try {
         // 1. Load source account (sequence number)
         const account = await server.getAccount(callerAddress);
 
-        // 2. Build the transaction
+        // 2. Build the initial transaction for simulation
         const contract = new Contract(contractId);
-        const transactionBuilder = new TransactionBuilder(account, {
+        const transaction = new TransactionBuilder(account, {
             fee: SOROBAN_BASE_FEE,
             networkPassphrase: NETWORK_PASSPHRASE,
         })
             .addOperation(contract.call(method, ...args))
-            .setTimeout(60);
-
-        if (memo) {
-            // Text memos are limited to 28 bytes
-            const safeMemo = memo.slice(0, 28);
-            transactionBuilder.addMemo(Memo.text(safeMemo));
-        }
-
-        const transaction = transactionBuilder.build();
+            .setTimeout(60)
+            .build();
 
         // 3. Simulate to get footprint and soroban data
         const simResult = await server.simulateTransaction(transaction);
 
         if (SorobanRpc.Api.isSimulationError(simResult)) {
-            console.error('Simulation result:', simResult);
+            console.error('[Soroban] Simulation error details:', JSON.stringify(simResult));
             return { success: false, error: `Simulation failed: ${simResult.error}` };
         }
 
-        // 4. Assemble the transaction with simulation data
-        // We increase the base fee explicitly for Soroban overhead
-        const assembledTxBuilder = SorobanRpc.assembleTransaction(transaction, simResult);
-        const assembledTx = assembledTxBuilder.build();
+        // 4. Assemble the final transaction with simulation data
+        const assembledTx = SorobanRpc.assembleTransaction(transaction, simResult).build();
         const txXdr = assembledTx.toXDR();
 
         // 4. Sign with Freighter
