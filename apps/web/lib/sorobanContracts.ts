@@ -203,8 +203,8 @@ export async function vaultCreate(callerAddress: string, tokenAddress: string) {
         contractId: CONTRACT_IDS.VAULT,
         method: 'create_vault',
         args: [
-            new Address(callerAddress).toScVal(),
-            new Address(tokenAddress).toScVal(),
+            nativeToScVal(callerAddress, { type: 'address' }),
+            nativeToScVal(tokenAddress, { type: 'address' }),
         ],
         callerAddress,
     });
@@ -251,7 +251,7 @@ export async function eloGetScore(sentinelAddress: string): Promise<number> {
     const result = await simulateContractRead({
         contractId: CONTRACT_IDS.ELO,
         method: 'get_elo',
-        args: [new Address(sentinelAddress).toScVal()],
+        args: [nativeToScVal(sentinelAddress, { type: 'address' })],
     });
     return Number(result ?? 0);
 }
@@ -281,7 +281,7 @@ export async function eloGetProfile(sentinelAddress: string): Promise<{
     const result = await simulateContractRead({
         contractId: CONTRACT_IDS.ELO,
         method: 'get_profile',
-        args: [new Address(sentinelAddress).toScVal()],
+        args: [nativeToScVal(sentinelAddress, { type: 'address' })],
     }) as Record<string, unknown> | null;
 
     if (!result) return null;
@@ -301,7 +301,7 @@ export async function eloRegisterSentinel(callerAddress: string) {
     return invokeContract({
         contractId: CONTRACT_IDS.ELO,
         method: 'register_sentinel',
-        args: [new Address(callerAddress).toScVal()],
+        args: [nativeToScVal(callerAddress, { type: 'address' })],
         callerAddress,
     });
 }
@@ -369,7 +369,7 @@ export async function marketplacePublishStrategy(
         contractId: CONTRACT_IDS.MARKETPLACE,
         method: 'publish_strategy',
         args: [
-            new Address(callerAddress).toScVal(),
+            nativeToScVal(callerAddress, { type: 'address' }),
             nativeToScVal(name, { type: 'string' }),
             nativeToScVal(ipfsCid, { type: 'string' }),
             nativeToScVal(subscriptionFeeUsdc, { type: 'i128' }),
@@ -390,9 +390,9 @@ export async function marketplaceSubscribe(
         contractId: CONTRACT_IDS.MARKETPLACE,
         method: 'subscribe',
         args: [
-            new Address(callerAddress).toScVal(),
+            nativeToScVal(callerAddress, { type: 'address' }),
             nativeToScVal(strategyId, { type: 'u64' }),
-            new Address(usdcTokenAddress).toScVal(),
+            nativeToScVal(usdcTokenAddress, { type: 'address' }),
         ],
         callerAddress,
     });
