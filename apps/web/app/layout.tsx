@@ -4,6 +4,7 @@ import { Toaster } from "sonner";
 import "./globals.css";
 import { Providers } from "./providers";
 import Footer from "@/components/layout/Footer";
+import { Analytics } from "@vercel/analytics/next";
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
 const inconsolata = Inconsolata({ subsets: ["latin"], variable: "--font-inconsolata" });
@@ -41,6 +42,7 @@ export default function RootLayout({
                     <Footer />
                     <Toaster position="bottom-right" theme="dark" />
                 </Providers>
+                <Analytics />
             </body>
         </html>
     );
