@@ -126,6 +126,7 @@ function DocsContent() {
 
 export default function DocsPage() {
     return (
+        // @ts-ignore - React 19 type mismatch in Next.js
         <Suspense fallback={
             <div className="min-h-screen bg-black flex items-center justify-center">
                 <div className="animate-pulse text-stellar-teal font-mono">LOADING FIELD MANUAL...</div>

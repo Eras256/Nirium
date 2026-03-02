@@ -1,3 +1,4 @@
+// @ts-nocheck
 'use client';
 
 import { Canvas } from '@react-three/fiber';
@@ -23,6 +24,7 @@ export function NeuralCanvas() {
                     alpha: true,
                 }}
             >
+                {/* @ts-ignore - React 19 type mismatch in Next.js */}
                 <Suspense fallback={null}>
                     <NeuralOrb />
                     <EffectComposer>

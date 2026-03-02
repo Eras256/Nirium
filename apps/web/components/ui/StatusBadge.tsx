@@ -8,7 +8,7 @@ interface StatusBadgeProps {
     label?: string;
 }
 
-const StatusBadge: React.FC<StatusBadgeProps> = ({ status, label }) => {
+const StatusBadge = ({ status, label }: StatusBadgeProps) => {
     const config = {
         active: { color: 'bg-green-500', glow: 'shadow-[0_0_15px_rgba(34,197,94,0.6)]', ping: true },
         inactive: { color: 'bg-zinc-500', glow: '', ping: false },

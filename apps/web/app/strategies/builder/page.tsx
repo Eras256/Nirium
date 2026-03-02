@@ -653,38 +653,6 @@ export default function StrategyBuilderPro() {
                 </ReactFlowProvider>
             </div>
 
-            <style jsx global>{`
-                .react-flow__handle {
-                    width: 12px; height: 12px;
-                    background: #2DEBE8 !important;
-                    border: 3px solid #080808 !important;
-                    box-shadow: 0 0 10px rgba(45,235,232,0.4);
-                }
-                .react-flow__attribution { display: none; }
-                .react-flow__controls {
-                    background: #121212 !important;
-                    border: 1px solid rgba(255,255,255,0.05) !important;
-                    border-radius: 12px !important;
-                    overflow: hidden;
-                    box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-                }
-                .react-flow__controls-button {
-                    background: transparent !important;
-                    border-bottom: 1px solid rgba(255,255,255,0.05) !important;
-                    color: #555 !important;
-                    fill: #555 !important;
-                    transition: all 0.2s;
-                }
-                .react-flow__controls-button:hover {
-                    background: rgba(45,235,232,0.1) !important;
-                    color: #2DEBE8 !important;
-                    fill: #2DEBE8 !important;
-                }
-                .scrollbar-hide::-webkit-scrollbar { display: none; }
-                .custom-scrollbar::-webkit-scrollbar { width: 4px; }
-                .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
-                .custom-scrollbar::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.05); border-radius: 2px; }
-            `}</style>
         </main>
     );
 }

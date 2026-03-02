@@ -109,6 +109,7 @@ export default function Home() {
                     </motion.div>
 
                     <div className="relative h-[600px] hidden lg:block">
+                        {/* @ts-ignore - React 19 type mismatch in Next.js */}
                         <Suspense fallback={<div className="w-full h-full flex items-center justify-center text-stellar-teal font-mono animate-pulse">CONNECTING NEURAL ORB...</div>}>
                             <NeuralCanvas />
                         </Suspense>
