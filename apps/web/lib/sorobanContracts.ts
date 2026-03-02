@@ -80,7 +80,7 @@ export async function invokeContract({
             networkPassphrase: NETWORK_PASSPHRASE,
         })
             .addOperation(contract.call(method, ...args))
-            .setTimeout(60)
+            .setTimeout(300)
             .build();
 
         // 3. Simulate to get footprint and soroban data
@@ -164,7 +164,7 @@ export async function simulateContractRead({
             networkPassphrase: NETWORK_PASSPHRASE,
         })
             .addOperation(contract.call(method, ...args))
-            .setTimeout(30)
+            .setTimeout(300)
             .build();
 
         const simResult = await server.simulateTransaction(tx);

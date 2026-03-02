@@ -102,7 +102,7 @@ function DashboardContent() {
         const { TransactionBuilder, Networks, Horizon } = await import("@stellar/stellar-sdk");
         const server = new Horizon.Server("https://horizon-testnet.stellar.org");
         const sourceAccount = await server.loadAccount(accountId);
-        return new TransactionBuilder(sourceAccount, { fee: "100", networkPassphrase: Networks.TESTNET }).setTimeout(180);
+        return new TransactionBuilder(sourceAccount, { fee: "100", networkPassphrase: Networks.TESTNET }).setTimeout(300);
     };
 
     // Helper: fetch account or contract state from Horizon/Soroban
@@ -757,7 +757,7 @@ function DashboardContent() {
                 incrementSequenceNumber: () => { }
             } as any, { fee: "100" })
                 .setNetworkPassphrase(Networks.TESTNET)
-                .setTimeout(30);
+                .setTimeout(300);
 
             // Stellar Termination: Simulated by sending a small XLM amount to oneself
             tx.addOperation(Operation.payment({
