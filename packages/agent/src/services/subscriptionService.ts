@@ -6,6 +6,7 @@ import { WebSocketServer, WebSocket } from 'ws';
 import { Server as HttpServer } from 'http';
 import { v4 as uuidv4 } from 'uuid';
 import { Signal, Subscription, SubscriptionFilter, LogEntry } from '../types/database.types.js';
+import { verifyToken } from '../middleware/auth.js';
 
 interface ConnectedClient {
     id: string;
@@ -31,6 +32,24 @@ export function initializeWebSocket(server: HttpServer): WebSocketServer {
     wss = new WebSocketServer({ server, path: '/ws/signals' });
 
     wss.on('connection', (ws, req) => {
+        // --- JWT SECURITY GUARD (ClawJacked Vulnerability Patch) ---
+        const urlParams = new URLSearchParams(req.url?.split('?')[1] || '');
+        const token = urlParams.get('token');
+
+        if (!token) {
+            ws.send(JSON.stringify({ type: 'error', message: 'Unauthorized: Access Denied. Missing JWT token.' }));
+            ws.close(1008, 'Unauthorized');
+            return;
+        }
+
+        const decoded = verifyToken(token);
+        if (!decoded) {
+            ws.send(JSON.stringify({ type: 'error', message: 'Unauthorized: Access Denied. Invalid or expired JWT token.' }));
+            ws.close(1008, 'Unauthorized');
+            return;
+        }
+        // -----------------------------------------------------------
+
         const clientId = uuidv4();
         const client: ConnectedClient = {
             id: clientId,
