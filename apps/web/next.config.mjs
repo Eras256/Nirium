@@ -18,16 +18,6 @@ const nextConfig = {
             type: 'asset/source',
         });
 
-        // This is critical for snarkjs wasm to load from public folder properly without webpack interfering
-        config.resolve.fallback = { fs: false, readline: false };
-
-        // Enable asyncWebAssembly for packages that might need it
-        config.experiments = {
-            ...config.experiments,
-            asyncWebAssembly: true,
-            layers: true,
-        };
-
         return config;
     },
 

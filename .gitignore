@@ -36,9 +36,12 @@ target/
 Cargo.lock
 *.wasm
 
-# ZK
-/circuits/WithdrawProof_js/
-/circuits/*.zkey
-/circuits/*.r1cs
-/circuits/*.sym
-/public/zk/
+
+
+# ---------------------------------------------
+# AI Agent Generated Documentation (Ignored)
+# ---------------------------------------------
+# Ignoring prompts and plans generated for other networks/hackathons
+*master_prompt*.md
+master_grants_table_2026.md
+implementation_plan.json
