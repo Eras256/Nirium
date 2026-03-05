@@ -140,5 +140,31 @@
         "archiving": "Archivando en Archivo Neural (IPFS)...",
         "broadcast_success": "Transmisión Exitosa",
         "broadcast_failed": "Error de Enlace"
+    },
+    "terms": {
+        "title": "Términos de Servicio",
+        "last_updated": "Última actualización: Marzo 2026",
+        "sections": {
+            "open_source": {
+                "title": "1. Marco de Código Abierto",
+                "content": "Nirium es un conjunto de contratos inteligentes de Soroban de código abierto desplegados en la red Stellar. La interfaz proporcionada aquí es simplemente un cliente que interactúa explícitamente con protocolos descentralizados. Al utilizar esta interfaz, usted entiende que está interactuando con una infraestructura de cadena de bloques pública."
+            },
+            "no_guarantees": {
+                "title": "2. Sin Garantías Financieras",
+                "content": "Las estrategias, complementos y agentes autónomos disponibles a través de Nirium son creados por la comunidad y se clasifican enteramente a través del sistema Sentinel ELO. Las clasificaciones ELO son solo datos históricos y no predicen ni garantizan el rendimiento futuro o los resultados financieros. La compra de una suscripción de estrategia a través de USDC no garantiza rendimientos financieros. Nirium no ofrece contratos de inversión ni valores que generen rendimientos."
+            },
+            "hallucination": {
+                "title": "3. Volatilidad de la Matriz Neural (Alucinación Algorítmica)",
+                "content": "Los agentes de Nirium consultan una matriz intercambiable de proveedores de LLM (incluyendo OpenAI, Anthropic, Gemini, Grok, MiniMax, etc.) para el análisis de señales cualitativas. Estos modelos son experimentales y pueden producir resultados impredecibles, retrasados o tácticamente incorrectos ('alucinaciones'). Nirium no asume ninguna responsabilidad por pérdidas comerciales, ventanas de arbitraje perdidas o consumo de gas resultante de la latencia de los LLM, caídas de las API o señales mal calculadas."
+            },
+            "fees": {
+                "title": "4. Tarifas de Red y Comisión de Matriz",
+                "content": "Los usuarios son responsables de todas las tarifas de operación de la red Stellar. Además, al ejecutar estrategias a través de los contratos inteligentes algorítmicos de Nirium, usted acepta la Comisión de Matriz del Protocolo del 1%. Esta tarifa se deduce atómicamente solo de la ganancia bruta realizada, no del capital, según lo exige el código del contrato inteligente."
+            },
+            "dispute": {
+                "title": "5. Resolución de Disputas y Ley Aplicable",
+                "content": "Al interactuar con el Protocolo Nirium, usted acepta que cualquier disputa o reclamo legal se resolverá exclusivamente mediante arbitraje vinculante y confidencial. Usted renuncia a cualquier derecho a presentar o participar en una demanda colectiva contra los desarrolladores o mantenedores. Estos Términos se rigen por las leyes del Estado de México (Estado de México), México."
+            }
+        }
     }
 }

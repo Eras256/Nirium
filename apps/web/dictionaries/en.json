@@ -140,5 +140,31 @@
         "archiving": "Archiving to Neural Archive (IPFS)...",
         "broadcast_success": "Transmission Successful",
         "broadcast_failed": "Uplink Error"
+    },
+    "terms": {
+        "title": "Terms of Service",
+        "last_updated": "Last Updated: March 2026",
+        "sections": {
+            "open_source": {
+                "title": "1. Open Source Framework",
+                "content": "Nirium is a set of open-source Soroban smart contracts deployed on the Stellar network. The interface provided here is merely a client explicitly interacting with decentralized protocols. By using this interface, you understand you are interacting with public blockchain infrastructure."
+            },
+            "no_guarantees": {
+                "title": "2. No Financial Guarantees",
+                "content": "The strategies, plugins, and autonomous agents available via Nirium are created by the community and rank entirely via the Sentinel ELO system. ELO rankings are historical data only and do not predict or guarantee future performance or financial outcomes. Purchasing a strategy subscription via USDC does not guarantee financial returns. Nirium does not offer investment contracts or yield-bearing securities."
+            },
+            "hallucination": {
+                "title": "3. Neural Matrix Volatility (Algorithmic Hallucination)",
+                "content": "Nirium agents consult a pluggable matrix of LLM providers (including OpenAI, Anthropic, Gemini, Grok, MiniMax, etc.) for qualitative signal analysis. These models are experimental and can produce unpredictable, delayed, or factually incorrect outputs ('hallucinations'). Nirium bears zero liability for trading losses, missed arbitrage windows, or gas consumption resulting from LLM latency, API downtimes, or miscalculated signals."
+            },
+            "fees": {
+                "title": "4. Network Fees & Matrix Fee",
+                "content": "Users are responsible for all Stellar network operation fees. Additionally, by executing strategies through Nirium's algorithmic smart contracts, you agree to the 1% Protocol Matrix Fee. This fee is deducted atomically only from realized gross profit, not principal, as enforced by the smart contract code."
+            },
+            "dispute": {
+                "title": "5. Dispute Resolution & Governing Law",
+                "content": "By interacting with the Nirium Protocol, you agree that any legal dispute or claim will be resolved exclusively through binding, confidential arbitration. You waive any right to bring or participate in a class action lawsuit against the developers or maintainers. These Terms are governed by the laws of the State of Mexico (Estado de México), Mexico."
+            }
+        }
     }
 }

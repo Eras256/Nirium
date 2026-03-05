@@ -140,5 +140,31 @@
         "archiving": "正在归档至神经档案 (IPFS)...",
         "broadcast_success": "传输成功",
         "broadcast_failed": "上行链路错误"
+    },
+    "terms": {
+        "title": "服务条款",
+        "last_updated": "最近更新：2026年3月",
+        "sections": {
+            "open_source": {
+                "title": "1. 开源框架",
+                "content": "Nirium 是部署在 Stellar 网络上的一组开源 Soroban 智能合约。这里提供的界面仅是与去中心化协议显式交互的客户端。通过使用此界面，您了解您正在与公共区块链基础设施进行交互。"
+            },
+            "no_guarantees": {
+                "title": "2. 无财务保证",
+                "content": "通过 Nirium 提供的策略、插件和自主代理均由社区创建，并完全通过 Sentinel ELO 系统进行排名。ELO 排名仅为历史数据，不预测或保证未来的表现或财务结果。通过 USDC 购买策略订阅并不保证财务回报。Nirium 不提供投资合同或带有收益的证券。"
+            },
+            "hallucination": {
+                "title": "3. 神经矩阵波动性 (算法幻觉)",
+                "content": "Nirium 代理咨询由 LLM 提供商组成的矩阵 (包括 OpenAI, Anthropic, Gemini, Grok, MiniMax 等) 进行定性信号分析。这些模型是实验性的，可能会产生不可预测的、延迟的或事实错误的内容 ('幻觉')。Nirium 对因 LLM 延迟、API 停机或错误计算信号而导致的交易损失、遗漏套利窗口或 Gas 消耗不承担任何责任。"
+            },
+            "fees": {
+                "title": "4. 网络费用和矩阵费用",
+                "content": "用户负责支付所有 Stellar 网络操作费用。此外，通过 Nirium 的算法智能合约执行策略，即表示您同意支付 1% 的协议矩阵费用。该费用由智能合约代码强制执行，仅从实现的毛利润中原子扣除，而非从本金中扣除。"
+            },
+            "dispute": {
+                "title": "5. 争议解决与管辖法律",
+                "content": "通过与 Nirium 协议进行交互，您同意任何法律争议或索赔将通过具有约束力的、机密的仲裁进行解决。您放弃针对开发人员或维护者提起或参与集体诉讼的任何权利。本条款受墨西哥墨西哥州 (Estado de México) 法律管辖。"
+            }
+        }
     }
 }
