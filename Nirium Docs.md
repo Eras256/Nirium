@@ -4,7 +4,8 @@
 **Red:** Stellar Testnet (Soroban)  
 **Arquitectura:** Hub & Spoke / Monorepo  
 **Estado:** Operacional — Swarm activo con 15 agentes  
-**Última actualización:** 2026-03-04
+**Última actualización:** 2026-03-05  
+**Frontend:** https://web-git-main-vaiosxs-projects.vercel.app
 
 ---
 
@@ -94,13 +95,28 @@ El enjambre opera en paralelo generando tráfico dual sobre la red Stellar cada 
 
 ## 6. Configuración del Swarm (Producción Actual)
 
-### Contrato Sentinel
-```
-ID:      CDHDX63NUYSFCIPJTTS46N5PYLTI7J5WIAIOP7TZSPBNUTLI32AY7GA2
-Red:     Stellar Testnet
-Creator: GAGXYW675VIR6AD35SQY3H6XWUWAVRHXXEMWVGL5ZXTDA4G5YIR6HDAW
-Deploy:  2026-03-05
-```
+### Contratos Desplegados (Actualizados 2026-03-05)
+
+| Contrato | Dirección | Rol Principal | Explorer |
+|:---|:---|:---|:---|
+| **NiriumVault** | `CDHDX63NUYSFCIPJTTS46N5PYLTI7J5WIAIOP7TZSPBNUTLI32AY7GA2` | Tesorería + Flash Loans | [Ver](https://stellar.expert/explorer/testnet/contract/CDHDX63NUYSFCIPJTTS46N5PYLTI7J5WIAIOP7TZSPBNUTLI32AY7GA2) |
+| **Sentinel ELO** | `CATYFAFL7QCBKSK3OSVNWA4O2VXWOADJ6IPNLCT2INXHP24OIUHZOUEK` | Reputación de agentes | [Ver](https://stellar.expert/explorer/testnet/contract/CATYFAFL7QCBKSK3OSVNWA4O2VXWOADJ6IPNLCT2INXHP24OIUHZOUEK) |
+| **ELO Registry** | `CCDTPOOGRUOTQZPDGSCA2EJGMZHWYD4FMHAINXXSE5VFM6T2FXSPV7BA` | Ledger on-chain de puntajes | [Ver](https://stellar.expert/explorer/testnet/contract/CCDTPOOGRUOTQZPDGSCA2EJGMZHWYD4FMHAINXXSE5VFM6T2FXSPV7BA) |
+| **Strategy Marketplace** | `CCAFXJOVJW7JH4JVDCEBACVHIW764MKFZNWMH63UARUJLHDKWAIVXAPP` | Compra/venta de estrategias | [Ver](https://stellar.expert/explorer/testnet/contract/CCAFXJOVJW7JH4JVDCEBACVHIW764MKFZNWMH63UARUJLHDKWAIVXAPP) |
+
+### ¿Para qué sirve cada contrato?
+
+#### 🏦 NiriumVault — El Corazón del Protocolo
+Es el contrato más importante. Actúa como la **cámara fuerte colectiva del enjambre**: recibe depósitos de capital, los gestiona bajo reglas de delegación criptográfica, y permite que los agentes ejecuten **Flash Loans** (préstamos atómicos sin colateral) en una sola transacción Soroban. Si el préstamo no se repaga en la misma tx, toda la operación se revierte automáticamente. También acumula fees de protocolo que van al treasury.
+
+#### 🏆 Sentinel ELO — El Sistema de Reputación
+Funciona como el **sistema de ranking on-chain** del protocolo. Cada vez que un agente ejecuta una transacción exitosa, este contrato actualiza su puntaje ELO (similar al sistema de ajedrez). Los agentes con mayor ELO tienen acceso a pools de mayor liquidez y estrategias premium del Marketplace. Es la capa de **meritocracia on-chain** que previene el abuso del sistema.
+
+#### 📋 ELO Registry — El Libro de Registros
+Es el **almacén permanente del historial de reputación**. Mientras Sentinel calcula los cambios de puntaje, Registry guarda el estado actual de todos los agentes. El frontend lo consulta para mostrar los rankings del leaderboard y el dashboard de on-chain stats. Desacoplar el cálculo del almacenamiento permite actualizaciones más baratas en gas.
+
+#### 🛒 Strategy Marketplace — La Economía de Estrategias
+Permite a los agentes y usuarios **comprar, vender y licenciar estrategias de trading** directamente on-chain. Una estrategia puede ser un algoritmo de arbitraje, una configuración de yield farming, o un set de parámetros para flash loans. El marketplace cobra una **comisión del 1%** por transacción al protocolo, creando un flujo de ingresos sostenible.
 
 ### Los 15 Agentes
 | # | Nombre | Rol |
@@ -217,8 +233,20 @@ Swarm (tx confirmada)
 | Transacciones/minuto | ~112 |
 | Agentes activos | 15 |
 | Fondeo por agente | 10,000 XLM (Friendbot) |
+| Capacidad estimada (Soroban+SDEX avg ~0.01 XLM/tx) | ~1,000,000 txs/agente |
+| Duración a 1 tx/seg continuo | ~11.5 días por agente |
 | Pools creados (acumulado) | 13+ y creciendo |
 | Uptime | Continuo mientras corre el swarm |
+
+### 💰 Costos por Tipo de Operación en Stellar Testnet
+
+| Tipo de Operación | Costo aprox. | Txs posibles con 10k XLM |
+|:---|:---:|---:|
+| SDEX Swap (base fee) | 0.00001 XLM | ~1,000,000,000 |
+| Soroban call simple | 0.005 XLM | ~2,000,000 |
+| Vault deposit/withdraw | 0.01 XLM | ~1,000,000 |
+| Flash Loan atómico | 0.02 XLM | ~500,000 |
+| Arbitraje multi-op | 0.015 XLM | ~666,000 |
 
 ---
 

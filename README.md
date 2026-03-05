@@ -44,12 +44,32 @@ Nirium goes far beyond a web application. It includes a complete suite of develo
 
 ## 🟢 Live on Testnet (Deployed Infrastructure)
 
-The core infrastructure of Nirium is fully functional and deployed on the **Stellar Testnet**:
+The core infrastructure of Nirium is fully functional and deployed on the **Stellar Testnet** with 15 autonomous agents generating continuous dual-layer traffic:
 
-- **Sentinel (Treasury Hub)**: `CBMI6CTXJUEGBDCCPHZVH7VJPEBDWEOBUJDB2VJ3RVF4AHO2THKDQRB4`
-- **Payment Gate (x402)**: `CCRZKETZFQA2UWNJMSXKOPS7QXRRBRW2J5Q32QQRQ6JHHEOLZWB5SWIH`
+| Contract | Role | Address | Explorer |
+|:---|:---|:---|:---|
+| **NiriumVault** | Treasury core + Flash Loans | `CDHDX63NUYSFCIPJTTS46N5PYLTI7J5WIAIOP7TZSPBNUTLI32AY7GA2` | [View](https://stellar.expert/explorer/testnet/contract/CDHDX63NUYSFCIPJTTS46N5PYLTI7J5WIAIOP7TZSPBNUTLI32AY7GA2) |
+| **Sentinel (ELO)** | Agent reputation scoring | `CATYFAFL7QCBKSK3OSVNWA4O2VXWOADJ6IPNLCT2INXHP24OIUHZOUEK` | [View](https://stellar.expert/explorer/testnet/contract/CATYFAFL7QCBKSK3OSVNWA4O2VXWOADJ6IPNLCT2INXHP24OIUHZOUEK) |
+| **ELO Registry** | On-chain ELO ledger | `CCDTPOOGRUOTQZPDGSCA2EJGMZHWYD4FMHAINXXSE5VFM6T2FXSPV7BA` | [View](https://stellar.expert/explorer/testnet/contract/CCDTPOOGRUOTQZPDGSCA2EJGMZHWYD4FMHAINXXSE5VFM6T2FXSPV7BA) |
+| **Strategy Marketplace** | Buy/sell trading strategies | `CCAFXJOVJW7JH4JVDCEBACVHIW764MKFZNWMH63UARUJLHDKWAIVXAPP` | [View](https://stellar.expert/explorer/testnet/contract/CCAFXJOVJW7JH4JVDCEBACVHIW764MKFZNWMH63UARUJLHDKWAIVXAPP) |
 
 *(Requirement: Freighter wallet correctly connected to Stellar Testnet).*
+
+---
+
+## 💰 Transaction Cost Analysis (10,000 XLM per Agent)
+
+Each agent wallet is funded with **10,000 XLM** via Stellar Friendbot. Here's the cost breakdown by operation type:
+
+| Operation Type | Cost per Tx | Capacity (10k XLM) |
+|:---|:---:|---:|
+| SDEX Swap (base fee) | ~0.00001 XLM | ~1,000,000,000 txs |
+| Soroban contract call | ~0.005 XLM | ~2,000,000 txs |
+| Vault deposit/withdraw | ~0.01 XLM | ~1,000,000 txs |
+| Flash Loan (atomic) | ~0.02 XLM | ~500,000 txs |
+| Arbitrage (multi-op) | ~0.015 XLM | ~666,000 txs |
+
+> **At 1 tx/second with mixed Soroban+SDEX ops (~0.01 XLM avg): ~11.5 days continuous operation per agent before refund needed.**
 
 ---
 
