@@ -42,7 +42,8 @@ pub enum DataKey {
     StrategyCount,
 }
 
-const CREATOR_SHARE_BPS: i128 = 10000; // 100% to creator
+const CREATOR_SHARE_BPS: i128 = 9900; // 99% to creator
+const PROTOCOL_SHARE_BPS: i128 = 100;  // 1% to protocol treasury
 
 #[contract]
 pub struct StrategyMarketplaceContract;
@@ -123,9 +124,16 @@ impl StrategyMarketplaceContract {
         let treasury: Address = env.storage().instance()
             .get(&DataKey::Treasury).expect("Not initialized");
 
-        // Transfer 100% of the fee from subscriber to creator
+        // Calculate 1% protocol fee and 99% creator royalty
+        let protocol_fee = (fee * PROTOCOL_SHARE_BPS) / 10000;
+        let creator_royalty = fee - protocol_fee;
+
         let token_client = token::Client::new(&env, &usdc_token);
-        token_client.transfer(&subscriber, &listing.creator, &fee);
+        
+        // Transfer 99% to creator
+        token_client.transfer(&subscriber, &listing.creator, &creator_royalty);
+        // Transfer 1% to protocol treasury
+        token_client.transfer(&subscriber, &treasury, &protocol_fee);
 
         // Update listing stats
         listing.subscriber_count += 1;

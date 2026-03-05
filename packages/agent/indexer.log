@@ -1,0 +1,226 @@
+
+🔍 NIRIUM SOROBAN INDEXER — Starting...
+
+✅ Supabase connected
+📡 Monitoring contracts:
+   → CDHDX63NUYSFCIPJTTS46N5PYLTI7J5WIAIOP7TZSPBNUTLI32AY7GA2
+   RPC: https://soroban-testnet.stellar.org
+
+Starting from ledger 1347507 (current: 1348507)
+
+── Tick 1 │ Ledger 1347507→1348507 │ 20 events ──
+── Tick 4 │ Ledger 1348510→1348511 │ 1 events ──
+── Tick 5 │ Ledger 1348511→1348512 │ 1 events ──
+── Tick 6 │ Ledger 1348512→1348513 │ 1 events ──
+── Tick 7 │ Ledger 1348513→1348514 │ 1 events ──
+── Tick 8 │ Ledger 1348514→1348516 │ 1 events ──
+── Tick 9 │ Ledger 1348516→1348517 │ 1 events ──
+── Tick 12 │ Ledger 1348519→1348520 │ 1 events ──
+
+📊 Indexer status: 27 events │ 13 wallets │ uptime 1m
+
+── Tick 13 │ Ledger 1348520→1348521 │ 1 events ──
+── Tick 14 │ Ledger 1348521→1348522 │ 1 events ──
+── Tick 15 │ Ledger 1348522→1348523 │ 1 events ──
+── Tick 16 │ Ledger 1348523→1348525 │ 1 events ──
+── Tick 17 │ Ledger 1348525→1348526 │ 1 events ──
+── Tick 19 │ Ledger 1348527→1348528 │ 1 events ──
+── Tick 20 │ Ledger 1348528→1348529 │ 1 events ──
+── Tick 21 │ Ledger 1348529→1348530 │ 1 events ──
+── Tick 22 │ Ledger 1348530→1348532 │ 2 events ──
+── Tick 23 │ Ledger 1348532→1348533 │ 1 events ──
+── Tick 24 │ Ledger 1348533→1348534 │ 1 events ──
+
+📊 Indexer status: 39 events │ 13 wallets │ uptime 2m
+
+── Tick 25 │ Ledger 1348534→1348535 │ 1 events ──
+── Tick 27 │ Ledger 1348536→1348537 │ 1 events ──
+── Tick 28 │ Ledger 1348537→1348539 │ 2 events ──
+── Tick 29 │ Ledger 1348539→1348540 │ 1 events ──
+── Tick 30 │ Ledger 1348540→1348541 │ 1 events ──
+── Tick 31 │ Ledger 1348541→1348542 │ 1 events ──
+── Tick 32 │ Ledger 1348542→1348543 │ 1 events ──
+── Tick 33 │ Ledger 1348543→1348544 │ 1 events ──
+── Tick 35 │ Ledger 1348546→1348547 │ 1 events ──
+── Tick 36 │ Ledger 1348547→1348548 │ 1 events ──
+
+📊 Indexer status: 50 events │ 14 wallets │ uptime 3m
+
+── Tick 38 │ Ledger 1348549→1348550 │ 1 events ──
+── Tick 39 │ Ledger 1348550→1348551 │ 1 events ──
+── Tick 40 │ Ledger 1348551→1348552 │ 1 events ──
+── Tick 41 │ Ledger 1348552→1348554 │ 2 events ──
+── Tick 42 │ Ledger 1348554→1348555 │ 1 events ──
+── Tick 43 │ Ledger 1348555→1348556 │ 1 events ──
+── Tick 44 │ Ledger 1348556→1348557 │ 1 events ──
+── Tick 45 │ Ledger 1348557→1348558 │ 1 events ──
+── Tick 46 │ Ledger 1348558→1348560 │ 2 events ──
+── Tick 47 │ Ledger 1348560→1348561 │ 1 events ──
+
+📊 Indexer status: 62 events │ 14 wallets │ uptime 4m
+
+── Tick 50 │ Ledger 1348563→1348564 │ 1 events ──
+── Tick 51 │ Ledger 1348564→1348565 │ 1 events ──
+── Tick 52 │ Ledger 1348565→1348566 │ 1 events ──
+── Tick 53 │ Ledger 1348566→1348568 │ 2 events ──
+── Tick 54 │ Ledger 1348568→1348569 │ 1 events ──
+── Tick 55 │ Ledger 1348569→1348570 │ 1 events ──
+── Tick 56 │ Ledger 1348570→1348571 │ 1 events ──
+── Tick 57 │ Ledger 1348571→1348572 │ 1 events ──
+── Tick 58 │ Ledger 1348572→1348573 │ 1 events ──
+── Tick 59 │ Ledger 1348573→1348575 │ 1 events ──
+── Tick 60 │ Ledger 1348575→1348576 │ 1 events ──
+
+📊 Indexer status: 74 events │ 14 wallets │ uptime 5m
+
+── Tick 61 │ Ledger 1348576→1348577 │ 1 events ──
+── Tick 62 │ Ledger 1348577→1348578 │ 1 events ──
+── Tick 63 │ Ledger 1348578→1348579 │ 1 events ──
+── Tick 64 │ Ledger 1348579→1348580 │ 1 events ──
+── Tick 65 │ Ledger 1348580→1348582 │ 2 events ──
+── Tick 66 │ Ledger 1348582→1348583 │ 1 events ──
+── Tick 67 │ Ledger 1348583→1348584 │ 1 events ──
+── Tick 68 │ Ledger 1348584→1348585 │ 1 events ──
+── Tick 69 │ Ledger 1348585→1348586 │ 1 events ──
+── Tick 70 │ Ledger 1348586→1348588 │ 2 events ──
+── Tick 71 │ Ledger 1348588→1348589 │ 1 events ──
+── Tick 72 │ Ledger 1348589→1348590 │ 1 events ──
+
+📊 Indexer status: 88 events │ 14 wallets │ uptime 6m
+
+── Tick 73 │ Ledger 1348590→1348591 │ 1 events ──
+── Tick 75 │ Ledger 1348592→1348593 │ 1 events ──
+── Tick 76 │ Ledger 1348593→1348594 │ 1 events ──
+── Tick 80 │ Ledger 1348598→1348599 │ 1 events ──
+── Tick 81 │ Ledger 1348599→1348600 │ 1 events ──
+── Tick 83 │ Ledger 1348601→1348602 │ 1 events ──
+── Tick 84 │ Ledger 1348602→1348603 │ 1 events ──
+
+📊 Indexer status: 95 events │ 14 wallets │ uptime 8m
+
+── Tick 88 │ Ledger 1348607→1348608 │ 1 events ──
+── Tick 89 │ Ledger 1348608→1348609 │ 1 events ──
+── Tick 91 │ Ledger 1348610→1348611 │ 1 events ──
+── Tick 92 │ Ledger 1348611→1348612 │ 1 events ──
+── Tick 93 │ Ledger 1348612→1348614 │ 1 events ──
+── Tick 94 │ Ledger 1348614→1348615 │ 1 events ──
+── Tick 96 │ Ledger 1348616→1348617 │ 1 events ──
+
+📊 Indexer status: 102 events │ 15 wallets │ uptime 9m
+
+── Tick 97 │ Ledger 1348617→1348618 │ 1 events ──
+── Tick 99 │ Ledger 1348619→1348620 │ 1 events ──
+── Tick 100 │ Ledger 1348620→1348622 │ 1 events ──
+── Tick 101 │ Ledger 1348622→1348623 │ 1 events ──
+── Tick 102 │ Ledger 1348623→1348624 │ 1 events ──
+── Tick 104 │ Ledger 1348625→1348626 │ 1 events ──
+── Tick 105 │ Ledger 1348626→1348627 │ 1 events ──
+── Tick 107 │ Ledger 1348628→1348630 │ 1 events ──
+
+📊 Indexer status: 110 events │ 15 wallets │ uptime 10m
+
+── Tick 109 │ Ledger 1348631→1348632 │ 1 events ──
+── Tick 110 │ Ledger 1348632→1348633 │ 1 events ──
+── Tick 112 │ Ledger 1348634→1348635 │ 1 events ──
+── Tick 113 │ Ledger 1348635→1348636 │ 1 events ──
+── Tick 114 │ Ledger 1348636→1348638 │ 1 events ──
+── Tick 115 │ Ledger 1348638→1348639 │ 1 events ──
+── Tick 117 │ Ledger 1348640→1348641 │ 1 events ──
+── Tick 118 │ Ledger 1348641→1348642 │ 1 events ──
+── Tick 120 │ Ledger 1348643→1348644 │ 1 events ──
+
+📊 Indexer status: 119 events │ 15 wallets │ uptime 11m
+
+── Tick 121 │ Ledger 1348644→1348646 │ 1 events ──
+── Tick 122 │ Ledger 1348646→1348647 │ 1 events ──
+── Tick 123 │ Ledger 1348647→1348648 │ 1 events ──
+── Tick 124 │ Ledger 1348648→1348649 │ 1 events ──
+── Tick 125 │ Ledger 1348649→1348650 │ 1 events ──
+── Tick 130 │ Ledger 1348655→1348656 │ 1 events ──
+── Tick 131 │ Ledger 1348656→1348657 │ 1 events ──
+
+📊 Indexer status: 126 events │ 15 wallets │ uptime 12m
+
+── Tick 133 │ Ledger 1348658→1348659 │ 1 events ──
+── Tick 134 │ Ledger 1348659→1348660 │ 1 events ──
+── Tick 136 │ Ledger 1348661→1348663 │ 1 events ──
+── Tick 138 │ Ledger 1348664→1348665 │ 1 events ──
+── Tick 139 │ Ledger 1348665→1348666 │ 1 events ──
+── Tick 140 │ Ledger 1348666→1348667 │ 1 events ──
+── Tick 141 │ Ledger 1348667→1348668 │ 1 events ──
+── Tick 142 │ Ledger 1348668→1348669 │ 1 events ──
+── Tick 143 │ Ledger 1348669→1348671 │ 1 events ──
+── Tick 144 │ Ledger 1348671→1348672 │ 1 events ──
+
+📊 Indexer status: 136 events │ 15 wallets │ uptime 13m
+
+── Tick 145 │ Ledger 1348672→1348673 │ 1 events ──
+── Tick 148 │ Ledger 1348675→1348676 │ 1 events ──
+── Tick 149 │ Ledger 1348676→1348677 │ 1 events ──
+── Tick 152 │ Ledger 1348680→1348681 │ 1 events ──
+── Tick 153 │ Ledger 1348681→1348682 │ 1 events ──
+── Tick 156 │ Ledger 1348684→1348685 │ 1 events ──
+
+📊 Indexer status: 142 events │ 15 wallets │ uptime 14m
+
+── Tick 157 │ Ledger 1348685→1348686 │ 1 events ──
+── Tick 158 │ Ledger 1348686→1348688 │ 1 events ──
+── Tick 160 │ Ledger 1348689→1348690 │ 1 events ──
+── Tick 161 │ Ledger 1348690→1348691 │ 1 events ──
+── Tick 162 │ Ledger 1348691→1348692 │ 1 events ──
+── Tick 163 │ Ledger 1348692→1348693 │ 1 events ──
+── Tick 165 │ Ledger 1348694→1348695 │ 1 events ──
+── Tick 166 │ Ledger 1348695→1348697 │ 1 events ──
+── Tick 167 │ Ledger 1348697→1348698 │ 1 events ──
+── Tick 168 │ Ledger 1348698→1348699 │ 2 events ──
+
+📊 Indexer status: 153 events │ 15 wallets │ uptime 16m
+
+── Tick 169 │ Ledger 1348699→1348700 │ 1 events ──
+── Tick 174 │ Ledger 1348704→1348706 │ 1 events ──
+── Tick 175 │ Ledger 1348706→1348707 │ 1 events ──
+── Tick 176 │ Ledger 1348707→1348708 │ 1 events ──
+── Tick 178 │ Ledger 1348709→1348710 │ 1 events ──
+── Tick 179 │ Ledger 1348710→1348711 │ 1 events ──
+── Tick 180 │ Ledger 1348711→1348712 │ 1 events ──
+
+📊 Indexer status: 160 events │ 15 wallets │ uptime 17m
+
+── Tick 181 │ Ledger 1348712→1348714 │ 2 events ──
+── Tick 182 │ Ledger 1348714→1348715 │ 1 events ──
+── Tick 184 │ Ledger 1348716→1348717 │ 1 events ──
+── Tick 185 │ Ledger 1348717→1348718 │ 1 events ──
+── Tick 186 │ Ledger 1348718→1348719 │ 1 events ──
+── Tick 187 │ Ledger 1348719→1348721 │ 2 events ──
+── Tick 188 │ Ledger 1348721→1348722 │ 1 events ──
+── Tick 189 │ Ledger 1348722→1348723 │ 1 events ──
+── Tick 190 │ Ledger 1348723→1348724 │ 1 events ──
+── Tick 192 │ Ledger 1348725→1348726 │ 1 events ──
+
+📊 Indexer status: 172 events │ 15 wallets │ uptime 18m
+
+── Tick 193 │ Ledger 1348726→1348728 │ 2 events ──
+── Tick 194 │ Ledger 1348728→1348729 │ 1 events ──
+── Tick 199 │ Ledger 1348733→1348734 │ 1 events ──
+── Tick 200 │ Ledger 1348734→1348735 │ 1 events ──
+── Tick 204 │ Ledger 1348739→1348740 │ 1 events ──
+
+📊 Indexer status: 178 events │ 15 wallets │ uptime 19m
+
+── Tick 205 │ Ledger 1348740→1348741 │ 1 events ──
+── Tick 207 │ Ledger 1348742→1348743 │ 1 events ──
+── Tick 208 │ Ledger 1348743→1348744 │ 1 events ──
+── Tick 209 │ Ledger 1348744→1348745 │ 1 events ──
+── Tick 210 │ Ledger 1348745→1348747 │ 2 events ──
+── Tick 211 │ Ledger 1348747→1348748 │ 1 events ──
+── Tick 213 │ Ledger 1348749→1348750 │ 1 events ──
+── Tick 214 │ Ledger 1348750→1348751 │ 1 events ──
+── Tick 216 │ Ledger 1348752→1348753 │ 1 events ──
+
+📊 Indexer status: 188 events │ 15 wallets │ uptime 20m
+
+── Tick 217 │ Ledger 1348753→1348755 │ 1 events ──
+── Tick 218 │ Ledger 1348755→1348756 │ 1 events ──
+── Tick 219 │ Ledger 1348756→1348757 │ 1 events ──
+── Tick 221 │ Ledger 1348758→1348759 │ 1 events ──
+Killed

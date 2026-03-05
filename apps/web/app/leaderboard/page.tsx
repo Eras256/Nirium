@@ -17,6 +17,10 @@ interface SwarmAgent {
     total_volume: number;
     last_tx_hash: string;
     last_activity: string;
+    elo_onchain: number;
+    pools_created: number;
+    vaults_created: number;
+    flash_loans: number;
 }
 
 interface LeaderboardEntry {
@@ -29,7 +33,12 @@ interface LeaderboardEntry {
     volume: string;
     lastTxHash: string;
     lastActivity: string;
+    eloOnchain: number;
+    poolsCreated: number;
+    vaultsCreated: number;
+    flashLoans: number;
     tier: 'matrix' | 'gold' | 'silver' | 'bronze';
+    avatar: string;
 }
 
 function agentToEntry(agent: SwarmAgent, rank: number): LeaderboardEntry {
@@ -48,7 +57,12 @@ function agentToEntry(agent: SwarmAgent, rank: number): LeaderboardEntry {
         volume: agent.total_volume.toFixed(4),
         lastTxHash: agent.last_tx_hash,
         lastActivity: agent.last_activity,
+        eloOnchain: agent.elo_onchain,
+        poolsCreated: agent.pools_created,
+        vaultsCreated: agent.vaults_created,
+        flashLoans: agent.flash_loans,
         tier,
+        avatar: `/avatars/core_${agent.id.length % 12}.png`
     };
 }
 
@@ -109,22 +123,25 @@ export default function LeaderboardPage() {
                 { event: '*', schema: 'public', table: 'nirium_swarm_agents' },
                 (payload) => {
                     setLeaderboard(prev => {
-                        const updated = payload.new as SwarmAgent;
-                        const existing = prev.find(e => e.name === updated.id);
                         let next: LeaderboardEntry[];
+                        const raw = (payload.new || payload.old) as SwarmAgent;
 
-                        if (existing) {
-                            next = prev.map(e => e.name === updated.id ? agentToEntry(updated, e.rank) : e);
+                        if (payload.eventType === 'INSERT') {
+                            next = [...prev, agentToEntry(raw, prev.length + 1)];
+                        } else if (payload.eventType === 'UPDATE') {
+                            next = prev.map(e => e.name === raw.id ? agentToEntry(raw, e.rank) : e);
+                        } else if (payload.eventType === 'DELETE') {
+                            next = prev.filter(e => e.name !== raw.id);
                         } else {
-                            next = [...prev, agentToEntry(updated, prev.length + 1)];
+                            return prev;
                         }
 
-                        // Re-rank by total_txs
+                        // Re-rank and sort (using total_txs as primary metric)
                         next.sort((a, b) => b.totalTxs - a.totalTxs);
-                        next = next.map((e, i) => ({ ...e, rank: i + 1 }));
-                        setLastUpdate(new Date());
-                        return next;
+                        return next.map((e, i) => ({ ...e, rank: i + 1 }));
                     });
+                    setLastUpdate(new Date());
+                    setIsLive(true);
                 },
             )
             .subscribe();
@@ -215,8 +232,9 @@ export default function LeaderboardPage() {
                                         <th className="p-5 text-[10px] text-gray-500 font-black uppercase tracking-widest">#</th>
                                         <th className="p-5 text-[10px] text-gray-500 font-black uppercase tracking-widest">Agent</th>
                                         <th className="p-5 text-[10px] text-gray-500 font-black uppercase tracking-widest text-center">Total Txs</th>
-                                        <th className="p-5 text-[10px] text-gray-500 font-black uppercase tracking-widest text-center">Soroban</th>
-                                        <th className="p-5 text-[10px] text-gray-500 font-black uppercase tracking-widest text-center">SDEX</th>
+                                        <th className="p-5 text-[10px] text-gray-500 font-black uppercase tracking-widest text-center" title="Smart Contract Calls">Soroban</th>
+                                        <th className="p-5 text-[10px] text-gray-500 font-black uppercase tracking-widest text-center" title="Stellar DEX Swaps">SDEX</th>
+                                        <th className="p-5 text-[10px] text-gray-500 font-black uppercase tracking-widest text-center" title="On-chain events tracked by Indexer">On-Chain Actions</th>
                                         <th className="p-5 text-[10px] text-gray-500 font-black uppercase tracking-widest text-right">Volume (XLM)</th>
                                         <th className="p-5 text-[10px] text-gray-500 font-black uppercase tracking-widest hidden xl:table-cell">Last Tx</th>
                                     </tr>
@@ -242,8 +260,8 @@ export default function LeaderboardPage() {
                                                     </td>
                                                     <td className="p-5">
                                                         <div className="flex items-center gap-3">
-                                                            <div className="w-9 h-9 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center">
-                                                                <Activity size={18} className="text-stellar-teal" />
+                                                            <div className="w-10 h-10 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center overflow-hidden">
+                                                                <img src={agent.avatar} alt={agent.name} className="w-full h-full object-cover opacity-80 group-hover:opacity-100 transition-opacity" />
                                                             </div>
                                                             <div>
                                                                 <p className="font-bold text-white text-sm tracking-tight" style={{ fontFamily: 'Orbitron, sans-serif' }}>
@@ -268,6 +286,18 @@ export default function LeaderboardPage() {
                                                     </td>
                                                     <td className="p-5 text-center">
                                                         <span className="text-purple-400 font-mono text-sm">{agent.sdexTxs}</span>
+                                                    </td>
+                                                    <td className="p-5 text-center">
+                                                        <div className="flex flex-col items-center justify-center gap-1">
+                                                            <span className="text-yellow-400 font-mono text-[10px] bg-yellow-500/10 px-2 py-0.5 rounded-full" title="On-Chain ELO">
+                                                                <Trophy size={8} className="inline mr-1" />{agent.eloOnchain || 1200}
+                                                            </span>
+                                                            <div className="flex gap-2 text-[9px] text-slate-400 font-mono mt-1">
+                                                                <span title="Pools Created" className="border-b border-dashed border-slate-600 pb-0.5">P: {agent.poolsCreated || 0}</span>
+                                                                <span title="Vaults Created" className="border-b border-dashed border-slate-600 pb-0.5">V: {agent.vaultsCreated || 0}</span>
+                                                                <span title="Flash Loans" className="border-b border-dashed border-slate-600 pb-0.5">F: {agent.flashLoans || 0}</span>
+                                                            </div>
+                                                        </div>
                                                     </td>
                                                     <td className="p-5 text-right">
                                                         <div className="flex flex-col items-end">
@@ -331,11 +361,10 @@ function PodiumCard({ agent, rank }: { agent: LeaderboardEntry; rank: number }) 
                 {isFirst && <div className="absolute top-0 left-1/2 -translate-x-1/2 w-48 h-48 bg-stellar-teal/20 blur-[80px] rounded-full" />}
 
                 <div className="relative z-10 text-center">
-                    <div className={`mx-auto mb-5 w-16 h-16 rounded-2xl flex items-center justify-center border-2 ${isFirst ? 'bg-stellar-teal/10 border-stellar-teal/50' : 'bg-white/5 border-white/10'
+                    <div className={`mx-auto mb-5 w-24 h-24 rounded-3xl flex items-center justify-center border-2 overflow-hidden relative group/avatar ${isFirst ? 'bg-stellar-teal/10 border-stellar-teal/50 shadow-[0_0_30px_rgba(45,235,232,0.2)]' : 'bg-white/5 border-white/10'
                         }`}>
-                        {rank === 1 ? <Zap size={30} className="text-stellar-teal" /> :
-                            rank === 2 ? <Shield size={30} className="text-slate-300" /> :
-                                <Trophy size={30} className="text-orange-500" />}
+                        <img src={agent.avatar} alt={agent.name} className="w-full h-full object-cover opacity-90 group-hover:scale-110 transition-transform duration-700" />
+                        <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-0 group-hover/avatar:opacity-100 transition-opacity" />
                     </div>
 
                     <h2 className="text-xl font-black text-white mb-1 tracking-tighter" style={{ fontFamily: 'Orbitron, sans-serif' }}>
@@ -369,5 +398,7 @@ const PLACEHOLDER_AGENTS: LeaderboardEntry[] = [
     rank: i + 1, name, address: 'G' + '0'.repeat(55),
     totalTxs: 0, sorobanTxs: 0, sdexTxs: 0,
     volume: '0.0000', lastTxHash: '', lastActivity: '',
-    tier: 'bronze' as const,
+    eloOnchain: 1200, poolsCreated: 0, vaultsCreated: 0, flashLoans: 0,
+    tier: (i < 2 ? 'matrix' : i < 5 ? 'gold' : i < 8 ? 'silver' : 'bronze') as any,
+    avatar: `/avatars/core_${name.length % 12}.png`
 }));
