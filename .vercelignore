@@ -1,12 +1,9 @@
-node_modules
-target
-dist
-.env*
-!*.env.example
-.turbo
-apps/web/.next
-apps/web/node_modules
-packages/agent/node_modules
-packages/agent/dist
-packages/contracts/target
-*.wasm
+# Vercel - ignore heavy monorepo packages not needed for web build
+packages/agent
+packages/contracts
+packages/cli
+packages/sdk
+packages/sdk-python
+packages/desktop
+*.log
+*.sql
