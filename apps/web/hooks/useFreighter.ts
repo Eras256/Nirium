@@ -12,6 +12,8 @@ import { WalletConnectModule } from "@creit.tech/stellar-wallets-kit/modules/wal
 // @ts-ignore
 import { defaultModules } from '@creit.tech/stellar-wallets-kit/modules/utils';
 // @ts-ignore
+import { SwkAppDarkTheme } from '@creit.tech/stellar-wallets-kit/components';
+// @ts-ignore
 import { isConnected } from "@stellar/freighter-api";
 
 // ──────────────────────────────────────────────────────────────────
@@ -57,9 +59,11 @@ function ensureInit() {
             }
         });
 
+        // Use custom dark theme parameters exactly as Soroswap
         StellarWalletsKit.init({
             modules: [...defaults, nativeFreighter, wcModule],
-            network: Networks.TESTNET
+            network: Networks.TESTNET,
+            theme: SwkAppDarkTheme
         });
         isInitialized = true;
     }
