@@ -17,7 +17,6 @@ import dynamic from 'next/dynamic';
 
 const NeuralCanvas = dynamic(() => import('@/components/3d/NeuralCanvas').then((mod) => mod.NeuralCanvas), { ssr: false });
 import Navbar from "@/components/layout/Navbar";
-import Footer from "@/components/layout/Footer";
 import { useLanguage } from "@/context/LanguageContext";
 
 const AGENT_NAMES = [
@@ -555,8 +554,6 @@ export default function Home() {
                     </Link>
                 </div>
             </section>
-
-            <Footer />
         </main>
     );
 }
