@@ -151,6 +151,21 @@ export function useFreighter() {
         }
     };
 
+    const signTransaction = async (xdr: string, opts?: { networkPassphrase?: string, address?: string }) => {
+        ensureInit();
+        return await StellarWalletsKit.signTransaction(xdr, opts);
+    };
+
+    const signAuthEntry = async (authEntry: string, opts?: { networkPassphrase?: string, address?: string }) => {
+        ensureInit();
+        return await StellarWalletsKit.signAuthEntry(authEntry, opts);
+    };
+
+    const signMessage = async (message: string, opts?: { networkPassphrase?: string, address?: string }) => {
+        ensureInit();
+        return await StellarWalletsKit.signMessage(message, opts);
+    };
+
     return {
         address,
         network,
@@ -160,5 +175,8 @@ export function useFreighter() {
         connect,
         disconnect,
         runWithFreighter,
+        signTransaction,
+        signAuthEntry,
+        signMessage,
     };
 }
