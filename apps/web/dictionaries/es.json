@@ -133,7 +133,7 @@
             {
                 "step": "02",
                 "title": "Elige o Despliega una Estrategia",
-                "desc": "Explora el Marketplace on-chain para estrategias probadas, o construye tu propio agente con el SDK de Nirium en segundos."
+                "desc": "Explora el Marketplace on-chain para estrategias probadas, o construye tu agente con nuestro Visual Builder, SDK, CLI, o MCP Server en segundos."
             },
             {
                 "step": "03",
@@ -149,8 +149,8 @@
         "deploy_cta_card1_desc": "Conecta tu wallet y suscríbete a una estrategia del marketplace. Los agentes hacen el trabajo.",
         "deploy_cta_card1_tag": "Sin código necesario",
         "deploy_cta_card2_title": "Despliega tu Agente",
-        "deploy_cta_card2_desc": "Usa el @nirium/sdk o CLI para lanzar un agente soberano con su propio keypair de Stellar y cerebro LLM.",
-        "deploy_cta_card2_tag": "TypeScript / Python",
+        "deploy_cta_card2_desc": "Usa nuestro Visual Builder, @nirium/sdk, CLI, o MCP Server para lanzar un agente soberano con su propio keypair de Stellar y cerebro LLM.",
+        "deploy_cta_card2_tag": "Builder / SDK / CLI / MCP",
         "deploy_cta_card3_title": "Publica Estrategias",
         "deploy_cta_card3_desc": "Empaqueta tu alpha en una estrategia on-chain, publícala y gana el 99% de las comisiones de suscripción de la comunidad.",
         "deploy_cta_card3_tag": "Gana USDC",

@@ -133,7 +133,7 @@
             {
                 "step": "02",
                 "title": "Choose or Deploy a Strategy",
-                "desc": "Browse the on-chain Marketplace for proven strategies, or scaffold your own agent using the Nirium SDK in seconds."
+                "desc": "Browse the on-chain Marketplace for proven strategies, or scaffold your agent using our Visual Builder, SDK, CLI, or MCP Server in seconds."
             },
             {
                 "step": "03",
@@ -149,8 +149,8 @@
         "deploy_cta_card1_desc": "Connect your wallet and subscribe to a strategy from the marketplace. The agents do the work.",
         "deploy_cta_card1_tag": "No code needed",
         "deploy_cta_card2_title": "Deploy Your Agent",
-        "deploy_cta_card2_desc": "Use the @nirium/sdk or CLI to launch a fully sovereign agent with its own Stellar keypair and LLM brain.",
-        "deploy_cta_card2_tag": "TypeScript / Python",
+        "deploy_cta_card2_desc": "Use our Visual Builder, @nirium/sdk, CLI, or MCP Server to launch a fully sovereign agent with its own Stellar keypair and LLM brain.",
+        "deploy_cta_card2_tag": "Builder / SDK / CLI / MCP",
         "deploy_cta_card3_title": "Publish Strategies",
         "deploy_cta_card3_desc": "Package your alpha into an on-chain strategy, publish it, and earn 99% of subscription fees from the community.",
         "deploy_cta_card3_tag": "Earn USDC",
