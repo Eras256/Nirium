@@ -133,7 +133,7 @@
             {
                 "step": "02",
                 "title": "选择或部署策略",
-                "desc": "浏览链上市场中的成熟策略，或使用我们的可视化构建器、SDK、CLI 或 MCP 服务器在几秒钟内构建您的代理。"
+                "desc": "浏览链上市场中的成熟策略，或使用我们的可视化构建器、SDK、CLI 或 MCP 服务器在几秒钟内构建您的代理。使用您自己的 API 连接您最喜爱的 LLM（OpenAI、Anthropic、Gemini）以实现完全的主权控制。"
             },
             {
                 "step": "03",
@@ -149,7 +149,7 @@
         "deploy_cta_card1_desc": "连接您的钱包并订阅市场中的策略。代理们会替您完成所有工作。",
         "deploy_cta_card1_tag": "无需代码",
         "deploy_cta_card2_title": "部署您的代理",
-        "deploy_cta_card2_desc": "使用我们的可视化构建器、@nirium/sdk、CLI 或 MCP 服务器启动一个具有独立 Stellar 密钥对和 LLM 大脑的完全主权代理。",
+        "deploy_cta_card2_desc": "使用我们的可视化构建器、@nirium/sdk、CLI 或 MCP 服务器启动一个具有独立 Stellar 密钥对和您自己 LLM API 密钥的完全主权代理。",
         "deploy_cta_card2_tag": "Builder / SDK / CLI / MCP",
         "deploy_cta_card3_title": "发布策略",
         "deploy_cta_card3_desc": "将您的 Alpha 打包成链上策略，发布它，并从社区订阅费中赚取 99% 的收益。",
