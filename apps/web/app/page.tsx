@@ -2,13 +2,14 @@
 
 import { useFreighter } from "@/hooks/useFreighter";
 import Link from "next/link";
-import { Suspense, useState, useEffect, useMemo } from "react";
+import { Suspense, useState, useEffect } from "react";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
 import {
     Zap, Shield, Cpu, Layers, Terminal as TerminalIcon,
     ArrowRight, Bot, Activity, Landmark, Database,
-    Download, ChevronRight, Workflow, CheckCircle
+    Download, ChevronRight, Workflow, TrendingUp, Lock,
+    Globe, Code2, BarChart3, Repeat2, Trophy, ExternalLink
 } from "lucide-react";
 import { motion } from "framer-motion";
 import dynamic from 'next/dynamic';
@@ -18,53 +19,80 @@ import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
 import { useLanguage } from "@/context/LanguageContext";
 
+const AGENT_NAMES = [
+    { name: 'Titan', role: 'Swarm Coordinator', color: '#FFD700' },
+    { name: 'Eliza', role: 'Sentiment Analysis', color: '#2DEBE8' },
+    { name: 'Maux', role: 'SDEX Liquidity', color: '#A78BFA' },
+    { name: 'Chronos', role: 'Temporal Arbitrage', color: '#F97316' },
+    { name: 'Astra', role: 'Pool Explorer', color: '#34D399' },
+    { name: 'Void', role: 'Dark Pool Strategy', color: '#6B7280' },
+    { name: 'Nexus', role: 'Inter-Agent Signals', color: '#EC4899' },
+    { name: 'Gaia', role: 'Yield Optimizer', color: '#10B981' },
+    { name: 'Orion', role: 'Micro-pair Hunter', color: '#3B82F6' },
+    { name: 'Sentinel', role: 'Vault Auditor', color: '#EF4444' },
+    { name: 'Matrix', role: 'Data Analyst', color: '#8B5CF6' },
+    { name: 'Atlas', role: 'Capital Support', color: '#F59E0B' },
+    { name: 'Nova', role: 'New Listings', color: '#60A5FA' },
+    { name: 'Cyber', role: 'MCP Audit Link', color: '#2DEBE8' },
+    { name: 'Nirium-1', role: 'Protocol Maintenance', color: '#FCD34D' },
+];
+
+const CONTRACTS = [
+    { name: 'NiriumVault', addr: 'CDHDX63...Y7GA2', full: 'CDHDX63NUYSFCIPJTTS46N5PYLTI7J5WIAIOP7TZSPBNUTLI32AY7GA2', role_key: 'vault', color: '#2DEBE8' },
+    { name: 'Sentinel ELO', addr: 'CATYFAFL...OUEK', full: 'CATYFAFL7QCBKSK3OSVNWA4O2VXWOADJ6IPNLCT2INXHP24OIUHZOUEK', role_key: 'sentinel', color: '#FFD700' },
+    { name: 'ELO Registry', addr: 'CCDTPOO...V7BA', full: 'CCDTPOOGRUOTQZPDGSCA2EJGMZHWYD4FMHAINXXSE5VFM6T2FXSPV7BA', role_key: 'elo', color: '#A78BFA' },
+    { name: 'Marketplace', addr: 'CCAFXJO...XAPP', full: 'CCAFXJOVJW7JH4JVDCEBACVHIW764MKFZNWMH63UARUJLHDKWAIVXAPP', role_key: 'marketplace', color: '#34D399' },
+];
+
 export default function Home() {
     const { t } = useLanguage();
     const router = useRouter();
     const { address: accountStr, isConnected } = useFreighter();
     const [agentLog, setAgentLog] = useState<string[]>([]);
+    const [ticker, setTicker] = useState(0);
 
     const handleLaunch = () => {
         if (!isConnected) {
-            toast.error(t.nav.auth_matrix, {
-                description: t.nav.stellar_connected
-            });
+            toast.error(t.nav.auth_matrix, { description: t.nav.stellar_connected });
             return;
         }
         router.push("/dashboard");
     };
 
-    // Real-time connection to Nirium Neural Feed via SSE
     useEffect(() => {
         const eventSource = new EventSource('/api/feed');
-
         eventSource.onmessage = (event) => {
             const newLogs = JSON.parse(event.data);
-            setAgentLog(prev => {
-                const updated = [...prev, ...newLogs];
-                return updated.slice(-8); // Keep last 8 messages
-            });
+            setAgentLog(prev => [...prev, ...newLogs].slice(-8));
         };
-
-        eventSource.onerror = () => {
-            console.error("Neural Feed Uplink lost");
-            eventSource.close();
-        };
-
+        eventSource.onerror = () => { eventSource.close(); };
         return () => eventSource.close();
     }, []);
+
+    // Animate swarm count ticker
+    useEffect(() => {
+        const interval = setInterval(() => setTicker(t => t + Math.floor(Math.random() * 3 + 1)), 4000);
+        return () => clearInterval(interval);
+    }, []);
+
+    const fadeUp = (delay = 0) => ({
+        initial: { opacity: 0, y: 30 },
+        whileInView: { opacity: 1, y: 0 },
+        viewport: { once: true },
+        transition: { duration: 0.6, delay },
+    });
 
     return (
         <main className="min-h-screen bg-[#050505] text-white selection:bg-stellar-teal/30 overflow-hidden relative">
             <Navbar />
 
-            {/* Background Grain & Gradients */}
+            {/* Background Gradients */}
             <div className="fixed inset-0 z-0 pointer-events-none">
                 <div className="absolute top-0 left-0 w-full h-[500px] bg-gradient-to-b from-stellar-yellow/10 to-transparent opacity-50" />
                 <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full h-full bg-[radial-gradient(circle_at_50%_50%,rgba(45,235,232,0.03),transparent_70%)]" />
             </div>
 
-            {/* Hero Section */}
+            {/* ── HERO ─────────────────────────────────────────────────────── */}
             <section className="relative z-10 container mx-auto px-4 pt-48 pb-32">
                 <div className="grid lg:grid-cols-2 gap-16 items-center">
                     <motion.div
@@ -78,7 +106,7 @@ export default function Home() {
                                 <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-stellar-teal opacity-75"></span>
                                 <span className="relative inline-flex rounded-full h-2 w-2 bg-stellar-teal"></span>
                             </span>
-                            v0.1.0 // STELLAR TESTNET LIVE
+                            v0.3.0 // {t.footer.testnet_live}
                         </div>
 
                         <h1 className="text-4xl sm:text-6xl md:text-7xl lg:text-8xl font-black tracking-tighter leading-[0.9] lg:leading-[0.85]">
@@ -89,6 +117,13 @@ export default function Home() {
                         <p className="text-gray-400 text-lg md:text-xl max-w-xl leading-relaxed">
                             {t.home.hero_subtitle}
                         </p>
+
+                        {/* Live swarm counter pill */}
+                        <div className="flex flex-wrap gap-3">
+                            <StatPill label={t.home.stat_agents} value="15" color="teal" />
+                            <StatPill label={t.home.stat_contracts} value="4" color="yellow" />
+                            <StatPill label={t.home.stat_throughput} value="~112 tx/min" color="purple" />
+                        </div>
 
                         <div className="flex flex-col sm:flex-row gap-4 pt-4 w-full">
                             <button
@@ -109,11 +144,10 @@ export default function Home() {
                     </motion.div>
 
                     <div className="relative h-[600px] hidden lg:block">
-                        {/* @ts-ignore - React 19 type mismatch in Next.js */}
+                        {/* @ts-ignore */}
                         <Suspense fallback={<div className="w-full h-full flex items-center justify-center text-stellar-teal font-mono animate-pulse">CONNECTING NEURAL ORB...</div>}>
                             <NeuralCanvas />
                         </Suspense>
-                        {/* Terminal Overlay */}
                         <motion.div
                             initial={{ opacity: 0, y: 50 }}
                             animate={{ opacity: 1, y: 0 }}
@@ -144,7 +178,7 @@ export default function Home() {
                 </div>
             </section>
 
-            {/* Protocol Integrations */}
+            {/* ── PROTOCOL INTEGRATIONS ──────────────────────────────────────── */}
             <section className="py-20 border-y border-white/5 bg-black/50">
                 <div className="container mx-auto px-4">
                     <h3 className="text-center text-[10px] font-mono text-gray-500 mb-12 tracking-[0.4em] uppercase">{t.home.built_for_stellar}</h3>
@@ -158,49 +192,136 @@ export default function Home() {
                 </div>
             </section>
 
-            {/* Features Matrix */}
-            <section className="py-32 container mx-auto px-4">
-                <div className="text-center mb-20 space-y-4">
-                    <h2 className="text-4xl md:text-6xl font-black tracking-tighter">{t.home.atomic_capabilities_title} <span className="text-stellar-teal">{t.home.atomic_capabilities_span}</span></h2>
-                    <p className="text-gray-400 max-w-2xl mx-auto text-lg">{t.home.atomic_capabilities_subtitle}</p>
-                </div>
-
-                <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
-                    <FeatureCard
-                        icon={Zap}
-                        title={t.home.features.path_arb.title}
-                        desc={t.home.features.path_arb.desc}
-                        color="cyan"
-                    />
-                    <FeatureCard
-                        icon={Shield}
-                        title={t.home.features.vaults.title}
-                        desc={t.home.features.vaults.desc}
-                        color="purple"
-                    />
-                    <FeatureCard
-                        icon={Workflow}
-                        title={t.home.features.bundling.title}
-                        desc={t.home.features.bundling.desc}
-                        color="blue"
-                    />
-                    <FeatureCard
-                        icon={Database}
-                        title={t.home.features.archive.title}
-                        desc={t.home.features.archive.desc}
-                        color="pink"
-                    />
+            {/* ── LIVE SWARM METRICS ─────────────────────────────────────────── */}
+            <section className="py-24 container mx-auto px-4">
+                <motion.div {...fadeUp()} className="text-center mb-16 space-y-4">
+                    <h2 className="text-4xl md:text-6xl font-black tracking-tighter">
+                        {t.home.swarm_title} <span className="text-stellar-teal">{t.home.swarm_title_span}</span>
+                    </h2>
+                    <p className="text-gray-400 max-w-2xl mx-auto text-lg">{t.home.swarm_subtitle}</p>
+                </motion.div>
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+                    {[
+                        { label: t.home.stat_agents, value: "15", sub: t.home.stat_agents_sub, icon: Bot, color: "teal" },
+                        { label: t.home.stat_throughput_label, value: "~112", sub: t.home.stat_throughput_sub, icon: Repeat2, color: "yellow" },
+                        { label: t.home.stat_latency_label, value: "<100ms", sub: t.home.stat_latency_sub, icon: Activity, color: "purple" },
+                        { label: t.home.stat_capacity_label, value: "~1M", sub: t.home.stat_capacity_sub, icon: BarChart3, color: "green" },
+                    ].map((s, i) => (
+                        <motion.div key={i} {...fadeUp(i * 0.1)} className={`p-6 rounded-2xl bg-white/[0.03] border border-white/10 group hover:border-${s.color === 'teal' ? 'stellar-teal' : s.color === 'yellow' ? 'stellar-yellow' : 'white'}/30 transition-all`}>
+                            <s.icon className={`w-6 h-6 mb-3 ${s.color === 'teal' ? 'text-stellar-teal' : s.color === 'yellow' ? 'text-stellar-yellow' : s.color === 'purple' ? 'text-purple-400' : 'text-green-400'}`} />
+                            <div className="text-3xl font-black tracking-tight">{s.value}</div>
+                            <div className="text-sm font-bold text-white/80 mt-1">{s.label}</div>
+                            <div className="text-xs text-gray-500 mt-0.5">{s.sub}</div>
+                        </motion.div>
+                    ))}
                 </div>
             </section>
 
-            {/* SDK Section */}
-            <section className="py-32 bg-black/40 border-t border-white/5">
+            {/* ── FEATURES MATRIX ───────────────────────────────────────────── */}
+            <section className="py-32 bg-black/30 border-t border-white/5">
+                <div className="container mx-auto px-4">
+                    <div className="text-center mb-20 space-y-4">
+                        <h2 className="text-4xl md:text-6xl font-black tracking-tighter">{t.home.atomic_capabilities_title} <span className="text-stellar-teal">{t.home.atomic_capabilities_span}</span></h2>
+                        <p className="text-gray-400 max-w-2xl mx-auto text-lg">{t.home.atomic_capabilities_subtitle}</p>
+                    </div>
+                    <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
+                        <FeatureCard icon={Zap} title={t.home.features.path_arb.title} desc={t.home.features.path_arb.desc} color="cyan" />
+                        <FeatureCard icon={Shield} title={t.home.features.vaults.title} desc={t.home.features.vaults.desc} color="purple" />
+                        <FeatureCard icon={Workflow} title={t.home.features.bundling.title} desc={t.home.features.bundling.desc} color="blue" />
+                        <FeatureCard icon={Database} title={t.home.features.archive.title} desc={t.home.features.archive.desc} color="pink" />
+                    </div>
+                </div>
+            </section>
+
+            {/* ── ELO REPUTATION SECTION ────────────────────────────────────── */}
+            <section className="py-32 container mx-auto px-4">
+                <div className="grid lg:grid-cols-2 gap-16 items-center">
+                    <motion.div {...fadeUp()} className="space-y-6">
+                        <h2 className="text-4xl md:text-6xl font-black tracking-tighter">
+                            {t.home.elo_title_1} <br /><span className="text-stellar-yellow">{t.home.elo_title_2}</span>
+                        </h2>
+                        <p className="text-gray-400 text-lg leading-relaxed">{t.home.elo_subtitle}</p>
+                        <div className="space-y-4">
+                            {[
+                                { tier: 'Matrix', elo: '≥ 2000', color: '#2DEBE8', label: t.home.elo_tier_matrix },
+                                { tier: 'Gold', elo: '≥ 1500', color: '#FFD700', label: t.home.elo_tier_gold },
+                                { tier: 'Silver', elo: '≥ 1000', color: '#A78BFA', label: t.home.elo_tier_silver },
+                            ].map(t2 => (
+                                <div key={t2.tier} className="flex items-center gap-4 p-4 bg-white/[0.03] rounded-xl border border-white/10">
+                                    <Trophy className="w-5 h-5 shrink-0" style={{ color: t2.color }} />
+                                    <div>
+                                        <div className="font-bold" style={{ color: t2.color }}>{t2.tier} Tier — ELO {t2.elo}</div>
+                                        <div className="text-xs text-gray-500">{t2.label}</div>
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                        <Link href="/leaderboard" className="inline-flex items-center gap-2 px-6 py-3 bg-white/5 border border-white/10 rounded-lg font-bold hover:bg-white/10 transition-all">
+                            {t.home.elo_cta} <ExternalLink className="w-4 h-4" />
+                        </Link>
+                    </motion.div>
+
+                    {/* Swarm Roster */}
+                    <motion.div {...fadeUp(0.2)}>
+                        <div className="grid grid-cols-3 gap-3">
+                            {AGENT_NAMES.map((agent, i) => (
+                                <motion.div
+                                    key={agent.name}
+                                    whileHover={{ scale: 1.05 }}
+                                    className="p-3 bg-white/[0.03] border border-white/10 rounded-xl text-center cursor-pointer hover:border-white/30 transition-all"
+                                >
+                                    <div className="w-8 h-8 rounded-full mx-auto mb-2 flex items-center justify-center text-[10px] font-black" style={{ background: `${agent.color}20`, color: agent.color, border: `1px solid ${agent.color}40` }}>
+                                        {agent.name.slice(0, 2)}
+                                    </div>
+                                    <div className="text-[10px] font-bold">{agent.name}</div>
+                                    <div className="text-[9px] text-gray-600 leading-tight">{agent.role}</div>
+                                </motion.div>
+                            ))}
+                        </div>
+                    </motion.div>
+                </div>
+            </section>
+
+            {/* ── LIVE CONTRACTS ────────────────────────────────────────────── */}
+            <section className="py-24 bg-black/40 border-t border-white/5">
+                <div className="container mx-auto px-4">
+                    <motion.div {...fadeUp()} className="text-center mb-16 space-y-4">
+                        <h2 className="text-4xl md:text-6xl font-black tracking-tighter">
+                            {t.home.contracts_title} <span className="text-stellar-teal">{t.home.contracts_span}</span>
+                        </h2>
+                        <p className="text-gray-400 max-w-2xl mx-auto">{t.home.contracts_subtitle}</p>
+                    </motion.div>
+                    <div className="grid md:grid-cols-2 gap-4 max-w-4xl mx-auto">
+                        {CONTRACTS.map((c, i) => (
+                            <motion.a
+                                key={c.name}
+                                {...fadeUp(i * 0.1)}
+                                href={`https://stellar.expert/explorer/testnet/contract/${c.full}`}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="flex items-center gap-4 p-5 bg-white/[0.03] border border-white/10 rounded-xl hover:border-white/30 transition-all group"
+                            >
+                                <div className="w-10 h-10 rounded-lg flex items-center justify-center shrink-0" style={{ background: `${c.color}15`, border: `1px solid ${c.color}30` }}>
+                                    <Lock className="w-4 h-4" style={{ color: c.color }} />
+                                </div>
+                                <div className="min-w-0">
+                                    <div className="font-bold text-sm">{c.name}</div>
+                                    <div className="text-xs font-mono text-gray-500 truncate">{c.addr}</div>
+                                    <div className="text-[10px] text-gray-600 mt-0.5">{t.home[`contract_role_${c.role_key}` as keyof typeof t.home] as string}</div>
+                                </div>
+                                <ExternalLink className="w-4 h-4 text-gray-600 group-hover:text-white ml-auto shrink-0 transition-colors" />
+                            </motion.a>
+                        ))}
+                    </div>
+                </div>
+            </section>
+
+            {/* ── SDK SECTION ───────────────────────────────────────────────── */}
+            <section className="py-32 border-t border-white/5">
                 <div className="container mx-auto px-4 grid lg:grid-cols-2 gap-16 items-center">
                     <div className="space-y-6">
                         <h3 className="text-3xl md:text-5xl font-black leading-tight tracking-tighter">{t.home.sdk_title_1} <br /><span className="text-stellar-yellow">{t.home.sdk_title_2}</span></h3>
                         <p className="text-gray-400 text-lg">{t.home.sdk_subtitle}</p>
-// ... (omitting intermediate code if possible, but replace_file_content needs contiguous block)
-                        // I'll copy the whole block between Features and end of RootLayout
                         <div className="bg-[#0A0A0A] border border-white/10 rounded-xl p-6 font-mono text-sm group relative overflow-hidden">
                             <div className="flex justify-between items-center mb-4">
                                 <div className="flex gap-2">
@@ -211,7 +332,7 @@ export default function Home() {
                                 <Activity className="w-4 h-4 text-stellar-teal" />
                             </div>
                             <code className="text-white block overflow-x-auto whitespace-nowrap text-xs sm:text-sm custom-scrollbar pb-2">
-                                <span className="text-purple-400">import</span> {"{"} Agent {"}"} <span className="text-purple-400">from</span> <span className="text-green-400">&apos;@nirium/sdk&apos;</span>;<br />
+                                <span className="text-purple-400">import</span> {"{"}Agent{"}"} <span className="text-purple-400">from</span> <span className="text-green-400">&apos;@nirium/sdk&apos;</span>;<br />
                                 <span className="text-blue-400">const</span> bot = <span className="text-blue-400">new</span> Agent(<span className="text-yellow-300">&quot;sk_live_...&quot;</span>);<br />
                                 <span className="text-gray-500">// Subscribe to Path Arb signals</span><br />
                                 bot.subscribe(<span className="text-cyan-400">&apos;path_arb&apos;</span>, (signal) ={">"} bot.execute(signal));
@@ -231,7 +352,7 @@ export default function Home() {
                 </div>
             </section>
 
-            {/* Final CTA */}
+            {/* ── FINAL CTA ─────────────────────────────────────────────────── */}
             <section className="py-40 text-center relative">
                 <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_100%,rgba(138,43,226,0.1),transparent_50%)]" />
                 <h2 className="text-4xl sm:text-5xl md:text-8xl font-black mb-12 tracking-tighter">
@@ -253,7 +374,22 @@ export default function Home() {
                 </div>
             </section>
 
+            <Footer />
         </main>
+    );
+}
+
+function StatPill({ label, value, color }: { label: string, value: string, color: 'teal' | 'yellow' | 'purple' }) {
+    const colorMap = {
+        teal: 'bg-stellar-teal/10 text-stellar-teal border-stellar-teal/30',
+        yellow: 'bg-stellar-yellow/10 text-stellar-yellow border-stellar-yellow/30',
+        purple: 'bg-purple-400/10 text-purple-400 border-purple-400/30',
+    };
+    return (
+        <div className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-full border text-xs font-mono ${colorMap[color]}`}>
+            <span className="font-black">{value}</span>
+            <span className="opacity-70">{label}</span>
+        </div>
     );
 }
 
@@ -274,11 +410,8 @@ function FeatureCard({ icon: Icon, title, desc, color }: { icon: any, title: str
         pink: 'text-pink-500 border-pink-500/20 bg-pink-500/5'
     };
     return (
-        <motion.div
-            whileHover={{ y: -10 }}
-            className={`p-8 rounded-2xl border ${colorMap[color]} group transition-all`}
-        >
-            <div className={`w-12 h-12 rounded-lg bg-white/5 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform`}>
+        <motion.div whileHover={{ y: -10 }} className={`p-8 rounded-2xl border ${colorMap[color]} group transition-all`}>
+            <div className="w-12 h-12 rounded-lg bg-white/5 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
                 <Icon className="w-6 h-6" />
             </div>
             <h3 className="text-2xl font-bold mb-3 tracking-tighter">{title}</h3>
