@@ -6,16 +6,54 @@ import { Horizon } from "@stellar/stellar-sdk";
 // @ts-ignore - Ignore module resolution for bundler due to TS bugs in SWK package
 import { StellarWalletsKit, Networks } from "@creit.tech/stellar-wallets-kit";
 // @ts-ignore
-import { FreighterModule, FREIGHTER_ID } from "@creit.tech/stellar-wallets-kit/modules/freighter";
+import { FreighterModule } from "@creit.tech/stellar-wallets-kit/modules/freighter";
 // @ts-ignore
-import { defaultModules } from '@creit.tech/stellar-wallets-kit/modules/utils';
+import { WalletConnectModule } from "@creit.tech/stellar-wallets-kit/modules/wallet-connect";
+// @ts-ignore
+import { isConnected } from "@stellar/freighter-api";
+
+// ──────────────────────────────────────────────────────────────────
+// OVERRIDE FREIGHTER MODULE
+// The official kit hardblocks the Freighter mobile app and forces
+// developers to use WalletConnect. We override isAvailable to
+// let the user try native injection just in case the app supports it.
+class NativeFreighterModule extends FreighterModule {
+    async isAvailable() {
+        if (typeof window !== "undefined" && (window as any).stellar?.provider === "freighter") {
+            return true;
+        }
+        try {
+            const response = await isConnected();
+            return !response.error && response.isConnected;
+        } catch {
+            return false;
+        }
+    }
+}
+// ──────────────────────────────────────────────────────────────────
 
 let isInitialized = false;
 
 function ensureInit() {
     if (!isInitialized) {
+
+        // 1. Native Freighter (PC Extension & Mobile attempt)
+        const nativeFreighter = new NativeFreighterModule();
+
+        // 2. WalletConnect (The officially supported method for Mobile)
+        // We use a public test ProjectID. In production, get one at cloud.walletconnect.com
+        const wcModule = new WalletConnectModule({
+            projectId: "5e98f060f64c1bd7e543bc8836528d22",
+            metadata: {
+                name: 'Nirium Protocol',
+                description: 'Institutional-grade autonomous Stellar AI Agent Swarm.',
+                url: 'https://nirium-stellar.vercel.app',
+                icons: ['https://nirium-stellar.vercel.app/icon.png']
+            }
+        });
+
         StellarWalletsKit.init({
-            modules: [new FreighterModule()],
+            modules: [nativeFreighter, wcModule],
             network: Networks.TESTNET
         });
         isInitialized = true;
@@ -26,7 +64,7 @@ export function useFreighter() {
     const [address, setAddress] = useState<string | null>(null);
     const [network, setNetwork] = useState<string | null>("TESTNET");
     const [balance, setBalance] = useState<string | null>(null);
-    const [isConnected, setIsConnected] = useState(false);
+    const [isConnectedState, setIsConnectedState] = useState(false);
     const [status, setStatus] = useState<'idle' | 'connecting' | 'connected' | 'error'>('idle');
 
     const fetchBalance = async (pubKey: string) => {
@@ -49,7 +87,7 @@ export function useFreighter() {
                 const { address: addr } = await StellarWalletsKit.getAddress();
                 if (addr) {
                     setAddress(addr);
-                    setIsConnected(true);
+                    setIsConnectedState(true);
                     setStatus('connected');
                     await fetchBalance(addr);
                 }
@@ -65,12 +103,12 @@ export function useFreighter() {
         try {
             ensureInit();
 
-            // This is the native Stellar Wallets Kit modal that works out-of-the-box in mobile app browser!
+            // This is the native Stellar Wallets Kit modal!
             const { address: addr } = await StellarWalletsKit.authModal();
 
             if (addr) {
                 setAddress(addr);
-                setIsConnected(true);
+                setIsConnectedState(true);
                 setStatus('connected');
                 await fetchBalance(addr);
             } else {
@@ -91,15 +129,15 @@ export function useFreighter() {
         }
         setAddress(null);
         setBalance(null);
-        setIsConnected(false);
+        setIsConnectedState(false);
         setStatus('idle');
     };
 
     const runWithFreighter = async (fn: () => Promise<void>) => {
-        if (!isConnected) {
+        if (!isConnectedState) {
             await connect();
         }
-        if (isConnected) {
+        if (isConnectedState) {
             await fn();
         }
     };
@@ -108,7 +146,7 @@ export function useFreighter() {
         address,
         network,
         balance,
-        isConnected,
+        isConnected: isConnectedState,
         status,
         connect,
         disconnect,
