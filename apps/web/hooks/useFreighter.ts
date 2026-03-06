@@ -2,6 +2,14 @@ import { isAllowed, setAllowed, getAddress, getNetwork } from "@stellar/freighte
 import { useState, useEffect } from "react";
 import { Horizon } from "@stellar/stellar-sdk";
 
+declare global {
+    interface Window {
+        freighter?: any;
+        stellar?: any;
+    }
+}
+
+
 export function useFreighter() {
     const [address, setAddress] = useState<string | null>(null);
     const [network, setNetwork] = useState<string | null>(null);
@@ -45,13 +53,17 @@ export function useFreighter() {
     useEffect(() => {
         const checkConnection = async () => {
             try {
-                if (await isAllowed()) {
-                    const response = await getAddress();
-                    if (response.address) {
-                        setAddress(response.address);
-                        setIsConnected(true);
-                        setStatus('connected');
-                        await fetchAccountDetails(response.address);
+                // Check if Freighter is available in window
+                if (typeof window !== 'undefined' && (window.freighter || window.stellar)) {
+                    const isAllowedResult = await isAllowed();
+                    if (isAllowedResult) {
+                        const response = await getAddress();
+                        if (response.address) {
+                            setAddress(response.address);
+                            setIsConnected(true);
+                            setStatus('connected');
+                            await fetchAccountDetails(response.address);
+                        }
                     }
                 }
             } catch (e) {
@@ -64,6 +76,13 @@ export function useFreighter() {
     const connect = async () => {
         setStatus('connecting');
         try {
+            // First check if extension is actually totally missing in mobile context
+            if (typeof window !== 'undefined' && !window.freighter && !window.stellar) {
+                alert("Freighter Wallet is not installed or not detected on this browser/device.");
+                setStatus('error');
+                return;
+            }
+
             const isAllowedResult = await setAllowed();
             if (isAllowedResult) {
                 const response = await getAddress();
@@ -80,10 +99,14 @@ export function useFreighter() {
                 setStatus('error');
                 console.error("User refused connection");
             }
-        } catch (e) {
+        } catch (e: any) {
             setStatus('error');
             console.error("Error connecting to Freighter", e);
-            alert("Please install Freighter wallet to connect!");
+            if (e.message && e.message.includes("is not installed")) {
+                alert("Please install Freighter wallet extension or use a supported browser.");
+            } else {
+                alert("Could not connect to Freighter wallet.");
+            }
         }
     };
 
