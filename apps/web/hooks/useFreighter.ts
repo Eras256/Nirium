@@ -1,110 +1,95 @@
-import { requestAccess, getAddress, getNetwork, isAllowed } from "@stellar/freighter-api";
+"use client";
+
 import { useState, useEffect } from "react";
 import { Horizon } from "@stellar/stellar-sdk";
 
+// @ts-ignore - Ignore module resolution for bundler due to TS bugs in SWK package
+import { StellarWalletsKit, Networks } from "@creit.tech/stellar-wallets-kit";
+// @ts-ignore
+import { FreighterModule, FREIGHTER_ID } from "@creit.tech/stellar-wallets-kit/modules/freighter";
+// @ts-ignore
+import { defaultModules } from '@creit.tech/stellar-wallets-kit/modules/utils';
+
+let isInitialized = false;
+
+function ensureInit() {
+    if (!isInitialized) {
+        StellarWalletsKit.init({
+            modules: [new FreighterModule()],
+            network: Networks.TESTNET
+        });
+        isInitialized = true;
+    }
+}
+
 export function useFreighter() {
     const [address, setAddress] = useState<string | null>(null);
-    const [network, setNetwork] = useState<string | null>(null);
+    const [network, setNetwork] = useState<string | null>("TESTNET");
     const [balance, setBalance] = useState<string | null>(null);
     const [isConnected, setIsConnected] = useState(false);
     const [status, setStatus] = useState<'idle' | 'connecting' | 'connected' | 'error'>('idle');
 
-    const fetchAccountDetails = async (pubKey: string) => {
+    const fetchBalance = async (pubKey: string) => {
         try {
-            const networkObj = await getNetwork();
-            const currentNetwork = networkObj.network;
-            setNetwork(currentNetwork);
-
-            const serverUrl = currentNetwork === 'TESTNET'
-                ? 'https://horizon-testnet.stellar.org'
-                : 'https://horizon.stellar.org';
-
-            const server = new Horizon.Server(serverUrl);
-            try {
-                const account = await server.loadAccount(pubKey);
-                // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                const nativeBalance = account.balances.find((b: any) => b.asset_type === 'native');
-                if (nativeBalance) {
-                    setBalance(nativeBalance.balance);
-                } else {
-                    setBalance('0');
-                }
-            } catch (err) {
-                console.warn("Account not funded or error fetching balance:", err);
-                setBalance('0');
-            }
-        } catch (e) {
-            console.error("Error fetching network/balance:", e);
+            const server = new Horizon.Server('https://horizon-testnet.stellar.org');
+            const account = await server.loadAccount(pubKey);
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            const nativeBalance = account.balances.find((b: any) => b.asset_type === 'native');
+            setBalance(nativeBalance ? nativeBalance.balance : '0');
+        } catch {
+            setBalance('0');
         }
     };
 
-    // ── Auto-reconnect: check if previously allowed ─────────────
+    // Check for existing connection on mount
     useEffect(() => {
-        const verifyExistingConnection = async () => {
+        const check = async () => {
             try {
-                const allowedResult = await isAllowed();
-                if ("isAllowed" in allowedResult && allowedResult.isAllowed) {
-                    const addrResult = await getAddress();
-                    if (addrResult.address && !addrResult.error) {
-                        setAddress(addrResult.address);
-                        setIsConnected(true);
-                        setStatus('connected');
-                        await fetchAccountDetails(addrResult.address);
-                    }
+                ensureInit();
+                const { address: addr } = await StellarWalletsKit.getAddress();
+                if (addr) {
+                    setAddress(addr);
+                    setIsConnected(true);
+                    setStatus('connected');
+                    await fetchBalance(addr);
                 }
-            } catch (e) {
-                // Freighter not available — silently ignore on page load
-                console.log("Freighter not detected on page load.");
+            } catch {
+                // Not connected — fine
             }
         };
-        verifyExistingConnection();
+        check();
     }, []);
 
-    // ── Connect: just call requestAccess directly ───────────────
     const connect = async () => {
         setStatus('connecting');
         try {
-            // requestAccess() does everything:
-            // - If Freighter is not installed, it throws an error
-            // - If the user hasn't allowed this app, it prompts them
-            // - If the user accepts, it returns { address: "G..." }
-            const accessResult = await requestAccess();
+            ensureInit();
 
-            if (accessResult.error) {
-                console.error("Freighter requestAccess error:", accessResult.error);
-                setStatus('error');
-                alert(
-                    "Could not connect to Freighter.\n\n" +
-                    "• Mobile: Open this site inside the Freighter App's DApp Browser.\n" +
-                    "• PC: Install the Freighter Chrome Extension from freighter.app\n\n" +
-                    "Error: " + accessResult.error
-                );
-                return;
-            }
+            // This is the native Stellar Wallets Kit modal that works out-of-the-box in mobile app browser!
+            const { address: addr } = await StellarWalletsKit.authModal();
 
-            if (accessResult.address) {
-                setAddress(accessResult.address);
+            if (addr) {
+                setAddress(addr);
                 setIsConnected(true);
                 setStatus('connected');
-                await fetchAccountDetails(accessResult.address);
+                await fetchBalance(addr);
             } else {
                 setStatus('error');
-                console.error("No address returned from Freighter");
             }
         } catch (e: any) {
             setStatus('error');
-            console.error("Error connecting to Freighter:", e);
-            alert(
-                "Freighter Wallet not detected.\n\n" +
-                "• Mobile: Open this site inside the Freighter App's DApp Browser.\n" +
-                "• PC: Install the Freighter Chrome Extension from freighter.app"
-            );
+            console.error("Wallet connection failed:", e);
         }
     };
 
     const disconnect = async () => {
+        try {
+            ensureInit();
+            await StellarWalletsKit.disconnect();
+        } catch (e) {
+            console.error("Disconnect error:", e);
+        }
         setAddress(null);
-        setNetwork(null);
         setBalance(null);
         setIsConnected(false);
         setStatus('idle');
@@ -117,7 +102,7 @@ export function useFreighter() {
         if (isConnected) {
             await fn();
         }
-    }
+    };
 
     return {
         address,
@@ -127,6 +112,6 @@ export function useFreighter() {
         status,
         connect,
         disconnect,
-        runWithFreighter
+        runWithFreighter,
     };
 }
