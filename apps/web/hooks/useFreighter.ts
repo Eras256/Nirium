@@ -10,6 +10,8 @@ import { FreighterModule } from "@creit.tech/stellar-wallets-kit/modules/freight
 // @ts-ignore
 import { WalletConnectModule } from "@creit.tech/stellar-wallets-kit/modules/wallet-connect";
 // @ts-ignore
+import { defaultModules } from '@creit.tech/stellar-wallets-kit/modules/utils';
+// @ts-ignore
 import { isConnected } from "@stellar/freighter-api";
 
 // ──────────────────────────────────────────────────────────────────
@@ -37,11 +39,14 @@ let isInitialized = false;
 function ensureInit() {
     if (!isInitialized) {
 
-        // 1. Native Freighter (PC Extension & Mobile attempt)
+        // 1. All default DApp wallets from the ecosystem (xBull, Albedo, LOBSTR, etc)
+        // EXCEPT Freighter (we filter it out to inject our extended version)
+        const defaults = defaultModules().filter((m: any) => m.productId !== "freighter");
+
+        // 2. Native Freighter (PC Extension & Mobile attempt)
         const nativeFreighter = new NativeFreighterModule();
 
-        // 2. WalletConnect (The officially supported method for Mobile)
-        // We use a public test ProjectID. In production, get one at cloud.walletconnect.com
+        // 3. WalletConnect (The officially supported method for Mobile)
         const wcModule = new WalletConnectModule({
             projectId: "5e98f060f64c1bd7e543bc8836528d22",
             metadata: {
@@ -53,7 +58,7 @@ function ensureInit() {
         });
 
         StellarWalletsKit.init({
-            modules: [nativeFreighter, wcModule],
+            modules: [...defaults, nativeFreighter, wcModule],
             network: Networks.TESTNET
         });
         isInitialized = true;
