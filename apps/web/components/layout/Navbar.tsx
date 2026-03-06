@@ -118,12 +118,12 @@ export default function Navbar() {
                             }`} />
                     </button>
 
-                    <div className="hidden md:flex items-center gap-1.5 bg-white/5 border border-white/10 rounded-lg p-1">
-                        <Globe className="w-3.5 h-3.5 text-gray-400 ml-1" />
+                    <div className="flex items-center gap-1 sm:gap-1.5 bg-white/5 border border-white/10 rounded-lg p-1 shrink-0">
+                        <Globe className="w-3.5 h-3.5 text-gray-400 ml-1 hidden sm:block" />
                         <select
                             value={language}
                             onChange={(e) => setLanguage(e.target.value as any)}
-                            className="bg-transparent text-[10px] sm:text-xs text-gray-300 font-bold focus:outline-none cursor-pointer p-0.5 sm:p-1"
+                            className="bg-transparent text-[10px] sm:text-xs text-gray-300 font-bold focus:outline-none cursor-pointer p-0.5"
                         >
                             <option value="en" className="bg-black text-white">EN</option>
                             <option value="es" className="bg-black text-white">ES</option>
