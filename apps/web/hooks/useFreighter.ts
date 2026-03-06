@@ -1,14 +1,6 @@
-import { isAllowed, setAllowed, getAddress, getNetwork, isConnected as getIsFreighterConnected } from "@stellar/freighter-api";
+import { isAllowed, setAllowed, getAddress, getNetwork, isConnected as getIsFreighterConnected, checkConnection } from "@stellar/freighter-api";
 import { useState, useEffect } from "react";
 import { Horizon } from "@stellar/stellar-sdk";
-
-declare global {
-    interface Window {
-        freighter?: any;
-        stellar?: any;
-    }
-}
-
 
 export function useFreighter() {
     const [address, setAddress] = useState<string | null>(null);
@@ -20,10 +12,6 @@ export function useFreighter() {
     const fetchAccountDetails = async (pubKey: string) => {
         try {
             const networkObj = await getNetwork();
-            // freighter-api returns network usually as 'PUBLIC' or 'TESTNET' (could vary slightly, handle safely)
-            // But getNetwork() returns object { network: string; ... } wrapped in promise.
-            // Actually based on index.d.ts: getNetwork: () => Promise<{ network: string; networkPassphrase: string; ... }>
-
             const currentNetwork = networkObj.network;
             setNetwork(currentNetwork);
 
@@ -50,39 +38,48 @@ export function useFreighter() {
         }
     };
 
+    // Helper to timeout hanging promises from Freighter API
+    const withTimeout = <T>(promise: Promise<T>, ms: number = 2000): Promise<T> => {
+        return Promise.race([
+            promise,
+            new Promise<T>((_, reject) => setTimeout(() => reject(new Error("Timeout")), ms))
+        ]);
+    };
+
     useEffect(() => {
-        const checkConnection = async () => {
+        const verifyExistingConnection = async () => {
             try {
-                const connStatus = await getIsFreighterConnected();
-                if (connStatus.isConnected) {
-                    const isAllowedResult = await isAllowed();
-                    if (isAllowedResult) {
-                        const response = await getAddress();
-                        if (response.address) {
-                            setAddress(response.address);
-                            setIsConnected(true);
-                            setStatus('connected');
-                            await fetchAccountDetails(response.address);
-                        }
+                // Fast check: Did we already authorize before?
+                const allowed = await withTimeout(isAllowed(), 1500).catch(() => false);
+                if (allowed) {
+                    const response = await withTimeout(getAddress(), 2000);
+                    if (response.address) {
+                        setAddress(response.address);
+                        setIsConnected(true);
+                        setStatus('connected');
+                        await fetchAccountDetails(response.address);
                     }
                 }
             } catch (e) {
-                console.error("Error checking Freighter connection:", e);
+                console.log("No previous freighter connection detected.");
             }
         };
-        checkConnection();
+        verifyExistingConnection();
     }, []);
 
     const connect = async () => {
         setStatus('connecting');
         try {
-            const connStatus = await getIsFreighterConnected();
+            // Check if user has Freighter installed (Extension OR App Browser)
+            const connStatus = await withTimeout(getIsFreighterConnected(), 1500).catch(() => ({ isConnected: false }));
+
             if (!connStatus.isConnected) {
-                alert("Freighter Wallet is not installed or not detected. Please ensure you are inside the Freighter App Browser on mobile or have the extension installed on desktop.");
+                alert("Freighter Wallet is not installed or not detected.\\n\\nIf you are on Mobile: Open this site INSIDE the Freighter App's DApp Browser.\\nIf you are on PC: Install the Freighter Chrome Extension.");
                 setStatus('error');
                 return;
             }
 
+            // Request connection to the wallet
             const isAllowedResult = await setAllowed();
             if (isAllowedResult) {
                 const response = await getAddress();
@@ -101,8 +98,14 @@ export function useFreighter() {
             }
         } catch (e: any) {
             setStatus('error');
-            console.error("Error connecting to Freighter", e);
-            alert("Timeout or failure connecting to Freighter. Please try refreshing or check your Freighter app.");
+            console.error("Error connecting to Freighter:", e);
+
+            // Handle edge case where Freighter API hangs entirely 
+            if (e.message === "Timeout") {
+                alert("Freighter is not responding.\\n\\nPlease ensure you are inside the Freighter App Browser on mobile.");
+            } else {
+                alert("Connection failed. Please unlock your Freighter wallet and try again.");
+            }
         }
     };
 
