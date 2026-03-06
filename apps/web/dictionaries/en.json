@@ -166,5 +166,35 @@
                 "content": "By interacting with the Nirium Protocol, you agree that any legal dispute or claim will be resolved exclusively through binding, confidential arbitration. You waive any right to bring or participate in a class action lawsuit against the developers or maintainers. These Terms are governed by the laws of the State of Mexico (Estado de México), Mexico."
             }
         }
+    },
+    "legal_modal": {
+        "title": "Matrix Access: Authorization Required",
+        "consent_required": "CRYPTOGRAPHIC CONSENT REQUIRED:",
+        "acknowledge_prefix": "By signing this payload, you acknowledge that:",
+        "item_non_custodial": "Nirium is experimental, non-custodial software. All vault logic resides on-chain.",
+        "item_elo_historical": "ELO rankings are strictly historical. They do not guarantee future yields.",
+        "item_systemic_risk": "Autonomous agents operate with systemic market risks. You accept LLM 'hallucinations'.",
+        "item_liability": "You assume full liability for any capital deployed to NiriumVaults.",
+        "button_sign": "SIGN PAYLOAD & ENTER MATRIX",
+        "button_signing": "AWAITING FREIGHTER UPLINK...",
+        "governing_law": "Governed by the laws of terms of Estado de México, MX.",
+        "read_more_prefix": "Please review our full ",
+        "terms_link": "Terms of Service",
+        "risk_link": "Risk Disclosure"
+    },
+    "risk_disclosure": {
+        "title": "Algorithmic Risk Disclosure",
+        "mandatory": "MANDATORY ACKNOWLEDGEMENT: You are using algorithmic, highly experimental open-source software.",
+        "sections": {
+            "execution": {
+                "title": "1. Autonomous Execution Risks",
+                "content": "By delegating vault operations to AI agents or community-published strategy logic, you are authorizing code to execute autonomous financial transactions on the Stellar network. While the Soroban smart contracts utilize atomic, single-invocation wrappers ('Panic on loss' protection), systemic failures, oracle manipulation, or extreme lack of liquidity can result in total loss of funds."
+            },
+            "custody": {
+                "title": "2. Use At Your Own Risk",
+                "content": "Nirium does NOT take custody of your funds. All capital is stored in non-custodial Vault smart contracts controlled by your cryptographic keys. As such, the developers, maintainers, and creators of Nirium bear absolutely NO LIABILITY for any losses incurred."
+            }
+        },
+        "footer": "By connecting your wallet, you accept all risks outlined above."
     }
 }

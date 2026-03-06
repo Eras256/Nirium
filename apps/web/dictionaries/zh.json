@@ -166,5 +166,35 @@
                 "content": "通过与 Nirium 协议进行交互，您同意任何法律争议或索赔将通过具有约束力的、机密的仲裁进行解决。您放弃针对开发人员或维护者提起或参与集体诉讼的任何权利。本条款受墨西哥墨西哥州 (Estado de México) 法律管辖。"
             }
         }
+    },
+    "legal_modal": {
+        "title": "矩阵访问：需要授权",
+        "consent_required": "需要加密确认：",
+        "acknowledge_prefix": "签署此有效载荷即表示您确认：",
+        "item_non_custodial": "Nirium 是实验性的、非托管软件。所有金库逻辑均在链上运行。",
+        "item_elo_historical": "ELO 排名纯属历史数据。不保证未来收益。",
+        "item_systemic_risk": "自主代理运作存在系统性市场风险。您接受 LLM '幻觉'。",
+        "item_liability": "您对部署到 NiriumVaults 的任何资本承担全部责任。",
+        "button_sign": "签署并进入矩阵",
+        "button_signing": "等待 FREIGHTER 签名...",
+        "governing_law": "受墨西哥州 (Estado de México, MX) 法律管辖。",
+        "read_more_prefix": "请查看我们的完整 ",
+        "terms_link": "服务条款",
+        "risk_link": "风险披露"
+    },
+    "risk_disclosure": {
+        "title": "算法风险披露",
+        "mandatory": "强制确认：您正在使用算法、高度实验性的开源软件。",
+        "sections": {
+            "execution": {
+                "title": "1. 自主执行风险",
+                "content": "通过将金库操作委托给 AI 代理或社区发布的策略逻辑，您即授权代码在 Stellar 网络上执行自主金融交易。虽然 Soroban 智能合约利用原子、单一调用包装器（'亏损即恐慌'保护），但系统故障、预言机操纵或极度缺乏流动性可能导致资金全额损失。"
+            },
+            "custody": {
+                "title": "2. 自担风险使用",
+                "content": "Nirium 不接管您的资金。所有资本都存储在由您的加密密钥控制的非托管金库智能合约中。因此，Nirium 的开发人员、维护者和创建者对所产生的任何损失不承担任何责任。"
+            }
+        },
+        "footer": "连接钱包即表示您接受上述所有风险。"
     }
 }

@@ -86,3 +86,5 @@ export function getUserApiKeys(userId: string) {
 export function revokeApiKey(id: string) {
     return true;
 }
+
+export * from './legalShield.js';

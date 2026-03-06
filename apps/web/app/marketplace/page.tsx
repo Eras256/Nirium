@@ -501,6 +501,7 @@ export default function MarketplacePage() {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
+                    'x-stellar-account': userWallet || '',
                     // 'Authorization': 'Bearer ...' // In a real app
                 },
                 body: JSON.stringify({ targetAgent: agentId }) // Send agent ID
@@ -583,7 +584,10 @@ export default function MarketplacePage() {
             // Use execute-demo to allow execution without explicit authentication for this demo
             const response = await fetch('/api/execute-demo', {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
+                headers: {
+                    'Content-Type': 'application/json',
+                    'x-stellar-account': userWallet || ''
+                },
                 body: JSON.stringify({ strategy: `${skillSlug}:${actionName}` })
             });
             const data = await response.json();

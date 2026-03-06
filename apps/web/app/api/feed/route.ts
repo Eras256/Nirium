@@ -6,6 +6,8 @@ export const dynamic = 'force-dynamic';
 export async function GET() {
   const encoder = new TextEncoder();
 
+  let timer: any;
+
   const stream = new ReadableStream({
     start(controller) {
       // We send initial logs right away
@@ -31,18 +33,22 @@ export async function GET() {
       ];
 
       let index = 0;
-      const timer = setInterval(() => {
-        if (index < dynamicLogs.length) {
-          controller.enqueue(encoder.encode(`data: ${JSON.stringify([dynamicLogs[index]])}\n\n`));
-          index++;
-        } else {
-          // Send a repeating ping or keep alive message
-          controller.enqueue(encoder.encode(`data: ${JSON.stringify(["Awaiting next market signal..."])}\n\n`));
+      timer = setInterval(() => {
+        try {
+          if (index < dynamicLogs.length) {
+            controller.enqueue(encoder.encode(`data: ${JSON.stringify([dynamicLogs[index]])}\n\n`));
+            index++;
+          } else {
+            // Send a repeating ping or keep alive message
+            controller.enqueue(encoder.encode(`data: ${JSON.stringify(["Awaiting next market signal..."])}\n\n`));
+          }
+        } catch (error) {
+          clearInterval(timer);
         }
       }, 1500);
-
-      // Cleanup when connection closes
-      return () => clearInterval(timer);
+    },
+    cancel() {
+      if (timer) clearInterval(timer);
     }
   });
 

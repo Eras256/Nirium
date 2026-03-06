@@ -166,5 +166,35 @@
                 "content": "Al interactuar con el Protocolo Nirium, usted acepta que cualquier disputa o reclamo legal se resolverá exclusivamente mediante arbitraje vinculante y confidencial. Usted renuncia a cualquier derecho a presentar o participar en una demanda colectiva contra los desarrolladores o mantenedores. Estos Términos se rigen por las leyes del Estado de México (Estado de México), México."
             }
         }
+    },
+    "legal_modal": {
+        "title": "Acceso a la Matriz: Autorización Requerida",
+        "consent_required": "CONSENTIMIENTO CRIPTOGRÁFICO REQUERIDO:",
+        "acknowledge_prefix": "Al firmar este mensaje, usted reconoce que:",
+        "item_non_custodial": "Nirium es software experimental y no-custodial. Toda la lógica del vault reside on-chain.",
+        "item_elo_historical": "Las clasificaciones ELO son estrictamente históricas. No garantizan rendimientos futuros.",
+        "item_systemic_risk": "Los agentes autónomos operan con riesgos sistémicos de mercado. Usted acepta 'alucinaciones' de LLM.",
+        "item_liability": "Usted asume toda la responsabilidad por el capital desplegado en NiriumVaults.",
+        "button_sign": "FIRMAR MENSAJE Y ENTRAR A LA MATRIZ",
+        "button_signing": "ESPERANDO FIRMA DE FREIGHTER...",
+        "governing_law": "Regido por las leyes del Estado de México, MX.",
+        "read_more_prefix": "Por favor revise nuestros ",
+        "terms_link": "Términos de Servicio",
+        "risk_link": "Aviso de Riesgo"
+    },
+    "risk_disclosure": {
+        "title": "Aviso de Riesgo Algorítmico",
+        "mandatory": "RECONOCIMIENTO OBLIGATORIO: Usted está utilizando software de código abierto algorítmico y altamente experimental.",
+        "sections": {
+            "execution": {
+                "title": "1. Riesgos de Ejecución Autónoma",
+                "content": "Al delegar las operaciones de la bóveda a agentes de IA o lógica de estrategia publicada por la comunidad, usted está autorizando al código para ejecutar transacciones financieras autónomas en la red Stellar. Si bien los contratos inteligentes de Soroban utilizan envoltorios atómicos de invocación única (protección 'Panic on loss'), las fallas sistémicas, la manipulación de oráculos o la falta extrema de liquidez pueden resultar en la pérdida total de los fondos."
+            },
+            "custody": {
+                "title": "2. Uso Bajo Su Propio Riesgo",
+                "content": "Nirium NO toma la custodia de sus fondos. Todo el capital se almacena en contratos inteligentes de Bóveda no custodiales controlados por sus llaves criptográficas. Como tal, los desarrolladores, mantenedores y creadores de Nirium no asumen ABSOLUTAMENTE NINGUNA RESPONSABILIDAD por las pérdidas incurridas."
+            }
+        },
+        "footer": "Al conectar su billetera, usted acepta todos los riesgos descritos anteriormente."
     }
 }

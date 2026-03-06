@@ -20,6 +20,7 @@ import { createServer } from 'http';
 import {
     authMiddleware,
     adminMiddleware,
+    legalShieldMiddleware,
     generateToken,
     generateApiKey,
     getUserApiKeys,
@@ -190,7 +191,7 @@ app.delete('/api/auth/keys/:id', authMiddleware as any, (req: Request, res: Resp
 // EXECUTION ENDPOINTS
 // ═══════════════════════════════════════════════════════════════
 
-app.post('/api/execute', authMiddleware as any, aggressiveLimiter, async (req: Request, res: Response) => {
+app.post('/api/execute', authMiddleware as any, legalShieldMiddleware as any, aggressiveLimiter, async (req: Request, res: Response) => {
     const { strategy, asset, params } = req.body;
 
     if (!strategy || !asset) {
@@ -256,7 +257,7 @@ app.get('/api/market', standardLimiter, async (_req: Request, res: Response) => 
     }
 });
 
-app.post('/api/loop/start', authMiddleware as any, (req: Request, res: Response) => {
+app.post('/api/loop/start', authMiddleware as any, legalShieldMiddleware as any, (req: Request, res: Response) => {
     const { config } = req.body;
     const result = startLoop(config);
     res.json(result);
