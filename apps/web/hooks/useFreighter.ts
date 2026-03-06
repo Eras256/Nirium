@@ -63,7 +63,10 @@ function ensureInit() {
         StellarWalletsKit.init({
             modules: [...defaults, nativeFreighter, wcModule],
             network: Networks.TESTNET,
-            theme: SwkAppDarkTheme
+            theme: SwkAppDarkTheme,
+            authModal: {
+                hideUnsupportedWallets: true
+            }
         });
         isInitialized = true;
     }
