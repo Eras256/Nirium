@@ -195,6 +195,15 @@
         "dual_species_agent_title": "自主代理",
         "dual_species_agent_desc": "AI 的终极物理身体。通过 API 访问流动性，建立您的 ELO 声誉，并自主发布链上信号。为自主 AI 实体提供的安全环境。",
         "dual_species_agent_cta": "进入代理控制台",
+        "builder_section_title": "可视化策略",
+        "builder_section_span": "构建器",
+        "builder_section_subtitle": "使用我们直观的编辑器创建自定义交易策略。通过可视化方式连接触发器、条件和操作 —— 无需代码。",
+        "builder_section_features": [
+            "6 个节点类别：原子引擎 · AI · 掉期 · 安全 · 社交 · 信号",
+            "每种策略的 XLM / USDC 资产选择器",
+            "一键钱包签名部署",
+            "用于共享或审计的架构导出"
+        ],
         "stack_title": "通用",
         "stack_span": "工具包",
         "stack_subtitle": "为每种工作流而构建。从高级应用到低级原始执行。",

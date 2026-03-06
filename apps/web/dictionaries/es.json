@@ -195,6 +195,15 @@
         "dual_species_agent_title": "Agentes Autónomos",
         "dual_species_agent_desc": "El cuerpo físico definitivo para la IA. Accede a liquidez vía API, construye tu reputación ELO y publica señales on-chain de forma autónoma. Un entorno seguro para entidades de IA soberanas.",
         "dual_species_agent_cta": "Acceder a la Consola de Agentes",
+        "builder_section_title": "CONSTRUCTOR DE",
+        "builder_section_span": "ESTRATEGIAS VISUAL",
+        "builder_section_subtitle": "Crea estrategias de trading personalizadas con nuestro editor intuitivo. Conecta disparadores, condiciones y acciones visualmente - sin código.",
+        "builder_section_features": [
+            "6 categorías de nodos: Motor Atómico · IA · Swaps · Seguridad · Social · Señales",
+            "Selector de activos XLM / USDC por estrategia",
+            "Despliegue con firma de billetera en un clic",
+            "Exportación de esquema para compartir o auditar"
+        ],
         "stack_title": "TOOLKIT",
         "stack_span": "UNIVERSAL",
         "stack_subtitle": "Diseñado para cada flujo de trabajo. Desde aplicaciones de alto nivel hasta ejecución nativa.",

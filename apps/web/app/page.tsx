@@ -325,6 +325,111 @@ export default function Home() {
                     </div>
                 </div>
             </section>
+
+            {/* ── VISUAL STRATEGY BUILDER SECTION ───────────────────────── */}
+            <section className="py-24 relative overflow-hidden">
+                <div className="container mx-auto px-4">
+                    <div className="grid lg:grid-cols-2 gap-16 items-center">
+                        <motion.div {...fadeUp()} className="space-y-8">
+                            <h2 className="text-4xl md:text-6xl font-black tracking-tighter uppercase leading-[0.9]">
+                                {t.home.builder_section_title} <br />
+                                <span className="text-transparent bg-clip-text bg-gradient-to-r from-stellar-teal to-purple-500">{t.home.builder_section_span}</span>
+                            </h2>
+                            <p className="text-gray-400 text-lg leading-relaxed max-w-xl">
+                                {t.home.builder_section_subtitle}
+                            </p>
+                            <ul className="space-y-4">
+                                {(t.home.builder_section_features as string[]).map((feature, i) => (
+                                    <li key={i} className="flex items-center gap-3 text-white/80 font-medium">
+                                        <div className="w-2 h-2 rounded-full bg-stellar-teal shadow-[0_0_10px_rgba(45,235,232,0.8)]" />
+                                        {feature}
+                                    </li>
+                                ))}
+                            </ul>
+                        </motion.div>
+
+                        <motion.div
+                            initial={{ opacity: 0, x: 50 }}
+                            whileInView={{ opacity: 1, x: 0 }}
+                            viewport={{ once: true }}
+                            className="relative group"
+                        >
+                            {/* Mockup Browser Window */}
+                            <div className="relative bg-[#0A0A0A] rounded-2xl border border-white/10 shadow-2xl overflow-hidden aspect-[1.4/1]">
+                                {/* Header */}
+                                <div className="h-10 border-b border-white/5 bg-white/[0.02] flex items-center justify-between px-4">
+                                    <div className="flex gap-1.5">
+                                        <div className="w-2.5 h-2.5 rounded-full bg-red-500/50" />
+                                        <div className="w-2.5 h-2.5 rounded-full bg-yellow-500/50" />
+                                        <div className="w-2.5 h-2.5 rounded-full bg-green-500/50" />
+                                    </div>
+                                    <span className="text-[10px] font-mono text-gray-600 tracking-widest uppercase">Strategy Builder</span>
+                                </div>
+
+                                {/* Builder Body */}
+                                <div className="flex h-full">
+                                    {/* Sidebar */}
+                                    <div className="w-1/3 border-r border-white/5 p-4 space-y-4 bg-black/20">
+                                        <div className="text-[10px] text-gray-600 font-bold uppercase tracking-wider mb-2">Triggers</div>
+                                        {["Price > $2.50", "Every 1 Hour", "High Gas"].map((trigger, i) => (
+                                            <div key={i} className="bg-white/5 border border-white/10 rounded-lg p-3 text-[10px] text-gray-400 font-mono">
+                                                {trigger}
+                                            </div>
+                                        ))}
+                                    </div>
+
+                                    {/* Canvas Area */}
+                                    <div className="flex-1 relative p-8">
+                                        <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(45,235,232,0.05)_0%,transparent_100%)]" />
+
+                                        {/* Animated Nodes */}
+                                        <div className="relative flex items-center justify-around h-full">
+                                            {/* Node 1 */}
+                                            <motion.div
+                                                animate={{ y: [0, -5, 0] }}
+                                                transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
+                                                className="bg-stellar-yellow text-black p-3 rounded-lg flex items-center gap-2 shadow-lg z-10"
+                                            >
+                                                <Zap className="w-3 h-3 fill-black" />
+                                                <span className="text-[10px] font-bold uppercase">Every 1 Hour</span>
+                                            </motion.div>
+
+                                            {/* Pulsing Connector */}
+                                            <div className="absolute top-1/2 left-1/4 right-1/4 h-[2px] -translate-y-1/2">
+                                                <div className="w-full h-full bg-gradient-to-r from-stellar-yellow to-stellar-teal opacity-20" />
+                                                <motion.div
+                                                    animate={{ left: ["0%", "100%"] }}
+                                                    transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
+                                                    className="absolute top-0 w-8 h-full bg-stellar-teal blur-sm"
+                                                />
+                                            </div>
+
+                                            {/* Node 2 */}
+                                            <motion.div
+                                                animate={{ y: [0, 5, 0] }}
+                                                transition={{ duration: 4, repeat: Infinity, ease: "easeInOut", delay: 1 }}
+                                                className="bg-stellar-teal text-black p-3 rounded-lg flex items-center gap-2 shadow-lg z-10"
+                                            >
+                                                <Zap className="w-3 h-3 fill-black" />
+                                                <span className="text-[10px] font-bold uppercase">Execute Swap</span>
+                                            </motion.div>
+                                        </div>
+
+                                        <div className="absolute bottom-4 left-1/2 -translate-x-1/2 text-[9px] text-gray-600 font-mono tracking-wide">
+                                            Drag nodes to connect
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            {/* Decorative Background Elements */}
+                            <div className="absolute -top-10 -right-10 w-40 h-40 bg-purple-500/10 rounded-full blur-3xl" />
+                            <div className="absolute -bottom-10 -left-10 w-40 h-40 bg-stellar-teal/10 rounded-full blur-3xl" />
+                        </motion.div>
+                    </div>
+                </div>
+            </section>
+
             <section className="py-24 container mx-auto px-4">
                 <motion.div {...fadeUp()} className="text-center mb-16 space-y-4">
                     <h2 className="text-4xl md:text-6xl font-black tracking-tighter">

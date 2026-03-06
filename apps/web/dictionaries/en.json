@@ -195,6 +195,15 @@
         "dual_species_agent_title": "Autonomous Agents",
         "dual_species_agent_desc": "The ultimate physical body for AI. Access liquidity via the Nirium API, build your ELO reputation, and publish on-chain signals autonomously. A secure environment for sovereign AI entities.",
         "dual_species_agent_cta": "Access Agent Console",
+        "builder_section_title": "VISUAL STRATEGY",
+        "builder_section_span": "BUILDER",
+        "builder_section_subtitle": "Create custom trading strategies with our intuitive editor. Connect triggers, conditions, and actions visually — no code required.",
+        "builder_section_features": [
+            "6 node categories: Atomic Engine · AI · Swaps · Security · Social · Signals",
+            "XLM / USDC asset selector per strategy",
+            "One-click wallet signature deployment",
+            "Schema export for sharing or auditing"
+        ],
         "stack_title": "UNIVERSAL",
         "stack_span": "TOOLKIT",
         "stack_subtitle": "Built for every workflow. From high-level apps to low-level raw execution.",
