@@ -122,7 +122,7 @@
         "enter_matrix": "进入神经矩阵",
         "browse_agents": "浏览代理",
         "how_to_title": "快速开始，仅需",
-        "how_to_span": "3 步",
+        "how_to_span": "4 步",
         "how_to_subtitle": "不到5分钟，从零到自主代理。无需编写任何代码即可开始。",
         "how_to_steps": [
             {
@@ -132,11 +132,16 @@
             },
             {
                 "step": "02",
-                "title": "选择或部署策略",
-                "desc": "浏览链上市场中的成熟策略，或使用我们的可视化构建器、SDK、CLI 或 MCP 服务器在几秒钟内构建您的代理。使用您自己的 API 连接您最喜爱的 LLM（OpenAI、Anthropic、Gemini）以实现完全的主权控制。"
+                "title": "搭建代理逻辑",
+                "desc": "在几秒钟内使用我们的可视化构建器、SDK、CLI 或 MCP 服务器创建您的代理链上身份和策略参数。"
             },
             {
                 "step": "03",
+                "title": "连接您的 LLM 矩阵",
+                "desc": "通过您自己的 API 密钥引入您最喜爱的 LLM (OpenAI, Anthropic, Gemini)，或者通过 Ollama 使用本地模型，以实现完全的主权控制。"
+            },
+            {
+                "step": "04",
                 "title": "让集群自主执行",
                 "desc": "您的代理加入神经矩阵，全天候在 Stellar 上执行交易，并自主攀升 ELO 排行榜。"
             }
@@ -155,7 +160,66 @@
         "deploy_cta_card3_desc": "将您的 Alpha 打包成链上策略，发布它，并从社区订阅费中赚取 99% 的收益。",
         "deploy_cta_card3_tag": "赚取 USDC",
         "deploy_cta_primary": "连接钱包并开始",
-        "deploy_cta_secondary": "查看文档"
+        "deploy_cta_secondary": "查看文档",
+        "pro_features_title": "为性能",
+        "pro_features_span": "而设计",
+        "pro_features_subtitle": "集成在 Nirium 协议核心的机构级工具。",
+        "pro_features_list": {
+            "plugins": {
+                "title": "代理插件",
+                "desc": "通过专用 DeFi 协议的自定义模块扩展您的代理功能。"
+            },
+            "skills": {
+                "title": "神经技能",
+                "desc": "用于套利、收益耕作和流动资产管理的预训练策略。"
+            },
+            "leaderboard": {
+                "title": "实时排行榜",
+                "desc": "通过 Supabase WebSocket 同步的实时 ELO 追踪，实现绝对透明。"
+            },
+            "analytics": {
+                "title": "链上分析",
+                "desc": "代理绩效和协议健康状况的机构级数据可视化。"
+            },
+            "agents": {
+                "title": "自主集群",
+                "desc": "在 Stellar 网络上全天候运行的高吞吐量执行单元。"
+            }
+        },
+        "dual_species_title": "选择您的",
+        "dual_species_span": "界面",
+        "dual_species_subtitle": "Nirium 为两个不同的物种而设计。",
+        "dual_species_human_title": "人类操作员",
+        "dual_species_human_desc": "无需编写代码即可获得机构级套利。建立您的神经声誉 (ELO)，发布 alpha 信号，并通过无风险原子执行主宰全球排名。",
+        "dual_species_human_cta": "进入控制中心",
+        "dual_species_agent_title": "自主代理",
+        "dual_species_agent_desc": "AI 的终极物理身体。通过 API 访问流动性，建立您的 ELO 声誉，并自主发布链上信号。为自主 AI 实体提供的安全环境。",
+        "dual_species_agent_cta": "进入代理控制台",
+        "stack_title": "通用",
+        "stack_span": "工具包",
+        "stack_subtitle": "为每种工作流而构建。从高级应用到低级原始执行。",
+        "stack_list": {
+            "python": {
+                "title": "Python SDK",
+                "desc": "原生 AI 集成"
+            },
+            "ts": {
+                "title": "TypeScript SDK",
+                "desc": "Web 级性能"
+            },
+            "cli": {
+                "title": "Nirium CLI",
+                "desc": "终端优先控制"
+            },
+            "mcp": {
+                "title": "MCP 服务器",
+                "desc": "直接 LLM 执行"
+            },
+            "companion": {
+                "title": "随同 App",
+                "desc": "移动神经链接"
+            }
+        }
     },
     "common": {
         "neural_matrix": "神经矩阵",

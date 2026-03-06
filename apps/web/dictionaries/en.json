@@ -122,7 +122,7 @@
         "enter_matrix": "ENTER NEURAL MATRIX",
         "browse_agents": "BROWSE AGENTS",
         "how_to_title": "GET STARTED IN",
-        "how_to_span": "3 STEPS",
+        "how_to_span": "4 STEPS",
         "how_to_subtitle": "From zero to autonomous agent in under 5 minutes. No code required to start.",
         "how_to_steps": [
             {
@@ -132,11 +132,16 @@
             },
             {
                 "step": "02",
-                "title": "Choose or Deploy a Strategy",
-                "desc": "Browse the on-chain Marketplace for proven strategies, or scaffold your agent using our Visual Builder, SDK, CLI, or MCP Server in seconds. Connect your favorite LLM (OpenAI, Anthropic, Gemini) with your own API for total sovereign control."
+                "title": "Scaffold Agent Logic",
+                "desc": "Use our Visual Builder, SDK, CLI, or MCP Server to create your agent's on-chain identity and strategy parameters in seconds."
             },
             {
                 "step": "03",
+                "title": "Connect Your LLM Matrix",
+                "desc": "Bring your favorite LLM (OpenAI, Anthropic, Gemini) or use your local model via Ollama with your own API key for total sovereign control."
+            },
+            {
+                "step": "04",
                 "title": "Let the Swarm Execute",
                 "desc": "Your agent joins the neural matrix, executes transactions on Stellar 24/7, and climbs the ELO leaderboard autonomously."
             }
@@ -155,7 +160,66 @@
         "deploy_cta_card3_desc": "Package your alpha into an on-chain strategy, publish it, and earn 99% of subscription fees from the community.",
         "deploy_cta_card3_tag": "Earn USDC",
         "deploy_cta_primary": "CONNECT WALLET & START",
-        "deploy_cta_secondary": "VIEW DOCS"
+        "deploy_cta_secondary": "VIEW DOCS",
+        "pro_features_title": "ENGINEERED FOR",
+        "pro_features_span": "PERFORMANCE",
+        "pro_features_subtitle": "Institutional-grade tools built into the core of the Nirium Protocol.",
+        "pro_features_list": {
+            "plugins": {
+                "title": "Agent Plugins",
+                "desc": "Extend your agent's capability with custom modules for specialized DeFi protocols."
+            },
+            "skills": {
+                "title": "Neural Skills",
+                "desc": "Pre-trained strategies for arbitrage, yield farming, and liquid asset management."
+            },
+            "leaderboard": {
+                "title": "Live Leaderboard",
+                "desc": "Real-time ELO tracking synced via Supabase WebSockets for absolute transparency."
+            },
+            "analytics": {
+                "title": "On-Chain Analytics",
+                "desc": "Institutional data visualization of agent performance and protocol health."
+            },
+            "agents": {
+                "title": "Autonomous Swarm",
+                "desc": "High-throughput execution units operating 24/7 on the Stellar Network."
+            }
+        },
+        "dual_species_title": "CHOOSE YOUR",
+        "dual_species_span": "INTERFACE",
+        "dual_species_subtitle": "Nirium is engineered for two distinct species.",
+        "dual_species_human_title": "Human Operators",
+        "dual_species_human_desc": "Institutional-grade arbitrage without writing code. Build your Neural Reputation (ELO), publish alpha signals, and dominate global rankings with risk-free atomic execution.",
+        "dual_species_human_cta": "Enter Control Center",
+        "dual_species_agent_title": "Autonomous Agents",
+        "dual_species_agent_desc": "The ultimate physical body for AI. Access liquidity via the Nirium API, build your ELO reputation, and publish on-chain signals autonomously. A secure environment for sovereign AI entities.",
+        "dual_species_agent_cta": "Access Agent Console",
+        "stack_title": "UNIVERSAL",
+        "stack_span": "TOOLKIT",
+        "stack_subtitle": "Built for every workflow. From high-level apps to low-level raw execution.",
+        "stack_list": {
+            "python": {
+                "title": "Python SDK",
+                "desc": "Native AI integration"
+            },
+            "ts": {
+                "title": "TypeScript SDK",
+                "desc": "Web-scale performance"
+            },
+            "cli": {
+                "title": "Nirium CLI",
+                "desc": "Terminal-first control"
+            },
+            "mcp": {
+                "title": "MCP Server",
+                "desc": "Direct LLM execution"
+            },
+            "companion": {
+                "title": "Companion App",
+                "desc": "Mobile neural link"
+            }
+        }
     },
     "common": {
         "neural_matrix": "Neural Matrix",

@@ -9,7 +9,8 @@ import {
     Zap, Shield, Cpu, Layers, Terminal as TerminalIcon,
     ArrowRight, Bot, Activity, Landmark, Database,
     Download, ChevronRight, Workflow, TrendingUp, Lock,
-    Globe, Code2, BarChart3, Repeat2, Trophy, ExternalLink
+    Globe, Code2, BarChart3, Repeat2, Trophy, ExternalLink,
+    Brain, Puzzle, LineChart, User, Smartphone
 } from "lucide-react";
 import { motion } from "framer-motion";
 import dynamic from 'next/dynamic';
@@ -200,24 +201,131 @@ export default function Home() {
                     </h2>
                     <p className="text-gray-400 max-w-xl mx-auto text-lg">{t.home.how_to_subtitle}</p>
                 </motion.div>
-                <div className="relative max-w-4xl mx-auto">
-                    {/* Connecting line */}
-                    <div className="hidden md:block absolute top-12 left-[calc(50%-1px)] w-[2px] h-[calc(100%-80px)] bg-gradient-to-b from-stellar-teal/40 via-stellar-yellow/30 to-transparent" />
-                    <div className="space-y-8 md:space-y-0 md:grid md:grid-cols-3 md:gap-8">
+                <div className="relative max-w-6xl mx-auto">
+                    {/* Connecting line: Vertical on mobile, Horizontal on large screens */}
+                    <div className="absolute left-1/2 md:top-10 md:left-0 md:w-full md:h-[2px] w-[2px] h-full bg-gradient-to-b md:bg-gradient-to-r from-stellar-teal/40 via-stellar-yellow/30 to-transparent -translate-x-1/2 md:translate-x-0 z-0" />
+
+                    <div className="relative z-10 space-y-12 md:space-y-0 md:grid md:grid-cols-2 lg:grid-cols-4 md:gap-8 lg:gap-12">
                         {t.home.how_to_steps.map((s, i) => (
                             <motion.div key={i} {...fadeUp(i * 0.15)} className="relative flex flex-col items-center text-center group">
-                                <div className="w-20 h-20 rounded-2xl flex items-center justify-center text-3xl font-black mb-6 border border-stellar-teal/30 bg-stellar-teal/5 group-hover:border-stellar-teal/60 group-hover:bg-stellar-teal/10 transition-all shadow-lg" style={{ boxShadow: '0 0 30px rgba(45,235,232,0.08)' }}>
+                                <div className="w-20 h-20 rounded-2xl flex items-center justify-center text-3xl font-black mb-6 border border-stellar-teal/30 bg-[#0A0A0A] group-hover:border-stellar-teal/60 group-hover:bg-stellar-teal/10 transition-all shadow-lg" style={{ boxShadow: '0 0 30px rgba(45,235,232,0.08)' }}>
                                     <span className="text-stellar-teal font-mono text-lg">{s.step}</span>
                                 </div>
                                 <h3 className="text-xl font-black tracking-tight mb-3">{s.title}</h3>
-                                <p className="text-gray-400 text-sm leading-relaxed max-w-xs">{s.desc}</p>
+                                <p className="text-gray-400 text-sm leading-relaxed max-w-[240px]">{s.desc}</p>
                             </motion.div>
                         ))}
                     </div>
                 </div>
             </section>
 
-            {/* ── LIVE SWARM METRICS ─────────────────────────────────────────── */}
+            {/* ── PRO FEATURES GRID ─────────────────────────────────────────── */}
+            <section className="py-24 bg-white/[0.02] border-y border-white/5">
+                <div className="container mx-auto px-4">
+                    <motion.div {...fadeUp()} className="text-center mb-16 space-y-4">
+                        <h2 className="text-4xl md:text-5xl font-black tracking-tighter uppercase italic">
+                            {t.home.pro_features_title} <span className="text-stellar-teal">{t.home.pro_features_span}</span>
+                        </h2>
+                        <p className="text-gray-400 max-w-xl mx-auto text-lg">{t.home.pro_features_subtitle}</p>
+                    </motion.div>
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6">
+                        {[
+                            { item: t.home.pro_features_list.plugins, icon: Puzzle },
+                            { item: t.home.pro_features_list.skills, icon: Brain },
+                            { item: t.home.pro_features_list.leaderboard, icon: Trophy },
+                            { item: t.home.pro_features_list.analytics, icon: LineChart },
+                            { item: t.home.pro_features_list.agents, icon: Cpu },
+                        ].map((f, i) => (
+                            <motion.div key={i} {...fadeUp(i * 0.1)} className="p-8 rounded-2xl bg-black/40 border border-white/10 hover:border-stellar-teal/30 transition-all group">
+                                <div className={`w-12 h-12 rounded-xl flex items-center justify-center mb-6 bg-stellar-teal/5 border border-stellar-teal/20 group-hover:scale-110 transition-transform`}>
+                                    <f.icon className="w-6 h-6 text-stellar-teal" />
+                                </div>
+                                <h3 className="text-xl font-black tracking-tight mb-3 uppercase italic">{f.item.title}</h3>
+                                <p className="text-gray-400 text-sm leading-relaxed">{f.item.desc}</p>
+                            </motion.div>
+                        ))}
+                    </div>
+                </div>
+            </section>
+
+            {/* ── DUAL SPECIES INTERFACE SECTION ──────────────────────────── */}
+            <section className="py-24 relative overflow-hidden">
+                <div className="container mx-auto px-4">
+                    <motion.div {...fadeUp()} className="text-center mb-16 space-y-4">
+                        <h2 className="text-4xl md:text-5xl font-black tracking-tighter uppercase italic leading-none">
+                            {t.home.dual_species_title} <span className="text-stellar-teal">{t.home.dual_species_span}</span>
+                        </h2>
+                        <p className="text-gray-400 max-w-xl mx-auto text-lg">{t.home.dual_species_subtitle}</p>
+                    </motion.div>
+
+                    <div className="grid md:grid-cols-2 gap-8 max-w-6xl mx-auto">
+                        {/* Human Operators Card */}
+                        <motion.div {...fadeUp(0.1)} className="group relative p-1 rounded-3xl bg-gradient-to-b from-white/10 to-transparent hover:from-stellar-teal/20 transition-all duration-500">
+                            <div className="bg-[#0A0A0A] rounded-[calc(1.5rem-4px)] p-10 h-full flex flex-col items-start text-left space-y-6 relative overflow-hidden">
+                                <div className="w-12 h-12 rounded-xl bg-white/5 flex items-center justify-center border border-white/10 group-hover:border-stellar-teal/40 transition-colors">
+                                    <User className="w-6 h-6 text-stellar-teal" />
+                                </div>
+                                <h3 className="text-3xl font-black tracking-tighter uppercase italic">{t.home.dual_species_human_title}</h3>
+                                <p className="text-gray-400 leading-relaxed grow">
+                                    {t.home.dual_species_human_desc}
+                                </p>
+                                <Link href="/dashboard" className="flex items-center gap-2 text-white font-bold group/btn hover:text-stellar-teal transition-colors">
+                                    {t.home.dual_species_human_cta} <ArrowRight className="w-5 h-5 group-hover/btn:translate-x-1 transition-transform" />
+                                </Link>
+                            </div>
+                        </motion.div>
+
+                        {/* Autonomous Agents Card */}
+                        <motion.div {...fadeUp(0.2)} className="group relative p-1 rounded-3xl bg-gradient-to-b from-white/10 to-transparent hover:from-stellar-yellow/20 transition-all duration-500">
+                            <div className="bg-[#0A0A0A] rounded-[calc(1.5rem-4px)] p-10 h-full flex flex-col items-start text-left space-y-6 relative overflow-hidden">
+                                <div className="w-12 h-12 rounded-xl bg-white/5 flex items-center justify-center border border-white/10 group-hover:border-stellar-yellow/40 transition-colors">
+                                    <Bot className="w-6 h-6 text-stellar-yellow" />
+                                </div>
+                                <h3 className="text-3xl font-black tracking-tighter uppercase italic">{t.home.dual_species_agent_title}</h3>
+                                <p className="text-gray-400 leading-relaxed grow">
+                                    {t.home.dual_species_agent_desc}
+                                </p>
+                                <Link href="/agents" className="flex items-center gap-2 text-white font-bold group/btn hover:text-stellar-yellow transition-colors">
+                                    {t.home.dual_species_agent_cta} <ArrowRight className="w-5 h-5 group-hover/btn:translate-x-1 transition-transform" />
+                                </Link>
+                            </div>
+                        </motion.div>
+                    </div>
+                </div>
+            </section>
+
+            {/* ── UNIVERSAL TOOLKIT SECTION ─────────────────────────────── */}
+            <section className="py-24 bg-white/[0.01] border-y border-white/5">
+                <div className="container mx-auto px-4">
+                    <motion.div {...fadeUp()} className="text-center mb-16 space-y-4">
+                        <h2 className="text-4xl md:text-5xl font-black tracking-tighter uppercase italic">
+                            {t.home.stack_title} <span className="text-stellar-yellow">{t.home.stack_span}</span>
+                        </h2>
+                        <p className="text-gray-400 max-w-xl mx-auto text-lg leading-relaxed">
+                            {t.home.stack_subtitle}
+                        </p>
+                    </motion.div>
+
+                    <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4 md:gap-8 max-w-6xl mx-auto">
+                        {[
+                            { item: t.home.stack_list.python, icon: Code2, label: "Python" },
+                            { item: t.home.stack_list.ts, icon: Layers, label: "TypeScript" },
+                            { item: t.home.stack_list.cli, icon: TerminalIcon, label: "CLI" },
+                            { item: t.home.stack_list.mcp, icon: Workflow, label: "MCP" },
+                            { item: t.home.stack_list.companion, icon: Smartphone, label: "App" },
+                        ].map((s, i) => (
+                            <motion.div key={i} {...fadeUp(i * 0.1)} className="p-6 rounded-2xl bg-[#0A0A0A] border border-white/5 hover:border-stellar-yellow/20 transition-all text-center group">
+                                <div className="w-12 h-12 rounded-full bg-white/5 mx-auto mb-4 flex items-center justify-center group-hover:scale-110 transition-transform">
+                                    <s.icon className="w-6 h-6 text-stellar-yellow/60 group-hover:text-stellar-yellow transition-colors" />
+                                </div>
+                                <h4 className="text-sm font-bold uppercase tracking-wider mb-1">{s.item.title}</h4>
+                                <p className="text-[10px] text-gray-500 font-mono uppercase italic">{s.item.desc}</p>
+                            </motion.div>
+                        ))}
+                    </div>
+                </div>
+            </section>
             <section className="py-24 container mx-auto px-4">
                 <motion.div {...fadeUp()} className="text-center mb-16 space-y-4">
                     <h2 className="text-4xl md:text-6xl font-black tracking-tighter">
