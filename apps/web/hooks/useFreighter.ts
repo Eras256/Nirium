@@ -1,4 +1,4 @@
-import { isAllowed, setAllowed, getAddress, getNetwork } from "@stellar/freighter-api";
+import { isAllowed, setAllowed, getAddress, getNetwork, isConnected as getIsFreighterConnected } from "@stellar/freighter-api";
 import { useState, useEffect } from "react";
 import { Horizon } from "@stellar/stellar-sdk";
 
@@ -53,14 +53,17 @@ export function useFreighter() {
     useEffect(() => {
         const checkConnection = async () => {
             try {
-                const isAllowedResult = await isAllowed();
-                if (isAllowedResult) {
-                    const response = await getAddress();
-                    if (response.address) {
-                        setAddress(response.address);
-                        setIsConnected(true);
-                        setStatus('connected');
-                        await fetchAccountDetails(response.address);
+                const connStatus = await getIsFreighterConnected();
+                if (connStatus.isConnected) {
+                    const isAllowedResult = await isAllowed();
+                    if (isAllowedResult) {
+                        const response = await getAddress();
+                        if (response.address) {
+                            setAddress(response.address);
+                            setIsConnected(true);
+                            setStatus('connected');
+                            await fetchAccountDetails(response.address);
+                        }
                     }
                 }
             } catch (e) {
@@ -73,6 +76,13 @@ export function useFreighter() {
     const connect = async () => {
         setStatus('connecting');
         try {
+            const connStatus = await getIsFreighterConnected();
+            if (!connStatus.isConnected) {
+                alert("Freighter Wallet is not installed or not detected. Please ensure you are inside the Freighter App Browser on mobile or have the extension installed on desktop.");
+                setStatus('error');
+                return;
+            }
+
             const isAllowedResult = await setAllowed();
             if (isAllowedResult) {
                 const response = await getAddress();
@@ -92,7 +102,7 @@ export function useFreighter() {
         } catch (e: any) {
             setStatus('error');
             console.error("Error connecting to Freighter", e);
-            alert("No route to Freighter. Please ensure you are inside the Freighter App Browser.");
+            alert("Timeout or failure connecting to Freighter. Please try refreshing or check your Freighter app.");
         }
     };
 
