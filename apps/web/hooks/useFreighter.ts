@@ -1,4 +1,4 @@
-import { isAllowed, setAllowed, getAddress, getNetwork, isConnected as getIsFreighterConnected, checkConnection } from "@stellar/freighter-api";
+import { isAllowed, setAllowed, getAddress, getNetwork, isConnected as getIsFreighterConnected } from "@stellar/freighter-api";
 import { useState, useEffect } from "react";
 import { Horizon } from "@stellar/stellar-sdk";
 
