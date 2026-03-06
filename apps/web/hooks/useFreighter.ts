@@ -1,4 +1,4 @@
-import { isConnected as getIsFreighterConnected, requestAccess, getAddress, getNetwork, isAllowed } from "@stellar/freighter-api";
+import { requestAccess, getAddress, getNetwork, isAllowed } from "@stellar/freighter-api";
 import { useState, useEffect } from "react";
 import { Horizon } from "@stellar/stellar-sdk";
 
@@ -38,58 +38,47 @@ export function useFreighter() {
         }
     };
 
-    // ── Auto-reconnect on load ──────────────────────────────────
+    // ── Auto-reconnect: check if previously allowed ─────────────
     useEffect(() => {
         const verifyExistingConnection = async () => {
             try {
-                // 1. Check if Freighter extension/app is present
-                const connResult = await getIsFreighterConnected();
-                if (!("isConnected" in connResult && connResult.isConnected)) return;
-
-                // 2. Check if this dApp was previously allowed
                 const allowedResult = await isAllowed();
-                if (!("isAllowed" in allowedResult && allowedResult.isAllowed)) return;
-
-                // 3. Retrieve user public key silently
-                const addrResult = await getAddress();
-                if (addrResult.error || !addrResult.address) return;
-
-                setAddress(addrResult.address);
-                setIsConnected(true);
-                setStatus('connected');
-                await fetchAccountDetails(addrResult.address);
+                if ("isAllowed" in allowedResult && allowedResult.isAllowed) {
+                    const addrResult = await getAddress();
+                    if (addrResult.address && !addrResult.error) {
+                        setAddress(addrResult.address);
+                        setIsConnected(true);
+                        setStatus('connected');
+                        await fetchAccountDetails(addrResult.address);
+                    }
+                }
             } catch (e) {
-                console.log("No previous Freighter connection detected.");
+                // Freighter not available — silently ignore on page load
+                console.log("Freighter not detected on page load.");
             }
         };
         verifyExistingConnection();
     }, []);
 
-    // ── Connect button handler ──────────────────────────────────
+    // ── Connect: just call requestAccess directly ───────────────
     const connect = async () => {
         setStatus('connecting');
         try {
-            // 1. Check if Freighter is installed (extension or mobile app browser)
-            const connResult = await getIsFreighterConnected();
-
-            if (!("isConnected" in connResult && connResult.isConnected)) {
-                alert(
-                    "Freighter Wallet is not detected.\n\n" +
-                    "• Mobile: Open this site inside the Freighter App's DApp Browser.\n" +
-                    "• PC: Install the Freighter Chrome Extension from freighter.app"
-                );
-                setStatus('error');
-                return;
-            }
-
-            // 2. Use requestAccess — this prompts the user AND returns the public key in one step
-            //    This is the officially recommended flow from docs.freighter.app
+            // requestAccess() does everything:
+            // - If Freighter is not installed, it throws an error
+            // - If the user hasn't allowed this app, it prompts them
+            // - If the user accepts, it returns { address: "G..." }
             const accessResult = await requestAccess();
 
             if (accessResult.error) {
                 console.error("Freighter requestAccess error:", accessResult.error);
                 setStatus('error');
-                alert("Connection refused or failed: " + accessResult.error);
+                alert(
+                    "Could not connect to Freighter.\n\n" +
+                    "• Mobile: Open this site inside the Freighter App's DApp Browser.\n" +
+                    "• PC: Install the Freighter Chrome Extension from freighter.app\n\n" +
+                    "Error: " + accessResult.error
+                );
                 return;
             }
 
@@ -105,7 +94,11 @@ export function useFreighter() {
         } catch (e: any) {
             setStatus('error');
             console.error("Error connecting to Freighter:", e);
-            alert("Connection failed. Please unlock your Freighter wallet and try again.");
+            alert(
+                "Freighter Wallet not detected.\n\n" +
+                "• Mobile: Open this site inside the Freighter App's DApp Browser.\n" +
+                "• PC: Install the Freighter Chrome Extension from freighter.app"
+            );
         }
     };
 
