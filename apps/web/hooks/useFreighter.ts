@@ -23,15 +23,22 @@ import { isConnected } from "@stellar/freighter-api";
 // let the user try native injection just in case the app supports it.
 class NativeFreighterModule extends FreighterModule {
     async isAvailable() {
-        if (typeof window !== "undefined" && (window as any).stellar?.provider === "freighter") {
-            return true;
-        }
+        if (typeof window === "undefined") return false;
+        // Check for injected providers or specific UA markers inside Freighter mobile
+        const isFreighterEnv = !!((window as any).stellar?.provider === "freighter" || (window as any).freighter);
+        if (isFreighterEnv) return true;
+
         try {
             const response = await isConnected();
-            return !response.error && response.isConnected;
+            return !!(response && response.isConnected);
         } catch {
             return false;
         }
+    }
+
+    async isPlatformWrapper() {
+        if (typeof window === "undefined") return false;
+        return !!((window as any).stellar?.provider === "freighter" || (window as any).freighter);
     }
 }
 // ──────────────────────────────────────────────────────────────────
@@ -65,7 +72,8 @@ function ensureInit() {
             network: Networks.TESTNET,
             theme: SwkAppDarkTheme,
             authModal: {
-                hideUnsupportedWallets: true
+                showInstallLabel: false,
+                hideUnsupportedWallets: false
             }
         });
         isInitialized = true;
