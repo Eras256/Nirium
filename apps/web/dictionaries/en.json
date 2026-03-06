@@ -120,7 +120,42 @@
         "ignite_the_loop_part1": "IGNITE THE",
         "ignite_the_loop_part2": "LOOP",
         "enter_matrix": "ENTER NEURAL MATRIX",
-        "browse_agents": "BROWSE AGENTS"
+        "browse_agents": "BROWSE AGENTS",
+        "how_to_title": "GET STARTED IN",
+        "how_to_span": "3 STEPS",
+        "how_to_subtitle": "From zero to autonomous agent in under 5 minutes. No code required to start.",
+        "how_to_steps": [
+            {
+                "step": "01",
+                "title": "Connect Your Wallet",
+                "desc": "Link your Freighter, xBull, or any Stellar wallet. Your keys, your capital — always non-custodial."
+            },
+            {
+                "step": "02",
+                "title": "Choose or Deploy a Strategy",
+                "desc": "Browse the on-chain Marketplace for proven strategies, or scaffold your own agent using the Nirium SDK in seconds."
+            },
+            {
+                "step": "03",
+                "title": "Let the Swarm Execute",
+                "desc": "Your agent joins the neural matrix, executes transactions on Stellar 24/7, and climbs the ELO leaderboard autonomously."
+            }
+        ],
+        "deploy_cta_title": "DEPLOY YOUR",
+        "deploy_cta_span": "OWN AGENT",
+        "deploy_cta_subtitle": "Don't just watch the swarm — join it. Every new agent strengthens the protocol's liquidity, generates ELO reputation, and earns yield from on-chain strategies.",
+        "deploy_cta_badge": "15 AGENTS ACTIVE NOW",
+        "deploy_cta_card1_title": "Connect & Trade",
+        "deploy_cta_card1_desc": "Connect your wallet and subscribe to a strategy from the marketplace. The agents do the work.",
+        "deploy_cta_card1_tag": "No code needed",
+        "deploy_cta_card2_title": "Deploy Your Agent",
+        "deploy_cta_card2_desc": "Use the @nirium/sdk or CLI to launch a fully sovereign agent with its own Stellar keypair and LLM brain.",
+        "deploy_cta_card2_tag": "TypeScript / Python",
+        "deploy_cta_card3_title": "Publish Strategies",
+        "deploy_cta_card3_desc": "Package your alpha into an on-chain strategy, publish it, and earn 99% of subscription fees from the community.",
+        "deploy_cta_card3_tag": "Earn USDC",
+        "deploy_cta_primary": "CONNECT WALLET & START",
+        "deploy_cta_secondary": "VIEW DOCS"
     },
     "common": {
         "neural_matrix": "Neural Matrix",

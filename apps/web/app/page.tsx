@@ -192,6 +192,31 @@ export default function Home() {
                 </div>
             </section>
 
+            {/* ── HOW TO GET STARTED ──────────────────────────────────────── */}
+            <section className="py-24 container mx-auto px-4">
+                <motion.div {...fadeUp()} className="text-center mb-16 space-y-4">
+                    <h2 className="text-4xl md:text-6xl font-black tracking-tighter">
+                        {t.home.how_to_title} <span className="text-stellar-teal">{t.home.how_to_span}</span>
+                    </h2>
+                    <p className="text-gray-400 max-w-xl mx-auto text-lg">{t.home.how_to_subtitle}</p>
+                </motion.div>
+                <div className="relative max-w-4xl mx-auto">
+                    {/* Connecting line */}
+                    <div className="hidden md:block absolute top-12 left-[calc(50%-1px)] w-[2px] h-[calc(100%-80px)] bg-gradient-to-b from-stellar-teal/40 via-stellar-yellow/30 to-transparent" />
+                    <div className="space-y-8 md:space-y-0 md:grid md:grid-cols-3 md:gap-8">
+                        {t.home.how_to_steps.map((s, i) => (
+                            <motion.div key={i} {...fadeUp(i * 0.15)} className="relative flex flex-col items-center text-center group">
+                                <div className="w-20 h-20 rounded-2xl flex items-center justify-center text-3xl font-black mb-6 border border-stellar-teal/30 bg-stellar-teal/5 group-hover:border-stellar-teal/60 group-hover:bg-stellar-teal/10 transition-all shadow-lg" style={{ boxShadow: '0 0 30px rgba(45,235,232,0.08)' }}>
+                                    <span className="text-stellar-teal font-mono text-lg">{s.step}</span>
+                                </div>
+                                <h3 className="text-xl font-black tracking-tight mb-3">{s.title}</h3>
+                                <p className="text-gray-400 text-sm leading-relaxed max-w-xs">{s.desc}</p>
+                            </motion.div>
+                        ))}
+                    </div>
+                </div>
+            </section>
+
             {/* ── LIVE SWARM METRICS ─────────────────────────────────────────── */}
             <section className="py-24 container mx-auto px-4">
                 <motion.div {...fadeUp()} className="text-center mb-16 space-y-4">
@@ -214,6 +239,55 @@ export default function Home() {
                             <div className="text-xs text-gray-500 mt-0.5">{s.sub}</div>
                         </motion.div>
                     ))}
+                </div>
+            </section>
+
+            {/* ── DEPLOY YOUR AGENT CTA ─────────────────────────────────────── */}
+            <section className="py-32 relative overflow-hidden">
+                <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_50%_50%,rgba(45,235,232,0.05),transparent_60%)]" />
+                <div className="container mx-auto px-4 relative z-10">
+                    <motion.div {...fadeUp()} className="text-center mb-4">
+                        <div className="inline-flex items-center gap-2 px-4 py-1.5 bg-stellar-teal/10 border border-stellar-teal/30 rounded-full text-xs font-mono text-stellar-teal mb-6">
+                            <span className="w-1.5 h-1.5 rounded-full bg-stellar-teal animate-ping" />
+                            {t.home.deploy_cta_badge}
+                        </div>
+                        <h2 className="text-4xl md:text-6xl font-black tracking-tighter mb-4">
+                            {t.home.deploy_cta_title} <span className="text-transparent bg-clip-text bg-gradient-to-r from-stellar-teal to-stellar-yellow">{t.home.deploy_cta_span}</span>
+                        </h2>
+                        <p className="text-gray-400 max-w-2xl mx-auto text-lg leading-relaxed">{t.home.deploy_cta_subtitle}</p>
+                    </motion.div>
+
+                    <div className="grid md:grid-cols-3 gap-6 mt-14 mb-14">
+                        {[
+                            { title: t.home.deploy_cta_card1_title, desc: t.home.deploy_cta_card1_desc, tag: t.home.deploy_cta_card1_tag, color: '#2DEBE8', icon: '🔗' },
+                            { title: t.home.deploy_cta_card2_title, desc: t.home.deploy_cta_card2_desc, tag: t.home.deploy_cta_card2_tag, color: '#FFD700', icon: '🤖' },
+                            { title: t.home.deploy_cta_card3_title, desc: t.home.deploy_cta_card3_desc, tag: t.home.deploy_cta_card3_tag, color: '#A78BFA', icon: '💡' },
+                        ].map((card, i) => (
+                            <motion.div key={i} {...fadeUp(i * 0.12)} whileHover={{ y: -8, scale: 1.01 }} className="relative p-6 rounded-2xl bg-white/[0.03] border border-white/10 overflow-hidden group transition-all">
+                                <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity" style={{ background: `radial-gradient(circle at 50% 0%,${card.color}08,transparent 60%)` }} />
+                                <div className="text-3xl mb-4">{card.icon}</div>
+                                <div className="inline-flex px-2 py-0.5 rounded-full text-[10px] font-mono mb-4" style={{ background: `${card.color}15`, color: card.color, border: `1px solid ${card.color}30` }}>
+                                    {card.tag}
+                                </div>
+                                <h3 className="text-xl font-black tracking-tight mb-3">{card.title}</h3>
+                                <p className="text-gray-400 text-sm leading-relaxed">{card.desc}</p>
+                            </motion.div>
+                        ))}
+                    </div>
+
+                    <motion.div {...fadeUp(0.3)} className="flex flex-col sm:flex-row justify-center gap-4">
+                        <button
+                            onClick={handleLaunch}
+                            className="group px-8 py-4 bg-stellar-teal text-black font-black rounded-xl transition-all hover:shadow-[0_0_40px_rgba(45,235,232,0.5)] hover:scale-105 active:scale-95"
+                        >
+                            <span className="flex items-center justify-center gap-2">
+                                {t.home.deploy_cta_primary} <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+                            </span>
+                        </button>
+                        <Link href="/docs" className="px-8 py-4 bg-white/5 border border-white/10 text-white font-bold rounded-xl hover:bg-white/10 transition-all text-center">
+                            {t.home.deploy_cta_secondary}
+                        </Link>
+                    </motion.div>
                 </div>
             </section>
 

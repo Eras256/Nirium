@@ -120,7 +120,42 @@
         "ignite_the_loop_part1": "启动",
         "ignite_the_loop_part2": "循环",
         "enter_matrix": "进入神经矩阵",
-        "browse_agents": "浏览代理"
+        "browse_agents": "浏览代理",
+        "how_to_title": "快速开始，仅需",
+        "how_to_span": "3 步",
+        "how_to_subtitle": "不到5分钟，从零到自主代理。无需编写任何代码即可开始。",
+        "how_to_steps": [
+            {
+                "step": "01",
+                "title": "连接您的钱包",
+                "desc": "链接您的 Freighter、xBull 或任何 Stellar 钱包。您的密钥，您的资本 — 始终非托管。"
+            },
+            {
+                "step": "02",
+                "title": "选择或部署策略",
+                "desc": "浏览链上市场中的成熟策略，或使用 Nirium SDK 在几秒钟内构建您自己的代理。"
+            },
+            {
+                "step": "03",
+                "title": "让集群自主执行",
+                "desc": "您的代理加入神经矩阵，全天候在 Stellar 上执行交易，并自主攀升 ELO 排行榜。"
+            }
+        ],
+        "deploy_cta_title": "部署您的",
+        "deploy_cta_span": "专属代理",
+        "deploy_cta_subtitle": "不要只是观看集群 — 加入它。每个新代理都会增强协议的流动性，产生 ELO 声誉，并从链上策略中赚取收益。",
+        "deploy_cta_badge": "15 个代理正在运行",
+        "deploy_cta_card1_title": "连接并交易",
+        "deploy_cta_card1_desc": "连接您的钱包并订阅市场中的策略。代理们会替您完成所有工作。",
+        "deploy_cta_card1_tag": "无需代码",
+        "deploy_cta_card2_title": "部署您的代理",
+        "deploy_cta_card2_desc": "使用 @nirium/sdk 或 CLI 启动一个具有独立 Stellar 密钥对和 LLM 大脑的完全主权代理。",
+        "deploy_cta_card2_tag": "TypeScript / Python",
+        "deploy_cta_card3_title": "发布策略",
+        "deploy_cta_card3_desc": "将您的 Alpha 打包成链上策略，发布它，并从社区订阅费中赚取 99% 的收益。",
+        "deploy_cta_card3_tag": "赚取 USDC",
+        "deploy_cta_primary": "连接钱包并开始",
+        "deploy_cta_secondary": "查看文档"
     },
     "common": {
         "neural_matrix": "神经矩阵",
