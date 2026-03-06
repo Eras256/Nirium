@@ -53,17 +53,14 @@ export function useFreighter() {
     useEffect(() => {
         const checkConnection = async () => {
             try {
-                // Check if Freighter is available in window
-                if (typeof window !== 'undefined' && (window.freighter || window.stellar)) {
-                    const isAllowedResult = await isAllowed();
-                    if (isAllowedResult) {
-                        const response = await getAddress();
-                        if (response.address) {
-                            setAddress(response.address);
-                            setIsConnected(true);
-                            setStatus('connected');
-                            await fetchAccountDetails(response.address);
-                        }
+                const isAllowedResult = await isAllowed();
+                if (isAllowedResult) {
+                    const response = await getAddress();
+                    if (response.address) {
+                        setAddress(response.address);
+                        setIsConnected(true);
+                        setStatus('connected');
+                        await fetchAccountDetails(response.address);
                     }
                 }
             } catch (e) {
@@ -76,13 +73,6 @@ export function useFreighter() {
     const connect = async () => {
         setStatus('connecting');
         try {
-            // First check if extension is actually totally missing in mobile context
-            if (typeof window !== 'undefined' && !window.freighter && !window.stellar) {
-                alert("Freighter Wallet is not installed or not detected on this browser/device.");
-                setStatus('error');
-                return;
-            }
-
             const isAllowedResult = await setAllowed();
             if (isAllowedResult) {
                 const response = await getAddress();
@@ -102,11 +92,7 @@ export function useFreighter() {
         } catch (e: any) {
             setStatus('error');
             console.error("Error connecting to Freighter", e);
-            if (e.message && e.message.includes("is not installed")) {
-                alert("Please install Freighter wallet extension or use a supported browser.");
-            } else {
-                alert("Could not connect to Freighter wallet.");
-            }
+            alert("No route to Freighter. Please ensure you are inside the Freighter App Browser.");
         }
     };
 
