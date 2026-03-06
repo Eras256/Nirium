@@ -12,7 +12,7 @@ import { WalletConnectModule } from "@creit.tech/stellar-wallets-kit/modules/wal
 // @ts-ignore
 import { defaultModules } from '@creit.tech/stellar-wallets-kit/modules/utils';
 // @ts-ignore
-import { SwkAppDarkTheme } from '@creit.tech/stellar-wallets-kit/components';
+import { SwkAppDarkTheme } from '@creit.tech/stellar-wallets-kit/types';
 // @ts-ignore
 import { isConnected } from "@stellar/freighter-api";
 
