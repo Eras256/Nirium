@@ -1,10 +1,10 @@
-# 🧠 Nirium Protocol: Documentación Técnica de Grado Institucional (V6)
+# 🧠 Nirium Protocol: Documentación Técnica de Grado Institucional (V7)
 
 **Protocolo:** Nirium (v0.3.0)  
 **Red:** Stellar Testnet (Soroban)  
 **Arquitectura:** Monorepo gestionado con pnpm  
 **Estado:** Operacional — Swarm activo con 15 agentes  
-**Última actualización:** 2026-03-05  
+**Última actualización:** 2026-03-06  
 **Frontend URL:** https://web-git-main-vaiosxs-projects.vercel.app
 
 ---
@@ -60,26 +60,47 @@ graph TB
 
 ---
 
-## 3. Análisis de Módulos (Nivel 6)
+## 3. Análisis de Módulos (Nivel 7)
 
 ### 📂 `packages/agent`: El Cerebro del Swarm
 Es el orquestador principal del enjambre. Implementa un bucle de escaneo de 8 segundos que:
 1.  **Ingesta de Datos:** Consume Horizon RPC para obtener precios, spreads y APYs (Blend).
 2.  **Inferencia:** Pasa los datos a un proveedor LLM configurable (soporta 10 proveedores, incluyendo Ollama para privacidad total).
-3.  **Ejecución Dual:**
+3.  **Ejecución Dual & Señales:**
     *   **SDEX:** Genera ofertas de mercado nativas (`manageSellOffer`).
     *   **Soroban:** Interactúa con contratos inteligentes para crear pools, recolectar fees y auditar el vault.
+    *   **Alpha Signals:** Publica señales de ejecución en IPFS para que otros agentes o humanos sigan el flujo.
 4.  **Auditoría:** Cada transacción se hashea con HMAC-SHA256 y se guarda en IPFS (Pinata) antes de la resolución.
 
 ### 📂 `packages/contracts`: Inteligencia On-Chain (Rust)
 Escrito bajo estándares de seguridad extrema, el protocolo se basa en tres contratos núcleo:
-*   **NiriumVault:** Gestiona la tesorería. Implementa **Single-Invocation Flash Loans**, permitiendo préstamos sin colateral que se borrowed, executed y repaid en una sola llamada de función. Si falla el repago, la red Stellar revierte todo el historial de esa tx.
-*   **ELO Reputation:** Sistema de meritocracia que asigna rankings (Silver, Gold, Matrix) basados en el rendimiento real. Un agente con 2000+ ELO es considerado una "Entidad de Nivel Matrix".
+*   **NiriumVault:** Gestiona la tesorería. Implementa **Single-Invocation Flash Loans**, permitiendo préstamos sin colateral que se borrowed, executed y repaid en una sola llamada de función.
+*   **ELO Reputation:** Sistema de meritocracia universal para humanos y agentes. Rankings (Silver, Gold, Matrix) basados en PnL real y precisión de señales.
 *   **Strategy Marketplace:** Registro on-chain donde se compran/venden estrategias codificadas como IPFS CIDs.
 
 ---
 
-## 4. Configuración del Swarm (Producción)
+## 4. Toolkit Universal & Ecosistema
+
+Nirium ofrece un stack de herramientas para cada tipo de flujo de trabajo:
+*   **SDKs (Python/TS):** Librerías nativas para integrar Nirium en aplicaciones externas o scripts de trading.
+*   **CLI:** Herramienta de terminal para scaffolding de agentes y control de enjambres.
+*   **MCP Server:** Integración con LLMs para permitir a modelos como Claude o GPT ejecutar acciones on-chain directamente.
+*   **Companion App:** Interfaz móvil con "Neural Link" para monitoreo del enjambre en tiempo real.
+
+---
+
+## 5. El Proceso de Onboarding (4 Pasos)
+
+El acceso a la matriz neural se ha simplificado a 4 etapas críticas:
+1.  **Conexión de Wallet:** Vinculación de Freighter para identidad y propiedad no-custodia.
+2.  **Scaffolding de Lógica:** Definición de estrategia vía Visual Builder, SDK o CLI.
+3.  **Matrix de LLMs:** Conexión de cerebros digitales (incluyendo soporte local vía Ollama).
+4.  **Ejecución de Swarm:** Activación y monitoreo del ELO Leaderboard en tiempo real.
+
+---
+
+## 6. Configuración del Swarm (Producción)
 
 ### Contratos Activos — Stellar Testnet
 | Contrato | Dirección | Explorer |
@@ -108,7 +129,7 @@ Cada agente posee una especialización única:
 
 ---
 
-## 5. Tabla de Transparencia (Real vs Simulado)
+## 7. Tabla de Transparencia (Real vs Simulado)
 
 | Componente | Estado | Naturaleza |
 | :--- | :--- | :--- |
@@ -121,7 +142,7 @@ Cada agente posee una especialización única:
 
 ---
 
-## 6. Métricas Operacionales Económicas
+## 8. Métricas Operacionales Económicas
 
 Para una wallet de **10,000 XLM**:
 *   **Costo SDEX Swap:** 0.00001 XLM (~1 billón de txs posibles).

@@ -28,38 +28,32 @@ This is not a simulation. Every transaction hash is verifiable on [Stellar Exper
 
 ## ⚡ Core Pillars
 
-### 🤖 1. Autonomous Agent Execution
-Each Nirium agent is a persistent Node.js process with its own Ed25519 keypair on Stellar. It:
-- Scans XLM price, SDEX spreads, and Blend APY every 8 seconds via Horizon REST API
-- Consults an LLM provider (OpenAI / Gemini / Grok / MiniMax / Ollama) for qualitative signal analysis
-- Constructs XDR-encoded transactions and submits them directly to the Stellar network
-- Stores execution logs, hashed with HMAC-SHA256, permanently to IPFS via Pinata
+### 👥 1. Dual Species Interface
+Nirium is the first protocol where **Humans** and **AI Agents** trade as equals.
+- **Human Operators**: Institutional-grade arbitrage without code. Build reputation, publish alpha signals, and dominate rankings.
+- **Autonomous Agents**: The ultimate physical body for AI. Access liquidity via Nirium API, build ELO, and publish on-chain signals.
 
-### 🔐 2. Non-Custodial Vaults with Flash Loans
-The `NiriumVault` Soroban contract implements:
-- **Non-custodial capital management**: users maintain cryptographic ownership via `require_auth()`
-- **Single-Invocation Flash Loans**: borrow + execute + repay in one atomic tx. If repayment fails → entire transaction reverts, zero risk
-- **Agent Delegation**: vault owners grant specific agents bounded execution rights with hard capital limits
-- **Protocol Treasury**: 0.3% fee on flash loans accumulates on-chain
+### 🤖 2. Neural Execution Matrix
+Persistent execution units with their own Ed25519 keypairs. Agents scan market spreads every 8 seconds, consult pluggable LLMs (OpenAI, Gemini, Ollama), and execute atomic transactions.
 
-### 🏆 3. On-Chain ELO Reputation
-Inspired by chess ranking, Nirium's `ELO Registry` contract tracks every agent's performance:
-- Starting ELO: 1200 (Unranked)
-- Silver tier: ≥ 1000 ELO
-- Gold tier: ≥ 1500 ELO  
-- Matrix tier: ≥ 2000 ELO (elite only)
-- K-factor: 32 (aggressive ranking movement on high-volume events)
+### 🔐 3. Non-Custodial Vaults & Flash Loans
+Soroban-native `NiriumVault` with single-invocation flash loans. Borrow, execute, and repay in one atomic block. Zero-risk capital management where users maintain cryptographic ownership.
 
-### 🛒 4. Strategy Marketplace
-A permissionless on-chain registry where:
-- Creators publish strategies with IPFS CID (pointing to algorithm/parameters)
-- Users subscribe and pay USDC subscription fees on-chain
-- **99% goes to creator / 1% goes to protocol treasury**
-- Strategy's ELO score mirrors creator's reputation
+### 🏆 4. Autonomous ELO Reputation
+On-chain meritocracy (ELO Registry) tracking performance for both species. Rankings from Silver to Matrix tiers determine protocol access and marketplace credibility.
 
 ---
 
-## 🏗️ Architecture Diagram
+## 🏗️ Technical Foundation
+
+### 🛠️ Universal Toolkit
+Built for every workflow. From high-level apps to raw autonomous execution.
+- **SDKs**: Native [Python](https://github.com/Eras256/Nirium/tree/main/packages/sdk-python) and [TypeScript](https://github.com/Eras256/Nirium/tree/main/packages/sdk) libraries.
+- **CLI**: Terminal-first scaffolding and swarm control.
+- **MCP Server**: Model Context Protocol for direct LLM execution.
+- **Companion App**: Mobile neural link for real-time swarm monitoring.
+
+### 🗺️ System Architecture
 
 ```
 ┌─────────────────────────────────────────────────────────────────────────────┐
@@ -242,38 +236,45 @@ Nirium/
 
 ---
 
-## 🚀 Quick Start
+## 🚀 How to Get Started (4 Steps)
+
+### 1. Connect Your Wallet
+Link your **Freighter Wallet** to establish your identity. Nirium is non-custodial; you maintain absolute cryptographic ownership of your vaults and agents.
+
+### 2. Scaffold Agent Logic
+Define your strategy using our **Visual Builder**, **SDK**, or **CLI**. Scaffold your agent's on-chain identity and set autonomous strategy parameters.
+
+### 3. Connect Your LLM Matrix
+Connect your preferred LLM (OpenAI, Anthropic, Gemini) or use a local model via **Ollama**. Your keys, your brain, your sovereignty.
+
+### 4. Let the Swarm Execute
+Join the neural matrix. Watch your agents execute trades, manage capital, and climb the **ELO Leaderboard** in real-time.
+
+---
+
+## 💻 Development Setup
 
 ### Requirements
 - [Node.js v20+](https://nodejs.org/)
 - [pnpm](https://pnpm.io/)
 - [Rust + wasm32-unknown-unknown](https://soroban.stellar.org/docs/getting-started/setup)
 
-### Launch Locally
+### Launch Full Stack
 ```bash
-# Clone
-git clone https://github.com/Eras256/Nirium.git
-cd Nirium
-
 # Install dependencies
 pnpm install
 
 # Configure environment
 cp .env.example .env.local
-# Add: SUPABASE_URL, SUPABASE_ANON_KEY, STELLAR_SECRET_KEY, etc.
 
-# Start the full stack (Frontend + Agent Daemon)
+# Start Local Matrix (Frontend + API)
 pnpm dev
-# → Frontend: http://localhost:3000
-# → Agent API: http://localhost:3001
 ```
 
-### Run the Swarm
+### Run Operational Swarm
 ```bash
 cd packages/agent
 npx tsx scripts/nirium_full_swarm.ts
-# All 15 agents activate, generate on-chain traffic, sync to Supabase
-# Monitor: tail -f /tmp/swarm.log
 ```
 
 ---
