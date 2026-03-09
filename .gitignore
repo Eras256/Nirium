@@ -49,3 +49,6 @@ implementation_plan.json
 # Secrets
 .env
 .env.*
+
+# AI config
+.gemini/
