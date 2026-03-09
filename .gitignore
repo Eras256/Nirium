@@ -45,3 +45,7 @@ Cargo.lock
 *master_prompt*.md
 master_grants_table_2026.md
 implementation_plan.json
+
+# Secrets
+.env
+.env.*
