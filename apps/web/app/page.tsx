@@ -630,7 +630,7 @@ export default function Home() {
                     <div className="grid grid-cols-2 md:grid-cols-3 gap-6">
                         <SDKCard name="Nirium CLI" lang="Commander" command="npx nirium create" icon={TerminalIcon} />
                         <SDKCard name="Python SDK" lang="v0.1.0" command="pip install nirium" icon={Shield} />
-                        <SDKCard name="Companion App" lang="Tauri v2" command="GitHub Downloads" icon={Download} />
+                        <SDKCard name="Companion App" lang="Tauri v2" command="Direct Downloads" icon={Download} />
                         <SDKCard name="Nirium MCP" lang="Claude & Grok" command="npm run start" icon={Bot} />
                         <SDKCard name="Market Docs" lang="API REST" command="GET /api/market" icon={Cpu} />
                         <SDKCard name="Web Studio" lang="Visual GUI" command="No Code Needed" icon={Layers} />

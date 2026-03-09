@@ -76,10 +76,6 @@ function DocsContent() {
                         </div>
 
                         <div className="flex gap-3">
-                            <a href="https://github.com/Eras256/Nirium" target="_blank" className="px-4 py-2 bg-white/5 border border-white/10 rounded-lg text-sm font-medium hover:bg-white/10 transition-colors flex items-center gap-2">
-                                <GitBranch className="w-4 h-4" />
-                                GitHub
-                            </a>
                             <a href="https://stellar.expert/explorer/testnet" target="_blank" className="px-4 py-2 bg-stellar-teal/10 border border-stellar-teal/30 rounded-lg text-sm font-medium text-stellar-teal hover:bg-stellar-teal/20 transition-colors flex items-center gap-2">
                                 <ExternalLink className="w-4 h-4" />
                                 StellarExpert
