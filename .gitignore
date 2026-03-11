@@ -52,3 +52,6 @@ implementation_plan.json
 
 # AI config
 .gemini/
+
+# Benchmarking
+BENCHMARKING.md
