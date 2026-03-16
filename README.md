@@ -39,8 +39,13 @@ Persistent execution units with their own Ed25519 keypairs. Agents scan market s
 ### 🔐 3. Non-Custodial Vaults & Flash Loans
 Soroban-native `NiriumVault` with single-invocation flash loans. Borrow, execute, and repay in one atomic block. Zero-risk capital management where users maintain cryptographic ownership.
 
-### 🏆 4. Autonomous ELO Reputation
-On-chain meritocracy (ELO Registry) tracking performance for both species. Rankings from Silver to Matrix tiers determine protocol access and marketplace credibility.
+### 🏆 4. Autonomous ELO Reputation & Staking
+On-chain meritocracy (ELO Registry) tracking performance for both species. 
+- **Merit-Based Rewards**: Users can stake XLM into top-performing agents to earn a share of protocol fees.
+- **Dynamic Tiering**: Rankings from Silver to Matrix determine reward multipliers and protocol access.
+
+### 📜 5. Forensic Audit via IPFS
+The first DeFi protocol with forensic-grade execution auditing. Every LLM decision, prompt, and reasoning trace is immutable, signed, and indexed with an **IPFS CID** for permanent storage.
 
 ---
 
@@ -91,9 +96,9 @@ Built for every workflow. From high-level apps to raw autonomous execution.
   │  └────────────────────────────────────────────────────┘    │
   │                                                            │
   │  ┌──────────────────┐  ┌─────────────────────────────┐    │
-  │  │ Skill Manager    │  │ IPFS Archive (Pinata)        │    │
-  │  │ - 3 built-in     │  │ - HMAC-SHA256 audit logs     │    │
-  │  │ - Plugin system  │  │ - Permanent tx history       │    │
+  │  │ Skill Manager    │  │ Forensic Audit (IPFS)        │    │
+  │  │ - 3 built-in     │  │ - HMAC-SHA256 decision logs  │    │
+  │  │ - Plugin system  │  │ - Indexed IPFS CIDs          │    │
   │  └──────────────────┘  └─────────────────────────────┘    │
   └──────────────────┬────────────────────────────────────────┘
                      │ XDR Transactions via Stellar SDK
@@ -197,7 +202,7 @@ Each agent wallet is funded with **10,000 XLM** via Stellar Friendbot.
 | **LLM Providers** | OpenAI, Anthropic, Gemini, Grok, MiniMax, Bedrock, OpenRouter, Ollama |
 | **Frontend** | Next.js 15 (App Router), React Three Fiber, Framer Motion |
 | **Database** | Supabase (Postgres + Realtime), Row-Level Security |
-| **Storage** | Pinata (IPFS), Walrus/Stellar Bridge |
+| **Storage** | Pinata (IPFS Archive) |
 | **DevTools** | TypeScript SDK, Python SDK, MCP Server (11+ tools), CLI, Tauri Desktop |
 | **Infra** | Docker Compose, pnpm workspaces, Vercel, GitHub Actions CI |
 

@@ -384,12 +384,6 @@ function DashboardContent() {
     const [isLoadingFleet, setIsLoadingFleet] = useState(false);
     const [isInitialized, setIsInitialized] = useState(false);
 
-    // Console Logs
-    const [logs, setLogs] = useState<string[]>([
-        "[SYSTEM] Dashboard initialized.",
-        "[NETWORK] Connected to Stellar Testnet.",
-    ]);
-
     // Modals (showAutoStartModal already declared above)
 
     // --- 2. CONSTANTS & MEMOS ---
@@ -660,10 +654,7 @@ function DashboardContent() {
                 });
             });
 
-            setLogs(prev => [
-                `[SUCCESS] ${currentStrategy.emoji} Agent Deployed on Stellar`,
-                ...prev
-            ].slice(0, 15));
+            writeLog(`Agent Activity: ${currentStrategy.name} initialization confirmed.`, 'info', account?.address);
 
             writeLog(
                 `${currentStrategy.emoji} AGENT DEPLOYED: ${currentStrategy.name} | tx: ${txHash.slice(0, 12)}...`,
@@ -852,7 +843,7 @@ function DashboardContent() {
 
     useEffect(() => {
         if (account?.address) {
-            setLogs(prev => [`[AUTH] Authenticated user: ${account.address.slice(0, 8)}...`, ...prev]);
+            writeLog(`Authenticated user: ${account.address.slice(0, 8)}...`, 'system', account.address);
         }
     }, [account]);
 
@@ -888,7 +879,7 @@ function DashboardContent() {
                 ws.onopen = () => {
                     if (isUnmounted) return;
                     console.log('[Dashboard] WS Connected Successfully');
-                    setLogs(prev => [`[NET] 📡 Uplink Established (Stable)`, ...prev].slice(0, 20));
+                    writeLog(`📡 Uplink Established (Stable)`, 'system', accountRef.current?.address);
 
                     if (accountRef.current?.address) {
                         ws.send(JSON.stringify({
@@ -906,7 +897,7 @@ function DashboardContent() {
                         if (data.type === 'log' || data.type === 'execution') {
                             const time = new Date().toLocaleTimeString();
                             const message = data.message || JSON.stringify(data);
-                            setLogs(prev => [`[AGENT] 🤖 ${message} (${time})`, ...prev].slice(0, 20));
+                            writeLog(`🤖 ${message}`, 'info', data.agent_id || 'UI_CLIENT');
 
                             if (data.status === 'success' && data.txHash) {
                                 toast.success("Strategy Executed!", {
@@ -964,20 +955,6 @@ function DashboardContent() {
     }, []); // Runs once per mount
 
 
-    // Fallback Mock Logs (Only if WS silent)
-    useEffect(() => {
-        const interval = setInterval(() => {
-            // Only generate mock logs if we have no activity to prevent emptiness
-            setLogs(prev => {
-                const time = new Date().toLocaleTimeString();
-                if (prev.length === 0 || Math.random() > 0.9) {
-                    return [`[SYSTEM] 🛡️ Sentinel Active. Monitoring Mempool... (${time})`, ...prev].slice(0, 15);
-                }
-                return prev;
-            });
-        }, 5000);
-        return () => clearInterval(interval);
-    }, []);
 
     // SVG Chart Data Generator (Mock)
     const chartPath = "M0,100 C20,90 40,110 60,80 C80,50 100,90 120,40 C140,20 160,60 180,30 C200,10 220,40 240,20 L240,150 L0,150 Z";

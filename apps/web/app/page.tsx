@@ -18,6 +18,7 @@ import dynamic from 'next/dynamic';
 const NeuralCanvas = dynamic(() => import('@/components/3d/NeuralCanvas').then((mod) => mod.NeuralCanvas), { ssr: false });
 import Navbar from "@/components/layout/Navbar";
 import { useLanguage } from "@/context/LanguageContext";
+import { supabase } from "@/lib/supabase";
 
 const AGENT_NAMES = [
     { name: 'Titan', role: 'Swarm Coordinator', color: '#FFD700' },
@@ -60,13 +61,53 @@ export default function Home() {
     };
 
     useEffect(() => {
-        const eventSource = new EventSource('/api/feed');
-        eventSource.onmessage = (event) => {
-            const newLogs = JSON.parse(event.data);
-            setAgentLog(prev => [...prev, ...newLogs].slice(-8));
+        const client = supabase;
+        if (!client) {
+            // Fallback for local development without Supabase
+            const initialLogs = [
+                "Initializing Nirium Neural Kernel...",
+                "Establishing Stellar Horizon Uplink...",
+                "Uplink Status: OPERATIONAL — All systems nominal."
+            ];
+            setAgentLog(initialLogs);
+            return;
+        }
+
+        // Fetch historic logs
+        const fetchInitialLogs = async () => {
+            try {
+                const { data } = await client
+                    .from('logs')
+                    .select('*')
+                    .order('timestamp', { ascending: false })
+                    .limit(8);
+                
+                if (data && data.length > 0) {
+                    setAgentLog(data.map((l: any) => `[${l.agent_id}] ${l.message}`).reverse());
+                }
+            } catch (e) {
+                console.error("Failed to load initial logs", e);
+            }
         };
-        eventSource.onerror = () => { eventSource.close(); };
-        return () => eventSource.close();
+        fetchInitialLogs();
+
+        // Subscribe to NEW logs
+        const channel = client
+            .channel('log_feed')
+            .on(
+                'postgres_changes',
+                { event: 'INSERT', schema: 'public', table: 'logs' },
+                (payload) => {
+                    const newLog = payload.new as any;
+                    const logMessage = `[${newLog.agent_id}] ${newLog.message}`;
+                    setAgentLog(prev => [...prev, logMessage].slice(-8));
+                }
+            )
+            .subscribe();
+
+        return () => {
+            client.removeChannel(channel);
+        };
     }, []);
 
     // Animate swarm count ticker
@@ -162,12 +203,25 @@ export default function Home() {
                                 </div>
                             </div>
                             <div className="space-y-1.5 h-32 overflow-hidden">
-                                {agentLog.map((log, i) => (
-                                    <div key={i} className="flex gap-2">
-                                        <span className="text-white/20 select-none">{i.toString().padStart(2, '0')}</span>
-                                        <span className="text-gray-300">{log}</span>
-                                    </div>
-                                ))}
+                                {agentLog.map((log, i) => {
+                                    const parts = log.split('|');
+                                    const mainMsg = parts[0];
+                                    const hashPart = parts[1];
+                                    
+                                    return (
+                                        <div key={i} className="flex gap-2 text-[10px]">
+                                            <span className="text-white/20 select-none">{i.toString().padStart(2, '0')}</span>
+                                            <span className="text-gray-300">
+                                                {mainMsg}
+                                                {hashPart && (
+                                                    <span className="text-stellar-yellow/80 ml-1 font-bold">
+                                                        {hashPart.trim()}
+                                                    </span>
+                                                )}
+                                            </span>
+                                        </div>
+                                    );
+                                })}
                                 <div className="flex gap-2 text-stellar-teal">
                                     <span className="text-stellar-teal animate-pulse">{">"}</span>
                                     <span className="animate-pulse">_</span>

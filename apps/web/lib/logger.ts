@@ -14,7 +14,7 @@ export async function writeLog(
     if (!url || !key) return; // Silently skip if not configured
 
     try {
-        await fetch(`${url}/rest/v1/nirium_protocol_records`, {
+        await fetch(`${url}/rest/v1/logs`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -23,11 +23,9 @@ export async function writeLog(
                 'Prefer': 'return=minimal',
             },
             body: JSON.stringify({
-                owner_address: 'UI_CLIENT',
-                record_type: 'LOG',
+                agent_id: agentId || 'UI_CLIENT',
                 message,
                 level,
-                tx_hash: agentId ?? null, // re-using field for trace id if needed
             }),
         });
     } catch (e) {

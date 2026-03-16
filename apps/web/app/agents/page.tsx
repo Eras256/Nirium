@@ -16,7 +16,7 @@ export default function AgentsPage() {
     const [syntax, setSyntax] = useState<'ts' | 'py'>('ts');
     const [sdkAsset, setSdkAsset] = useState<'XLM' | 'USDC'>('XLM');
     const [logs, setLogs] = useState<any[]>([]);
-    const logsEndRef = useRef<HTMLDivElement>(null);
+    const logContainerRef = useRef<HTMLDivElement>(null);
 
     // Dynamic system telemetry
     const [rpcLatency, setRpcLatency] = useState<number | null>(null);
@@ -71,16 +71,13 @@ export default function AgentsPage() {
         // Fetch recent logs on mount
         const fetchInitialLogs = async () => {
             const { data } = await db
-                .from('nirium_protocol_records')
+                .from('logs')
                 .select('*')
-                .eq('record_type', 'LOG')
-                .order('created_at', { ascending: false })
+                .order('timestamp', { ascending: false })
                 .limit(30);
 
             if (data) {
-                // Map created_at to timestamp for UI compatibility
-                const mapped = data.map((d: any) => ({ ...d, timestamp: d.created_at }));
-                setLogs(mapped.reverse());
+                setLogs(data.reverse());
             }
         };
         fetchInitialLogs();
@@ -91,14 +88,12 @@ export default function AgentsPage() {
             .on('postgres_changes', {
                 event: 'INSERT',
                 schema: 'public',
-                table: 'nirium_protocol_records',
-                filter: 'record_type=eq.LOG'
+                table: 'logs'
             }, (payload) => {
                 setLogs(prev => {
                     const exists = prev.some(l => l.id === payload.new.id);
                     if (exists) return prev;
-                    const newLog = { ...payload.new, timestamp: payload.new.created_at };
-                    return [...prev, newLog].slice(-100);
+                    return [...prev, payload.new].slice(-100);
                 });
             })
             .subscribe();
@@ -119,10 +114,10 @@ export default function AgentsPage() {
         return () => clearInterval(interval);
     }, []);
 
-    // Auto-scroll to bottom of logs
+    // Auto-scroll to bottom of logs (without scrolling the window)
     useEffect(() => {
-        if (activeTab === 'logs') {
-            logsEndRef.current?.scrollIntoView({ behavior: "smooth" });
+        if (activeTab === 'logs' && logContainerRef.current) {
+            logContainerRef.current.scrollTop = logContainerRef.current.scrollHeight;
         }
     }, [logs, activeTab]);
 
@@ -347,29 +342,42 @@ export default function AgentsPage() {
                             </div>
 
                             {activeTab === 'logs' ? (
-                                <div className="bg-black rounded-lg p-4 font-mono text-xs text-gray-300 overflow-y-auto border border-white/5 shadow-inner flex-grow h-[300px] scrollbar-thin scrollbar-thumb-white/10">
+                                <div 
+                                    ref={logContainerRef}
+                                    className="bg-black rounded-lg p-4 font-mono text-xs text-gray-300 overflow-y-auto border border-white/5 shadow-inner flex-grow h-[300px] scrollbar-thin scrollbar-thumb-white/10"
+                                >
                                     <div className="space-y-1">
                                         {logs.length === 0 && (
                                             <div className="text-gray-600 italic">Waiting for signal Uplink...</div>
                                         )}
-                                        {logs.map((log, i) => (
-                                            <div key={i} className="break-all">
-                                                <span className="text-gray-600">[{new Date(log.timestamp).toLocaleTimeString()}]</span>{' '}
-                                                <span className={`${log.level === 'error' ? 'text-red-500' :
-                                                    log.level === 'warn' ? 'text-yellow-500' :
-                                                        log.level === 'success' ? 'text-green-400' :
-                                                            log.level === 'system' ? 'text-stellar-teal' :
-                                                                'text-blue-400'
-                                                    }`}>
-                                                    {log.level?.toUpperCase()}
-                                                </span>{' '}
-                                                <span className="text-gray-300">{log.message}</span>
-                                                {archiveStatus === 'live' && (
-                                                    <span className="ml-2 text-blue-500/40 text-[9px]">⬆ archive</span>
-                                                )}
-                                            </div>
-                                        ))}
-                                        <div ref={logsEndRef} />
+                                        {logs.map((log, i) => {
+                                            const parts = log.message.split('|');
+                                            const mainMsg = parts[0];
+                                            const hashPart = parts[1];
+                                            
+                                            return (
+                                                <div key={i} className="break-all flex flex-wrap gap-x-1">
+                                                    <span className="text-gray-600">[{new Date(log.timestamp).toLocaleTimeString()}]</span>{' '}
+                                                    <span className={`${log.level === 'error' ? 'text-red-500' :
+                                                        log.level === 'warn' ? 'text-yellow-500' :
+                                                            log.level === 'success' ? 'text-green-400' :
+                                                                log.level === 'system' ? 'text-stellar-teal' :
+                                                                    'text-blue-400'
+                                                        }`}>
+                                                        {log.level?.toUpperCase()}
+                                                    </span>{' '}
+                                                    <span className="text-gray-300">{mainMsg}</span>
+                                                    {hashPart && (
+                                                        <span className="text-stellar-yellow/80 font-bold bg-white/5 px-1 rounded">
+                                                            {hashPart.trim()}
+                                                        </span>
+                                                    )}
+                                                    {archiveStatus === 'live' && (
+                                                        <span className="text-blue-500/40 text-[9px] flex items-center">⬆ archive</span>
+                                                    )}
+                                                </div>
+                                            );
+                                        })}
                                     </div>
                                 </div>
                             ) : (

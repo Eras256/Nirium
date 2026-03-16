@@ -9,9 +9,10 @@ import { writeLog } from '@/lib/logger';
 export default function OpsConsole({ isExpanded, onToggleExpand, walletAddress }: { isExpanded: boolean, onToggleExpand: () => void, walletAddress?: string }) {
     const [logs, setLogs] = useState<any[]>([]);
     const [status, setStatus] = useState<'connecting' | 'online' | 'unavailable'>('connecting');
-    const logsEndRef = useRef<HTMLDivElement>(null);
+    const logContainerRef = useRef<HTMLDivElement>(null);
 
     useEffect(() => {
+        // ... (existing Supabase logic remains same)
         // Guard: if Supabase is not configured, show graceful message
         if (!supabase) {
             setStatus('unavailable');
@@ -19,30 +20,17 @@ export default function OpsConsole({ isExpanded, onToggleExpand, walletAddress }
         }
         const db = supabase;
 
-        // Initial fetch of recent logs from the unified protocol records table
+        // Initial fetch of recent logs from the swarm logs table
         const fetchInitialLogs = async () => {
             try {
-                let query = db
-                    .from('nirium_protocol_records')
+                const { data, error } = await db
+                    .from('logs')
                     .select('*')
-                    .eq('record_type', 'LOG')
-                    .order('created_at', { ascending: false })
-                    .limit(30);
-
-                if (walletAddress) {
-                    // Filter for logs relevant to this user or global logs
-                    query = query.or(`tx_hash.eq.${walletAddress},owner_address.eq.UI_CLIENT`);
-                }
-
-                const { data, error } = await query;
+                    .order('timestamp', { ascending: false })
+                    .limit(50);
 
                 if (data && !error) {
-                    // Map created_at to timestamp for UI compatibility
-                    const mappedData = data.map((d: any) => ({
-                        ...d,
-                        timestamp: d.created_at
-                    }));
-                    setLogs(mappedData.reverse()); // oldest first
+                    setLogs(data.reverse()); // oldest first
                 }
             } catch (e) {
                 console.error("Failed to fetch initial logs", e);
@@ -50,45 +38,29 @@ export default function OpsConsole({ isExpanded, onToggleExpand, walletAddress }
         };
         fetchInitialLogs();
 
-        // Realtime subscription for new logs in the protocol records table
+        // Realtime subscription for new logs in the swarm logs table
         const channel = db
-            .channel(`realtime-ops-console-${walletAddress || 'global'}`)
+            .channel(`realtime-ops-console-global`)
             .on(
                 'postgres_changes',
                 {
                     event: 'INSERT',
                     schema: 'public',
-                    table: 'nirium_protocol_records',
-                    filter: 'record_type=eq.LOG'
+                    table: 'logs'
                 },
                 (payload) => {
                     const newLog = payload.new as any;
 
-                    // Client-side filtering check for relevance
-                    const isRelevant = !walletAddress ||
-                        newLog.tx_hash === walletAddress ||
-                        newLog.owner_address === 'UI_CLIENT';
-
-                    if (!isRelevant) return;
-
-                    // Map created_at to timestamp
-                    const logWithTimestamp = {
-                        ...newLog,
-                        timestamp: newLog.created_at
-                    };
-
                     setLogs(prev => {
                         const exists = prev.some(l => l.id === payload.new.id);
                         if (exists) return prev;
-                        return [...prev, logWithTimestamp].slice(-50);
+                        return [...prev, newLog].slice(-50);
                     });
                 }
             )
             .subscribe((s) => {
                 if (s === 'SUBSCRIBED') {
                     setStatus('online');
-                    // Write a system log to indicate connection
-                    writeLog('Neural Matrix Uplink Active — Monitoring Protocol Records', 'system', walletAddress);
                 } else if (s === 'CLOSED' || s === 'CHANNEL_ERROR') {
                     setStatus('unavailable');
                 }
@@ -97,11 +69,13 @@ export default function OpsConsole({ isExpanded, onToggleExpand, walletAddress }
         return () => {
             db.removeChannel(channel);
         };
-    }, [walletAddress]);
+    }, []);
 
-    // Auto-scroll to bottom when new logs arrive
+    // Secure scroll: only scroll the container, not the window
     useEffect(() => {
-        logsEndRef.current?.scrollIntoView({ behavior: "smooth" });
+        if (logContainerRef.current) {
+            logContainerRef.current.scrollTop = logContainerRef.current.scrollHeight;
+        }
     }, [logs]);
 
     const statusColors = {
@@ -120,7 +94,7 @@ export default function OpsConsole({ isExpanded, onToggleExpand, walletAddress }
             <div className="bg-white/5 border-b border-white/5 px-4 py-3 flex justify-between items-center shrink-0">
                 <div className="flex items-center gap-2">
                     <Terminal className="w-4 h-4 text-stellar-teal" />
-                    <span className="text-xs font-mono font-bold text-gray-300">OPS CONSOLE // LIVE FEED</span>
+                    <span className="text-xs font-mono font-bold text-gray-300 uppercase tracking-widest">Neural Feed // Uplink</span>
                     <span className={`flex items-center gap-1.5 ml-2 px-1.5 py-0.5 rounded ${s.bg} text-[10px] ${s.text} border`}>
                         <span className={`w-1 h-1 rounded-full ${s.dot} ${status === 'online' ? 'animate-pulse' : ''}`}></span>
                         {s.label}
@@ -135,46 +109,47 @@ export default function OpsConsole({ isExpanded, onToggleExpand, walletAddress }
             </div>
 
             {/* Logs Area */}
-            <div className="flex-1 bg-black/50 p-4 font-mono text-[11px] overflow-y-auto custom-scrollbar">
-                <div className="space-y-1">
+            <div 
+                ref={logContainerRef}
+                className="flex-1 bg-black/50 p-4 font-mono text-[10px] overflow-y-auto custom-scrollbar"
+            >
+                <div className="space-y-1.5">
                     {status === 'unavailable' && (
                         <div className="text-yellow-600 italic">
                             No database connection. Check Supabase configuration.
                         </div>
                     )}
                     {status === 'connecting' && logs.length === 0 && (
-                        <div className="text-gray-600 italic">Connecting to Supabase Realtime...</div>
+                        <div className="text-gray-600 italic">Establishing Neural Uplink...</div>
                     )}
-                    {logs.map((log, i) => (
-                        <div
-                            key={log.id ? `${log.id}-${i}` : i}
-                            className="break-all border-l-2 pl-2 py-0.5 hover:bg-white/5 transition-colors"
-                            style={{
-                                borderColor:
-                                    log.level === 'error' ? '#ef4444' :
-                                        log.level === 'success' ? '#4ade80' :
-                                            log.level === 'system' ? '#06b6d4' :
-                                                log.level === 'warn' ? '#f59e0b' :
-                                                    '#3b82f6',
-                            }}
-                        >
-                            <span className="text-gray-600 mr-2">
-                                [{new Date(log.timestamp).toLocaleTimeString()}]
-                            </span>
-                            <span
-                                className={`font-bold mr-2 ${log.level === 'error' ? 'text-red-500' :
+                    {logs.map((log, i) => {
+                        const parts = log.message.split('|');
+                        const mainMsg = parts[0];
+                        const hashPart = parts[1];
+
+                        return (
+                            <div key={i} className="break-all flex flex-wrap gap-x-1 items-start leading-relaxed">
+                                <span className="text-gray-600">[{new Date(log.timestamp).toLocaleTimeString()}]</span>
+                                <span className={`${log.level === 'error' ? 'text-red-500' :
                                     log.level === 'warn' ? 'text-yellow-500' :
                                         log.level === 'success' ? 'text-green-400' :
                                             log.level === 'system' ? 'text-stellar-teal' :
                                                 'text-blue-400'
-                                    }`}
-                            >
-                                {log.level?.toUpperCase()}
-                            </span>
-                            <span className="text-gray-300">{log.message}</span>
-                        </div>
-                    ))}
-                    <div ref={logsEndRef} />
+                                    } font-bold min-w-[50px]`}>
+                                    {log.level?.toUpperCase()}
+                                </span>
+                                <span className="text-gray-300">
+                                    {log.agent_id && <span className="text-stellar-teal/80 font-bold mr-1">[{log.agent_id}]</span>}
+                                    {mainMsg}
+                                </span>
+                                {hashPart && (
+                                    <span className="text-stellar-yellow/80 font-bold bg-white/5 px-1 rounded text-[9px] h-fit mt-0.5">
+                                        {hashPart.trim()}
+                                    </span>
+                                )}
+                            </div>
+                        );
+                    })}
                 </div>
             </div>
         </motion.div>

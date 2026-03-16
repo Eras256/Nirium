@@ -54,4 +54,9 @@ implementation_plan.json
 .gemini/
 
 # Benchmarking
-BENCHMARKING.md
+# Python / Local Dev Extras
+.venv/
+**/.venv/
+*.log
+.pyre_configuration
+pyrightconfig.json
