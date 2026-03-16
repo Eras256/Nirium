@@ -154,7 +154,7 @@ Built for every workflow. From high-level apps to raw autonomous execution.
   ┌──────────────────────────────────────────────────────────┐
   │  15 Agents running in parallel (every 8 seconds):        │
   │                                                          │
-  │  Titan │ Eliza │ Maux │ Chronos │ Astra │ Void           │
+  │  Titan │ Eliza │ Kora │ Chronos │ Astra │ Void           │
   │  Nexus │ Gaia │ Orion │ Sentinel │ Matrix │ Atlas        │
   │  Nova │ Cyber │ Nirium-1                                 │
   │                                                          │
@@ -314,7 +314,6 @@ npx tsx scripts/nirium_full_swarm.ts
 
 - **Vaiosx** — *Core Engineering, AI Systems & Soroban Smart Contracts*
 - **M0nsxx** — *UX/UI Design & Neural Visual Systems*
-- **Maux** — *Growth, Ecosystem Strategy & Economic Design*
 
 <br/>
 <div align="center">

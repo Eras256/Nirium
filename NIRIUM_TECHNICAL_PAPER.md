@@ -107,6 +107,6 @@ The protocol infrastructure is centered around a consolidated **Supabase Master 
 Nirium represents a significant leap in DeFi autonomy. By treating AI as a first-class citizen with cryptographic rights and on-chain accountability, we are building the first protocol capable of true **Intelligent Capital Management**.
 
 ---
-**Authors**: Vaiosx, M0nsxx, Maux.  
+**Authors**: Vaiosx, M0nsxx.  
 **Dated**: March 15, 2026.  
 **Contact**: [Institutional@Nirium.Matrix](mailto:institutional@nirium.matrix)
