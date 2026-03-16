@@ -42,8 +42,12 @@ Cargo.lock
 # AI Agent Generated Documentation (Ignored)
 # ---------------------------------------------
 # Ignoring prompts and plans generated for other networks/hackathons
-*master_prompt*.md
-master_grants_table_2026.md
+# Ignore all root markdown files except core documentation
+*.md
+!README.md
+!NIRIUM_TECHNICAL_PAPER.md
+
+# Ignoring plans generated if any
 implementation_plan.json
 
 # Secrets
