@@ -174,9 +174,28 @@ function StrategyBuilderInner() {
                 color: NODE_TEMPLATES.find(c => c.items.some(i => i.label === template.label))?.color
             },
         };
-        setNodes((nds) => [...nds, newNode]);
+        setNodes((nds) => {
+            const lastNode = nds[nds.length - 1];
+            if (lastNode) {
+                setEdges((eds) => {
+                    const edgeId = `edge_${lastNode.id}_to_${newId}`;
+                    if (eds.some((e) => e.id === edgeId)) return eds;
+                    return [
+                        ...eds,
+                        {
+                            id: edgeId,
+                            source: lastNode.id,
+                            target: newId,
+                            animated: true,
+                            style: { stroke: '#2DEBE8' }
+                        }
+                    ];
+                });
+            }
+            return [...nds, newNode];
+        });
         toast.success(`Matrix Enhanced: ${template.label}`);
-    }, [reactFlowInstance, setNodes]);
+    }, [reactFlowInstance, setNodes, setEdges]);
 
     const onDrop = useCallback(
         (event: React.DragEvent) => {
@@ -201,9 +220,28 @@ function StrategyBuilderInner() {
                     color: NODE_TEMPLATES.find(c => c.items.some(i => i.label === template.label))?.color
                 },
             };
-            setNodes((nds) => [...nds, newNode]);
+            setNodes((nds) => {
+                const lastNode = nds[nds.length - 1];
+                if (lastNode) {
+                    setEdges((eds) => {
+                        const edgeId = `edge_${lastNode.id}_to_${newId}`;
+                        if (eds.some((e) => e.id === edgeId)) return eds;
+                        return [
+                            ...eds,
+                            {
+                                id: edgeId,
+                                source: lastNode.id,
+                                target: newId,
+                                animated: true,
+                                style: { stroke: '#2DEBE8' }
+                            }
+                        ];
+                    });
+                }
+                return [...nds, newNode];
+            });
         },
-        [reactFlowInstance, setNodes]
+        [reactFlowInstance, setNodes, setEdges]
     );
 
     const handleSave = async (deploy = false) => {
