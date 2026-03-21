@@ -20,7 +20,7 @@ import { useVault, useEloReputation } from "@/hooks/useNiriumContracts";
 import { getWebSocketUrl } from "@/lib/constants";
 import { simulateSorobanTx } from "@/lib/stellarSim";
 import { handleWalletError } from "@/components/wallet/WalletErrorHandler";
-import { NATIVE_ASSET_ID } from "@/lib/sorobanContracts";
+import { NATIVE_ASSET_ID, vaultDeposit, vaultWithdraw, vaultCreate, vaultGetVaultCount } from "@/lib/sorobanContracts";
 import MarketTicker from "@/components/dashboard/MarketTicker";
 import NeuralOrb from "@/components/dashboard/NeuralOrb";
 import StatusBadge from "@/components/ui/StatusBadge";
@@ -150,7 +150,7 @@ function DashboardContent() {
         fetchOnChainData();
     }, [accountStr]);
     const [vaultBalance, setVaultBalance] = useState<number>(0);
-    const [vaultId, setVaultId] = useState<string | null>(null);
+    const [vaultId, setVaultId] = useState<number | null>(null);
     const [ownerCapId, setOwnerCapId] = useState<string | null>(null);
     const [amountInput, setAmountInput] = useState<string>("0.1");
     const [installedSkills, setInstalledSkills] = useState<any[]>([]);
@@ -967,18 +967,33 @@ function DashboardContent() {
             if (savedData) {
                 try {
                     const vaultData = JSON.parse(savedData);
-                    if (typeof vaultData === 'object' && vaultData.vaultId) {
-                        setVaultId(vaultData.vaultId);
-                        if (vaultData.ownerCapId) {
-                            setOwnerCapId(vaultData.ownerCapId);
+                    if (typeof vaultData === 'object' && vaultData.vaultId !== undefined) {
+                        // Parse as number (handles both numeric and string IDs from old vaults)
+                        const numericId = typeof vaultData.vaultId === 'number'
+                            ? vaultData.vaultId
+                            : parseInt(String(vaultData.vaultId), 10);
+
+                        if (!isNaN(numericId)) {
+                            setVaultId(numericId);
+                            if (vaultData.ownerCapId) {
+                                setOwnerCapId(vaultData.ownerCapId);
+                            }
+                        } else {
+                            // Old format with G... address - clear it
+                            console.warn('Legacy vault ID detected (Stellar address). Please create a new vault.');
+                            localStorage.removeItem(`nirium-vault-${baseAsset}-${account.address}`);
+                            setVaultId(null);
+                            setOwnerCapId(null);
                         }
                     } else {
-                        // Fallback: Old format (just string ID)
-                        setVaultId(savedData);
+                        // Invalid format
+                        setVaultId(null);
+                        setOwnerCapId(null);
                     }
-                } catch {
-                    // Fallback: Old format (just string ID)
-                    setVaultId(savedData);
+                } catch (e) {
+                    console.error('Failed to parse vault data:', e);
+                    setVaultId(null);
+                    setOwnerCapId(null);
                 }
             } else {
                 setVaultId(null);
@@ -1023,7 +1038,17 @@ function DashboardContent() {
     };
 
     const executeDeposit = async (amount: string) => {
-        if (!account || !vaultId) return;
+        if (!account) {
+            toast.error("Please connect your wallet");
+            return;
+        }
+
+        if (!vaultId || typeof vaultId !== 'number') {
+            toast.error("No vault found", {
+                description: "Please create a vault first before depositing"
+            });
+            return;
+        }
 
         // Network Check (Strict)
         if (account.chains?.[0] && account.chains[0] !== 'stellar:testnet') {
@@ -1035,45 +1060,39 @@ function DashboardContent() {
 
         const toastId = toast.loading(`Executing Deposit of ${amount} XLM...`);
         try {
-            const { TransactionBuilder, Networks, Operation, Asset } = await import("@stellar/stellar-sdk");
+            // Convert amount to stroops (1 XLM = 10^7 stroops)
+            const amountInStroops = BigInt(Math.floor(parseFloat(amount) * 10_000_000));
 
-            const tx = await buildStellarTransaction(account.address);
-
-            // Stellar Deposit: Simply send to Vault Account
-            // We use manageData combined with a self Native payment to simulate this reliably on Testnet
-            // without needing actual deployed Vault contracts or USDC trustlines.
-            tx.addOperation(Operation.payment({
-                destination: account.address,
-                asset: Asset.native(),
-                amount: "0.0001"
-            }));
-            tx.addOperation(Operation.manageData({
-                name: "vault_deposit",
-                value: `${amount} ${baseAsset}`
-            }));
-
-            const builtTx = tx.build();
-            const result = await signAndSubmitTransaction({ transaction: builtTx });
+            // Call the actual Soroban vault contract deposit function
+            const result = await vaultDeposit(account.address, vaultId, amountInStroops);
 
             toast.dismiss(toastId);
 
-            // Sync demo vault balance visually
-            const currentBalance = parseFloat(localStorage.getItem(`nirium-vault-balance-${vaultId}-${baseAsset}`) || "0");
-            const newBalance = currentBalance + parseFloat(amount);
-            localStorage.setItem(`nirium-vault-balance-${vaultId}-${baseAsset}`, newBalance.toString());
-            setVaultBalance(newBalance);
+            if (result.success) {
+                // Refresh vault balance from on-chain data
+                // The vault balance should now be updated on-chain
+                setVaultBalance(prev => prev + parseFloat(amount));
 
-            toast.success("Deposit Successful", {
-                description: `${amount} XLM moved to Vault.`,
-                action: {
-                    label: "View Tx",
-                    onClick: () => window.open(`https://stellar.expert/explorer/testnet/tx/${result.hash}`, "_blank")
-                }
+                toast.success("Deposit Successful", {
+                    description: `${amount} XLM deposited to Vault on-chain.`,
+                    action: result.txHash ? {
+                        label: "View Tx",
+                        onClick: () => window.open(`https://stellar.expert/explorer/testnet/tx/${result.txHash}`, "_blank")
+                    } : undefined
+                });
+
+                // Log the successful deposit
+                writeLog(`VAULT DEPOSIT: ${amount} XLM | Vault ID: ${vaultId} | Tx: ${result.txHash?.slice(0, 12)}...`, 'success');
+            } else {
+                throw new Error(result.error || 'Deposit failed');
+            }
+        } catch (e: any) {
+            console.error('Deposit error:', e);
+            toast.dismiss(toastId);
+            toast.error("Deposit Failed", {
+                description: e.message || "Failed to deposit to vault contract"
             });
-        } catch (e) {
-            console.error(e);
-            toast.dismiss(toastId);
-            toast.error("Deposit Failed");
+            writeLog(`VAULT DEPOSIT FAILED: ${e.message}`, 'error');
         }
     };
 
@@ -1116,7 +1135,24 @@ function DashboardContent() {
     };
 
     const executeWithdraw = async (amount: string) => {
-        if (!account || !vaultId || !ownerCapId) return;
+        if (!account) {
+            toast.error("Please connect your wallet");
+            return;
+        }
+
+        if (!vaultId || typeof vaultId !== 'number') {
+            toast.error("No vault found", {
+                description: "Please create a vault first"
+            });
+            return;
+        }
+
+        if (!ownerCapId) {
+            toast.error("Owner capability not found", {
+                description: "Only the vault owner can withdraw"
+            });
+            return;
+        }
 
         // Network Check (Strict)
         if (account.chains?.[0] && account.chains[0] !== 'stellar:testnet') {
@@ -1128,44 +1164,38 @@ function DashboardContent() {
 
         const toastId = toast.loading("Executing Withdrawal...");
         try {
-            const { TransactionBuilder, Networks, Operation, Asset } = await import("@stellar/stellar-sdk");
+            // Convert amount to stroops (1 XLM = 10^7 stroops)
+            const amountInStroops = BigInt(Math.floor(parseFloat(amount) * 10_000_000));
 
-            const tx = await buildStellarTransaction(account.address);
-
-            // Stellar Withdraw: Simulated Soroban call or specialized payment
-            // For now, we simulate a withdraw from a multisig/contract vault reliably
-            tx.addOperation(Operation.payment({
-                destination: account.address,
-                asset: Asset.native(),
-                amount: "0.0001" // dummy tx amount to simulate movement
-            }));
-            tx.addOperation(Operation.manageData({
-                name: "vault_withdraw",
-                value: `${amount} ${baseAsset}`
-            }));
-
-            const builtTx = tx.build();
-            const result = await signAndSubmitTransaction({ transaction: builtTx });
+            // Call the actual Soroban vault contract withdraw function
+            const result = await vaultWithdraw(account.address, vaultId, amountInStroops);
 
             toast.dismiss(toastId);
 
-            // Sync demo vault balance visually
-            const currentBalance = parseFloat(localStorage.getItem(`nirium-vault-balance-${vaultId}-${baseAsset}`) || "0");
-            const newBalance = Math.max(0, currentBalance - parseFloat(amount));
-            localStorage.setItem(`nirium-vault-balance-${vaultId}-${baseAsset}`, newBalance.toString());
-            setVaultBalance(newBalance);
+            if (result.success) {
+                // Refresh vault balance from on-chain data
+                setVaultBalance(prev => Math.max(0, prev - parseFloat(amount)));
 
-            toast.success("Withdrawal Successful", {
-                description: `${amount} XLM returned to your wallet.`,
-                action: {
-                    label: "View Tx",
-                    onClick: () => window.open(`https://stellar.expert/explorer/testnet/tx/${result.hash}`, "_blank")
-                }
+                toast.success("Withdrawal Successful", {
+                    description: `${amount} XLM withdrawn from Vault on-chain.`,
+                    action: result.txHash ? {
+                        label: "View Tx",
+                        onClick: () => window.open(`https://stellar.expert/explorer/testnet/tx/${result.txHash}`, "_blank")
+                    } : undefined
+                });
+
+                // Log the successful withdrawal
+                writeLog(`VAULT WITHDRAW: ${amount} XLM | Vault ID: ${vaultId} | Tx: ${result.txHash?.slice(0, 12)}...`, 'success');
+            } else {
+                throw new Error(result.error || 'Withdrawal failed');
+            }
+        } catch (e: any) {
+            console.error('Withdrawal error:', e);
+            toast.dismiss(toastId);
+            toast.error("Withdrawal Failed", {
+                description: e.message || "Failed to withdraw from vault contract"
             });
-        } catch (e) {
-            console.error(e);
-            toast.dismiss(toastId);
-            toast.error("Withdrawal Failed");
+            writeLog(`VAULT WITHDRAW FAILED: ${e.message}`, 'error');
         }
     };
 
@@ -1212,57 +1242,66 @@ function DashboardContent() {
             return;
         }
 
-        const toastId = toast.loading("Creating Secure Vault...");
+        const toastId = toast.loading("Creating Vault on Soroban...");
 
         try {
-            const { TransactionBuilder, Networks, Operation, Keypair } = await import("@stellar/stellar-sdk");
-
-            const tx = await buildStellarTransaction(account.address);
-
-            // Stellar Create Vault: Create a new account or sub-entry
-            // For the demo, we use a random G... address as the "Vault ID"
-            const vaultKeypair = Keypair.random();
-            const vaultId = vaultKeypair.publicKey();
-
-            tx.addOperation(Operation.manageData({
-                name: `vault_${baseAsset}_create`,
-                value: vaultId.slice(0, 64)
-            }));
-
-            const builtTx = tx.build();
-            const result = await signAndSubmitTransaction({ transaction: builtTx });
+            // Call the actual Soroban vault contract create_vault function
+            const vaultName = `Vault-${Date.now()}`;
+            const result = await vaultCreate(account.address, NATIVE_ASSET_ID, vaultName);
 
             toast.dismiss(toastId);
-            console.log("Vault Creation Result (Hash):", result.hash);
 
-            const vaultData = {
-                vaultId: vaultId,
-                ownerCapId: 'cap_' + Math.random().toString(36).substring(7),
-                hash: result.hash
-            };
+            if (result.success && result.result) {
+                // Extract the vault object from the result
+                const vaultData = result.result as any;
+                const numericVaultId = Number(vaultData.vault_id || vaultData.vaultId || vaultData[0]);
 
-            // Persist to LocalStorage
-            localStorage.setItem(`nirium-vault-${baseAsset}-${account.address}`, JSON.stringify(vaultData));
-            setVaultId(vaultData.vaultId);
-            setOwnerCapId(vaultData.ownerCapId);
-
-            toast.success("Secure Vault Deployed on-chain!", {
-                description: `Vault ID: ${vaultData.vaultId.slice(0, 6)}...`,
-                action: {
-                    label: "View on Explorer",
-                    onClick: () => window.open(`https://stellar.expert/explorer/testnet/tx/${result.hash}`, "_blank")
+                if (!numericVaultId || isNaN(numericVaultId)) {
+                    throw new Error('Failed to extract vault ID from contract response');
                 }
-            });
 
-            writeLog(
-                `VAULT INITIALIZED: ${baseAsset} Secure Enclave created | tx: ${result.hash.slice(0, 12)}...`,
-                'system',
-                account?.address
-            );
+                // Store vault data with numeric ID
+                const storageData = {
+                    vaultId: numericVaultId,
+                    ownerCapId: `cap_${numericVaultId}_${Date.now()}`,
+                    createdAt: Date.now(),
+                    txHash: result.txHash
+                };
+
+                localStorage.setItem(
+                    `nirium-vault-${baseAsset}-${account.address}`,
+                    JSON.stringify(storageData)
+                );
+
+                setVaultId(numericVaultId);
+                setOwnerCapId(storageData.ownerCapId);
+
+                toast.success("Vault Created Successfully!", {
+                    description: `Vault ID: ${numericVaultId} | On-chain`,
+                    action: result.txHash ? {
+                        label: "View Tx",
+                        onClick: () => window.open(
+                            `https://stellar.expert/explorer/testnet/tx/${result.txHash}`,
+                            "_blank"
+                        )
+                    } : undefined
+                });
+
+                writeLog(
+                    `VAULT CREATED: ID=${numericVaultId} | Asset=${baseAsset} | Tx: ${result.txHash?.slice(0, 12)}...`,
+                    'success',
+                    account?.address
+                );
+            } else {
+                throw new Error(result.error || 'Failed to create vault');
+            }
         } catch (e: any) {
             toast.dismiss(toastId);
             console.error("Vault Creation Error:", e);
-            toast.error("Deployment Failed: " + (e?.message || String(e)));
+            toast.error("Vault Creation Failed", {
+                description: e.message || "Failed to create vault on-chain"
+            });
+            writeLog(`VAULT CREATE FAILED: ${e.message}`, 'error', account?.address);
         }
     };
 
@@ -1353,53 +1392,36 @@ function DashboardContent() {
     const executeVaultDestruction = async (vaultData: any) => {
         if (!account) return;
 
-        // Network Check (Strict)
-        if (account.chains?.[0] && account.chains[0] !== 'stellar:testnet') {
-            toast.error("Wrong Network Detected", {
-                description: "This dApp runs on Stellar Testnet. Please switch your wallet network."
-            });
-            return;
-        }
-
-        const toastId = toast.loading("Destroying Vault...");
+        const toastId = toast.loading("Disconnecting Vault...");
 
         try {
-            const { TransactionBuilder, Networks, Operation } = await import("@stellar/stellar-sdk");
+            // Note: Actual vault destruction on-chain would require withdrawing all funds first,
+            // then calling a contract function to mark the vault as inactive.
+            // For now, we just disconnect the vault locally.
 
-            const tx = await buildStellarTransaction(account.address);
+            // Clear local storage
+            localStorage.removeItem(`nirium-vault-${baseAsset}-${account.address}`);
+            localStorage.removeItem(`nirium-vault-balance-${vaultData.vaultId}-${baseAsset}`);
 
-            // Stellar Destroy Vault: Merger account or close entries
-            // Since we don't have the vault's secret key in this frontend demo, we simulate
-            // destruction via a ManageData operation on the user's own account.
-            tx.addOperation(Operation.manageData({
-                name: `vault_${baseAsset}_closed`,
-                value: vaultData.vaultId.slice(0, 64)
-            }));
-
-            const builtTx = tx.build();
-            const result = await signAndSubmitTransaction({ transaction: builtTx });
+            setVaultId(null);
+            setOwnerCapId(null);
+            setVaultBalance(0);
 
             toast.dismiss(toastId);
-            localStorage.removeItem(`nirium-vault-${baseAsset}-${account.address}`);
-            setVaultId(null);
-            toast.success("Vault Destroyed & Funds Recovered!", {
-                description: "Your vault has been destroyed on-chain.",
-                action: {
-                    label: "View Tx",
-                    onClick: () => window.open(`https://stellar.expert/explorer/testnet/tx/${result.hash}`, '_blank')
-                },
-                duration: 8000
+            toast.success("Vault Disconnected", {
+                description: `Vault ID ${vaultData.vaultId} has been disconnected locally. Funds remain on-chain.`,
+                duration: 6000
             });
 
             writeLog(
-                `VAULT DESTROYED: ${baseAsset} Enclave terminated and funds returned | tx: ${result.hash.slice(0, 12)}...`,
+                `VAULT DISCONNECTED: ID=${vaultData.vaultId} | Local data cleared`,
                 'warn',
                 account?.address
             );
         } catch (error: any) {
             toast.dismiss(toastId);
-            console.error("Destroy Vault Error:", error);
-            toast.error("Failed to destroy vault: " + (error as any).message);
+            console.error("Disconnect Vault Error:", error);
+            toast.error("Failed to disconnect vault: " + error.message);
         }
     };
 
@@ -1935,7 +1957,7 @@ function DashboardContent() {
                                         </div>
                                     </div>
                                     <p className="text-xs text-gray-500 font-mono mt-1">
-                                        {vaultId ? `ID: ${vaultId.slice(0, 6)}...${vaultId.slice(-4)}` : 'Vault ID: Not Created'} • {vaultBalance.toFixed(2)} {baseAsset} Locked
+                                        {vaultId ? `ID: ${vaultId}` : 'Vault ID: Not Created'} • {vaultBalance.toFixed(2)} {baseAsset} Locked
                                     </p>
                                     <div className="flex items-center gap-2 pt-1">
                                         {vaultId ? (

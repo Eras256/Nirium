@@ -3,12 +3,14 @@ import { createClient } from '@supabase/supabase-js';
 const supabaseUrl = process.env.SUPABASE_URL;
 const supabaseKey = process.env.SUPABASE_ANON_KEY;
 
+// ⚠️ CRITICAL: Fail loudly if Supabase credentials are missing
+// Silent failures cause ALL database operations to fail, blocking requests
 if (!supabaseUrl || !supabaseKey) {
-  console.warn('[DB Provider] Supabase URL or Key missing. Database operations will fail.');
+  throw new Error(
+    '❌ FATAL: SUPABASE_URL and SUPABASE_ANON_KEY environment variables must be set. ' +
+    'Get these from your Supabase project dashboard at https://app.supabase.com'
+  );
 }
 
-// Fallback to a dummy URL so we don't crash the whole agent if the user doesn't have Supabase configured
-export const supabase = createClient(
-  supabaseUrl || 'https://dummy-nirium-project.supabase.co',
-  supabaseKey || 'dummy_key'
-);
+// No fallback - only create client with valid credentials
+export const supabase = createClient(supabaseUrl, supabaseKey);

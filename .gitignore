@@ -46,6 +46,7 @@ Cargo.lock
 *.md
 !README.md
 !NIRIUM_TECHNICAL_PAPER.md
+!claude.md
 
 # Ignoring plans generated if any
 implementation_plan.json

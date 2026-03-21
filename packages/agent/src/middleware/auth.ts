@@ -5,9 +5,26 @@
 import { Request, Response, NextFunction } from 'express';
 import jwt from 'jsonwebtoken';
 import crypto from 'crypto';
+import { supabase } from '../providers/database';
 
-const JWT_SECRET = process.env.JWT_SECRET || 'nirium-jwt-secret-change-me';
-const ADMIN_API_KEY = process.env.ADMIN_API_KEY || 'nirium-admin-key-change-me';
+// ⚠️ SECURITY: These secrets MUST be set in environment variables
+// No fallback values - fail loudly if missing
+const JWT_SECRET = process.env.JWT_SECRET;
+const ADMIN_API_KEY = process.env.ADMIN_API_KEY;
+
+if (!JWT_SECRET || JWT_SECRET.length < 32) {
+    throw new Error(
+        '❌ FATAL: JWT_SECRET environment variable must be set and at least 32 characters. ' +
+        'Generate with: openssl rand -hex 32'
+    );
+}
+
+if (!ADMIN_API_KEY || ADMIN_API_KEY.length < 32) {
+    throw new Error(
+        '❌ FATAL: ADMIN_API_KEY environment variable must be set and at least 32 characters. ' +
+        'Generate with: openssl rand -hex 32'
+    );
+}
 
 export interface AuthenticatedRequest extends Request {
     user?: {
@@ -16,9 +33,6 @@ export interface AuthenticatedRequest extends Request {
         authMethod: 'jwt' | 'api_key';
     };
 }
-
-// In-memory API key store (production would use database)
-const apiKeys = new Map<string, { userId: string; permissions: string[]; name: string }>();
 
 /**
  * Generate a JWT token for a user.
@@ -40,61 +54,108 @@ export function verifyToken(token: string): { userId: string; permissions: strin
 }
 
 /**
- * Generate a new API key.
+ * Generate a new API key and persist it to Supabase.
+ * ✅ Fixed: Now persists to database instead of in-memory Map.
  */
-export function generateApiKey(userId: string, name: string, permissions: string[] = ['user']): string {
+export async function generateApiKey(
+    userId: string,
+    name: string,
+    permissions: string[] = ['user']
+): Promise<string> {
     const key = `nrm_${crypto.randomBytes(32).toString('hex')}`;
     const keyHash = crypto.createHash('sha256').update(key).digest('hex');
-    apiKeys.set(keyHash, { userId, permissions, name });
-    return key;
+
+    // Persist to Supabase auth_keys table
+    const { error } = await supabase.from('auth_keys').insert({
+        user_address: userId,
+        api_key: keyHash,
+        permissions: permissions,
+        name: name,
+        is_active: true,
+    });
+
+    if (error) {
+        console.error('[Auth] Failed to persist API key:', error);
+        throw new Error('Failed to generate API key');
+    }
+
+    console.log(`[Auth] ✅ Generated API key for user ${userId}: ${name}`);
+    return key; // Return the raw key (only time it's visible)
 }
 
 /**
  * Validate an API key and return associated user info.
+ * ✅ Fixed: Now reads from Supabase instead of in-memory Map.
  */
-function validateApiKey(key: string): { userId: string; permissions: string[] } | null {
+async function validateApiKey(key: string): Promise<{ userId: string; permissions: string[] } | null> {
     // Check admin key first
     if (key === ADMIN_API_KEY) {
         return { userId: 'admin', permissions: ['admin', 'user'] };
     }
 
     const keyHash = crypto.createHash('sha256').update(key).digest('hex');
-    const keyData = apiKeys.get(keyHash);
-    if (keyData) {
-        return { userId: keyData.userId, permissions: keyData.permissions };
+
+    // Query Supabase for the hashed key
+    const { data, error } = await supabase
+        .from('auth_keys')
+        .select('user_address, permissions, is_active')
+        .eq('api_key', keyHash)
+        .eq('is_active', true)
+        .single();
+
+    if (error || !data) {
+        return null;
     }
-    return null;
+
+    return {
+        userId: data.user_address,
+        permissions: data.permissions || ['user'],
+    };
 }
 
 /**
  * Get all API keys for a user (returns metadata only, not the actual keys).
+ * ✅ Fixed: Now reads from Supabase instead of in-memory Map.
  */
-export function getUserApiKeys(userId: string): Array<{ id: string; name: string; permissions: string[]; created: string }> {
-    const keys: Array<{ id: string; name: string; permissions: string[]; created: string }> = [];
-    apiKeys.forEach((value, hash) => {
-        if (value.userId === userId) {
-            keys.push({
-                id: hash.substring(0, 16),
-                name: value.name,
-                permissions: value.permissions,
-                created: new Date().toISOString(),
-            });
-        }
-    });
-    return keys;
+export async function getUserApiKeys(
+    userId: string
+): Promise<Array<{ id: string; name: string; permissions: string[]; created: string }>> {
+    const { data, error } = await supabase
+        .from('auth_keys')
+        .select('id, name, permissions, created_at')
+        .eq('user_address', userId)
+        .eq('is_active', true);
+
+    if (error || !data) {
+        console.error('[Auth] Failed to fetch user API keys:', error);
+        return [];
+    }
+
+    return data.map((key) => ({
+        id: key.id,
+        name: key.name,
+        permissions: key.permissions || ['user'],
+        created: key.created_at,
+    }));
 }
 
 /**
- * Revoke an API key by its hash prefix.
+ * Revoke an API key by its ID.
+ * ✅ Fixed: Now updates Supabase instead of in-memory Map.
  */
-export function revokeApiKey(keyIdPrefix: string): boolean {
-    for (const [hash] of apiKeys) {
-        if (hash.startsWith(keyIdPrefix)) {
-            apiKeys.delete(hash);
-            return true;
-        }
+export async function revokeApiKey(keyId: string): Promise<boolean> {
+    const { error } = await supabase
+        .from('auth_keys')
+        .update({ is_active: false, revoked_at: new Date().toISOString() })
+        .eq('id', keyId);
+
+    if (error) {
+        console.error('[Auth] Failed to revoke API key:', error);
+        return false;
     }
-    return false;
+
+    console.log(`[Auth] ✅ Revoked API key: ${keyId}`);
+    return true;
 }
 
 /**
@@ -114,8 +175,13 @@ export function verifyHmacSignature(payload: string, signature: string, secret: 
 
 /**
  * Authentication middleware — supports JWT Bearer tokens and API keys.
+ * ✅ Fixed: Now async to support Supabase lookups for API keys.
  */
-export function authMiddleware(req: AuthenticatedRequest, res: Response, next: NextFunction): void {
+export async function authMiddleware(
+    req: AuthenticatedRequest,
+    res: Response,
+    next: NextFunction
+): Promise<void> {
     // Try JWT Bearer token first
     const authHeader = req.headers.authorization;
     if (authHeader?.startsWith('Bearer ')) {
@@ -128,10 +194,10 @@ export function authMiddleware(req: AuthenticatedRequest, res: Response, next: N
         }
     }
 
-    // Try API key
+    // Try API key (now async - queries Supabase)
     const apiKey = req.headers['x-api-key'] as string;
     if (apiKey) {
-        const keyData = validateApiKey(apiKey);
+        const keyData = await validateApiKey(apiKey);
         if (keyData) {
             req.user = { ...keyData, authMethod: 'api_key' };
             next();
