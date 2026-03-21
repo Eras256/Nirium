@@ -1,6 +1,6 @@
 {
-    "buildCommand": "cd apps/web && pnpm install && pnpm build",
+    "buildCommand": "pnpm --filter nirium-web build",
     "outputDirectory": "apps/web/.next",
-    "installCommand": "npm install -g pnpm@9.15.9 && pnpm install --filter nirium-web --filter nirium-web...",
+    "installCommand": "pnpm install",
     "framework": "nextjs"
 }
