@@ -288,7 +288,7 @@ npx tsx scripts/nirium_full_swarm.ts
 
 | Metric | Value |
 |:---|:---|
-| Active Agents | 15 |
+| Active Agents | 30 |
 | Swarm Tick Interval | 8 seconds |
 | Estimated Throughput | ~112 txs/minute |
 | Wallet Funding | 10,000 XLM/agent (Friendbot) |
@@ -307,6 +307,49 @@ npx tsx scripts/nirium_full_swarm.ts
 | 🔵 NiriumVault Contract | https://stellar.expert/explorer/testnet/contract/CDHDX63NUYSFCIPJTTS46N5PYLTI7J5WIAIOP7TZSPBNUTLI32AY7GA2 |
 | 📦 GitHub | https://github.com/Eras256/Nirium |
 | 🗄️ Supabase Dashboard | https://supabase.com/dashboard/project/hnvmyjmhgcobcibnioyw |
+
+## 🛸 Swarm Agent Registry (Testnet)
+
+Explore the live activity of our 30 strategic agents on the Stellar network.
+
+<details>
+<summary><b>Click to view 30 Agent Accounts</b></summary>
+<br/>
+
+| Agent | Stellar Expert Explorer |
+|:---|:---|
+| **Titan** | [GAGXYW67...](https://stellar.expert/explorer/testnet/account/GAGXYW675VIR6AD35SQY3H6XWUWAVRHXXEMWVGL5ZXTDA4G5YIR6HDAW) |
+| **Eliza** | [GAKCEJF4...](https://stellar.expert/explorer/testnet/account/GAKCEJF4RVLJFF3FPJ6NQEJO7CQ3D4YEVLGUJ7RNRG4TWK7GOGW4H63Y) |
+| **Maux** | [GB3XK5LM...](https://stellar.expert/explorer/testnet/account/GB3XK5LMSG7534CV4BRMGQWGT2UOWWJBEZUURQLVMMWCWIRVBW5O6OSM) |
+| **Chronos** | [GD26N3VQ...](https://stellar.expert/explorer/testnet/account/GD26N3VQONMMP6OFHMWOMEW4QGUX3D4DFIBWMUPYPXTYYQH3JBPORM5B) |
+| **Astra** | [GCZOJ2Z7...](https://stellar.expert/explorer/testnet/account/GCZOJ2Z7627MJFCRNCVNDBR6K5K3OSK43CWUZBRGKFUM5GENK4ZCYHPG) |
+| **Void** | [GB55O2TD...](https://stellar.expert/explorer/testnet/account/GB55O2TDRMMZHOSDOSUNX5GFOZO4XXSVDIIPUHU2M6W6XKUVCMRCSLZA) |
+| **Nexus** | [GACR47Q2...](https://stellar.expert/explorer/testnet/account/GACR47Q2ZSMGNWJQRQM32ZUMLN74TOTI7HXUQ5LPS4RTYKB7QUSBJGOL) |
+| **Gaia** | [GB5TOK2H...](https://stellar.expert/explorer/testnet/account/GB5TOK2HHN5F6GFMBIL2J2A7J4AJANFEP3ZZL53G3NDNEACN7COKHCXW) |
+| **Orion** | [GCX4VKBQ...](https://stellar.expert/explorer/testnet/account/GCX4VKBQQFAYIA6GKDSE7NGDB7TPUG34TXEN4DKV3WLAOGXOQMGGOWVC) |
+| **Sentinel** | [GCSWEA3P...](https://stellar.expert/explorer/testnet/account/GCSWEA3PRTXU5RPV7Y4526OQ3P3EIWV2CSPULYIRYIRUJZJH6OAYV3ES) |
+| **Matrix** | [GBSFV55L...](https://stellar.expert/explorer/testnet/account/GBSFV55L5I4JBNKN5MD5GM4WFPINPDEH7DRHV7KQQGUMYMK255PFZIFW) |
+| **Atlas** | [GCPGD5MH...](https://stellar.expert/explorer/testnet/account/GCPGD5MHV5ESWUX56BIZD6I4FMHDHHROJ6OQE5Q64L3MZCP4DI6J2EXJ) |
+| **Nova** | [GAHPS6JZ...](https://stellar.expert/explorer/testnet/account/GAHPS6JZ7OVB5RATDKBITDNY3267QQVRITG2WVGTB7VDH5ESSZWVBHLC) |
+| **Cyber** | [GDEDC33Z...](https://stellar.expert/explorer/testnet/account/GDEDC33ZHYWEY4Y43VCVKWDYKV4HXLOJQPUE5OTW4NFPVRCK2YAMQCGB) |
+| **Nirium-1** | [GCHHSVY7...](https://stellar.expert/explorer/testnet/account/GCHHSVY73IRGX4CFF6OWI72VLRS6RSLV34APCEEJ3JH5Q5IIG4CKS6HK) |
+| **Kora** | [GAWR6MPW...](https://stellar.expert/explorer/testnet/account/GAWR6MPWFZ552B6CSV7WWF4JOYIWBUN6RVDGAUGB6DCKD2DD3QQS3BYL) |
+| **Sol** | [GAXMVHTS...](https://stellar.expert/explorer/testnet/account/GAXMVHTSEAJIZDUITG7JR27IXLXBVPYRAU46OIFNLQFFF4CCEOS5XIIK) |
+| **Luna** | [GCYFUVEW...](https://stellar.expert/explorer/testnet/account/GCYFUVEWKWUFNPMNEW7C6D75EUJPW67V5BLLWYDCTRVW64A7SUOALB2D) |
+| **Vortex** | [GD256Y6V...](https://stellar.expert/explorer/testnet/account/GD256Y6VAAAMMMXGGSYNAQIOHEQPO42JTOIXGBP67XYRGNAIG2XN2ZPC) |
+| **Zen** | [GA5NFSWC...](https://stellar.expert/explorer/testnet/account/GA5NFSWCCRVEIKQGRBS5JTGZO2MDMBBVUQPFLHCP33CN6RFIKBSWA2L4) |
+| **Aura** | [GDJN3S5R...](https://stellar.expert/explorer/testnet/account/GDJN3S5RAPAV57HHXUC25YCC3XFEVKIK7RJSIAQEDJDRADXM72MUVJ4Y) |
+| **Zero** | [GBWOVJQ4...](https://stellar.expert/explorer/testnet/account/GBWOVJQ4FJE6O3ODFWAZLO45WZQXJF7KKNB5FFT5R2AA3WDHUOQSUPYX) |
+| **Quantum** | [GAKYPGHC...](https://stellar.expert/explorer/testnet/account/GAKYPGHC2NJ6YN6PAZFAKDEHFBD2BHO6EN5AOJCHMRVP3JR7P3Y2CASJ) |
+| **Specter** | [GCNIGKRV...](https://stellar.expert/explorer/testnet/account/GCNIGKRVAM6HGFK6KV5CKZ5MLAULSK44YD75ETV5OJ6VHUVPSWQM66TZ) |
+| **Viper** | [GDVQ372A...](https://stellar.expert/explorer/testnet/account/GDVQ372ADCOJQ7U25QY3LADEZMT36CI7JYUBUGEQAGTC2VKNYBAMRGNV) |
+| **Pulse** | [GBXGVSH6...](https://stellar.expert/explorer/testnet/account/GBXGVSH6NALR3YAAZHHQNXIN4JBMRVVMHUU5T3EEGEREASHXJ5NEWXYG) |
+| **Rift** | [GABZEAPJ...](https://stellar.expert/explorer/testnet/account/GABZEAPJDB6YN75ZMKNKHIGGMR2VCC6O4YFBAK7IIB5RMFUKDVFJG2SZ) |
+| **Blade** | [GA2THKAI...](https://stellar.expert/explorer/testnet/account/GA2THKAIQMWL5N6IEK5KQUXMX3YCCKMI74PRABAKBC2V7LD76RU6RRFA) |
+| **Echo** | [GAHH7UVP...](https://stellar.expert/explorer/testnet/account/GAHH7UVPUJTVXPTMBKCFQB5JLOEQICOZSU6QMQ6BNPCPDXSTNMJKLAX4) |
+| **Shadow** | [GDGYI6QO...](https://stellar.expert/explorer/testnet/account/GDGYI6QOG3B4KSI2UO3VRFMQUPUYIAM73WIXYZEOSMEOHQ5WPSDXU6IL) |
+
+</details>
 
 ---
 
