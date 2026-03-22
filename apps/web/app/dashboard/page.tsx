@@ -2074,7 +2074,7 @@ function DashboardContent() {
                     </div>
                     <div className="text-[10px] text-gray-500 mt-1 flex items-center gap-1.5 font-sans">
                         <div className="w-1 h-1 rounded-full bg-stellar-teal" />
-                        WALLET: {walletBalance.toFixed(3)} {baseAsset}
+                        WALLET: {baseAsset === 'CETES' ? parseFloat(cetesBalance).toFixed(3) : walletBalance.toFixed(3)} {baseAsset}
                     </div>
                 </div>
                 <div className="glass-panel p-4 rounded-xl border border-green-500/20 hover:border-green-500/40 transition-all cursor-pointer" onClick={handleOpenRamp}>

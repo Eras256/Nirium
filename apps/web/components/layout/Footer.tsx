@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { ExternalLink, Zap, Shield, Activity, Cpu, Database } from "lucide-react";
+import { useState, useEffect } from "react";
 import { useLanguage } from "../../context/LanguageContext";
 
 const COLOR_MAP: Record<string, string> = {
@@ -27,6 +28,14 @@ export default function Footer() {
         { label: t.footer.neural_plugins, href: "/plugins" },
     ];
 
+    const [contractHref, setContractHref] = useState("https://stellar.expert/explorer/testnet");
+
+    useEffect(() => {
+        if (process.env.NEXT_PUBLIC_CONTRACT_SENTINEL) {
+            setContractHref(`https://stellar.expert/explorer/testnet/contract/${process.env.NEXT_PUBLIC_CONTRACT_SENTINEL}`);
+        }
+    }, []);
+
     const INTEL_LINKS = [
         { label: t.footer.agents_control, href: "/agents" },
         { label: t.footer.protocol_manifesto, href: "/manifesto" },
@@ -34,7 +43,7 @@ export default function Footer() {
         { label: t.footer.developer_docs, href: "/docs" },
         {
             label: t.footer.soroban_source,
-            href: process.env.NEXT_PUBLIC_CONTRACT_SENTINEL ? `https://stellar.expert/explorer/testnet/contract/${process.env.NEXT_PUBLIC_CONTRACT_SENTINEL}` : "https://stellar.expert/explorer/testnet",
+            href: contractHref,
             external: true,
         },
     ];
