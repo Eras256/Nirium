@@ -4,7 +4,7 @@
  * Functions to interact with CETES Stellar Asset Contract (SAC)
  */
 
-import { Address, nativeToScVal, Contract, SorobanRpc, TransactionBuilder, Networks, Keypair } from '@stellar/stellar-sdk';
+import { Address, nativeToScVal, Contract, rpc as SorobanRpc, TransactionBuilder, Networks, Keypair } from '@stellar/stellar-sdk';
 import { CETES_ASSET_ID, CONTRACT_IDS } from './sorobanContracts';
 
 const RPC_URL = process.env.NEXT_PUBLIC_SOROBAN_RPC_URL || 'https://soroban-testnet.stellar.org';
