@@ -1,2 +1,0 @@
-ALTER TABLE nirium_swarm_agents DROP CONSTRAINT IF EXISTS nirium_swarm_agents_wallet_address_key;
-ALTER TABLE nirium_swarm_agents ADD CONSTRAINT nirium_swarm_agents_wallet_address_key UNIQUE (wallet_address);
