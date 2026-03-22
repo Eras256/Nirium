@@ -35,13 +35,32 @@ const NETWORK_PASSPHRASE = Networks.TESTNET;
 const HORIZON_URL = process.env.NEXT_PUBLIC_HORIZON_URL || 'https://horizon-testnet.stellar.org';
 
 export const CONTRACT_IDS = {
-    VAULT: process.env.NEXT_PUBLIC_CONTRACT_VAULT || 'CAEXPP7HO3BNCFUGZ4ESEMGDVE77FRP53RLSYES46XWCGW3PBR4NJHNZ', // Fixed: was NEXT_PUBLIC_CONTRACT_SENTINEL
+    VAULT: process.env.NEXT_PUBLIC_CONTRACT_VAULT || 'CB67X4QCJDD4ZCKDXSW34M5H5WDUXEGOP3WKND6YSUCGPTTO4ODZ4HEN', // Fixed: was NEXT_PUBLIC_CONTRACT_SENTINEL
     ELO: process.env.NEXT_PUBLIC_CONTRACT_ELO || 'CB4RCN4YHLCX2SIFMEJJSMDBWO6NPJHMDLSSKA4CT4HRTD2TFCU6XW4H',
     MARKETPLACE: process.env.NEXT_PUBLIC_CONTRACT_MARKETPLACE || 'CCUDDIF6BIIA6NZNSDD63KNWMEAPYTB5WHRDMU2IGOATBCZF6KV6BLEN',
 } as const;
 
 // Soroban Native Token Address (XLM) on Stellar Testnet
 export const NATIVE_ASSET_ID = 'CDLZFC3SYJYDZT7K67VZ75HPJVIEUVNIXF47ZG2FB2RMQQVU2HHGCYSC';
+
+// USDC Asset ID on Stellar Testnet (GBBD47IF6LWK7P7MDEVSCWR7DPUWV3NY3DTQEVFL4NAT4AQH3ZLLFLA5)
+export const USDC_ASSET_ID = 'CBIELTK6YBZJU5UP2WWQEUCYKLPU6AUNZ2BQ4WWFEIE3USCIHMXQDAMA';
+
+// ─── CETES Asset — Etherfuse Stablebonds on Stellar ──────────────────
+// CETES = Mexican Federal Treasury Certificates, tokenized by Etherfuse
+// This issuer EXISTS on Stellar TESTNET (confirmed via Horizon)
+// Reference: https://github.com/ElliotFriend/regional-starter-pack
+export const CETES_ASSET = {
+    code: 'CETES',
+    issuer: 'GC3CW7EDYRTWQ635VDIGY6S4ZUF5L6TQ7AA4MWS7LEQDBLUSZXV7UPS4',
+} as const;
+
+// CETES Contract Address (for Soroban vaults) - UPDATED 2026-03-22
+export const CETES_ASSET_ID = 'CC72F57YTPX76HAA64JQOEGHQAPSADQWSY5DWVBR66JINPFDLNCQYHIC';
+console.log('🔍 [CETES_ASSET_ID LOADED]:', CETES_ASSET_ID);
+
+// Etherfuse On/Off Ramp URLs
+export const ETHERFUSE_RAMP_URL = 'https://devnet.etherfuse.com';
 
 export type ContractName = keyof typeof CONTRACT_IDS;
 
@@ -228,6 +247,7 @@ export async function vaultCreate(callerAddress: string, tokenAddress: string, n
             Address.fromString(callerAddress).toScVal(),
             Address.fromString(tokenAddress).toScVal(),
             nativeToScVal(name, { type: 'string' }),
+            Address.fromString(NATIVE_ASSET_ID).toScVal(),
         ],
         callerAddress,
     });
@@ -419,4 +439,54 @@ export async function marketplaceSubscribe(
         ],
         callerAddress,
     });
+}
+
+// ═══════════════════════════════════════════════════════
+// CETES INTEGRATION — Etherfuse Ramp Support
+// ═══════════════════════════════════════════════════════
+
+
+
+/**
+ * Get CETES balance for a user's wallet.
+ */
+export async function getCETESBalance(walletAddress: string): Promise<string> {
+    const { Horizon } = await import('@stellar/stellar-sdk');
+
+    try {
+        const horizonServer = new Horizon.Server(HORIZON_URL);
+        const account = await horizonServer.loadAccount(walletAddress);
+
+        const cetesBalance = account.balances.find(
+            (balance: any) =>
+                balance.asset_type !== 'native' &&
+                balance.asset_code === CETES_ASSET.code &&
+                balance.asset_issuer === CETES_ASSET.issuer
+        );
+
+        return cetesBalance ? cetesBalance.balance : '0';
+    } catch {
+        return '0';
+    }
+}
+
+/**
+ * Check if user has CETES trustline established.
+ */
+export async function hasCETESTrustline(walletAddress: string): Promise<boolean> {
+    const { Horizon } = await import('@stellar/stellar-sdk');
+
+    try {
+        const horizonServer = new Horizon.Server(HORIZON_URL);
+        const account = await horizonServer.loadAccount(walletAddress);
+
+        return account.balances.some(
+            (balance: any) =>
+                balance.asset_type !== 'native' &&
+                balance.asset_code === CETES_ASSET.code &&
+                balance.asset_issuer === CETES_ASSET.issuer
+        );
+    } catch {
+        return false;
+    }
 }

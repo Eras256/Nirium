@@ -20,7 +20,8 @@ import { useVault, useEloReputation } from "@/hooks/useNiriumContracts";
 import { getWebSocketUrl } from "@/lib/constants";
 import { simulateSorobanTx } from "@/lib/stellarSim";
 import { handleWalletError } from "@/components/wallet/WalletErrorHandler";
-import { NATIVE_ASSET_ID, vaultDeposit, vaultWithdraw, vaultCreate, vaultGetVaultCount } from "@/lib/sorobanContracts";
+import { NATIVE_ASSET_ID, USDC_ASSET_ID, CETES_ASSET_ID, vaultDeposit, vaultWithdraw, vaultCreate, vaultGetVaultCount, CETES_ASSET, getCETESBalance, hasCETESTrustline } from "@/lib/sorobanContracts";
+import { generateOnboardingUrl, getOrCreateCustomerIds } from "@/lib/etherfuseApi";
 import MarketTicker from "@/components/dashboard/MarketTicker";
 import NeuralOrb from "@/components/dashboard/NeuralOrb";
 import StatusBadge from "@/components/ui/StatusBadge";
@@ -112,9 +113,11 @@ function DashboardContent() {
         return obj.data;
     };
     const [showAutoStartModal, setShowAutoStartModal] = useState(false);
-    const [baseAsset, setBaseAsset] = useState<"XLM" | "USDC">("USDC");
+    const [baseAsset, setBaseAsset] = useState<"XLM" | "USDC" | "CETES">("USDC");
     const getCoinType = () => baseAsset === "XLM"
         ? "XLM"
+        : baseAsset === "CETES"
+        ? "CETES"
         : "USDC";
 
     const [selectedStrategy, setSelectedStrategy] = useState<any>(null); // State for Details Modal
@@ -123,6 +126,8 @@ function DashboardContent() {
     const [blendData, setBlendData] = useState<{ supplyApy: number, borrowApy: number } | null>(null);
     const [phoenixData, setPhoenixData] = useState<{ supplyApy: number, borrowApy: number } | null>(null);
     const [walletBalance, setWalletBalance] = useState<number>(0);
+    const [cetesBalance, setCetesBalance] = useState<string>('0');
+    const [hasCetesTrust, setHasCetesTrust] = useState<boolean>(false);
     const [onChainVaultCount, setOnChainVaultCount] = useState<number | null>(null);
     const [onChainTotalFees, setOnChainTotalFees] = useState<number | null>(null);
     const [onChainElo, setOnChainElo] = useState<number | null>(null);
@@ -200,6 +205,28 @@ function DashboardContent() {
         const interval = setInterval(fetchBalance, 10000); // Poll every 10s
         return () => clearInterval(interval);
     }, [account, baseAsset]);
+
+    // Fetch CETES Balance and Trustline Status
+    useEffect(() => {
+        if (!account?.address) return;
+
+        const fetchCETESData = async () => {
+            try {
+                const [balance, trustlineStatus] = await Promise.all([
+                    getCETESBalance(account.address),
+                    hasCETESTrustline(account.address)
+                ]);
+                setCetesBalance(balance);
+                setHasCetesTrust(trustlineStatus);
+            } catch (e) {
+                console.warn("CETES fetch failed:", e);
+            }
+        };
+
+        fetchCETESData();
+        const interval = setInterval(fetchCETESData, 10000); // Poll every 10s
+        return () => clearInterval(interval);
+    }, [account]);
 
     // Fetch Vault Balance specifically
     useEffect(() => {
@@ -963,7 +990,7 @@ function DashboardContent() {
     // Load Vault & OwnerCap from LocalStorage on mount
     useEffect(() => {
         if (account?.address) {
-            const savedData = localStorage.getItem(`nirium-vault-${baseAsset}-${account.address}`);
+            const savedData = localStorage.getItem(`nirium-vault-v2-${baseAsset}-${account.address}`);
             if (savedData) {
                 try {
                     const vaultData = JSON.parse(savedData);
@@ -981,7 +1008,7 @@ function DashboardContent() {
                         } else {
                             // Old format with G... address - clear it
                             console.warn('Legacy vault ID detected (Stellar address). Please create a new vault.');
-                            localStorage.removeItem(`nirium-vault-${baseAsset}-${account.address}`);
+                            localStorage.removeItem(`nirium-vault-v2-${baseAsset}-${account.address}`);
                             setVaultId(null);
                             setOwnerCapId(null);
                         }
@@ -1010,7 +1037,7 @@ function DashboardContent() {
             title: "Deposit to Vault",
             description: (
                 <div className="space-y-4">
-                    <p className="text-xs text-gray-400">Transfer XLM from your wallet to the secure vault.</p>
+                    <p className="text-xs text-gray-400">Transfer {baseAsset} from your wallet to the secure vault.</p>
                     <div className="relative">
                         <input
                             id="depositInput"
@@ -1058,9 +1085,20 @@ function DashboardContent() {
             return;
         }
 
-        const toastId = toast.loading(`Executing Deposit of ${amount} XLM...`);
+        // Validate balance before deposit
+        const depositAmount = parseFloat(amount);
+        const currentBalance = baseAsset === 'CETES' ? parseFloat(cetesBalance) : walletBalance;
+
+        if (depositAmount > currentBalance) {
+            toast.error("Insufficient Balance", {
+                description: `You only have ${currentBalance.toFixed(2)} ${baseAsset}. Cannot deposit ${depositAmount} ${baseAsset}.`
+            });
+            return;
+        }
+
+        const toastId = toast.loading(`Executing Deposit of ${amount} ${baseAsset}...`);
         try {
-            // Convert amount to stroops (1 XLM = 10^7 stroops)
+            // Convert amount to stroops (1 XLM/USDC/CETES = 10^7 stroops)
             const amountInStroops = BigInt(Math.floor(parseFloat(amount) * 10_000_000));
 
             // Call the actual Soroban vault contract deposit function
@@ -1069,12 +1107,14 @@ function DashboardContent() {
             toast.dismiss(toastId);
 
             if (result.success) {
-                // Refresh vault balance from on-chain data
-                // The vault balance should now be updated on-chain
+                // Update vault balance optimistically
                 setVaultBalance(prev => prev + parseFloat(amount));
 
+                // Immediately update wallet balance (subtract deposited amount)
+                setWalletBalance(prev => Math.max(0, prev - parseFloat(amount)));
+
                 toast.success("Deposit Successful", {
-                    description: `${amount} XLM deposited to Vault on-chain.`,
+                    description: `${amount} ${baseAsset} deposited to Vault on-chain.`,
                     action: result.txHash ? {
                         label: "View Tx",
                         onClick: () => window.open(`https://stellar.expert/explorer/testnet/tx/${result.txHash}`, "_blank")
@@ -1082,7 +1122,7 @@ function DashboardContent() {
                 });
 
                 // Log the successful deposit
-                writeLog(`VAULT DEPOSIT: ${amount} XLM | Vault ID: ${vaultId} | Tx: ${result.txHash?.slice(0, 12)}...`, 'success');
+                writeLog(`VAULT DEPOSIT: ${amount} ${baseAsset} | Vault ID: ${vaultId} | Tx: ${result.txHash?.slice(0, 12)}...`, 'success');
             } else {
                 throw new Error(result.error || 'Deposit failed');
             }
@@ -1107,7 +1147,7 @@ function DashboardContent() {
             title: "Withdraw from Vault",
             description: (
                 <div className="space-y-4">
-                    <p className="text-xs text-gray-400">Transfer XLM from the vault back to your wallet address.</p>
+                    <p className="text-xs text-gray-400">Transfer {baseAsset} from the vault back to your wallet address.</p>
                     <div className="relative">
                         <input
                             id="withdrawInput"
@@ -1162,9 +1202,9 @@ function DashboardContent() {
             return;
         }
 
-        const toastId = toast.loading("Executing Withdrawal...");
+        const toastId = toast.loading(`Withdrawing ${amount} ${baseAsset}...`);
         try {
-            // Convert amount to stroops (1 XLM = 10^7 stroops)
+            // Convert amount to stroops (1 XLM/USDC = 10^7 stroops)
             const amountInStroops = BigInt(Math.floor(parseFloat(amount) * 10_000_000));
 
             // Call the actual Soroban vault contract withdraw function
@@ -1173,11 +1213,14 @@ function DashboardContent() {
             toast.dismiss(toastId);
 
             if (result.success) {
-                // Refresh vault balance from on-chain data
+                // Update vault balance optimistically
                 setVaultBalance(prev => Math.max(0, prev - parseFloat(amount)));
 
+                // Immediately update wallet balance (add withdrawn amount)
+                setWalletBalance(prev => prev + parseFloat(amount));
+
                 toast.success("Withdrawal Successful", {
-                    description: `${amount} XLM withdrawn from Vault on-chain.`,
+                    description: `${amount} ${baseAsset} withdrawn from Vault on-chain.`,
                     action: result.txHash ? {
                         label: "View Tx",
                         onClick: () => window.open(`https://stellar.expert/explorer/testnet/tx/${result.txHash}`, "_blank")
@@ -1185,7 +1228,7 @@ function DashboardContent() {
                 });
 
                 // Log the successful withdrawal
-                writeLog(`VAULT WITHDRAW: ${amount} XLM | Vault ID: ${vaultId} | Tx: ${result.txHash?.slice(0, 12)}...`, 'success');
+                writeLog(`VAULT WITHDRAW: ${amount} ${baseAsset} | Vault ID: ${vaultId} | Tx: ${result.txHash?.slice(0, 12)}...`, 'success');
             } else {
                 throw new Error(result.error || 'Withdrawal failed');
             }
@@ -1247,7 +1290,12 @@ function DashboardContent() {
         try {
             // Call the actual Soroban vault contract create_vault function
             const vaultName = `Vault-${Date.now()}`;
-            const result = await vaultCreate(account.address, NATIVE_ASSET_ID, vaultName);
+            const targetAssetId = baseAsset === 'USDC'
+                ? USDC_ASSET_ID
+                : baseAsset === 'CETES'
+                ? CETES_ASSET_ID
+                : NATIVE_ASSET_ID;
+            const result = await vaultCreate(account.address, targetAssetId, vaultName);
 
             toast.dismiss(toastId);
 
@@ -1269,7 +1317,7 @@ function DashboardContent() {
                 };
 
                 localStorage.setItem(
-                    `nirium-vault-${baseAsset}-${account.address}`,
+                    `nirium-vault-v2-${baseAsset}-${account.address}`,
                     JSON.stringify(storageData)
                 );
 
@@ -1305,6 +1353,146 @@ function DashboardContent() {
         }
     };
 
+    // ═══════════════════════════════════════════════════════
+    // MXNE RAMP INTEGRATION — Etherfuse
+    // ═══════════════════════════════════════════════════════
+
+    const handleAddCETESTrustline = async () => {
+        if (!account) {
+            toast.error("Please connect your wallet first");
+            return;
+        }
+
+        const toastId = toast.loading("Adding CETES trustline...");
+        try {
+            const { signTransaction } = await import("@stellar/freighter-api");
+            const { Horizon, Networks, TransactionBuilder, Asset, Operation } = await import("@stellar/stellar-sdk");
+
+            // 1. Load account from Horizon
+            const horizonServer = new Horizon.Server("https://horizon-testnet.stellar.org");
+            const sourceAccount = await horizonServer.loadAccount(account.address);
+
+            // 2. Build changeTrust transaction
+            const cetesAsset = new Asset(CETES_ASSET.code, CETES_ASSET.issuer);
+            const transaction = new TransactionBuilder(sourceAccount, {
+                fee: "100",
+                networkPassphrase: Networks.TESTNET,
+            })
+                .addOperation(Operation.changeTrust({
+                    asset: cetesAsset,
+                    limit: '1000000000',
+                }))
+                .setTimeout(300)
+                .build();
+
+            // 3. Sign with Freighter — MUST specify address to avoid tx_bad_auth
+            toast.loading("Sign the trustline in your wallet...", { id: toastId });
+            const txXdr = transaction.toXDR();
+            const signedResult = await signTransaction(txXdr, {
+                networkPassphrase: Networks.TESTNET,
+                address: account.address,
+            });
+
+            if (signedResult && typeof signedResult === 'object' && (signedResult as any).error) {
+                throw new Error(String((signedResult as any).error));
+            }
+
+            const signedXdr = typeof signedResult === 'string' ? signedResult : (signedResult as any).signedTxXdr;
+            if (!signedXdr) {
+                throw new Error('Wallet signing was cancelled');
+            }
+
+            // 4. Submit signed transaction to Horizon
+            toast.loading("Submitting to Stellar network...", { id: toastId });
+            const signedTx = TransactionBuilder.fromXDR(signedXdr, Networks.TESTNET);
+            const result = await horizonServer.submitTransaction(signedTx as any);
+
+            toast.dismiss(toastId);
+
+            if (result.successful) {
+                setHasCetesTrust(true);
+                toast.success("CETES Trustline Added!", {
+                    description: "You can now receive CETES (Mexican Treasury Bonds) on Stellar",
+                    action: {
+                        label: "View Tx",
+                        onClick: () => window.open(`https://stellar.expert/explorer/testnet/tx/${result.hash}`, "_blank")
+                    }
+                });
+                writeLog(`CETES TRUSTLINE ADDED | Tx: ${result.hash?.slice(0, 12)}...`, 'success', account.address);
+            } else {
+                throw new Error('Transaction was not successful');
+            }
+        } catch (e: any) {
+            toast.dismiss(toastId);
+
+            let errorMsg = e.message || "Failed to add CETES trustline";
+            if (e.response?.data?.extras?.result_codes) {
+                const codes = e.response.data.extras.result_codes;
+                errorMsg = `Horizon: tx=${codes.transaction}, ops=${codes.operations?.join(', ')}`;
+            }
+
+            toast.error("Trustline Failed", { description: errorMsg });
+            writeLog(`CETES TRUSTLINE FAILED: ${errorMsg}`, 'error', account?.address);
+        }
+    };
+
+    const handleOpenRamp = async () => {
+        if (!account) {
+            toast.error("Please connect your wallet first");
+            return;
+        }
+
+        if (!hasCetesTrust) {
+            toast.error("Add CETES Trustline First", {
+                description: "You need the CETES trustline before buying"
+            });
+            return;
+        }
+
+        const toastId = toast.loading("Opening Etherfuse ramp...");
+
+        try {
+            // Get or create persistent customer IDs for this wallet
+            const { customerId, bankAccountId } = getOrCreateCustomerIds(account.address);
+
+            // Generate onboarding URL via Etherfuse API
+            const result = await generateOnboardingUrl({
+                customerId,
+                bankAccountId,
+                publicKey: account.address,
+                blockchain: 'stellar',
+            });
+
+            toast.dismiss(toastId);
+
+            if (result.success && result.data?.url) {
+                // Open the presigned URL in new tab
+                window.open(result.data.url, '_blank');
+
+                toast.success("Etherfuse Ramp Opened", {
+                    description: "Complete KYC to buy CETES with SPEI. URL expires in 15 minutes."
+                });
+
+                writeLog(`ETHERFUSE RAMP: Opened for customer ${customerId}`, 'info', account.address);
+            } else {
+                // Fallback: open devnet directly
+                const fallbackUrl = 'https://devnet.etherfuse.com';
+                window.open(fallbackUrl, '_blank');
+                toast.info("Opened Etherfuse Directly", {
+                    description: result.error || "Opened Etherfuse devnet portal."
+                });
+                writeLog(`ETHERFUSE RAMP: API issue, opened devnet directly. ${result.error}`, 'warn', account?.address);
+            }
+        } catch (e: any) {
+            toast.dismiss(toastId);
+            window.open('https://devnet.etherfuse.com', '_blank');
+            toast.info("Opened Etherfuse Directly", {
+                description: "Could not generate presigned URL — opened portal directly."
+            });
+            writeLog(`ETHERFUSE RAMP FALLBACK: ${e.message}`, 'warn', account?.address);
+        }
+    };
+
     const handleDestroyVault = async () => {
         if (!account) {
             toast.error("Please connect your Stellar Wallet first");
@@ -1313,7 +1501,7 @@ function DashboardContent() {
         if (!vaultId) return;
 
         // Load vault data from localStorage
-        const savedData = localStorage.getItem(`nirium-vault-${baseAsset}-${account.address}`);
+        const savedData = localStorage.getItem(`nirium-vault-v2-${baseAsset}-${account.address}`);
         if (!savedData) {
             toast.error("Cannot find vault data");
             return;
@@ -1343,7 +1531,7 @@ function DashboardContent() {
                 confirmText: "LOCAL RESET",
                 type: 'info',
                 onConfirm: () => {
-                    localStorage.removeItem(`nirium-vault-${baseAsset}-${account.address}`);
+                    localStorage.removeItem(`nirium-vault-v2-${baseAsset}-${account.address}`);
                     setVaultId(null);
                     setConfirmConfig(prev => ({ ...prev, isOpen: false }));
                     toast.info("Vault Disconnected (Format Updated)", {
@@ -1400,7 +1588,7 @@ function DashboardContent() {
             // For now, we just disconnect the vault locally.
 
             // Clear local storage
-            localStorage.removeItem(`nirium-vault-${baseAsset}-${account.address}`);
+            localStorage.removeItem(`nirium-vault-v2-${baseAsset}-${account.address}`);
             localStorage.removeItem(`nirium-vault-balance-${vaultData.vaultId}-${baseAsset}`);
 
             setVaultId(null);
@@ -1878,7 +2066,7 @@ function DashboardContent() {
             </div>
 
             {/* Real-Time Analytics Bar */}
-            <div className="w-full max-w-[1600px] mx-auto grid grid-cols-2 md:grid-cols-4 gap-4 mb-8 relative z-10">
+            <div className="w-full max-w-[1600px] mx-auto grid grid-cols-2 md:grid-cols-5 gap-4 mb-8 relative z-10">
                 <div className="glass-panel p-4 rounded-xl border border-white/5">
                     <h3 className="text-xs text-gray-400 uppercase tracking-wider mb-1">Secure Vault TVL</h3>
                     <div className="text-xl font-mono text-white font-bold">
@@ -1887,6 +2075,26 @@ function DashboardContent() {
                     <div className="text-[10px] text-gray-500 mt-1 flex items-center gap-1.5 font-sans">
                         <div className="w-1 h-1 rounded-full bg-stellar-teal" />
                         WALLET: {walletBalance.toFixed(3)} {baseAsset}
+                    </div>
+                </div>
+                <div className="glass-panel p-4 rounded-xl border border-green-500/20 hover:border-green-500/40 transition-all cursor-pointer" onClick={handleOpenRamp}>
+                    <h3 className="text-xs text-green-400 uppercase tracking-wider mb-1 flex items-center gap-1.5">
+                        <span className="text-base">🇲🇽</span> CETES (MXN Bonds)
+                    </h3>
+                    <div className="text-xl font-mono text-green-400 font-bold">
+                        {parseFloat(cetesBalance).toLocaleString(undefined, { maximumFractionDigits: 2 })} <span className="text-xs text-gray-500">CETES</span>
+                    </div>
+                    <div className="text-[10px] text-gray-500 mt-1 flex items-center gap-1.5 font-sans">
+                        {hasCetesTrust ? (
+                            <>
+                                <div className="w-1 h-1 rounded-full bg-green-500 animate-pulse" />
+                                Click to Buy CETES via SPEI
+                            </>
+                        ) : (
+                            <button onClick={(e) => { e.stopPropagation(); handleAddCETESTrustline(); }} className="text-yellow-400 hover:text-yellow-300 underline">
+                                Add Trustline First
+                            </button>
+                        )}
                     </div>
                 </div>
                 <div className="glass-panel p-4 rounded-xl border border-white/5">
@@ -1953,6 +2161,13 @@ function DashboardContent() {
                                                 className={`px-3 py-1 rounded-md text-xs font-bold transition-colors ${baseAsset === 'XLM' ? 'bg-[#4ca2ff] text-white shadow-lg' : 'text-gray-500 hover:text-white'}`}
                                             >
                                                 XLM
+                                            </button>
+                                            <button
+                                                onClick={() => setBaseAsset('CETES')}
+                                                className={`px-3 py-1 rounded-md text-xs font-bold transition-colors ${baseAsset === 'CETES' ? 'bg-green-600 text-white shadow-lg' : 'text-gray-500 hover:text-white'}`}
+                                                title="Mexican Treasury Bonds (Etherfuse)"
+                                            >
+                                                🇲🇽 CETES
                                             </button>
                                         </div>
                                     </div>

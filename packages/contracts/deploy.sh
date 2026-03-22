@@ -60,21 +60,21 @@ success "Account verified and funded."
 
 # ─── Step 1: Build Contracts ────────────────────────────────
 log "Building Soroban contracts..."
-stellar contract build 2>&1 || error "Contract build failed."
+cargo build --target wasm32-unknown-unknown --release 2>&1 || error "Contract build failed."
 success "Contracts built successfully."
 
 # Verify WASM output exists
-if [ ! -f "${WASM_DIR}/nirium_contracts.wasm" ]; then
-    error "WASM binary not found at ${WASM_DIR}/nirium_contracts.wasm"
+if [ ! -f "../../target/wasm32-unknown-unknown/release/nirium_contracts.wasm" ]; then
+    error "WASM binary not found at ../../target/wasm32-unknown-unknown/release/nirium_contracts.wasm"
 fi
 
-WASM_SIZE=$(wc -c < "${WASM_DIR}/nirium_contracts.wasm")
+WASM_SIZE=$(wc -c < "../../target/wasm32-unknown-unknown/release/nirium_contracts.wasm")
 log "WASM binary size: ${WASM_SIZE} bytes"
 
 # ─── Step 2: Deploy NiriumVault ─────────────────────────────
 log "Deploying NiriumVault contract..."
 VAULT_ID=$(stellar contract deploy \
-    --wasm "${WASM_DIR}/nirium_contracts.wasm" \
+    --wasm "../../target/wasm32-unknown-unknown/release/nirium_contracts.wasm" \
     --source "${STELLAR_SECRET_KEY}" \
     --rpc-url "${SOROBAN_RPC_URL}" \
     --network-passphrase "${SOROBAN_NETWORK_PASSPHRASE}" 2>&1)

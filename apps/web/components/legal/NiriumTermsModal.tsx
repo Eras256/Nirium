@@ -19,19 +19,28 @@ export default function NiriumTermsModal({ walletAddress }: NiriumTermsProps) {
     useEffect(() => {
         if (!walletAddress) return;
 
-        const checkSignature = async () => {
-            try {
-                const res = await fetch(`/api/legal/sign?wallet=${walletAddress}`);
-                if (!res.ok) throw new Error("Failed to check signature");
-                const { hasSigned } = await res.json();
-                if (!hasSigned) setHasSigned(false);
-            } catch (error) {
-                console.error("Check signature error:", error);
-                setHasSigned(false);
-            }
-        };
+        // Check localStorage first (fast, no server required)
+        const localKey = `nirium-terms-signed-${walletAddress}`;
+        const localSigned = localStorage.getItem(localKey);
+        if (localSigned) {
+            setHasSigned(true);
+            return;
+        }
 
-        checkSignature();
+        // Optionally try the server as a secondary check (but don't block on failure)
+        fetch(`/api/legal/sign?wallet=${walletAddress}`)
+            .then(res => res.ok ? res.json() : null)
+            .then(data => {
+                if (data?.hasSigned) {
+                    setHasSigned(true);
+                } else {
+                    setHasSigned(false);
+                }
+            })
+            .catch(() => {
+                // Server unavailable \u2014 localStorage is authoritative
+                setHasSigned(false);
+            });
     }, [walletAddress]);
 
     const handleSignTerms = async () => {
@@ -44,21 +53,21 @@ export default function NiriumTermsModal({ walletAddress }: NiriumTermsProps) {
 
             if (!signedMessage) throw new Error("Signature failed or was rejected");
 
-            const res = await fetch('/api/legal/sign', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    wallet_address: walletAddress,
-                    signature_hash: signedMessage,
-                    message_signed: message,
-                    network: 'stellar:testnet',
-                    accepted_at: new Date().toISOString()
-                })
-            });
+            // Store signature in localStorage (temporary for hackathon demo)
+            // TODO: Replace with Supabase storage in production
+            const signatureData = {
+                wallet_address: walletAddress,
+                signature_hash: signedMessage,
+                message_signed: message,
+                network: 'stellar:testnet',
+                accepted_at: new Date().toISOString()
+            };
 
-            if (!res.ok) {
-                const data = await res.json();
-                throw new Error(data.error || "Failed to submit signature");
+            try {
+                localStorage.setItem(`nirium-terms-signed-${walletAddress}`, JSON.stringify(signatureData));
+                console.log('[Terms] Signature stored in localStorage:', signatureData);
+            } catch (e) {
+                console.warn('[Terms] Failed to store signature in localStorage:', e);
             }
 
             setHasSigned(true);

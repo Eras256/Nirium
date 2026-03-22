@@ -151,11 +151,12 @@ impl NiriumVaultContract {
 
     /// Create a new vault. The caller becomes the owner.
     /// A deployment fee is collected and sent to the treasury.
-    pub fn create_vault(env: Env, owner: Address, token_address: Address, name: String) -> Vault {
+    pub fn create_vault(env: Env, owner: Address, token_address: Address, name: String, xlm_address: Address) -> Vault {
         owner.require_auth();
 
+        // Platform fee: 12.5 XLM (always charged in XLM regardless of Vault's base currency)
         let treasury: Address = env.storage().instance().get(&DataKey::Treasury).unwrap();
-        let xlm_client = token::Client::new(&env, &token_address);
+        let xlm_client = token::Client::new(&env, &xlm_address);
         xlm_client.transfer(&owner, &treasury, &DEPLOYMENT_FEE);
 
         let prev_fees: i128 = env

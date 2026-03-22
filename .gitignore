@@ -65,3 +65,4 @@ implementation_plan.json
 *.log
 .pyre_configuration
 pyrightconfig.json
+apps/web/.env.local
