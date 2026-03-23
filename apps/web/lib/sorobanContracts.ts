@@ -55,9 +55,8 @@ export const CETES_ASSET = {
     issuer: 'GC3CW7EDYRTWQ635VDIGY6S4ZUF5L6TQ7AA4MWS7LEQDBLUSZXV7UPS4',
 } as const;
 
-// CETES Contract Address (for Soroban vaults) - UPDATED 2026-03-22
+// CETES Contract Address (for Soroban vaults) - SAC Wrapper
 export const CETES_ASSET_ID = 'CC72F57YTPX76HAA64JQOEGHQAPSADQWSY5DWVBR66JINPFDLNCQYHIC';
-console.log('🔍 [CETES_ASSET_ID LOADED]:', CETES_ASSET_ID);
 
 // Etherfuse On/Off Ramp URLs
 export const ETHERFUSE_RAMP_URL = 'https://devnet.etherfuse.com';

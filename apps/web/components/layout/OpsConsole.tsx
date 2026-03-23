@@ -31,6 +31,7 @@ export default function OpsConsole({ isExpanded, onToggleExpand, walletAddress }
 
                 if (data && !error) {
                     setLogs(data.reverse()); // oldest first
+                    setStatus('online');
                 }
             } catch (e) {
                 console.error("Failed to fetch initial logs", e);
@@ -50,6 +51,9 @@ export default function OpsConsole({ isExpanded, onToggleExpand, walletAddress }
                 },
                 (payload) => {
                     const newLog = payload.new as any;
+                    
+                    // Fallback: if we are getting data, we are online
+                    if (status !== 'online') setStatus('online');
 
                     setLogs(prev => {
                         const exists = prev.some(l => l.id === payload.new.id);
@@ -58,15 +62,19 @@ export default function OpsConsole({ isExpanded, onToggleExpand, walletAddress }
                     });
                 }
             )
-            .subscribe((s) => {
-                if (s === 'SUBSCRIBED') {
+            .subscribe((status, err) => {
+                console.log(`[Supabase Realtime] Channel status: ${status}`, err || "");
+                if (status === 'SUBSCRIBED') {
                     setStatus('online');
-                } else if (s === 'CLOSED' || s === 'CHANNEL_ERROR') {
-                    setStatus('unavailable');
+                } else if (status === 'CLOSED' || status === 'CHANNEL_ERROR' || status === 'TIMED_OUT') {
+                    console.error(`[Supabase Realtime] Connection error: ${status}`, err);
+                    // Don't set to unavailable immediately if we have logs (might be intermittent)
+                    if (logs.length === 0) setStatus('unavailable');
                 }
             });
 
         return () => {
+            console.log(`[Supabase Realtime] Cleaning up channel...`);
             db.removeChannel(channel);
         };
     }, []);

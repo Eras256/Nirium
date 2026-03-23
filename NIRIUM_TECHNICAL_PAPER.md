@@ -4,7 +4,7 @@
 ---
 
 ## 1. Abstract
-Nirium is a decentralized infrastructure protocol designed for the orchestration of **Sovereign AI Agents** on the Stellar network. By combining **Soroban Smart Contracts** with a high-fidelity **Neural Matrix (LLM)** layer, Nirium enables a new class of financial actors: autonomous, self-custodial AI entities that can navigate complex DeFi environments. The protocol introduces three key innovations: **Single-Invocation Atomic Flash Loans**, an **On-Chain ELO Meritocracy**, and a **BlackBox Audit Immutable Archive**. This paper details the architectural implementation, economic incentives, and security of the Nirium Protocol.
+Nirium is a decentralized infrastructure protocol designed for the orchestration of **Sovereign AI Agents** on the Stellar network. By combining **Soroban Smart Contracts** with a high-fidelity **Neural Matrix (LLM)** layer, Nirium enables a new class of financial actors: autonomous, self-custodial AI entities that can navigate complex DeFi environments spanning both cryptocurrency and **Real-World Assets (RWAs)**. The protocol introduces four key innovations: **Multi-Asset Vault System** (XLM, USDC, CETES), **Single-Invocation Atomic Flash Loans**, an **On-Chain ELO Meritocracy**, and a **BlackBox Audit Immutable Archive**. This paper details the architectural implementation, economic incentives, and security of the Nirium Protocol.
 
 ---
 
@@ -18,10 +18,16 @@ A Sentinel in Nirium can be either a Human or an AI Agent. Both are tracked by t
 
 ## 3. On-Chain Protocol Architecture (Soroban-Native)
 
-### 3.1 NiriumVault: Atomic Orchestration Engine
-The `NiriumVault` contract is the primary entry point for capital. It implements two critical security boundaries:
+### 3.1 NiriumVault: Multi-Asset Orchestration Engine
+The `NiriumVault` contract is the primary entry point for capital, supporting three asset types through Stellar Asset Contracts (SAC):
+- **XLM**: Native Stellar lumens (Contract: `CDLZFC3SYJYDZT7K67VZ75HPJVIEUVNIXF47ZG2FB2RMQQVU2HHGCYSC`)
+- **USDC**: Circle USD stablecoin (Contract: `CBIELTK6YBZJU5UP2WWQEUCYKLPU6AUNZ2BQ4WWFEIE3USCIHMXQDAMA`)
+- **CETES**: Mexican Federal Treasury Certificates via Etherfuse (Contract: `CC72F57YTPX76HAA64JQOEGHQAPSADQWSY5DWVBR66JINPFDLNCQYHIC`)
+
+The vault implements three critical security boundaries:
 - **Authorization Boundary**: Deposits and withdrawals are strictly restricted to the owner (`require_auth`).
-- **Execution Boundary**: Agents can only execute pre-authorized functions (`execute_path_arbitrage`, `execute_cross_dex`) within defined `max_execution_amount` limits.
+- **Asset Isolation**: Each vault is tied to a specific asset type, preventing cross-contamination.
+- **Execution Boundary**: Agents can only execute pre-authorized functions within defined `max_execution_amount` limits.
 
 #### 3.1.1 Single-Invocation Flash Loan (SIFL) Pattern
 Unlike traditional flash loans that require separate "borrow" and "repay" steps (often leading to "Hot Potato" vulnerabilities), Nirium implements an atomic pattern:
@@ -85,7 +91,34 @@ The protocol implements `Pausable` states and `max_execution_amount` per delegat
 
 ---
 
-## 6. Economic Model: Matrix Fee
+## 6. Real-World Asset Integration: CETES on Stellar
+
+### 6.1 Etherfuse Partnership
+Nirium integrates **CETES** (Certificados de la Tesorería de la Federación - Mexican Federal Treasury Certificates) through a partnership with Etherfuse, enabling AI agents to manage real-world government bonds alongside cryptocurrency assets.
+
+### 6.2 Stellar Asset Contract (SAC) Architecture
+CETES tokens are wrapped as Stellar Asset Contracts, allowing seamless interaction with Soroban smart contracts:
+- **Classic Asset**: `CETES:GC3CW7EDYRTWQ635VDIGY6S4ZUF5L6TQ7AA4MWS7LEQDBLUSZXV7UPS4`
+- **SAC Address**: `CC72F57YTPX76HAA64JQOEGHQAPSADQWSY5DWVBR66JINPFDLNCQYHIC`
+- **Decimals**: 7 (matching Stellar standard)
+
+### 6.3 Mexican Market Access
+The CETES integration enables:
+- **Fiat On-Ramp**: Mexican users can convert MXN to CETES via Etherfuse's SPEI integration
+- **Autonomous Management**: AI agents can create vaults, deposit, and withdraw CETES programmatically
+- **Cross-Border DeFi**: International users gain access to Mexican government bonds without traditional banking barriers
+
+### 6.4 Swarm Operations with CETES
+The autonomous swarm executes three CETES-specific operations:
+1. **Vault Creation** (5% probability): Creates CETES-denominated vaults
+2. **Deposits** (10% probability): 100-1000 CETES deposits
+3. **Withdrawals** (5% probability): 50-500 CETES withdrawals
+
+This extends the total operation distribution from 17 to 20 weighted operations, with an estimated 90 CETES vaults and 8,640 total vault operations per hour.
+
+---
+
+## 7. Economic Model: Matrix Fee
 Nirium avoids inflationary token models. Instead, it operates on a **Value-Capture model**:
 - **Protocol Fee**: 1% of net realized profit from autonomous executions.
 - **Vault Deployment**: 12.5 XLM (one-time) for anti-spam.
@@ -93,18 +126,35 @@ Nirium avoids inflationary token models. Instead, it operates on a **Value-Captu
 
 ---
 
-## 7. Performance Benchmarks (Stellar Testnet)
-- **Max Throughput per Wallet**: ~1.2M atomic operations/month.
-- **Average Interaction Latency**: ~3.5s (Data ingestion to TX Finality).
-- **Data Sync Latency**: <100ms (On-chain to UI).
+## 8. Performance Benchmarks (Stellar Testnet)
+- **Active Agents**: 30 autonomous units
+- **Supported Assets**: 3 (XLM, USDC, CETES)
+- **Total Operations**: 20 weighted operations (9 SDEX + 8 Vault + 3 CETES)
+- **Estimated Vault Creation**: 90 vaults (30 XLM + 30 USDC + 30 CETES)
+- **Vault Operations Throughput**: ~8,640 ops/hour
+- **Max Throughput per Wallet**: ~1.2M atomic operations/month
+- **Average Interaction Latency**: ~3.5s (Data ingestion to TX Finality)
+- **Data Sync Latency**: <100ms (On-chain to UI via Supabase Realtime)
 
 ---
 
-## 8. Data Sovereignty: Master Schema
+## 9. Data Sovereignty: Master Schema
 The protocol infrastructure is centered around a consolidated **Supabase Master Schema**, enabling sub-100ms real-time synchronization of the Neural Feed, Leaderboard, and Marketplace logic. This schema ensures a unified source of truth for all protocol actors (Agents, Creators, and Stakers).
 
-## 9. Conclusion
-Nirium represents a significant leap in DeFi autonomy. By treating AI as a first-class citizen with cryptographic rights and on-chain accountability, we are building the first protocol capable of true **Intelligent Capital Management**.
+## 10. Recent Technical Refinements: From Demo to On-Chain Reality
+
+During the final development of the hackathon, critical architectural adjustments were made to solidify the protocol's execution guarantees:
+
+1. **Eradication of Simulated State:** Early UI prototypes relied on `localStorage` and simulated zero-value interactions. The Next.js client is now exclusively wired to raw Soroban contract calls, guaranteeing that every vault creation, deposit (XLM, USDC, CETES), and withdrawal is a cryptographically verifiable transaction on the Stellar Testnet. 
+2. **Multi-Asset Fee Decoupling:** A critical bug was resolved in the `NiriumVault` contract where non-native vaults (like USDC) attempted to charge the platform deployment fee in their base asset. We introduced a decoupled `xlm_address` parameter to the `create_vault` ABI, ensuring the 12.5 platform fee is consistently settled in native XLM without compromising the vault's internal asset accounting.
+3. **CETES Expansion Operations:** The Soroban smart contracts and Swarm agent pipelines were expanded to fully support the Mexican Treasury Bond (CETES) tokenization layer via Etherfuse. The AI swarm now seamlessly distributes its actions across XLM, USDC, and CETES operations (Vault Creation, Deposits, and Withdrawals).
+4. **State Persistence & Server Hardening:** In-memory API key stores for the agent server were replaced with robust Supabase PostgreSQL persistence, ensuring that agent authentication remains robust across server redeployments and silent failures are forcefully rejected upon initialization.
+
+---
+
+## 11. Conclusion
+
+Nirium represents a significant leap in DeFi autonomy. By treating AI as a first-class citizen with cryptographic rights and on-chain accountability, we are building the first protocol capable of true **Intelligent Capital Management** spanning both cryptocurrency and real-world assets. The integration of CETES (Mexican Treasury Bonds) demonstrates Nirium's ability to bridge traditional finance with decentralized autonomous systems, opening new frontiers for AI-managed portfolios that include government securities alongside digital assets.
 
 ---
 **Authors**: Vaiosx, M0nsxx.  

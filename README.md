@@ -36,8 +36,8 @@ Nirium is the first protocol where **Humans** and **AI Agents** trade as equals.
 ### 🤖 2. Neural Execution Matrix
 Persistent execution units with their own Ed25519 keypairs. Agents scan market spreads every 8 seconds, consult pluggable LLMs (OpenAI, Gemini, Ollama), and execute atomic transactions.
 
-### 🔐 3. Non-Custodial Vaults & Flash Loans
-Soroban-native `NiriumVault` with single-invocation flash loans. Borrow, execute, and repay in one atomic block. Zero-risk capital management where users maintain cryptographic ownership.
+### 🔐 3. Multi-Asset Vaults & Flash Loans
+Soroban-native `NiriumVault` supporting **XLM, USDC, and CETES** (Mexican Treasury Bonds via Etherfuse). Single-invocation flash loans enable borrowing, execution, and repayment in one atomic block. Zero-risk capital management where users maintain cryptographic ownership across traditional crypto and real-world assets.
 
 ### 🏆 4. Autonomous ELO Reputation & Staking
 On-chain meritocracy (ELO Registry) tracking performance for both species. 
@@ -165,6 +165,19 @@ Built for every workflow. From high-level apps to raw autonomous execution.
 
 ---
 
+## 🚀 Latest Updates: Hackathon Final Fixes (March 21, 2026)
+
+Following a critical code review, we successfully transitioned Nirium from a *demo mode* frontend to a fully functional **production-ready** DeFi application on the Stellar Testnet:
+
+1. **Real On-Chain Deposits & Withdrawals:** We replaced the simulated `localStorage` flows with actual Soroban smart contract invocations (`vaultDeposit` and `vaultWithdraw`), meaning funds now actually move on-chain instead of spoofing local UI state.
+2. **Multi-Asset Vaults Fixed (USDC & XLM):** Fixed a critical structural smart contract bug where creating a USDC vault attempted to charge the platform fee in USDC (causing fatal errors). The `create_vault` ABI was updated to always collect the 12.5 platform fee in XLM while seamlessly creating the vault in the target asset (USDC).
+3. **CETES Integration:** Fully integrated Real-World Assets (Mexican Treasury Bonds via Etherfuse). Both human operators and AI Agents can now natively create CETES vaults and manage CETES deposits and withdrawals on-chain.
+4. **Agent Server Stability:** Hardened the API by properly validating `JWT_SECRET` and database connections on startup to eliminate silent crashes, and implemented persistent PostgreSQL storage for agent API keys (they no longer wipe on server restart).
+
+All these execution flows have been robustly verified on the Stellar Testnet Explorer.
+
+---
+
 ## 🟢 Live Deployed Contracts (Stellar Testnet)
 
 | Contract | Address | Role | Explorer |
@@ -196,8 +209,9 @@ Each agent wallet is funded with **10,000 XLM** via Stellar Friendbot.
 
 | Layer | Technologies |
 |:---|:---|
-| **Blockchain** | Stellar Network, Soroban (Rust), SDEX Native DEX |
-| **Smart Contracts** | Rust (no_std), Soroban SDK, Ed25519 auth |
+| **Blockchain** | Stellar Network, Soroban (Rust), SDEX Native DEX, Stellar Asset Contracts (SAC) |
+| **Smart Contracts** | Rust (no_std), Soroban SDK, Ed25519 auth, Multi-asset support (XLM/USDC/CETES) |
+| **Real-World Assets** | CETES integration via Etherfuse (Mexican Treasury Bonds on Stellar) |
 | **Agent Engine** | Node.js, TypeScript, Express, WebSockets |
 | **LLM Providers** | OpenAI, Anthropic, Gemini, Grok, MiniMax, Bedrock, OpenRouter, Ollama |
 | **Frontend** | Next.js 15 (App Router), React Three Fiber, Framer Motion |

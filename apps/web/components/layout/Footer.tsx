@@ -31,8 +31,9 @@ export default function Footer() {
     const [contractHref, setContractHref] = useState("https://stellar.expert/explorer/testnet");
 
     useEffect(() => {
-        if (process.env.NEXT_PUBLIC_CONTRACT_SENTINEL) {
-            setContractHref(`https://stellar.expert/explorer/testnet/contract/${process.env.NEXT_PUBLIC_CONTRACT_SENTINEL}`);
+        if (process.env.NEXT_PUBLIC_CONTRACT_VAULT) {
+            const network = process.env.NEXT_PUBLIC_STELLAR_NETWORK === 'public' ? 'public' : 'testnet';
+            setContractHref(`https://stellar.expert/explorer/${network}/contract/${process.env.NEXT_PUBLIC_CONTRACT_VAULT}`);
         }
     }, []);
 
