@@ -393,7 +393,9 @@ function PodiumCard({ agent, rank }: { agent: LeaderboardEntry; rank: number }) 
 // ─── Placeholder while table is empty ────────────────────────────
 const PLACEHOLDER_AGENTS: LeaderboardEntry[] = [
     'Titan', 'Eliza', 'Maux', 'Chronos', 'Astra', 'Void', 'Nexus',
-    'Gaia', 'Orion', 'Sentinel', 'Matrix', 'Atlas', 'Nova', 'Cyber', 'Nirium-1'
+    'Gaia', 'Orion', 'Sentinel', 'Matrix', 'Atlas', 'Nova', 'Cyber', 'Nirium-1',
+    'Aether', 'Beryl', 'Cipher', 'Drift', 'Eon', 'Flux', 'Glitch',
+    'Helix', 'Ion', 'Jade', 'Krypton', 'Lumen', 'Mite', 'Neon', 'Ozone'
 ].map((name, i) => ({
     rank: i + 1, name, address: 'G' + '0'.repeat(55),
     totalTxs: 0, sorobanTxs: 0, sdexTxs: 0,

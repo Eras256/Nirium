@@ -28,7 +28,7 @@ export default function Footer() {
         { label: t.footer.neural_plugins, href: "/plugins" },
     ];
 
-    const [contractHref, setContractHref] = useState("https://stellar.expert/explorer/testnet");
+    const [contractHref, setContractHref] = useState("https://stellar.expert/explorer/testnet/contract/CB67X4QCJDD4ZCKDXSW34M5H5WDUXEGOP3WKND6YSUCGPTTO4ODZ4HEN");
 
     useEffect(() => {
         if (process.env.NEXT_PUBLIC_CONTRACT_VAULT) {

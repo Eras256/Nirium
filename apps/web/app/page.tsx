@@ -39,10 +39,9 @@ const AGENT_NAMES = [
 ];
 
 const CONTRACTS = [
-    { name: 'NiriumVault', addr: 'CDHDX63...Y7GA2', full: 'CDHDX63NUYSFCIPJTTS46N5PYLTI7J5WIAIOP7TZSPBNUTLI32AY7GA2', role_key: 'vault', color: '#2DEBE8' },
-    { name: 'Sentinel ELO', addr: 'CATYFAFL...OUEK', full: 'CATYFAFL7QCBKSK3OSVNWA4O2VXWOADJ6IPNLCT2INXHP24OIUHZOUEK', role_key: 'sentinel', color: '#FFD700' },
-    { name: 'ELO Registry', addr: 'CCDTPOO...V7BA', full: 'CCDTPOOGRUOTQZPDGSCA2EJGMZHWYD4FMHAINXXSE5VFM6T2FXSPV7BA', role_key: 'elo', color: '#A78BFA' },
-    { name: 'Marketplace', addr: 'CCAFXJO...XAPP', full: 'CCAFXJOVJW7JH4JVDCEBACVHIW764MKFZNWMH63UARUJLHDKWAIVXAPP', role_key: 'marketplace', color: '#34D399' },
+    { name: 'Nirium Vault', addr: 'CB67...DHEN', full: 'CB67X4QCJDD4ZCKDXSW34M5H5WDUXEGOP3WKND6YSUCGPTTO4ODZ4HEN', role_key: 'vault', color: '#00F3FF' },
+    { name: 'ELO Registry', addr: 'CB4R...XW4H', full: 'CB4RCN4YHLCX2SIFMEJJSMDBWO6NPJHMDLSSKA4CT4HRTD2TFCU6XW4H', role_key: 'elo', color: '#A78BFA' },
+    { name: 'Marketplace', addr: 'CCUD...BLEN', full: 'CCUDDIF6BIIA6NZNSDD63KNWMEAPYTB5WHRDMU2IGOATBCZF6KV6BLEN', role_key: 'marketplace', color: '#34D399' },
 ];
 
 export default function Home() {

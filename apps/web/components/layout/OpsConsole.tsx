@@ -63,13 +63,16 @@ export default function OpsConsole({ isExpanded, onToggleExpand, walletAddress }
                 }
             )
             .subscribe((status, err) => {
-                console.log(`[Supabase Realtime] Channel status: ${status}`, err || "");
                 if (status === 'SUBSCRIBED') {
                     setStatus('online');
                 } else if (status === 'CLOSED' || status === 'CHANNEL_ERROR' || status === 'TIMED_OUT') {
-                    console.error(`[Supabase Realtime] Connection error: ${status}`, err);
-                    // Don't set to unavailable immediately if we have logs (might be intermittent)
-                    if (logs.length === 0) setStatus('unavailable');
+                    // Transient disconnects are normal — only warn, don't error
+                    console.warn(`[Supabase Realtime] ${status} (will auto-reconnect)`);
+                    // Keep 'online' status if we already loaded logs via REST
+                    setLogs(prev => {
+                        if (prev.length === 0) setStatus('unavailable');
+                        return prev;
+                    });
                 }
             });
 

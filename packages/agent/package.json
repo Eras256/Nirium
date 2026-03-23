@@ -9,6 +9,8 @@
         "dev": "tsx watch src/index.ts",
         "build": "tsc",
         "start": "node dist/index.js",
+        "swarm": "tsx scripts/nirium_full_swarm.ts",
+        "generate-swarm": "tsx scripts/generate_swarm.ts",
         "lint": "eslint src/",
         "test": "jest --passWithNoTests"
     },
