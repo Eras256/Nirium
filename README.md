@@ -111,16 +111,16 @@ Built for every workflow. From high-level apps to raw autonomous execution.
   │  │                                                      │  │
   │  │  ┌───────────────┐  ┌──────────────┐                │  │
   │  │  │  NiriumVault  │  │  ELO Registry │                │  │
-  │  │  │  CDHDX63...   │  │  CCDTPO...    │                │  │
+  │  │  │  CB67X4...    │  │  CB4RCN...    │                │  │
   │  │  │  Flash Loans  │  │  Reputation   │                │  │
-  │  │  │  Vaults       │  │  Tiers        │                │  │
+  │  │  │  Multi-Asset  │  │  Tiers        │                │  │
   │  │  │  Delegation   │  │  K=32 factor  │                │  │
   │  │  └───────────────┘  └──────────────┘                │  │
   │  │  ┌───────────────┐  ┌──────────────┐                │  │
-  │  │  │ Sentinel ELO  │  │  Marketplace │                │  │
-  │  │  │  CATYFAFL...  │  │  CCAFXJO...  │                │  │
-  │  │  │  Score Calc   │  │  IPFS CIDs   │                │  │
-  │  │  │  Win/Loss     │  │  USDC subs   │                │  │
+  │  │  │  CETES SAC    │  │  Marketplace │                │  │
+  │  │  │  CC72F57...   │  │  CCUDDI...   │                │  │
+  │  │  │  Etherfuse    │  │  IPFS CIDs   │                │  │
+  │  │  │  RWA Bonds    │  │  USDC subs   │                │  │
   │  │  └───────────────┘  └──────────────┘                │  │
   │  └─────────────────────────────────────────────────────┘  │
   │                                                           │
@@ -165,16 +165,27 @@ Built for every workflow. From high-level apps to raw autonomous execution.
 
 ---
 
-## 🚀 Latest Updates: Hackathon Final Fixes (March 21, 2026)
+## 🚀 Latest Updates: Production-Ready Multi-Asset Protocol (March 24, 2026)
 
-Following a critical code review, we successfully transitioned Nirium from a *demo mode* frontend to a fully functional **production-ready** DeFi application on the Stellar Testnet:
+Following critical code reviews and architectural iterations, Nirium has been fully transitioned from a *demo mode* frontend to a **production-ready** multi-asset DeFi protocol on the Stellar Testnet:
 
-1. **Real On-Chain Deposits & Withdrawals:** We replaced the simulated `localStorage` flows with actual Soroban smart contract invocations (`vaultDeposit` and `vaultWithdraw`), meaning funds now actually move on-chain instead of spoofing local UI state.
-2. **Multi-Asset Vaults Fixed (USDC & XLM):** Fixed a critical structural smart contract bug where creating a USDC vault attempted to charge the platform fee in USDC (causing fatal errors). The `create_vault` ABI was updated to always collect the 12.5 platform fee in XLM while seamlessly creating the vault in the target asset (USDC).
-3. **CETES Integration:** Fully integrated Real-World Assets (Mexican Treasury Bonds via Etherfuse). Both human operators and AI Agents can now natively create CETES vaults and manage CETES deposits and withdrawals on-chain.
-4. **Agent Server Stability:** Hardened the API by properly validating `JWT_SECRET` and database connections on startup to eliminate silent crashes, and implemented persistent PostgreSQL storage for agent API keys (they no longer wipe on server restart).
+### Smart Contract Evolution
+1. **New Sentinel→Vault Deployment:** Deployed a new `NiriumVault` contract (`CB67X4...DHEN`) replacing the original instance, with full multi-asset support and decoupled fee architecture.
+2. **Multi-Asset Fee Decoupling:** Fixed a critical bug where non-native vaults (USDC/CETES) attempted to charge the platform fee in the vault's base asset. The `create_vault` ABI now accepts an explicit `xlm_address` parameter, ensuring the 12.5 XLM deployment fee is always settled in native XLM.
+3. **Triple-Asset Vault Operations:** All three asset types — **XLM**, **USDC**, and **CETES** — support full create → deposit → withdraw lifecycle, verified on-chain.
 
-All these execution flows have been robustly verified on the Stellar Testnet Explorer.
+### CETES (Real-World Assets) Integration
+4. **Etherfuse CETES SAC:** Deployed Stellar Asset Contract at `CC72F57...YHIC` wrapping Mexican Federal Treasury Certificates. CETES issuer confirmed on Testnet: `GC3CW7...UPS4`.
+5. **Fiat On-Ramp Pipeline:** Full Etherfuse API integration (Sandbox) — KYC onboarding, quote generation, SPEI on-ramp orders, and order status tracking.
+6. **Dashboard CETES Panel:** CETES balance display, trustline management (add/verify), and "Buy via SPEI" flow integrated directly into the operator dashboard.
+
+### Frontend & Infrastructure
+7. **Real On-Chain Deposits & Withdrawals:** Replaced all simulated `localStorage` flows with actual Soroban contract invocations (`vaultDeposit`/`vaultWithdraw`), ensuring all funds move on-chain.
+8. **Agent Server Stability:** Hardened the API by validating `JWT_SECRET` and database connections on startup; persistent PostgreSQL storage for agent API keys.
+9. **30-Agent Swarm V2:** Expanded from 15 to 30 autonomous agents, each racing independently with 20 weighted Soroban operations (including 3 CETES-specific ops) and SDEX swaps.
+10. **Test Suite:** 579 lines of comprehensive Rust tests covering vaults, delegation, flash loans, path arbitrage, cross-DEX, and edge cases.
+
+All execution flows verified on [Stellar Expert](https://stellar.expert/explorer/testnet).
 
 ---
 
@@ -182,10 +193,15 @@ All these execution flows have been robustly verified on the Stellar Testnet Exp
 
 | Contract | Address | Role | Explorer |
 |:---|:---|:---|:---|
-| **NiriumVault** | `CDHDX63NUYSFCIPJTTS46N5PYLTI7J5WIAIOP7TZSPBNUTLI32AY7GA2` | Treasury + Flash Loans | [🔍 View](https://stellar.expert/explorer/testnet/contract/CDHDX63NUYSFCIPJTTS46N5PYLTI7J5WIAIOP7TZSPBNUTLI32AY7GA2) |
-| **Sentinel ELO** | `CATYFAFL7QCBKSK3OSVNWA4O2VXWOADJ6IPNLCT2INXHP24OIUHZOUEK` | Agent reputation scoring | [🔍 View](https://stellar.expert/explorer/testnet/contract/CATYFAFL7QCBKSK3OSVNWA4O2VXWOADJ6IPNLCT2INXHP24OIUHZOUEK) |
-| **ELO Registry** | `CCDTPOOGRUOTQZPDGSCA2EJGMZHWYD4FMHAINXXSE5VFM6T2FXSPV7BA` | On-chain ELO ledger | [🔍 View](https://stellar.expert/explorer/testnet/contract/CCDTPOOGRUOTQZPDGSCA2EJGMZHWYD4FMHAINXXSE5VFM6T2FXSPV7BA) |
-| **Strategy Marketplace** | `CCAFXJOVJW7JH4JVDCEBACVHIW764MKFZNWMH63UARUJLHDKWAIVXAPP` | Buy/sell strategies | [🔍 View](https://stellar.expert/explorer/testnet/contract/CCAFXJOVJW7JH4JVDCEBACVHIW764MKFZNWMH63UARUJLHDKWAIVXAPP) |
+| **NiriumVault** | `CB67X4QCJDD4ZCKDXSW34M5H5WDUXEGOP3WKND6YSUCGPTTO4ODZ4HEN` | Multi-Asset Treasury + Flash Loans | [🔍 View](https://stellar.expert/explorer/testnet/contract/CB67X4QCJDD4ZCKDXSW34M5H5WDUXEGOP3WKND6YSUCGPTTO4ODZ4HEN) |
+| **ELO Reputation** | `CB4RCN4YHLCX2SIFMEJJSMDBWO6NPJHMDLSSKA4CT4HRTD2TFCU6XW4H` | Sentinel ELO scoring & tiering | [🔍 View](https://stellar.expert/explorer/testnet/contract/CB4RCN4YHLCX2SIFMEJJSMDBWO6NPJHMDLSSKA4CT4HRTD2TFCU6XW4H) |
+| **Strategy Marketplace** | `CCUDDIF6BIIA6NZNSDD63KNWMEAPYTB5WHRDMU2IGOATBCZF6KV6BLEN` | Permissionless strategy registry | [🔍 View](https://stellar.expert/explorer/testnet/contract/CCUDDIF6BIIA6NZNSDD63KNWMEAPYTB5WHRDMU2IGOATBCZF6KV6BLEN) |
+| **CETES SAC** | `CC72F57YTPX76HAA64JQOEGHQAPSADQWSY5DWVBR66JINPFDLNCQYHIC` | Mexican Treasury Bonds (Etherfuse) | [🔍 View](https://stellar.expert/explorer/testnet/contract/CC72F57YTPX76HAA64JQOEGHQAPSADQWSY5DWVBR66JINPFDLNCQYHIC) |
+
+> **Supported Assets (SACs):**
+> - **XLM**: `CDLZFC3SYJYDZT7K67VZ75HPJVIEUVNIXF47ZG2FB2RMQQVU2HHGCYSC`
+> - **USDC**: `CBIELTK6YBZJU5UP2WWQEUCYKLPU6AUNZ2BQ4WWFEIE3USCIHMXQDAMA`
+> - **CETES**: `CC72F57YTPX76HAA64JQOEGHQAPSADQWSY5DWVBR66JINPFDLNCQYHIC` (Issuer: `GC3CW7...UPS4`)
 
 ---
 
@@ -250,7 +266,8 @@ Nirium/
 │   ├── mcp/                    # Model Context Protocol (11+ tools)
 │   ├── cli/                    # @nirium/cli dev scaffolding
 │   └── desktop/                # Tauri native wrapper
-└── supabase/                   # DB migrations + RLS policies
+├── supabase/                   # DB migrations + RLS policies
+└── deploy_vault.sh             # Quick vault deployment shortcut
 ```
 
 ---
@@ -303,11 +320,14 @@ npx tsx scripts/nirium_full_swarm.ts
 | Metric | Value |
 |:---|:---|
 | Active Agents | 30 |
-| Swarm Tick Interval | 8 seconds |
+| Swarm Tick Interval | 3–12 seconds (randomized racing) |
+| Weighted Soroban Operations | 20 (9 SDEX + 8 Vault + 3 CETES) |
 | Estimated Throughput | ~112 txs/minute |
 | Wallet Funding | 10,000 XLM/agent (Friendbot) |
 | Estimated Capacity | ~1,000,000 txs/agent |
-| Deployed Contracts | 4 (Testnet) |
+| Deployed Contracts | 4 + 3 SACs (Testnet) |
+| Supported Vault Assets | 3 (XLM, USDC, CETES) |
+| Test Coverage (Rust) | 579 lines / 14 test cases |
 | Supabase Realtime Latency | < 100ms |
 
 ---
@@ -318,7 +338,9 @@ npx tsx scripts/nirium_full_swarm.ts
 |:---|:---|
 | 🌐 Frontend (Production) | https://web-git-main-vaiosxs-projects.vercel.app |
 | 🏆 Live Leaderboard | https://web-git-main-vaiosxs-projects.vercel.app/leaderboard |
-| 🔵 NiriumVault Contract | https://stellar.expert/explorer/testnet/contract/CDHDX63NUYSFCIPJTTS46N5PYLTI7J5WIAIOP7TZSPBNUTLI32AY7GA2 |
+| 🔵 NiriumVault Contract | https://stellar.expert/explorer/testnet/contract/CB67X4QCJDD4ZCKDXSW34M5H5WDUXEGOP3WKND6YSUCGPTTO4ODZ4HEN |
+| 🟢 ELO Reputation | https://stellar.expert/explorer/testnet/contract/CB4RCN4YHLCX2SIFMEJJSMDBWO6NPJHMDLSSKA4CT4HRTD2TFCU6XW4H |
+| 🟡 CETES SAC | https://stellar.expert/explorer/testnet/contract/CC72F57YTPX76HAA64JQOEGHQAPSADQWSY5DWVBR66JINPFDLNCQYHIC |
 | 📦 GitHub | https://github.com/Eras256/Nirium |
 | 🗄️ Supabase Dashboard | https://supabase.com/dashboard/project/hnvmyjmhgcobcibnioyw |
 
@@ -364,6 +386,39 @@ Explore the live activity of our 30 strategic agents on the Stellar network.
 | **Shadow** | [GDGYI6QO...](https://stellar.expert/explorer/testnet/account/GDGYI6QOG3B4KSI2UO3VRFMQUPUYIAM73WIXYZEOSMEOHQ5WPSDXU6IL) |
 
 </details>
+
+---
+
+## 🧪 Test Coverage
+
+The Soroban smart contracts include a comprehensive test suite (`packages/contracts/tests/vault_tests.rs` — 579 lines, 14 test cases):
+
+| Category | Tests | Status |
+|:---|:---|:---:|
+| Vault Creation | Single, Multiple, Fee Collection | ✅ Passing |
+| Deposit / Withdraw | Normal, Overflow Guard | ✅ Passing |
+| Agent Delegation | Delegate, Revoke, Auth Boundary | ✅ Passing |
+| Flash Loans (SIFL) | Success, Liquidity, Revoked, Limit | ✅ Passing |
+| Stellar-Native Ops | Path Arb, Cross-DEX, Soroswap, Blend | ✅ Passing |
+| Pool Management | Creation, Fee Cap | ✅ Passing |
+
+**Pending tests:** Multi-asset specific scenarios (USDC/CETES deposits), ELO contract tests, Marketplace contract tests, end-to-end integration tests.
+
+---
+
+## 🗺️ Roadmap & Pending Work
+
+| Item | Priority | Status |
+|:---|:---:|:---:|
+| Multi-asset vault tests (USDC/CETES) | High | 🔲 Pending |
+| ELO Reputation contract tests | High | 🔲 Pending |
+| Strategy Marketplace contract tests | Medium | 🔲 Pending |
+| Staking contract implementation | Medium | 🔲 Planned |
+| End-to-end integration tests | Medium | 🔲 Pending |
+| Mainnet deployment | High | 🔲 Planned |
+| Security audit (smart contracts) | Critical | 🔲 Planned |
+| Etherfuse KYC production flow | Medium | 🔲 Pending |
+| IPFS BlackBox full pipeline | Low | 🟡 Partial |
 
 ---
 

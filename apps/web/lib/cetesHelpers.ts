@@ -4,7 +4,7 @@
  * Functions to interact with CETES Stellar Asset Contract (SAC)
  */
 
-import { Address, nativeToScVal, Contract, rpc as SorobanRpc, TransactionBuilder, Networks, Keypair } from '@stellar/stellar-sdk';
+import { Address, nativeToScVal, scValToNative, Contract, rpc as SorobanRpc, TransactionBuilder, Networks, Keypair } from '@stellar/stellar-sdk';
 import { CETES_ASSET_ID, CONTRACT_IDS } from './sorobanContracts';
 
 const RPC_URL = process.env.NEXT_PUBLIC_SOROBAN_RPC_URL || 'https://soroban-testnet.stellar.org';
@@ -144,7 +144,8 @@ export async function checkCETESAllowance(
             // Extract allowance from result
             const scVal = simResult.result.retval;
             // Parse i128 value
-            return BigInt(0); // Placeholder - parse the actual scVal
+            const nativeValue = scValToNative(scVal);
+            return BigInt(nativeValue.toString());
         }
 
         return BigInt(0);
