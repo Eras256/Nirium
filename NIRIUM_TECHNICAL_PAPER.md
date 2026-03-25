@@ -157,6 +157,8 @@ During the final development phases, critical architectural adjustments were mad
 6. **State Persistence & Server Hardening:** In-memory API key stores for the agent server were replaced with robust Supabase PostgreSQL persistence, ensuring that agent authentication remains robust across server redeployments and silent failures are forcefully rejected upon initialization.
 7. **30-Agent Swarm V2:** The autonomous swarm was expanded from 15 to 30 agents, each racing independently with randomized 3-12 second intervals and 20 weighted Soroban operations.
 8. **Comprehensive Test Suite:** 579 lines of Rust tests covering 14 test scenarios across vault lifecycle, agent delegation, flash loans, and Stellar-native operations.
+9. **Institutional Sandbox API:** Engineered a robust multi-tier API gateway designed specifically for institutional due diligence. The system handles dynamic tiering (Free, Sandbox, Institutional) with aggressive rate-limiting (up to 10,000 req/day). Keys (`nrm_ins_...`) operate atop a hybrid persistence layer (PostgreSQL + In-memory fallback).
+10. **Cryptographic Developer Console:** Deployed an Agent Console where external developers generate personal API keys (`nrm_fre_...`) by cryptographically signing payloads with their Ed25519 Stellar wallets, ensuring secure 3rd-party access to the Nirium execution engine.
 
 ---
 

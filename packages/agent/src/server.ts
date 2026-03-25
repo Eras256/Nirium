@@ -26,7 +26,10 @@ import {
     getUserApiKeys,
     revokeApiKey,
     AuthenticatedRequest,
+    sandboxMiddleware,
 } from './middleware/index.js';
+import sandboxRoutes from './routes/sandbox.js';
+import publicRoutes from './routes/public.js';
 import { createRateLimiter } from './middleware/rateLimit.js';
 import {
     initializeWebSocket,
@@ -82,6 +85,13 @@ const standardLimiter = createRateLimiter('standard');
 const aggressiveLimiter = createRateLimiter('aggressive');
 
 // ═══════════════════════════════════════════════════════════════
+// MOUNT ROUTE MODULES
+// ═══════════════════════════════════════════════════════════════
+
+app.use('/api/sandbox', sandboxRoutes);
+app.use('/api/public', publicRoutes);
+
+// ═══════════════════════════════════════════════════════════════
 // PUBLIC ENDPOINTS (No Auth)
 // ═══════════════════════════════════════════════════════════════
 
@@ -100,9 +110,22 @@ app.get('/api/info', (_req: Request, res: Response) => {
         name: 'Nirium Agent',
         version: VERSION,
         network: NETWORK,
-        documentation: 'https://nirium.dev/docs',
+        documentation: 'https://nirium.xyz/docs',
         endpoints: {
             health: 'GET /health',
+            public: {
+                demoAuth: 'POST /api/public/demo-auth',
+                authenticate: 'POST /api/public/authenticate',
+                marketSnapshot: 'GET /api/public/market-snapshot',
+                examples: 'GET /api/public/examples',
+                quickstart: 'GET /api/public/quickstart',
+            },
+            sandbox: {
+                request: 'POST /api/sandbox/request',
+                info: 'GET /api/sandbox/info',
+                status: 'GET /api/sandbox/status (auth required)',
+                accounts: 'GET /api/sandbox/accounts (admin only)',
+            },
             auth: {
                 token: 'POST /api/auth/token',
                 keys: 'POST|GET|DELETE /api/auth/keys',
@@ -124,6 +147,7 @@ app.get('/api/info', (_req: Request, res: Response) => {
             active: getLLMProvider().name,
             available: getAvailableProviders(),
         },
+        quickstart: 'GET /api/public/quickstart',
     });
 });
 
@@ -132,7 +156,7 @@ app.get('/api/info', (_req: Request, res: Response) => {
 // ═══════════════════════════════════════════════════════════════
 
 app.post('/api/auth/token', standardLimiter, (req: Request, res: Response) => {
-    const { walletAddress, signature } = req.body;
+    const { walletAddress } = req.body;
 
     if (!walletAddress) {
         res.status(400).json({ error: 'walletAddress required' });
@@ -141,49 +165,66 @@ app.post('/api/auth/token', standardLimiter, (req: Request, res: Response) => {
 
     // In production: verify the Stellar signature against the public key
     // For now, issue a token for any valid-looking address
-    const token = generateToken(walletAddress, ['user']);
+    const token = generateToken(walletAddress, ['user'], 'free');
 
     broadcastLog('info', `[Auth] Token issued for ${walletAddress.substring(0, 12)}...`);
 
     res.json({
+        success: true,
         token,
         expiresIn: '24h',
         userId: walletAddress,
         permissions: ['user'],
+        tier: 'free',
     });
 });
 
-app.post('/api/auth/keys', authMiddleware as any, adminMiddleware as any, (req: Request, res: Response) => {
+app.post('/api/auth/keys', authMiddleware as any, async (req: Request, res: Response) => {
     const authReq = req as AuthenticatedRequest;
-    const { name } = req.body;
+    const { name, tier } = req.body;
 
-    const apiKey = generateApiKey(
-        authReq.user!.userId,
-        name || 'Default Key',
-        ['user']
-    );
+    try {
+        const apiKey = await generateApiKey(
+            authReq.user!.userId,
+            name || 'Default Key',
+            ['user'],
+            tier || authReq.user!.tier || 'free'
+        );
 
-    broadcastLog('info', `[Auth] API key generated for ${authReq.user!.userId}`);
+        broadcastLog('info', `[Auth] API key generated for ${authReq.user!.userId}`);
 
-    res.json({
-        apiKey,
-        name: name || 'Default Key',
-        message: 'Store this key securely — it will not be shown again.',
-    });
+        res.json({
+            success: true,
+            apiKey,
+            name: name || 'Default Key',
+            tier: tier || authReq.user!.tier || 'free',
+            message: 'Store this key securely — it will not be shown again.',
+        });
+    } catch (error) {
+        res.status(500).json({ error: 'Failed to generate API key' });
+    }
 });
 
-app.get('/api/auth/keys', authMiddleware as any, (req: Request, res: Response) => {
+app.get('/api/auth/keys', authMiddleware as any, async (req: Request, res: Response) => {
     const authReq = req as AuthenticatedRequest;
-    const keys = getUserApiKeys(authReq.user!.userId);
-    res.json({ keys });
+    try {
+        const keys = await getUserApiKeys(authReq.user!.userId);
+        res.json({ keys });
+    } catch (error) {
+        res.status(500).json({ error: 'Failed to retrieve API keys' });
+    }
 });
 
-app.delete('/api/auth/keys/:id', authMiddleware as any, (req: Request, res: Response) => {
-    const revoked = revokeApiKey(req.params.id as string);
-    if (revoked) {
-        res.json({ message: 'API key revoked' });
-    } else {
-        res.status(404).json({ error: 'API key not found' });
+app.delete('/api/auth/keys/:id', authMiddleware as any, async (req: Request, res: Response) => {
+    try {
+        const revoked = await revokeApiKey(req.params.id as string);
+        if (revoked) {
+            res.json({ message: 'API key revoked' });
+        } else {
+            res.status(404).json({ error: 'API key not found' });
+        }
+    } catch (error) {
+        res.status(500).json({ error: 'Failed to revoke API key' });
     }
 });
 

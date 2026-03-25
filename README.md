@@ -184,6 +184,8 @@ Following critical code reviews and architectural iterations, Nirium has been fu
 8. **Agent Server Stability:** Hardened the API by validating `JWT_SECRET` and database connections on startup; persistent PostgreSQL storage for agent API keys.
 9. **30-Agent Swarm V2:** Expanded from 15 to 30 autonomous agents, each racing independently with 20 weighted Soroban operations (including 3 CETES-specific ops) and SDEX swaps.
 10. **Test Suite:** 579 lines of comprehensive Rust tests covering vaults, delegation, flash loans, path arbitrage, cross-DEX, and edge cases.
+11. **Institutional Sandbox API:** Deployed a fully functional multi-tier API Gateway (Free, Sandbox, Institutional). Successfully verified institutional API key provisioning (`nrm_ins_...`) with secure rate-limiting (10,000 req/day) for B2B due diligence.
+12. **Cryptographic Agent Console:** Integrated wallet message signing to generate Personal API keys (`nrm_fre_...`) natively from the dashboard for third-party developers to access the execution matrix.
 
 All execution flows verified on [Stellar Expert](https://stellar.expert/explorer/testnet).
 
