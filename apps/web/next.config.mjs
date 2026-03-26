@@ -2,6 +2,8 @@
 const nextConfig = {
     reactStrictMode: true,
     output: 'standalone',
+    productionBrowserSourceMaps: false, // Blindaje contra inspección de código fuente en producción
+
 
     // Transpile three.js ecosystem packages
     transpilePackages: [
