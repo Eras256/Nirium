@@ -6,8 +6,8 @@ import { Suspense, useState, useEffect } from "react"; // Restored useEffect
 import {
     ArrowLeft, Book, Code, Shield, Layers, Cpu, Database, Zap,
     GitBranch, FileCode, Rocket, CheckCircle, AlertTriangle,
-    Terminal, Globe, Lock, TrendingUp, ChevronRight, ExternalLink,
-    Play, Settings, Users, Workflow, Key, Lightbulb, HardDrive, FileCheck, BookOpen
+    Terminal, Globe, Lock, TrendingUp, ChevronRight, ChevronLeft, ExternalLink,
+    Play, Settings, Users, Workflow, Key, Lightbulb, HardDrive, FileCheck, BookOpen, Activity, Heart, Clock
 } from "lucide-react";
 import { SectionBrandLogo } from "@/components/ui/SectionBrandLogo";
 import Navbar from "@/components/layout/Navbar";
@@ -16,15 +16,15 @@ import ApiKeyManager from "@/components/docs/ApiKeyManager";
 type TabId = 'overview' | 'architecture' | 'contracts' | 'agent' | 'frontend' | 'api' | 'security' | 'ideas' | 'builder';
 
 const tabs = [
-    { id: 'overview' as TabId, label: 'MISSION BRIEF', icon: Book },
-    { id: 'ideas' as TabId, label: 'TACTICAL SCENARIOS', icon: Lightbulb },
-    { id: 'architecture' as TabId, label: 'SYSTEM SCHEMATICS', icon: Layers },
-    { id: 'contracts' as TabId, label: 'ON-CHAIN KERNEL', icon: Code },
-    { id: 'agent' as TabId, label: 'AUTONOMOUS UNITS', icon: Cpu },
-    { id: 'builder' as TabId, label: 'STRATEGY ARCHITECT', icon: Workflow },
-    { id: 'frontend' as TabId, label: 'COMMAND INTERFACE', icon: Globe },
-    { id: 'api' as TabId, label: 'AGENTS API', icon: Terminal },
-    { id: 'security' as TabId, label: 'DEFENSE PROTOCOLS', icon: Shield },
+    { id: 'overview' as TabId, label: 'RESUMEN DE MISIÓN', icon: Book },
+    { id: 'api' as TabId, label: 'COMANDOS API', icon: Terminal },
+    { id: 'ideas' as TabId, label: 'ESCENARIOS TÁCTICOS', icon: Lightbulb },
+    { id: 'architecture' as TabId, label: 'ESQUEMAS DEL SISTEMA', icon: Layers },
+    { id: 'contracts' as TabId, label: 'KERNEL ON-CHAIN', icon: Code },
+    { id: 'agent' as TabId, label: 'UNIDADES AUTÓNOMAS', icon: Cpu },
+    { id: 'builder' as TabId, label: 'ARQUITECTO DE ESTRATEGIAS', icon: Workflow },
+    { id: 'frontend' as TabId, label: 'INTERFAZ DE COMANDO', icon: Globe },
+    { id: 'security' as TabId, label: 'PROTOCOLOS DE DEFENSA', icon: Shield },
 ];
 
 function DocsContent() {
@@ -109,15 +109,75 @@ function DocsContent() {
                 </div>
 
                 <div className="max-w-[1600px] w-full mx-auto px-6 py-12">
-                    {activeTab === 'overview' && <OverviewSection />}
-                    {activeTab === 'ideas' && <IdeasSection />}
-                    {activeTab === 'architecture' && <ArchitectureSection />}
-                    {activeTab === 'contracts' && <ContractsSection />}
-                    {activeTab === 'agent' && <AgentSection />}
-                    {activeTab === 'builder' && <BuilderSection />}
-                    {activeTab === 'frontend' && <FrontendSection />}
-                    {activeTab === 'api' && <ApiSection />}
-                    {activeTab === 'security' && <SecuritySection />}
+                    <div className="min-h-[60vh]">
+                        {activeTab === 'overview' && <OverviewSection />}
+                        {activeTab === 'ideas' && <IdeasSection />}
+                        {activeTab === 'architecture' && <ArchitectureSection />}
+                        {activeTab === 'contracts' && <ContractsSection />}
+                        {activeTab === 'agent' && <AgentSection />}
+                        {activeTab === 'builder' && <BuilderSection />}
+                        {activeTab === 'frontend' && <FrontendSection />}
+                        {activeTab === 'api' && <ApiSection />}
+                        {activeTab === 'security' && <SecuritySection />}
+                    </div>
+
+                    {/* Sequential Navigation Footer */}
+                    <div className="mt-24 pt-12 border-t border-white/10 flex justify-between items-center gap-8">
+                        {(() => {
+                            const currentIndex = tabs.findIndex(t => t.id === activeTab);
+                            const prevTab = currentIndex > 0 ? tabs[currentIndex - 1] : null;
+                            const nextTab = currentIndex < tabs.length - 1 ? tabs[currentIndex + 1] : null;
+
+                            const handleTabChange = (id: TabId) => {
+                                setActiveTab(id);
+                                window.scrollTo({ top: 0, behavior: 'smooth' });
+                            };
+
+                            return (
+                                <>
+                                    <div className="flex-1">
+                                        {prevTab ? (
+                                            <button
+                                                onClick={() => handleTabChange(prevTab.id)}
+                                                className="group flex flex-col items-start gap-2 max-w-[280px]"
+                                            >
+                                                <div className="flex items-center gap-2 text-xs font-mono text-gray-500 group-hover:text-stellar-teal transition-colors">
+                                                    <ChevronLeft size={14} className="group-hover:-translate-x-1 transition-transform" />
+                                                    ANTERIOR
+                                                </div>
+                                                <div className="text-lg font-bold text-gray-400 group-hover:text-white transition-colors text-left uppercase tracking-tight">
+                                                    {prevTab.label}
+                                                </div>
+                                            </button>
+                                        ) : (
+                                            <div className="h-1" />
+                                        )}
+                                    </div>
+
+                                    <div className="hidden sm:block w-px h-12 bg-white/5" />
+
+                                    <div className="flex-1 flex justify-end">
+                                        {nextTab ? (
+                                            <button
+                                                onClick={() => handleTabChange(nextTab.id)}
+                                                className="group flex flex-col items-end gap-2 max-w-[280px]"
+                                            >
+                                                <div className="flex items-center gap-2 text-xs font-mono text-gray-500 group-hover:text-stellar-teal transition-colors">
+                                                    SIGUIENTE
+                                                    <ChevronRight size={14} className="group-hover:translate-x-1 transition-transform" />
+                                                </div>
+                                                <div className="text-lg font-bold text-gray-400 group-hover:text-white transition-colors text-right uppercase tracking-tight">
+                                                    {nextTab.label}
+                                                </div>
+                                            </button>
+                                        ) : (
+                                            <div className="h-1" />
+                                        )}
+                                    </div>
+                                </>
+                            );
+                        })()}
+                    </div>
                 </div>
             </div>
         </main>
@@ -836,141 +896,380 @@ function FrontendSection() {
 
 function ApiSection() {
     return (
-        <div className="space-y-12">
-            {/* API Key Generation Tool */}
-            <section className="bg-gradient-to-br from-stellar-yellow/5 to-transparent border border-stellar-yellow/20 rounded-2xl p-8 relative overflow-hidden">
-                <div className="absolute top-0 right-0 w-[300px] h-[300px] bg-stellar-yellow/10 blur-[100px] rounded-full -translate-y-1/2 translate-x-1/2 pointer-events-none" />
-
-                <h2 className="text-2xl font-bold mb-6 flex items-center gap-3 relative z-10">
-                    <Key className="text-stellar-yellow" />
-                    Authentication & Keys
-                </h2>
-
-                <div className="grid md:grid-cols-2 gap-12 relative z-10">
-                    <div className="space-y-6">
-                        <p className="text-gray-300 leading-relaxed">
-                            To use the autonomous agent API (`http://localhost:3001`), you must authenticate using an
-                            <strong> API Key</strong> or a short-lived <strong>JWT Token</strong>.
-                        </p>
-
-                        <div className="space-y-4">
-                            <h3 className="font-bold text-white">Authentication Methods</h3>
-                            <ul className="space-y-3">
-                                <li className="flex items-start gap-3">
-                                    <div className="mt-1 bg-stellar-teal/20 p-1 rounded">
-                                        <Code className="w-3 h-3 text-stellar-teal" />
-                                    </div>
-                                    <div>
-                                        <div className="text-white font-medium">x-api-key Header</div>
-                                        <div className="text-sm text-gray-500">Best for backend scripts and long-running bots.</div>
-                                    </div>
-                                </li>
-                                <li className="flex items-start gap-3">
-                                    <div className="mt-1 bg-stellar-yellow/20 p-1 rounded">
-                                        <Shield className="w-3 h-3 text-stellar-yellow" />
-                                    </div>
-                                    <div>
-                                        <div className="text-white font-medium">Bearer Token (JWT)</div>
-                                        <div className="text-sm text-gray-500">Best for frontend applications (expires in 24h).</div>
-                                    </div>
-                                </li>
-                            </ul>
+        <div className="space-y-16">
+            {/* Header / Intro */}
+            <section className="bg-gradient-to-br from-stellar-teal/10 via-[#0A0A0A] to-transparent border border-stellar-teal/20 rounded-3xl p-8 relative overflow-hidden group">
+                <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-stellar-teal/5 blur-[120px] rounded-full pointer-events-none group-hover:bg-stellar-teal/10 transition-colors duration-700" />
+                <div className="relative z-10">
+                    <div className="flex items-center gap-3 mb-6">
+                        <div className="p-2 bg-stellar-teal/20 rounded-lg">
+                            <Terminal className="text-stellar-teal w-6 h-6" />
                         </div>
+                        <h2 className="text-4xl font-black tracking-tight">NIRIUM NEXUS API</h2>
                     </div>
-
-                    <div className="relative group">
-                        <div className="absolute -inset-1 bg-gradient-to-r from-stellar-yellow to-stellar-teal opacity-20 blur-lg rounded-xl pointer-events-none transition-opacity group-hover:opacity-30" />
-                        <Link href="/agents" className="block relative z-20 bg-[#0A0A0A] border border-white/10 rounded-xl p-8 text-center hover:bg-white/5 transition-colors group">
-                            <div className="w-16 h-16 bg-stellar-yellow/20 rounded-full flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform">
-                                <Terminal className="w-8 h-8 text-stellar-yellow" />
+                    <p className="text-gray-400 text-lg max-w-3xl leading-relaxed mb-8">
+                        Infraestructura de alto rendimiento diseñada para la integración de agentes autónomos y sistemas fintech. 
+                        Proporcionamos el rastro forense inmutable y los protocolos de seguridad necesarios para la experimentación con activos financieros en entornos controlados (Art. 80 Ley Fintech).
+                    </p>
+                    <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+                        {[
+                            { label: 'Uptime SLA', val: '99.5%', icon: Activity, color: 'text-stellar-teal' },
+                            { label: 'Latencia P95', val: '< 500ms', icon: Clock, color: 'text-stellar-yellow' },
+                            { label: 'Endpoints', val: '32+', icon: Layers, color: 'text-purple-400' },
+                            { label: 'Security', val: 'AES-256', icon: Shield, color: 'text-green-400' },
+                        ].map((stat) => (
+                            <div key={stat.label} className="bg-white/5 border border-white/10 rounded-xl p-4 hover:border-white/20 transition-colors">
+                                <div className="flex items-center gap-2 mb-1">
+                                    <stat.icon className={`w-3 h-3 ${stat.color}`} />
+                                    <span className="text-[10px] font-mono text-gray-500 uppercase tracking-widest">{stat.label}</span>
+                                </div>
+                                <div className="text-xl font-black text-white">{stat.val}</div>
                             </div>
-                            <h3 className="text-xl font-bold text-white mb-2">Launch Agent Console</h3>
-                            <p className="text-gray-400 mb-6">Generate keys, manage bots, and view live telemetry in the dedicated command center.</p>
-                            <span className="inline-flex items-center gap-2 text-stellar-teal font-bold">
-                                Open Console <img src="/icons/arrow-right.svg" className="w-4 h-4 hidden" alt="" /> →
-                            </span>
-                        </Link>
+                        ))}
                     </div>
                 </div>
             </section>
-            {/* Environment Variables */}
-            <section>
-                <h2 className="text-2xl font-bold mb-6">Environment Variables</h2>
-                <div className="space-y-6">
-                    <div className="bg-[#0A0A0A] border border-white/10 rounded-xl overflow-hidden">
-                        <div className="px-4 py-2 bg-white/5 border-b border-white/10">
-                            <span className="text-sm font-mono text-gray-400">packages/web/.env.local</span>
-                        </div>
-                        <pre className="p-4 text-sm font-mono text-gray-300">
-                            {`NEXT_PUBLIC_STELLAR_NETWORK=testnet
-NEXT_PUBLIC_API_URL=http://localhost:3001
-NEXT_PUBLIC_SUPABASE_URL=your_supabase_url
-NEXT_PUBLIC_SUPABASE_ANON_KEY=your_supabase_anon_key
 
-# IPFS Pinata
-PINATA_JWT=your_pinata_jwt_token
-NEXT_PUBLIC_GATEWAY_URL=your_pinata_gateway_url`}
+            {/* Authentication & Access */}
+            <section>
+                <div className="flex items-center gap-3 mb-8">
+                    <Key className="text-stellar-yellow w-6 h-6" />
+                    <h3 className="text-2xl font-bold">Autenticación y Acceso</h3>
+                </div>
+                <div className="grid md:grid-cols-2 gap-8">
+                    <div className="space-y-6">
+                        <div className="bg-[#0A0A0A] border border-white/10 rounded-2xl p-6">
+                            <h4 className="text-white font-bold mb-4 flex items-center gap-2">
+                                <Shield className="w-4 h-4 text-stellar-teal" /> x-api-key Authentication
+                            </h4>
+                            <p className="text-sm text-gray-400 mb-4">Recomendado para servidores, bots y sistemas institucionales que requieren acceso persistente.</p>
+                            <div className="bg-black/50 p-4 rounded-lg font-mono text-xs text-stellar-teal border border-stellar-teal/20 mb-4">
+                                curl -H "x-api-key: nrm_live_[TU_KEY]" \ <br />
+                                &nbsp;&nbsp;https://api.nirium.xyz/health
+                            </div>
+                        </div>
+
+                        <div className="bg-[#0A0A0A] border border-white/10 rounded-2xl p-6">
+                            <h4 className="text-white font-bold mb-4 flex items-center gap-2">
+                                <Lock className="w-4 h-4 text-stellar-yellow" /> JWT Bearer Token
+                            </h4>
+                            <p className="text-sm text-gray-400 mb-4">Tokens efímeros de corta duración (24h) generados mediante firma criptográfica de wallet.</p>
+                            <div className="bg-black/50 p-4 rounded-lg font-mono text-xs text-stellar-yellow border border-stellar-yellow/20">
+                                Authorization: Bearer eyJhbGciOi...
+                            </div>
+                        </div>
+                    </div>
+
+                    <div className="bg-gradient-to-br from-stellar-teal/5 to-transparent border border-white/10 rounded-2xl p-8">
+                        <h4 className="text-white font-bold mb-6">Matriz de Cuotas de Sandbox</h4>
+                        <div className="space-y-4">
+                            {[
+                                { tier: 'Sandbox Personal', req: '1,000 req/día', speed: '60 rpm' },
+                                { tier: 'Tier Institucional', req: '10,000 req/día', speed: '300 rpm' },
+                                { tier: 'Enterprise Custom', req: '100,000+ req/día', speed: '1,000+ rpm' },
+                            ].map((tier, idx) => (
+                                <div key={tier.tier} className="flex items-center justify-between p-3 bg-white/5 rounded-lg border border-white/5">
+                                    <div>
+                                        <div className="text-sm font-bold text-white">{tier.tier}</div>
+                                        <div className="text-xs text-gray-500">{tier.speed}</div>
+                                    </div>
+                                    <div className="text-stellar-teal font-mono text-sm">{tier.req}</div>
+                                </div>
+                            ))}
+                        </div>
+                        <p className="text-[10px] text-gray-500 mt-6 text-center italic">
+                            * Para incrementar límites, contacte a institutional@nirium.xyz
+                        </p>
+                    </div>
+                </div>
+            </section>
+
+            {/* Smart Contracts Directory */}
+            <section>
+                <div className="flex items-center gap-3 mb-8">
+                    <Database className="text-purple-400 w-6 h-6" />
+                    <h3 className="text-2xl font-bold">Directorio de Contratos (Stellar Mainnet)</h3>
+                </div>
+                <div className="bg-[#0A0A0A] border border-white/10 rounded-2xl overflow-hidden">
+                    <table className="w-full text-left">
+                        <thead>
+                            <tr className="bg-white/5 border-b border-white/10 text-xs font-mono text-gray-500">
+                                <th className="py-4 px-6 uppercase tracking-widest">Contrato / Asset</th>
+                                <th className="py-4 px-6 uppercase tracking-widest">Identificador on-chain</th>
+                                <th className="py-4 px-6 text-right uppercase tracking-widest">Network</th>
+                            </tr>
+                        </thead>
+                        <tbody className="text-sm">
+                            {[
+                                { name: 'Vault Principal (Treasury)', id: 'CB67X4Q...4ODZ4HEN', type: 'Nirium Protocol' },
+                                { name: 'Reputation System (ELO)', id: 'CB4RCN4...TFCU6XW4H', type: 'Reputation' },
+                                { name: 'Marketplace Strategist', id: 'CCUDDIF...BCZF6KV6', type: 'Logic' },
+                                { name: 'CETES RWA (Soroban SAC)', id: 'CC72F57...PFDLNCQY', type: 'Asset' },
+                            ].map((c) => (
+                                <tr key={c.name} className="border-b border-white/5 hover:bg-white/5 transition-colors group">
+                                    <td className="py-4 px-6">
+                                        <div className="text-white font-bold">{c.name}</div>
+                                        <div className="text-[10px] text-gray-500 uppercase">{c.type}</div>
+                                    </td>
+                                    <td className="py-2 px-6">
+                                        <div className="bg-black/40 px-3 py-1.5 rounded-lg border border-white/5 font-mono text-xs text-stellar-teal group-hover:border-stellar-teal/30 flex items-center gap-2">
+                                            {c.id}
+                                            <ExternalLink size={10} className="text-gray-600" />
+                                        </div>
+                                    </td>
+                                    <td className="py-4 px-6 text-right text-gray-400 font-mono text-xs">Soroban Mainnet</td>
+                                </tr>
+                            ))}
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            {/* Integration Examples Hub */}
+            <section className="space-y-8">
+                <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-3">
+                        <Code className="text-stellar-teal w-6 h-6" />
+                        <h3 className="text-2xl font-bold">Protocolos de Integración (SDK)</h3>
+                    </div>
+                </div>
+
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                    {/* REST API Python */}
+                    <div className="bg-[#0A0A0A] border border-white/10 rounded-2xl overflow-hidden flex flex-col">
+                        <div className="px-5 py-3 bg-white/5 border-b border-white/10 flex items-center justify-between">
+                            <div className="flex items-center gap-2">
+                                <div className="w-1.5 h-6 bg-stellar-teal rounded-full" />
+                                <span className="text-xs font-mono text-gray-400">PYTHON SDK — AUDIT STATUS</span>
+                            </div>
+                        </div>
+                        <pre className="p-6 text-xs font-mono text-gray-300 overflow-x-auto leading-relaxed bg-black/40 flex-grow">
+                            {`import os
+import requests
+
+# Inicialización institucional
+API_KEY = os.getenv("NIRIUM_API_KEY")
+URL = "https://api.nirium.xyz/api/sandbox/status"
+
+headers = {
+    "x-api-key": API_KEY,
+    "Content-Type": "application/json"
+}
+
+def get_compliance_status():
+    res = requests.get(URL, headers=headers)
+    if res.status_code == 200:
+        data = res.json()
+        print(f"✅ Protocol Status: {data['account']['tier']}")
+        print(f"📊 Daily Usage: {data['usage']['dailyRequests']}/100000")
+
+get_compliance_status()`}
                         </pre>
                     </div>
 
-                    <div className="bg-[#0A0A0A] border border-white/10 rounded-xl overflow-hidden">
-                        <div className="px-4 py-2 bg-white/5 border-b border-white/10">
-                            <span className="text-sm font-mono text-gray-400">Next.js API Routes</span>
+                    {/* WebSocket Node.js */}
+                    <div className="bg-[#0A0A0A] border border-white/10 rounded-2xl overflow-hidden flex flex-col">
+                        <div className="px-5 py-3 bg-white/5 border-b border-white/10 flex items-center justify-between">
+                            <div className="flex items-center gap-2">
+                                <div className="w-1.5 h-6 bg-purple-500 rounded-full" />
+                                <span className="text-xs font-mono text-gray-400">NODE.JS — REAL-TIME SWARM TELEMETRY</span>
+                            </div>
                         </div>
-                        <ul className="p-4 space-y-2 text-sm text-gray-300">
-                            <li><code className="text-stellar-teal">/api/feed</code> : Server-Sent Events (SSE) telemetry feed for Live Logs</li>
-                            <li><code className="text-stellar-teal">/api/pinata</code> : Secure proxy endpoint to upload JSON Kernel schemas to IPFS without exposing keys</li>
-                        </ul>
-                    </div>
-                </div>
-            </section>
+                        <pre className="p-6 text-xs font-mono text-gray-300 overflow-x-auto leading-relaxed bg-black/40 flex-grow">
+                            {`const WebSocket = require('ws');
+const API_KEY = process.env.NIRIUM_API_KEY;
 
-            {/* CLI Commands */}
-            <section>
-                <h2 className="text-2xl font-bold mb-6">CLI Commands</h2>
-                <div className="bg-[#0A0A0A] border border-white/10 rounded-xl overflow-hidden">
-                    <pre className="p-4 text-sm font-mono text-gray-300">
-                        {`# Install dependencies
-pnpm install
+const ws = new WebSocket('wss://api.nirium.xyz/ws/signals', {
+  headers: { 'x-api-key': API_KEY }
+});
 
-# Run development server
-pnpm dev
+ws.on('open', () => {
+  console.log('📡 Connected to Nirium Swarm Telemetry');
+});
 
-# Run tests
-pnpm test
-
-# Run agent
-pnpm --filter @nirium/agent dev "Loop 0.1 XLM"
-
-# Build for production
-pnpm build`}
-                    </pre>
-                </div>
-            </section>
-
-            {/* CLI Example */}
-            <section>
-                <h2 className="text-2xl font-bold mb-6">Contract Interaction (CLI)</h2>
-                <p className="text-sm text-gray-500 mb-4">
-                    ⚠️ Use the <code className="text-amber-400">stellar-cli</code> to interact with Soroban contracts.
-                </p>
-                <div className="space-y-4">
-                    <div className="bg-[#0A0A0A] border border-white/10 rounded-xl overflow-hidden">
-                        <div className="px-4 py-2 bg-white/5 border-b border-white/10 flex items-center justify-between">
-                            <span className="text-sm font-mono text-gray-400">Authorize Agent (Soroban)</span>
-                        </div>
-                        <pre className="p-4 text-xs font-mono text-gray-300 overflow-x-auto">
-                            {`stellar contract invoke \\
-  --id C... \\
-  --source-account S... \\
-  --network testnet \\
-  -- authorize_agent \\
-  --owner G... \\
-  --agent_id 0x...`}
+ws.on('message', (payload) => {
+  const signal = JSON.parse(payload);
+  if (signal.confidence > 0.90) {
+    console.log('🔥 CRITICAL SIGNAL DETECTED:', signal.action);
+    // Execute trade logic here
+  }
+});`}
                         </pre>
                     </div>
                 </div>
             </section>
+
+            {/* Full Endpoint Directory */}
+            <section id="endpoints-directory">
+                <div className="flex items-center gap-3 mb-8">
+                    <Workflow className="text-stellar-teal w-6 h-6" />
+                    <h3 className="text-2xl font-bold uppercase tracking-tighter">Directorio Universal de Endpoints (32+)</h3>
+                </div>
+                
+                <EndpointExplorer />
+            </section>
+
+            {/* SLA & Reliability Section */}
+            <section className="bg-gradient-to-r from-stellar-teal/5 to-stellar-yellow/5 border border-white/10 rounded-3xl p-8">
+                <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-6 mb-12">
+                    <div>
+                        <h3 className="text-3xl font-black text-white mb-2">Acuerdo de Nivel de Servicio (SLA)</h3>
+                        <p className="text-gray-400">Compromisos de rendimiento para operaciones institucionales (Anexo A).</p>
+                    </div>
+                    <Link href="/status" className="flex items-center gap-2 px-6 py-3 bg-white/5 border border-white/10 rounded-xl hover:bg-white/10 transition-all group">
+                        <Activity className="w-4 h-4 text-stellar-teal group-hover:animate-pulse" />
+                        <span className="text-sm font-bold text-white">Ver Status en Vivo</span>
+                    </Link>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+                    {[
+                        { title: 'Disponibilidad API', target: '99.5%', detail: 'Indisponibilidad máx. 3.6h/mes', icon: Globe },
+                        { title: 'Latencia P95', target: '< 500ms', detail: 'Medido en corredores MXN/USD', icon: Zap },
+                        { title: 'Soporte Premium', target: '24 / 7', detail: 'Respuesta < 30m para críticos', icon: Heart },
+                    ].map((item) => (
+                        <div key={item.title} className="space-y-3">
+                            <div className="flex items-center gap-2">
+                                <item.icon className="w-4 h-4 text-stellar-teal" />
+                                <span className="text-sm text-gray-400 font-bold uppercase tracking-widest">{item.title}</span>
+                            </div>
+                            <div className="text-4xl font-black text-white">{item.target}</div>
+                            <p className="text-xs text-gray-500 leading-relaxed">{item.detail}</p>
+                        </div>
+                    ))}
+                </div>
+
+                {/* Health Checklist Final */}
+                <div className="mt-12 bg-white/5 border border-white/5 rounded-2xl p-6 flex flex-wrap gap-x-12 gap-y-4">
+                    <div className="flex items-center gap-2">
+                        <CheckCircle size={14} className="text-stellar-teal" />
+                        <span className="text-xs text-gray-400">Certificación SSL TLS 1.3</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                        <CheckCircle size={14} className="text-stellar-teal" />
+                        <span className="text-xs text-gray-400">Cifrado AES-256 at Rest</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                        <CheckCircle size={14} className="text-stellar-teal" />
+                        <span className="text-xs text-gray-400">IPFS Immutable Audit Trail</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                        <CheckCircle size={14} className="text-stellar-teal" />
+                        <span className="text-xs text-gray-400">SOC2 Type II Compliant Layer</span>
+                    </div>
+                </div>
+            </section>
+        </div>
+    );
+}
+
+function EndpointExplorer() {
+    const [activeCat, setActiveCat] = useState('auth');
+
+    const categories = [
+        { id: 'auth', label: 'PÚBLICOS & AUTH', icon: Lock },
+        { id: 'market', label: 'MERCADO & SEÑALES', icon: TrendingUp },
+        { id: 'exec', label: 'EJECUCIÓN & LOOP', icon: Cpu },
+        { id: 'sandbox', label: 'SANDBOX & CUOTAS', icon: Shield },
+        { id: 'events', label: 'EVENTOS (WS/WEBHOOKS)', icon: Zap },
+    ];
+
+    const endpoints: Record<string, any[]> = {
+        auth: [
+            { method: 'GET', path: '/health', desc: 'Verifica el estado de salud del cluster API.' },
+            { method: 'GET', path: '/api/info', desc: 'Retorna metadatos del protocolo, versión y red activa.' },
+            { method: 'POST', path: '/api/public/authenticate', desc: 'Autenticación mediante firma criptográfica de wallet Stellar.' },
+            { method: 'POST', path: '/api/public/demo-auth', desc: 'Genera token de acceso para entorno de pruebas (24h).' },
+            { method: 'POST', path: '/api/auth/token', desc: 'Renovación de JWT Bearer Token.' },
+            { method: 'POST', path: '/api/auth/keys', desc: 'Creación de API Keys institucionales permanentes.' },
+            { method: 'GET', path: '/api/auth/keys', desc: 'Lista de llaves activas vinculadas a la cuenta.' },
+        ],
+        market: [
+            { method: 'GET', path: '/api/market', desc: 'Snapshot completo del SDEX (Orderbook, Spreads, Volúmenes).' },
+            { method: 'GET', path: '/api/public/market-snapshot', desc: 'Datos públicos de mercado optimizados para frontend.' },
+            { method: 'GET', path: '/api/signals/recent', desc: 'Feed de señales generadas por el Swarm de agentes (High Confidence).' },
+            { method: 'GET', path: '/api/tickers', desc: 'Precios en tiempo real de pares XLM, USDC y CETES.' },
+            { method: 'GET', path: '/api/stats/global', desc: 'Estadísticas de TVL y volumen procesado por el protocolo.' },
+        ],
+        exec: [
+            { method: 'POST', path: '/api/execute', desc: 'Ejecución atómica de estrategia en Mainnet (Requiere colateral).' },
+            { method: 'POST', path: '/api/execute-demo', desc: 'Simulación de estrategia en Sandbox sin riesgo de capital.' },
+            { method: 'POST', path: '/api/loop/start', desc: 'Inicia ciclo autónomo de escaneo y ejecución para un agente.' },
+            { method: 'POST', path: '/api/loop/stop', desc: 'Detiene el ciclo autónomo de forma inmediata.' },
+            { method: 'GET', path: '/api/loop/status', desc: 'Reporte de estado, uptime y memoria del proceso autónomo.' },
+            { method: 'POST', path: '/api/loop/scan', desc: 'Dispara un escaneo manual de oportunidades de arbitraje/path.' },
+            { method: 'GET', path: '/api/strategies', desc: 'Lista de estrategias (skils) habilitadas para el usuario.' },
+        ],
+        sandbox: [
+            { method: 'POST', path: '/api/sandbox/request', desc: 'Solicitud de acceso al entorno controlado para instituciones.' },
+            { method: 'GET', path: '/api/sandbox/info', desc: 'Especificaciones de tiers, límites y capacidades del sandbox.' },
+            { method: 'GET', path: '/api/sandbox/status', desc: 'Uso de cuotas y reporte de cumplimiento del entorno institucional.' },
+            { method: 'GET', path: '/api/sandbox/accounts', desc: 'Gestión de sub-cuentas para equipos de auditoría.' },
+        ],
+        events: [
+            { method: 'POST', path: '/api/webhooks', desc: 'Registro de endpoint para notificaciones HMAC-Signed.' },
+            { method: 'GET', path: '/api/webhooks', desc: 'Lista de webhooks configurados.' },
+            { method: 'POST', path: '/api/webhooks/{id}/test', desc: 'Envío de evento de prueba para validar integración.' },
+            { method: 'POST', path: '/api/subscriptions', desc: 'Creación de subscripción WebSocket de baja latencia.' },
+            { method: 'GET', path: '/api/subscriptions', desc: 'Monitoreo de conexiones socket activas.' },
+            { method: 'WS', path: 'wss://api.nirium.xyz/ws/signals', desc: 'Stream de señales de mercado en tiempo real.' },
+            { method: 'WS', path: 'wss://api.nirium.xyz/ws/telemetry', desc: 'Logs de ejecución y pensamiento de agentes en vivo.' },
+        ]
+    };
+
+    return (
+        <div className="bg-[#0A0A0A] border border-white/10 rounded-3xl overflow-hidden">
+            <div className="flex overflow-x-auto border-b border-white/10 bg-white/5 scrollbar-hide">
+                {categories.map((cat) => (
+                    <button
+                        key={cat.id}
+                        onClick={() => setActiveCat(cat.id)}
+                        className={`flex items-center gap-2 px-6 py-4 text-[10px] font-black uppercase tracking-widest whitespace-nowrap transition-all border-b-2 ${
+                            activeCat === cat.id 
+                            ? 'border-stellar-teal text-stellar-teal bg-stellar-teal/5' 
+                            : 'border-transparent text-gray-500 hover:text-white'
+                        }`}
+                    >
+                        <cat.icon size={14} />
+                        {cat.label}
+                    </button>
+                ))}
+            </div>
+
+            <div className="p-2 sm:p-6 space-y-2">
+                {endpoints[activeCat].map((ep, idx) => (
+                    <div key={idx} className="group flex flex-col sm:flex-row items-start sm:items-center gap-4 p-4 rounded-xl hover:bg-white/5 transition-all border border-transparent hover:border-white/10">
+                        <div className={`px-2 py-1 rounded font-mono text-[10px] font-black w-14 text-center shrink-0 ${
+                            ep.method === 'GET' ? 'bg-blue-500/20 text-blue-400' :
+                            ep.method === 'POST' ? 'bg-green-500/20 text-green-400' :
+                            ep.method === 'WS' ? 'bg-purple-500/20 text-purple-400' :
+                            'bg-red-500/20 text-red-400'
+                        }`}>
+                            {ep.method}
+                        </div>
+                        <div className="font-mono text-xs text-stellar-teal tracking-tighter">
+                            {ep.path}
+                        </div>
+                        <div className="text-xs text-gray-400 group-hover:text-gray-300 transition-colors">
+                            {ep.desc}
+                        </div>
+                    </div>
+                ))}
+            </div>
+            
+            <div className="bg-white/5 px-6 py-4 flex items-center justify-between">
+                <span className="text-[10px] text-gray-500 font-mono italic">
+                    Referencia completa: <a href="/nirium-api.yaml" className="underline hover:text-stellar-teal transition-colors">nirium-api.yaml</a> (OpenAPI 3.1.0)
+                </span>
+                <a 
+                    href="/nirium-api.yaml" 
+                    download="nirium-api-spec.yaml" 
+                    className="text-[10px] text-stellar-teal font-black hover:underline uppercase tracking-widest flex items-center gap-2 group"
+                >
+                    <FileCode size={12} className="group-hover:rotate-12 transition-transform" />
+                    Descargar/Importar en Postman →
+                </a>
+            </div>
         </div>
     );
 }

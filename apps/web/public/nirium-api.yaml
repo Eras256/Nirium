@@ -1,0 +1,1509 @@
+openapi: 3.1.0
+info:
+  title: Nirium Protocol API
+  version: 1.0.0
+  description: |
+    **Nirium Protocol** - Autonomous AI Agent Matrix on Stellar/Soroban
+
+    This API provides access to:
+    - Multi-asset vault management (XLM, USDC, CETES)
+    - Autonomous agent orchestration
+    - Real-time market data and signals
+    - Strategy execution and testing
+    - WebSocket subscriptions for live updates
+
+    ## Authentication
+
+    Nirium supports multiple authentication methods:
+
+    1. **JWT Tokens** (short-lived, 24h)
+       - Obtain via `/api/public/demo-auth` or `/api/auth/token`
+       - Use header: `Authorization: Bearer <token>`
+
+    2. **API Keys** (long-lived, institutional)
+       - Request via `/api/sandbox/request` or `/api/auth/keys`
+       - Use header: `x-api-key: <your-api-key>`
+
+    ## Rate Limiting
+
+    Rate limits vary by tier:
+
+    | Tier | Requests/Min | Requests/Day |
+    |------|--------------|--------------|
+    | Free | 10 | 100 |
+    | Sandbox | 60 | 1,000 |
+    | Institutional | 300 | 10,000 |
+    | Enterprise | 1,000 | 100,000 |
+
+    ## Base URLs
+
+    - **Production:** `https://api.nirium.xyz`
+    - **Staging:** `https://api-staging.nirium.xyz`
+    - **Local Dev:** `http://localhost:3001`
+
+    ## Support
+
+    - **Documentation:** https://docs.nirium.xyz
+    - **Email:** support@nirium.xyz
+    - **Discord:** https://discord.gg/nirium
+  contact:
+    name: Nirium Protocol Support
+    email: support@nirium.xyz
+    url: https://nirium.xyz
+  license:
+    name: MIT
+    url: https://github.com/Eras256/Nirium/blob/main/LICENSE
+
+servers:
+  - url: https://api.nirium.xyz
+    description: Production Server
+  - url: https://api-staging.nirium.xyz
+    description: Staging Server
+  - url: http://localhost:3001
+    description: Local Development
+
+tags:
+  - name: Public
+    description: Public endpoints (no authentication required)
+  - name: Authentication
+    description: JWT tokens and API key management
+  - name: Sandbox
+    description: Institutional sandbox accounts
+  - name: Market Data
+    description: Real-time market data and signals
+  - name: Execution
+    description: Strategy execution (production and demo)
+  - name: Autonomous Loop
+    description: Autonomous agent loop control
+  - name: Webhooks
+    description: HMAC-signed webhook management
+  - name: Subscriptions
+    description: WebSocket subscription management
+  - name: Skills
+    description: Plugin/skill marketplace and management
+  - name: System
+    description: Health checks and system configuration
+
+paths:
+  # ========================================
+  # PUBLIC ENDPOINTS
+  # ========================================
+
+  /health:
+    get:
+      tags: [Public]
+      summary: Health check
+      description: Simple health endpoint to verify API availability
+      operationId: getHealth
+      responses:
+        '200':
+          description: Service is operational
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: operational
+                  version:
+                    type: string
+                    example: 0.1.0
+                  uptime:
+                    type: number
+                    description: Uptime in seconds
+                    example: 3600
+                  network:
+                    type: string
+                    enum: [testnet, mainnet]
+                    example: testnet
+                  timestamp:
+                    type: string
+                    format: date-time
+
+  /api/info:
+    get:
+      tags: [Public]
+      summary: API information
+      description: Returns comprehensive API documentation and available endpoints
+      operationId: getApiInfo
+      responses:
+        '200':
+          description: API information
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  name:
+                    type: string
+                  version:
+                    type: string
+                  network:
+                    type: string
+                  documentation:
+                    type: string
+                    format: uri
+                  endpoints:
+                    type: object
+                  llm:
+                    type: object
+                    properties:
+                      active:
+                        type: string
+                      available:
+                        type: array
+                        items:
+                          type: string
+
+  /api/public/demo-auth:
+    post:
+      tags: [Public, Authentication]
+      summary: Generate demo token
+      description: |
+        Generate a demo JWT token without signature verification.
+        Useful for testing and onboarding. Returns a free-tier token valid for 24 hours.
+      operationId: postDemoAuth
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [walletAddress]
+              properties:
+                walletAddress:
+                  type: string
+                  pattern: '^G[A-Z0-9]{55}$'
+                  description: Valid Stellar wallet address
+                  example: GAAAA...
+      responses:
+        '200':
+          description: Token generated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TokenResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+
+  /api/public/authenticate:
+    post:
+      tags: [Public, Authentication]
+      summary: Wallet signature authentication
+      description: |
+        Authenticate using Stellar wallet signature.
+        For production use with proper cryptographic verification.
+      operationId: postAuthenticate
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [walletAddress, signature]
+              properties:
+                walletAddress:
+                  type: string
+                  pattern: '^G[A-Z0-9]{55}$'
+                signature:
+                  type: string
+                  description: Base64-encoded signature
+                message:
+                  type: string
+                  description: Message that was signed
+      responses:
+        '200':
+          description: Authentication successful
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TokenResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  /api/public/market-snapshot:
+    get:
+      tags: [Public, Market Data]
+      summary: Public market snapshot
+      description: Limited market data snapshot without authentication
+      operationId: getMarketSnapshot
+      responses:
+        '200':
+          description: Market snapshot
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  timestamp:
+                    type: string
+                    format: date-time
+                  network:
+                    type: string
+                  assets:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/AssetInfo'
+                  note:
+                    type: string
+
+  /api/public/examples:
+    get:
+      tags: [Public]
+      summary: Code examples
+      description: Returns code examples in multiple languages (cURL, JavaScript, Python)
+      operationId: getExamples
+      responses:
+        '200':
+          description: Code examples
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  curl:
+                    type: object
+                  javascript:
+                    type: object
+                  python:
+                    type: object
+
+  /api/public/quickstart:
+    get:
+      tags: [Public]
+      summary: Quick start guide
+      description: Step-by-step guide to get started with the API
+      operationId: getQuickstart
+      responses:
+        '200':
+          description: Quick start guide
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  title:
+                    type: string
+                  steps:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/QuickstartStep'
+
+  # ========================================
+  # SANDBOX ENDPOINTS
+  # ========================================
+
+  /api/sandbox/request:
+    post:
+      tags: [Sandbox]
+      summary: Request sandbox account
+      description: |
+        Request a new sandbox account for institutional testing.
+        Returns API key (shown only once) and tier quotas.
+      operationId: postSandboxRequest
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SandboxRequest'
+      responses:
+        '200':
+          description: Sandbox account created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SandboxAccountResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '429':
+          $ref: '#/components/responses/RateLimitExceeded'
+
+  /api/sandbox/info:
+    get:
+      tags: [Sandbox]
+      summary: Sandbox program information
+      description: Public information about sandbox tiers, quotas, and features
+      operationId: getSandboxInfo
+      responses:
+        '200':
+          description: Sandbox information
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  name:
+                    type: string
+                  description:
+                    type: string
+                  tiers:
+                    type: object
+                  features:
+                    type: array
+                    items:
+                      type: string
+
+  /api/sandbox/status:
+    get:
+      tags: [Sandbox]
+      summary: Sandbox account status
+      description: Get current sandbox account status, quotas, and usage
+      operationId: getSandboxStatus
+      security:
+        - bearerAuth: []
+        - apiKeyAuth: []
+      responses:
+        '200':
+          description: Sandbox status
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SandboxStatus'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  /api/sandbox/accounts:
+    get:
+      tags: [Sandbox]
+      summary: List sandbox accounts (admin only)
+      description: List all sandbox accounts with details
+      operationId: getSandboxAccounts
+      security:
+        - bearerAuth: []
+        - apiKeyAuth: []
+      responses:
+        '200':
+          description: List of sandbox accounts
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  total:
+                    type: number
+                  accounts:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/SandboxAccount'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+
+  # ========================================
+  # AUTHENTICATION ENDPOINTS
+  # ========================================
+
+  /api/auth/token:
+    post:
+      tags: [Authentication]
+      summary: Generate JWT token
+      description: Generate a JWT token for wallet address
+      operationId: postAuthToken
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [walletAddress]
+              properties:
+                walletAddress:
+                  type: string
+      responses:
+        '200':
+          description: Token generated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TokenResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+
+  /api/auth/keys:
+    post:
+      tags: [Authentication]
+      summary: Generate API key
+      description: Generate a new API key for the authenticated user
+      operationId: postApiKey
+      security:
+        - bearerAuth: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                  description: Friendly name for the key
+                  example: Production Key
+                tier:
+                  type: string
+                  enum: [free, sandbox, institutional, enterprise]
+      responses:
+        '200':
+          description: API key generated
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  apiKey:
+                    type: string
+                    description: The API key (shown only once)
+                  name:
+                    type: string
+                  tier:
+                    type: string
+                  message:
+                    type: string
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+    get:
+      tags: [Authentication]
+      summary: List API keys
+      description: Get all API keys for the authenticated user
+      operationId: getApiKeys
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: List of API keys
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  keys:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/ApiKey'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  /api/auth/keys/{id}:
+    delete:
+      tags: [Authentication]
+      summary: Revoke API key
+      description: Revoke an API key by ID
+      operationId: deleteApiKey
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: API key revoked
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  # ========================================
+  # MARKET DATA ENDPOINTS
+  # ========================================
+
+  /api/market:
+    get:
+      tags: [Market Data]
+      summary: Get market data
+      description: |
+        Get comprehensive real-time market data from Stellar SDEX.
+        Includes orderbook, spreads, volumes, and price movements.
+      operationId: getMarket
+      security:
+        - bearerAuth: []
+        - apiKeyAuth: []
+      responses:
+        '200':
+          description: Market data
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MarketData'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '429':
+          $ref: '#/components/responses/RateLimitExceeded'
+
+  /api/signals/recent:
+    get:
+      tags: [Market Data]
+      summary: Get recent signals
+      description: Get recent trading signals from autonomous agents
+      operationId: getRecentSignals
+      security:
+        - bearerAuth: []
+        - apiKeyAuth: []
+      parameters:
+        - name: count
+          in: query
+          schema:
+            type: number
+            minimum: 1
+            maximum: 100
+            default: 20
+      responses:
+        '200':
+          description: Recent signals
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  signals:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Signal'
+
+  # ========================================
+  # EXECUTION ENDPOINTS
+  # ========================================
+
+  /api/execute:
+    post:
+      tags: [Execution]
+      summary: Execute strategy (production)
+      description: |
+        Execute a trading strategy with real funds on Stellar network.
+        Requires authentication and sufficient quotas.
+      operationId: postExecute
+      security:
+        - bearerAuth: []
+        - apiKeyAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ExecuteRequest'
+      responses:
+        '200':
+          description: Execution result
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExecuteResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '429':
+          $ref: '#/components/responses/RateLimitExceeded'
+
+  /api/execute-demo:
+    post:
+      tags: [Execution]
+      summary: Execute strategy (demo/simulation)
+      description: |
+        Execute a trading strategy in simulation mode.
+        No real funds are used. Great for testing and development.
+      operationId: postExecuteDemo
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [strategy]
+              properties:
+                strategy:
+                  type: string
+                  example: scan
+                asset:
+                  type: string
+                  example: XLM
+      responses:
+        '200':
+          description: Demo execution result
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExecuteResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+
+  # ========================================
+  # AUTONOMOUS LOOP ENDPOINTS
+  # ========================================
+
+  /api/loop/start:
+    post:
+      tags: [Autonomous Loop]
+      summary: Start autonomous loop
+      description: Start the autonomous trading loop with custom configuration
+      operationId: postLoopStart
+      security:
+        - bearerAuth: []
+        - apiKeyAuth: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                config:
+                  type: object
+                  properties:
+                    interval:
+                      type: number
+                      description: Loop interval in milliseconds
+                      example: 60000
+                    assets:
+                      type: array
+                      items:
+                        type: string
+                      example: [XLM, USDC]
+                    strategies:
+                      type: array
+                      items:
+                        type: string
+      responses:
+        '200':
+          description: Loop started
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  message:
+                    type: string
+
+  /api/loop/stop:
+    post:
+      tags: [Autonomous Loop]
+      summary: Stop autonomous loop
+      description: Stop the running autonomous trading loop
+      operationId: postLoopStop
+      security:
+        - bearerAuth: []
+        - apiKeyAuth: []
+      responses:
+        '200':
+          description: Loop stopped
+
+  /api/loop/status:
+    get:
+      tags: [Autonomous Loop]
+      summary: Get loop status
+      description: Get current status of autonomous loop
+      operationId: getLoopStatus
+      security:
+        - bearerAuth: []
+        - apiKeyAuth: []
+      responses:
+        '200':
+          description: Loop status
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LoopStatus'
+
+  /api/loop/scan:
+    post:
+      tags: [Autonomous Loop]
+      summary: Perform manual scan
+      description: Manually trigger a market scan
+      operationId: postLoopScan
+      security:
+        - bearerAuth: []
+        - apiKeyAuth: []
+      responses:
+        '200':
+          description: Scan result
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  marketState:
+                    $ref: '#/components/schemas/MarketData'
+
+  # ========================================
+  # WEBHOOKS ENDPOINTS
+  # ========================================
+
+  /api/webhooks:
+    post:
+      tags: [Webhooks]
+      summary: Register webhook
+      description: Register a new HMAC-signed webhook for events
+      operationId: postWebhook
+      security:
+        - bearerAuth: []
+        - apiKeyAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/WebhookRequest'
+      responses:
+        '200':
+          description: Webhook registered
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Webhook'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+
+    get:
+      tags: [Webhooks]
+      summary: List webhooks
+      description: Get all registered webhooks for the user
+      operationId: getWebhooks
+      security:
+        - bearerAuth: []
+        - apiKeyAuth: []
+      responses:
+        '200':
+          description: List of webhooks
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  webhooks:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Webhook'
+
+  /api/webhooks/{id}:
+    delete:
+      tags: [Webhooks]
+      summary: Delete webhook
+      description: Delete a registered webhook
+      operationId: deleteWebhook
+      security:
+        - bearerAuth: []
+        - apiKeyAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Webhook deleted
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /api/webhooks/{id}/test:
+    post:
+      tags: [Webhooks]
+      summary: Test webhook
+      description: Send a test event to webhook
+      operationId: postWebhookTest
+      security:
+        - bearerAuth: []
+        - apiKeyAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Test result
+
+  # ========================================
+  # SUBSCRIPTIONS ENDPOINTS
+  # ========================================
+
+  /api/subscriptions:
+    post:
+      tags: [Subscriptions]
+      summary: Create subscription
+      description: Create a new WebSocket subscription with filters
+      operationId: postSubscription
+      security:
+        - bearerAuth: []
+        - apiKeyAuth: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                filters:
+                  type: object
+      responses:
+        '200':
+          description: Subscription created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Subscription'
+
+    get:
+      tags: [Subscriptions]
+      summary: List subscriptions
+      description: Get all subscriptions for the user
+      operationId: getSubscriptions
+      security:
+        - bearerAuth: []
+        - apiKeyAuth: []
+      responses:
+        '200':
+          description: List of subscriptions
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  subscriptions:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Subscription'
+
+  /api/subscriptions/{id}:
+    delete:
+      tags: [Subscriptions]
+      summary: Delete subscription
+      description: Delete a WebSocket subscription
+      operationId: deleteSubscription
+      security:
+        - bearerAuth: []
+        - apiKeyAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Subscription deleted
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /api/subscriptions/stats:
+    get:
+      tags: [Subscriptions]
+      summary: Get subscription stats
+      description: Get statistics about active subscriptions
+      operationId: getSubscriptionStats
+      responses:
+        '200':
+          description: Subscription statistics
+
+  # ========================================
+  # SKILLS/PLUGINS ENDPOINTS
+  # ========================================
+
+  /api/skills:
+    get:
+      tags: [Skills]
+      summary: List skills
+      description: Get all loaded skills/plugins
+      operationId: getSkills
+      responses:
+        '200':
+          description: List of skills
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  skills:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Skill'
+                  total:
+                    type: number
+
+  /api/skills/marketplace:
+    get:
+      tags: [Skills]
+      summary: Browse skill marketplace
+      description: Get all available skills in marketplace
+      operationId: getSkillsMarketplace
+      responses:
+        '200':
+          description: Marketplace skills
+
+  /api/skills/install:
+    post:
+      tags: [Skills]
+      summary: Install skill
+      description: Install a skill from GitHub or NiriumHub
+      operationId: postSkillInstall
+      security:
+        - bearerAuth: []
+        - apiKeyAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [source]
+              properties:
+                source:
+                  type: string
+                  description: GitHub URL or NiriumHub slug
+                  example: https://github.com/user/skill-repo
+      responses:
+        '200':
+          description: Skill installed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Skill'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+
+  /api/skills/{slug}:
+    delete:
+      tags: [Skills]
+      summary: Uninstall skill
+      description: Uninstall a skill by slug
+      operationId: deleteSkill
+      security:
+        - bearerAuth: []
+        - apiKeyAuth: []
+      parameters:
+        - name: slug
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Skill uninstalled
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /api/skills/{slug}/actions/{action}:
+    post:
+      tags: [Skills]
+      summary: Execute skill action
+      description: Execute a specific action from a skill
+      operationId: postSkillAction
+      security:
+        - bearerAuth: []
+        - apiKeyAuth: []
+      parameters:
+        - name: slug
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: action
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                params:
+                  type: object
+                context:
+                  type: object
+      responses:
+        '200':
+          description: Action executed
+
+  # ========================================
+  # SYSTEM ENDPOINTS
+  # ========================================
+
+  /api/system/health:
+    get:
+      tags: [System]
+      summary: Detailed health check
+      description: Get detailed health status of all system components
+      operationId: getSystemHealth
+      responses:
+        '200':
+          description: System health
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SystemHealth'
+
+  /api/config/llm:
+    post:
+      tags: [System]
+      summary: Configure LLM provider
+      description: Update active LLM provider configuration
+      operationId: postLlmConfig
+      security:
+        - bearerAuth: []
+        - apiKeyAuth: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                provider:
+                  type: string
+                  enum: [openai, anthropic, gemini, grok, minimax, bedrock, openrouter, ollama]
+                model:
+                  type: string
+                apiKey:
+                  type: string
+                ollamaUrl:
+                  type: string
+      responses:
+        '200':
+          description: Configuration updated
+
+# ========================================
+# COMPONENTS
+# ========================================
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: JWT token obtained from /api/public/demo-auth or /api/auth/token
+
+    apiKeyAuth:
+      type: apiKey
+      in: header
+      name: x-api-key
+      description: Long-lived API key obtained from /api/sandbox/request or /api/auth/keys
+
+  schemas:
+    TokenResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+        token:
+          type: string
+          description: JWT token
+        expiresIn:
+          type: string
+          example: 24h
+        userId:
+          type: string
+        tier:
+          type: string
+          enum: [free, sandbox, institutional, enterprise]
+        quotas:
+          $ref: '#/components/schemas/Quotas'
+
+    Quotas:
+      type: object
+      properties:
+        requestsPerMinute:
+          type: number
+        requestsPerDay:
+          type: number
+        maxStrategiesPerDay:
+          type: number
+
+    AssetInfo:
+      type: object
+      properties:
+        code:
+          type: string
+          example: XLM
+        name:
+          type: string
+        issuer:
+          type: string
+        status:
+          type: string
+          example: operational
+
+    SandboxRequest:
+      type: object
+      required: [companyName, contactEmail, walletAddress]
+      properties:
+        companyName:
+          type: string
+          example: Institutional Partner SAPI de CV
+        contactEmail:
+          type: string
+          format: email
+        walletAddress:
+          type: string
+          pattern: '^G[A-Z0-9]{55}$'
+        tier:
+          type: string
+          enum: [sandbox, institutional]
+          default: sandbox
+        message:
+          type: string
+
+    SandboxAccountResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+        message:
+          type: string
+        account:
+          $ref: '#/components/schemas/SandboxAccount'
+        warning:
+          type: string
+
+    SandboxAccount:
+      type: object
+      properties:
+        id:
+          type: string
+        companyName:
+          type: string
+        contactEmail:
+          type: string
+        walletAddress:
+          type: string
+        apiKey:
+          type: string
+          description: Only shown once upon creation
+        tier:
+          type: string
+        quotas:
+          $ref: '#/components/schemas/Quotas'
+        createdAt:
+          type: string
+          format: date-time
+        expiresAt:
+          type: string
+          format: date-time
+        isActive:
+          type: boolean
+
+    SandboxStatus:
+      type: object
+      properties:
+        account:
+          type: object
+          properties:
+            userId:
+              type: string
+            tier:
+              type: string
+            permissions:
+              type: array
+              items:
+                type: string
+        quotas:
+          $ref: '#/components/schemas/Quotas'
+        usage:
+          type: object
+          properties:
+            totalRequests:
+              type: number
+            dailyRequests:
+              type: number
+            lastReset:
+              type: string
+              format: date-time
+            remainingToday:
+              type: number
+
+    ApiKey:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        tier:
+          type: string
+        permissions:
+          type: array
+          items:
+            type: string
+        isActive:
+          type: boolean
+        createdAt:
+          type: string
+          format: date-time
+        expiresAt:
+          type: string
+          format: date-time
+
+    MarketData:
+      type: object
+      properties:
+        timestamp:
+          type: string
+          format: date-time
+        assets:
+          type: array
+          items:
+            $ref: '#/components/schemas/AssetInfo'
+        orderbook:
+          type: object
+        spreads:
+          type: object
+        volumes:
+          type: object
+
+    Signal:
+      type: object
+      properties:
+        id:
+          type: string
+        timestamp:
+          type: string
+          format: date-time
+        asset:
+          type: string
+        signal:
+          type: string
+          enum: [buy, sell, hold]
+        confidence:
+          type: number
+          minimum: 0
+          maximum: 1
+        reasoning:
+          type: string
+
+    ExecuteRequest:
+      type: object
+      required: [strategy, asset]
+      properties:
+        strategy:
+          type: string
+          example: buy
+        asset:
+          type: string
+          example: XLM
+        params:
+          type: object
+          properties:
+            amount:
+              type: number
+            maxPrice:
+              type: number
+
+    ExecuteResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+        txHash:
+          type: string
+          description: Stellar transaction hash
+        strategy:
+          type: string
+        asset:
+          type: string
+        result:
+          type: object
+
+    LoopStatus:
+      type: object
+      properties:
+        isRunning:
+          type: boolean
+        uptime:
+          type: number
+        lastScan:
+          type: string
+          format: date-time
+        totalScans:
+          type: number
+
+    WebhookRequest:
+      type: object
+      required: [url, events]
+      properties:
+        url:
+          type: string
+          format: uri
+        events:
+          type: array
+          items:
+            type: string
+            enum: [execution.started, execution.completed, execution.failed, signal.high_confidence]
+        secret:
+          type: string
+          description: HMAC secret for signature validation
+
+    Webhook:
+      type: object
+      properties:
+        id:
+          type: string
+        url:
+          type: string
+        events:
+          type: array
+          items:
+            type: string
+        isActive:
+          type: boolean
+        createdAt:
+          type: string
+          format: date-time
+
+    Subscription:
+      type: object
+      properties:
+        id:
+          type: string
+        filters:
+          type: object
+        createdAt:
+          type: string
+          format: date-time
+
+    Skill:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        slug:
+          type: string
+        version:
+          type: string
+        description:
+          type: string
+        author:
+          type: string
+        isBuiltIn:
+          type: boolean
+
+    SystemHealth:
+      type: object
+      properties:
+        agent:
+          type: object
+          properties:
+            healthy:
+              type: boolean
+            uptime:
+              type: number
+        horizon:
+          type: object
+          properties:
+            healthy:
+              type: boolean
+            latency:
+              type: number
+        soroban:
+          type: object
+          properties:
+            healthy:
+              type: boolean
+            latency:
+              type: number
+        websocket:
+          type: object
+          properties:
+            healthy:
+              type: boolean
+            clients:
+              type: number
+        ipfs:
+          type: object
+          properties:
+            gateway:
+              type: string
+        llm:
+          type: object
+          properties:
+            provider:
+              type: string
+            model:
+              type: string
+
+    QuickstartStep:
+      type: object
+      properties:
+        step:
+          type: number
+        title:
+          type: string
+        endpoint:
+          type: string
+        body:
+          type: object
+        headers:
+          type: object
+        note:
+          type: string
+
+    Error:
+      type: object
+      properties:
+        error:
+          type: string
+        message:
+          type: string
+        code:
+          type: string
+
+  responses:
+    BadRequest:
+      description: Bad request - invalid parameters
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+
+    Unauthorized:
+      description: Unauthorized - authentication required or invalid
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+
+    Forbidden:
+      description: Forbidden - insufficient permissions
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+
+    NotFound:
+      description: Resource not found
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+
+    RateLimitExceeded:
+      description: Rate limit exceeded
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              error:
+                type: string
+                example: Too Many Requests
+              retryAfter:
+                type: number
+                description: Seconds until rate limit resets
