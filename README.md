@@ -117,8 +117,16 @@ Following critical code reviews and architectural iterations, Nirium has been fu
 | Vault deposit/withdraw | ~0.01 XLM | ~1,000,000 txs |
 | Flash Loan (atomic 3-op) | ~0.02 XLM | ~500,000 txs |
 | Multi-op arbitrage | ~0.015 XLM | ~666,000 txs |
+## 🏆 Milestones & Traction
 
-💻 Full Technology Stack
+- ✅ **Stellar Impacta Bootcamp**: Completed with a high-performance score of **83/100**.
+- 📍 **Stellar Scale Program (CDMX)**: Successfully graduated from the official Stellar acceleration program in Mexico City.
+- 🥇 **Instaward 2026**: Formally invited to participate in the prestigious **Instawards** application process.
+- 💼 **Institutional Pipeline**: Currently in advanced negotiations with a major institutional client; **NBO (Non-Binding Offer) signed** by a prominent Web2 Venture Capital firm.
+
+---
+
+## 💻 Full Technology Stack
 
 | Layer | Technologies |
 |:---|:---|
