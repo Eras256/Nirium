@@ -10,25 +10,27 @@ import {
     Play, Settings, Users, Workflow, Key, Lightbulb, HardDrive, FileCheck, BookOpen, Activity, Heart, Clock
 } from "lucide-react";
 import { SectionBrandLogo } from "@/components/ui/SectionBrandLogo";
+import { useLanguage } from "../../context/LanguageContext";
 import Navbar from "@/components/layout/Navbar";
 import ApiKeyManager from "@/components/docs/ApiKeyManager";
 
 type TabId = 'overview' | 'architecture' | 'contracts' | 'agent' | 'frontend' | 'api' | 'security' | 'ideas' | 'builder';
 
-const tabs = [
-    { id: 'overview' as TabId, label: 'RESUMEN DE MISIÓN', icon: Book },
-    { id: 'api' as TabId, label: 'COMANDOS API', icon: Terminal },
-    { id: 'ideas' as TabId, label: 'ESCENARIOS TÁCTICOS', icon: Lightbulb },
-    { id: 'architecture' as TabId, label: 'ESQUEMAS DEL SISTEMA', icon: Layers },
-    { id: 'contracts' as TabId, label: 'KERNEL ON-CHAIN', icon: Code },
-    { id: 'agent' as TabId, label: 'UNIDADES AUTÓNOMAS', icon: Cpu },
-    { id: 'builder' as TabId, label: 'ARQUITECTO DE ESTRATEGIAS', icon: Workflow },
-    { id: 'frontend' as TabId, label: 'INTERFAZ DE COMANDO', icon: Globe },
-    { id: 'security' as TabId, label: 'PROTOCOLOS DE DEFENSA', icon: Shield },
-];
-
 function DocsContent() {
+    const { t } = useLanguage();
     const searchParams = useSearchParams();
+
+    const tabs = [
+        { id: 'overview' as TabId, label: t.docs.nav.overview, icon: Book },
+        { id: 'api' as TabId, label: 'API & SANDBOX', icon: Terminal },
+        { id: 'ideas' as TabId, label: t.docs.nav.ideas, icon: Lightbulb },
+        { id: 'architecture' as TabId, label: t.docs.nav.architecture, icon: Layers },
+        { id: 'contracts' as TabId, label: t.docs.nav.security, icon: Code },
+        { id: 'agent' as TabId, label: 'UNIDADES AUTÓNOMAS', icon: Cpu },
+        { id: 'builder' as TabId, label: 'ARQUITECTO DE ESTRATEGIAS', icon: Workflow },
+        { id: 'frontend' as TabId, label: 'INTERFAZ DE COMANDO', icon: Globe },
+        { id: 'security' as TabId, label: t.docs.nav.security, icon: Shield },
+    ];
     const initialTabParam = searchParams.get('tab');
     const isValidTab = (t: string | null): t is TabId => tabs.some(tab => tab.id === t);
     const initialTab = isValidTab(initialTabParam) ? initialTabParam : 'overview';
@@ -55,7 +57,7 @@ function DocsContent() {
                 <div className="max-w-[1600px] w-full mx-auto px-6 pb-8 border-b border-white/10">
                     <Link href="/" className="inline-flex items-center gap-2 text-gray-400 hover:text-white mb-6 transition-colors">
                         <ArrowLeft className="w-4 h-4" />
-                        Back to Protocol
+                        {t.docs.overview.back}
                     </Link>
 
                     <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-12">
@@ -67,14 +69,14 @@ function DocsContent() {
                                         <Book className="w-6 h-6 text-white" />
                                     </div>
                                     <div className="flex items-center gap-3">
-                                        <h1 className="text-4xl md:text-7xl font-black font-mono tracking-tighter uppercase leading-none">DOCUMENTATION</h1>
+                                        <h1 className="text-4xl md:text-7xl font-black font-mono tracking-tighter uppercase leading-none">{t.docs.overview.title}</h1>
                                         <span className="px-2 py-0.5 bg-green-500/20 text-green-400 text-xs font-mono rounded-full border border-green-500/30 animate-pulse">
                                             v0.0.7
                                         </span>
                                     </div>
                                 </div>
                                 <p className="text-xl text-gray-400 max-w-2xl leading-relaxed">
-                                    Field Manual for Autonomous Financial Operations on the Stellar Network.
+                                    {t.docs.overview.subtitle}
                                 </p>
                             </div>
                         </div>
@@ -140,18 +142,15 @@ function DocsContent() {
                                             <button
                                                 onClick={() => handleTabChange(prevTab.id)}
                                                 className="group flex flex-col items-start gap-2 max-w-[280px]"
-                                            >
-                                                <div className="flex items-center gap-2 text-xs font-mono text-gray-500 group-hover:text-stellar-teal transition-colors">
+                                            >                                                <div className="flex items-center gap-2 text-xs font-mono text-gray-500 group-hover:text-stellar-teal transition-colors text-left">
                                                     <ChevronLeft size={14} className="group-hover:-translate-x-1 transition-transform" />
-                                                    ANTERIOR
+                                                    {t.docs.nav.previous}
                                                 </div>
                                                 <div className="text-lg font-bold text-gray-400 group-hover:text-white transition-colors text-left uppercase tracking-tight">
                                                     {prevTab.label}
                                                 </div>
                                             </button>
-                                        ) : (
-                                            <div className="h-1" />
-                                        )}
+                                        ) : <div />}
                                     </div>
 
                                     <div className="hidden sm:block w-px h-12 bg-white/5" />
@@ -162,13 +161,14 @@ function DocsContent() {
                                                 onClick={() => handleTabChange(nextTab.id)}
                                                 className="group flex flex-col items-end gap-2 max-w-[280px]"
                                             >
-                                                <div className="flex items-center gap-2 text-xs font-mono text-gray-500 group-hover:text-stellar-teal transition-colors">
-                                                    SIGUIENTE
+                                                <div className="flex items-center gap-2 text-xs font-mono text-gray-500 group-hover:text-stellar-teal transition-colors text-right">
+                                                    {t.docs.nav.next}
                                                     <ChevronRight size={14} className="group-hover:translate-x-1 transition-transform" />
                                                 </div>
                                                 <div className="text-lg font-bold text-gray-400 group-hover:text-white transition-colors text-right uppercase tracking-tight">
                                                     {nextTab.label}
                                                 </div>
+
                                             </button>
                                         ) : (
                                             <div className="h-1" />
@@ -198,16 +198,17 @@ export default function DocsPage() {
 }
 
 function OverviewSection() {
+    const { t } = useLanguage();
     return (
         <div className="space-y-12">
             {/* Hero Stats */}
             <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
                 {[
-                    { label: 'Testnet Version', value: 'v0.0.7', color: 'text-stellar-teal' },
-                    { label: 'Unit Tests', value: '12/12 ✓', color: 'text-green-400' },
-                    { label: 'Neural Plugins', value: '13+ Active', color: 'text-purple-400' },
-                    { label: 'Flash Loan Fee', value: '0.3%', color: 'text-amber-400' },
-                    { label: 'Assets', value: 'XLM + USDC', color: 'text-blue-400' },
+                    { label: t.docs.overview.stats.version, value: 'v0.0.7', color: 'text-stellar-teal' },
+                    { label: t.docs.overview.stats.tests, value: '12/12 ✓', color: 'text-green-400' },
+                    { label: t.docs.overview.stats.plugins, value: '13+ Active', color: 'text-purple-400' },
+                    { label: t.docs.overview.stats.fee, value: '0.3%', color: 'text-amber-400' },
+                    { label: t.docs.overview.stats.assets, value: 'XLM + USDC', color: 'text-blue-400' },
                 ].map((stat) => (
                     <div key={stat.label} className="bg-white/5 border border-white/10 rounded-xl p-4">
                         <div className="text-xs text-gray-500 uppercase tracking-wider mb-1">{stat.label}</div>
@@ -220,7 +221,7 @@ function OverviewSection() {
             <section className="bg-gradient-to-br from-white/5 to-white/0 border border-white/10 rounded-2xl p-8">
                 <h2 className="text-2xl font-bold mb-6 flex items-center gap-3">
                     <Shield className="text-stellar-yellow" />
-                    Executive Summary
+                    {t.docs.overview.summary_title}
                 </h2>
                 <div className="prose prose-invert max-w-none text-gray-300 space-y-4">
                     <p className="text-lg leading-relaxed">
@@ -240,7 +241,7 @@ function OverviewSection() {
             <section>
                 <h2 className="text-2xl font-bold mb-6 flex items-center gap-3">
                     <Cpu className="text-stellar-teal" />
-                    Progressive Automation
+                    {t.docs.overview.progressive_title}
                 </h2>
                 <p className="text-gray-400 mb-6">
                     Nirium solves the biggest AI-Crypto dilemma: <strong className="text-white">Security vs. Autonomy</strong>
@@ -349,11 +350,12 @@ function OverviewSection() {
 }
 
 function ArchitectureSection() {
+    const { t } = useLanguage();
     return (
         <div className="space-y-12">
             {/* System Diagram */}
             <section>
-                <h2 className="text-2xl font-bold mb-6">System Architecture</h2>
+                <h2 className="text-2xl font-bold mb-6">{t.docs.nav.architecture}</h2>
                 <div className="bg-[#0A0A0A] border border-white/10 rounded-2xl p-6 font-mono text-sm overflow-x-auto">
                     <pre className="text-gray-300 whitespace-pre">
                         {`┌─────────────────────────────────────────────────────────────────────────┐
@@ -470,18 +472,19 @@ function ArchitectureSection() {
 }
 
 function ContractsSection() {
+    const { t } = useLanguage();
     return (
         <div className="space-y-12">
             {/* Deployed Contracts */}
             <section>
-                <h2 className="text-2xl font-bold mb-6">Deployed Contracts (Testnet v0.0.7)</h2>
+                <h2 className="text-2xl font-bold mb-6">{t.docs.api.contracts_title} (Testnet v0.0.7)</h2>
                 <div className="overflow-x-auto">
                     <table className="w-full text-left border-collapse">
                         <thead>
                             <tr className="border-b border-white/10 text-gray-400 text-sm">
-                                <th className="py-3 px-4">Component</th>
-                                <th className="py-3 px-4">Address</th>
-                                <th className="py-3 px-4">Description</th>
+                                <th className="py-3 px-4">{t.common.component}</th>
+                                <th className="py-3 px-4">{t.common.address}</th>
+                                <th className="py-3 px-4">{t.common.description}</th>
                             </tr>
                         </thead>
                         <tbody className="text-sm font-mono">
@@ -609,6 +612,7 @@ impl NiriumAgent {
 }
 
 function AgentSection() {
+    const { t } = useLanguage();
     return (
         <div className="space-y-12">
             {/* Overview */}
@@ -719,6 +723,7 @@ pnpm --filter @nirium/agent dev "Loop 10 USDC"
 }
 
 function BuilderSection() {
+    const { t } = useLanguage();
     return (
         <div className="space-y-12">
             <section>
@@ -807,6 +812,7 @@ function BuilderSection() {
 }
 
 function FrontendSection() {
+    const { t } = useLanguage();
     return (
         <div className="space-y-12">
             {/* Overview */}
@@ -895,6 +901,7 @@ function FrontendSection() {
 }
 
 function ApiSection() {
+    const { t } = useLanguage();
     return (
         <div className="space-y-16">
             {/* Header / Intro */}
@@ -908,7 +915,7 @@ function ApiSection() {
                         <h2 className="text-4xl font-black tracking-tight">NIRIUM NEXUS API</h2>
                     </div>
                     <p className="text-gray-400 text-lg max-w-3xl leading-relaxed mb-8">
-                        Infraestructura de alto rendimiento diseñada para la integración de agentes autónomos y sistemas fintech. 
+                        Infraestructura de alto rendimiento diseñada para la integración de agentes autónomos y sistemas fintech.
                         Proporcionamos el rastro forense inmutable y los protocolos de seguridad necesarios para la experimentación con activos financieros en entornos controlados (Art. 80 Ley Fintech).
                     </p>
                     <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
@@ -1103,9 +1110,9 @@ ws.on('message', (payload) => {
             <section id="endpoints-directory">
                 <div className="flex items-center gap-3 mb-8">
                     <Workflow className="text-stellar-teal w-6 h-6" />
-                    <h3 className="text-2xl font-bold uppercase tracking-tighter">Directorio Universal de Endpoints (32+)</h3>
+                    <h3 className="text-2xl font-bold uppercase tracking-tighter">{t.docs.api.explorer_title} (32+)</h3>
                 </div>
-                
+
                 <EndpointExplorer />
             </section>
 
@@ -1113,12 +1120,12 @@ ws.on('message', (payload) => {
             <section className="bg-gradient-to-r from-stellar-teal/5 to-stellar-yellow/5 border border-white/10 rounded-3xl p-8">
                 <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-6 mb-12">
                     <div>
-                        <h3 className="text-3xl font-black text-white mb-2">Acuerdo de Nivel de Servicio (SLA)</h3>
-                        <p className="text-gray-400">Compromisos de rendimiento para operaciones institucionales (Anexo A).</p>
+                        <h3 className="text-3xl font-black text-white mb-2">{t.docs.api.sla_title}</h3>
+                        <p className="text-gray-400">{t.docs.api.sla_subtitle}</p>
                     </div>
                     <Link href="/status" className="flex items-center gap-2 px-6 py-3 bg-white/5 border border-white/10 rounded-xl hover:bg-white/10 transition-all group">
                         <Activity className="w-4 h-4 text-stellar-teal group-hover:animate-pulse" />
-                        <span className="text-sm font-bold text-white">Ver Status en Vivo</span>
+                        <span className="text-sm font-bold text-white">{t.docs.api.status_button}</span>
                     </Link>
                 </div>
 
@@ -1164,14 +1171,15 @@ ws.on('message', (payload) => {
 }
 
 function EndpointExplorer() {
+    const { t } = useLanguage();
     const [activeCat, setActiveCat] = useState('auth');
 
     const categories = [
-        { id: 'auth', label: 'PÚBLICOS & AUTH', icon: Lock },
-        { id: 'market', label: 'MERCADO & SEÑALES', icon: TrendingUp },
-        { id: 'exec', label: 'EJECUCIÓN & LOOP', icon: Cpu },
-        { id: 'sandbox', label: 'SANDBOX & CUOTAS', icon: Shield },
-        { id: 'events', label: 'EVENTOS (WS/WEBHOOKS)', icon: Zap },
+        { id: 'auth', label: t.docs.api.categories.auth, icon: Lock },
+        { id: 'market', label: t.docs.api.categories.market, icon: TrendingUp },
+        { id: 'exec', label: t.docs.api.categories.exec, icon: Cpu },
+        { id: 'sandbox', label: t.docs.api.categories.sandbox, icon: Shield },
+        { id: 'events', label: t.docs.api.categories.events, icon: Zap },
     ];
 
     const endpoints: Record<string, any[]> = {
@@ -1224,11 +1232,10 @@ function EndpointExplorer() {
                     <button
                         key={cat.id}
                         onClick={() => setActiveCat(cat.id)}
-                        className={`flex items-center gap-2 px-6 py-4 text-[10px] font-black uppercase tracking-widest whitespace-nowrap transition-all border-b-2 ${
-                            activeCat === cat.id 
-                            ? 'border-stellar-teal text-stellar-teal bg-stellar-teal/5' 
-                            : 'border-transparent text-gray-500 hover:text-white'
-                        }`}
+                        className={`flex items-center gap-2 px-6 py-4 text-[10px] font-black uppercase tracking-widest whitespace-nowrap transition-all border-b-2 ${activeCat === cat.id
+                                ? 'border-stellar-teal text-stellar-teal bg-stellar-teal/5'
+                                : 'border-transparent text-gray-500 hover:text-white'
+                            }`}
                     >
                         <cat.icon size={14} />
                         {cat.label}
@@ -1239,12 +1246,11 @@ function EndpointExplorer() {
             <div className="p-2 sm:p-6 space-y-2">
                 {endpoints[activeCat].map((ep, idx) => (
                     <div key={idx} className="group flex flex-col sm:flex-row items-start sm:items-center gap-4 p-4 rounded-xl hover:bg-white/5 transition-all border border-transparent hover:border-white/10">
-                        <div className={`px-2 py-1 rounded font-mono text-[10px] font-black w-14 text-center shrink-0 ${
-                            ep.method === 'GET' ? 'bg-blue-500/20 text-blue-400' :
-                            ep.method === 'POST' ? 'bg-green-500/20 text-green-400' :
-                            ep.method === 'WS' ? 'bg-purple-500/20 text-purple-400' :
-                            'bg-red-500/20 text-red-400'
-                        }`}>
+                        <div className={`px-2 py-1 rounded font-mono text-[10px] font-black w-14 text-center shrink-0 ${ep.method === 'GET' ? 'bg-blue-500/20 text-blue-400' :
+                                ep.method === 'POST' ? 'bg-green-500/20 text-green-400' :
+                                    ep.method === 'WS' ? 'bg-purple-500/20 text-purple-400' :
+                                        'bg-red-500/20 text-red-400'
+                            }`}>
                             {ep.method}
                         </div>
                         <div className="font-mono text-xs text-stellar-teal tracking-tighter">
@@ -1256,18 +1262,18 @@ function EndpointExplorer() {
                     </div>
                 ))}
             </div>
-            
+
             <div className="bg-white/5 px-6 py-4 flex items-center justify-between">
                 <span className="text-[10px] text-gray-500 font-mono italic">
                     Referencia completa: <a href="/nirium-api.yaml" className="underline hover:text-stellar-teal transition-colors">nirium-api.yaml</a> (OpenAPI 3.1.0)
                 </span>
-                <a 
-                    href="/nirium-api.yaml" 
-                    download="nirium-api-spec.yaml" 
+                <a
+                    href="/nirium-api.yaml"
+                    download="nirium-api-spec.yaml"
                     className="text-[10px] text-stellar-teal font-black hover:underline uppercase tracking-widest flex items-center gap-2 group"
                 >
                     <FileCode size={12} className="group-hover:rotate-12 transition-transform" />
-                    Descargar/Importar en Postman →
+                    {t.docs.api.download_postman} →
                 </a>
             </div>
         </div>
@@ -1275,13 +1281,14 @@ function EndpointExplorer() {
 }
 
 function SecuritySection() {
+    const { t } = useLanguage();
     return (
         <div className="space-y-12">
             {/* Atomic Operations */}
             <section>
-                <h2 className="text-2xl font-bold mb-6 flex items-center gap-3">
+                <h2 className="text-2xl font-bold mb-6 flex items-center gap-3 text-white">
                     <Lock className="text-stellar-teal" />
-                    Atomic Operation Enforcement
+                    {t.docs.security.atomic_enforcement}
                 </h2>
                 <div className="bg-red-500/5 border border-red-500/20 rounded-xl p-6">
                     <p className="text-gray-300 mb-4">
@@ -1305,7 +1312,7 @@ function SecuritySection() {
 
             {/* Attack Prevention */}
             <section>
-                <h2 className="text-2xl font-bold mb-6">Attack Prevention Matrix</h2>
+                <h2 className="text-2xl font-bold mb-6 text-white">{t.docs.security.matrix_title}</h2>
                 <div className="overflow-x-auto">
                     <table className="w-full text-left">
                         <thead>
@@ -1411,13 +1418,13 @@ function SecuritySection() {
 }
 
 function IdeasSection() {
+    const { t } = useLanguage();
     return (
         <div className="space-y-12">
             <section className="text-center max-w-3xl mx-auto mb-16">
-                <h2 className="text-4xl font-black mb-6">What to Build? 🏗️</h2>
+                <h2 className="text-4xl font-black mb-6 text-white">{t.docs.ideas.title}</h2>
                 <p className="text-xl text-gray-400">
-                    Nirium provides the financial rails. You build the vehicles. <br />
-                    Here are some "Request for Startups" using our SDK.
+                    {t.docs.ideas.subtitle}
                 </p>
             </section>
 
@@ -1428,7 +1435,7 @@ function IdeasSection() {
                         <div className="p-3 bg-yellow-500/10 rounded-xl text-yellow-500 shrink-0">
                             <Shield size={32} />
                         </div>
-                        <span className="px-3 py-1 rounded-full bg-white/5 text-[10px] sm:text-xs font-mono text-gray-400 self-start xs:self-center">Difficulty: Medium</span>
+                        <span className="px-3 py-1 rounded-full bg-white/5 text-[10px] sm:text-xs font-mono text-gray-400 self-start xs:self-center">{t.docs.ideas.difficulty}: Medium</span>
                     </div>
                     <h3 className="text-xl sm:text-2xl font-bold text-white mb-2">PortfolioGuard Bot</h3>
                     <p className="text-gray-400 mb-6 sm:min-h-[60px] text-sm sm:text-base leading-relaxed">

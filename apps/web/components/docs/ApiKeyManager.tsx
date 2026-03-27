@@ -16,11 +16,8 @@ interface ApiKeyData {
 }
 
 export default function ApiKeyManager() {
-    const { address: accountStr, isConnected } = useFreighter();
+    const { address: accountStr, isConnected, signMessage } = useFreighter();
     const account = isConnected ? { address: accountStr, chains: ['stellar:testnet'] } : null;
-    const signPersonalMessage = async (params: { message: Uint8Array }) => {
-        return { signature: "mock_signature_for_stellar" };
-    };
 
     const [isLoading, setIsLoading] = useState(false);
     const [generatedKey, setGeneratedKey] = useState<ApiKeyData | null>(null);
@@ -42,12 +39,16 @@ export default function ApiKeyManager() {
         setIsLoading(true);
         try {
             console.log("1. Requesting signature...");
-            // 1. Sign Message to Authenticate
-            const message = new TextEncoder().encode(`Login to Nirium Agent API\nTimestamp: ${Date.now()}`);
-            const { signature } = await signPersonalMessage({
-                message,
-            });
-            console.log("Signature obtained:", signature);
+            // 1. Sign Message to Authenticate with Freighter
+            const messageText = `Login to Nirium Agent API\nTimestamp: ${Date.now()}`;
+
+            if (!signMessage) {
+                throw new Error('Freighter signMessage not available');
+            }
+
+            // StellarWalletsKit.signMessage returns { signedMessage: string }
+            const { signedMessage } = await signMessage(messageText);
+            console.log("Signature obtained:", signedMessage);
 
             // 2. Get JWT Token
             console.log(`2. Fetching JWT token from ${API_URL}/api/auth/token...`);
@@ -56,7 +57,8 @@ export default function ApiKeyManager() {
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
                     walletAddress: account.address,
-                    signature: signature
+                    signature: signedMessage,
+                    message: messageText
                 })
             }).catch(err => {
                 throw new Error(`Connection to Agent API failed: ${err.message}. Is the server running at ${API_URL}?`);

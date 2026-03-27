@@ -4,7 +4,7 @@
         "dashboard": "Panel",
         "strategies": "Estrategias",
         "builder": "Constructor Visual",
-        "marketplace": "Mercado",
+        "marketplace": "Marketplace",
         "leaderboard": "Clasificación",
         "plugins": "Complementos",
         "agents": "Agentes",
@@ -238,7 +238,10 @@
         "dashboard": "Panel de Control",
         "strategies": "Estrategias",
         "marketplace": "Mercado",
-        "analytics": "Analíticas"
+        "analytics": "Analíticas",
+        "component": "Componente",
+        "address": "Dirección",
+        "description": "Descripción"
     },
     "dashboard": {
         "fleet_status": "Estado Operativo de Flota",
@@ -318,7 +321,7 @@
         "title": "Acceso a la Matriz: Protocolo de Consentimiento",
         "consent_required": "FIRMA DE CONSENTIMIENTO CRIPTOGRÁFICO:",
         "acknowledge_prefix": "Al firmar este payload, usted declara bajo protesta de decir verdad que:",
-        "item_non_custodial": "Entiende que Nirium es un software no-custodial y experimental; sus llaves son su responsabilidad.",
+        "item_non_custodial": "Entiende que Nirium es un software no-custodial and experimental; sus llaves son su responsabilidad.",
         "item_elo_historical": "Reconoce que los retornos históricos (ELO) no implican rendimientos futuros garantizados.",
         "item_systemic_risk": "Acepta el riesgo sistémico de la IA y reconoce que las 'alucinaciones' del modelo son un vector de riesgo operacional.",
         "item_liability": "Libera a los desarrolladores de Nirium de toda responsabilidad por pérdidas de capital derivadas de volatilidad o fallos de red.",
@@ -343,5 +346,59 @@
             }
         },
         "footer": "Al conectar su billetera, usted acepta todos los riesgos descritos anteriormente."
+    },
+    "docs": {
+        "nav": {
+            "overview": "RESUMEN DE MISIÓN",
+            "architecture": "ARQUITECTURA & SLA",
+            "api": "API & SANDBOX",
+            "security": "SEGURIDAD & COMPLIANCE",
+            "ideas": "RFCS & ESTRATEGIAS",
+            "previous": "ANTERIOR",
+            "next": "SIGUIENTE"
+        },
+        "api": {
+            "title": "Protocolos de Integración (SDK)",
+            "explorer_title": "Directorio Universal de Endpoints",
+            "contracts_title": "Directorio de Contratos (Stellar Mainnet)",
+            "download_postman": "Descargar/Importar en Postman",
+            "categories": {
+                "auth": "PÚBLICOS & AUTH",
+                "market": "MERCADO & SEÑALES",
+                "exec": "EJECUCIÓN & LOOP",
+                "sandbox": "SANDBOX & CUOTAS",
+                "events": "EVENTOS (WS/WEBHOOKS)"
+            },
+            "sla_title": "Acuerdo de Nivel de Servicio (SLA)",
+            "sla_subtitle": "Compromisos de rendimiento para operaciones institucionales (Anexo A).",
+            "status_button": "Ver Status en Vivo"
+        },
+        "security": {
+            "title": "Seguridad & Matrices de Ataque",
+            "atomic_enforcement": "Ejecución Atómica Forzada",
+            "matrix_title": "Matriz de Prevención de Ataques",
+            "rls_title": "Seguridad de Datos (Row Level Security)",
+            "audit_trail": "Rastros de Auditoría Forense",
+            "ipfs_archive": "Archivo Neural (IPFS)"
+        },
+        "ideas": {
+            "title": "¿Qué Construir? 🏗️",
+            "subtitle": "Nirium proporciona los rieles financieros. Tú construyes los vehículos.",
+            "difficulty": "Dificultad"
+        },
+        "overview": {
+            "title": "DOCUMENTACIÓN",
+            "subtitle": "Manual de Campo para Operaciones Financieras Autónomas en Stellar.",
+            "back": "Volver al Protocolo",
+            "summary_title": "Resumen Ejecutivo",
+            "progressive_title": "Automatización Progresiva",
+            "stats": {
+                "version": "Versión Testnet",
+                "tests": "Pruebas Unitarias",
+                "plugins": "Plugins Neurales",
+                "fee": "Comisión Flash Loan",
+                "assets": "Activos"
+            }
+        }
     }
 }

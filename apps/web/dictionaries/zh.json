@@ -128,12 +128,12 @@
             {
                 "step": "01",
                 "title": "连接您的钱包",
-                "desc": "链接您的 Freighter、xBull 或任何 Stellar 钱包。您的密钥，您的资本 — 始终非托管。"
+                "desc": "连接您的钱包并订阅市场中的策略。您的密钥，您的资本 — 始终非托管。"
             },
             {
                 "step": "02",
                 "title": "搭建代理逻辑",
-                "desc": "在几秒钟内使用我们的可视化构建器、SDK、CLI 或 MCP 服务器创建您的代理链上身份和策略参数。"
+                "desc": "在几秒钟内使用我们的可视化构建器、SDK、CLI 或 MCP 服务器创建您的代理链上身份 and 策略参数。"
             },
             {
                 "step": "03",
@@ -238,7 +238,10 @@
         "dashboard": "控制面板",
         "strategies": "策略",
         "marketplace": "市场",
-        "analytics": "数据分析"
+        "analytics": "数据分析",
+        "component": "组件",
+        "address": "地址",
+        "description": "描述"
     },
     "dashboard": {
         "fleet_status": "舰队运行状态",
@@ -277,28 +280,40 @@
         "broadcast_failed": "上行链路错误"
     },
     "terms": {
-        "title": "服务条款",
+        "title": "服务条款与企业许可",
         "last_updated": "最近更新：2026年3月",
         "sections": {
-            "open_source": {
-                "title": "1. 开源框架",
-                "content": "Nirium 是部署在 Stellar 网络上的一组开源 Soroban 智能合约。这里提供的界面仅是与去中心化协议显式交互的客户端。通过使用此界面，您了解您正在与公共区块链基础设施进行交互。"
+            "nature": {
+                "title": "1. 服务性质与法律框架 (墨西哥)",
+                "content": "Nirium 是根据墨西哥《金融科技法》第 80 条规定的“创新模型”（监管沙盒）标准设计的技术基础设施平台。该协议提供必要的不可篡改取证审计追踪和安全协议，用于在受控环境中进行金融资产实验，简化金融实体和机构用户的监管合规。墨西哥国债 (CETES/RWA) 的托管和执行服务由获得授权的第三方供应商 (Etherfuse/Indeval) 根据其自身的法律责任提供。"
             },
             "no_guarantees": {
-                "title": "2. 无财务保证",
-                "content": "通过 Nirium 提供的策略、插件和自主代理均由社区创建，并完全通过 Sentinel ELO 系统进行排名。ELO 排名仅为历史数据，不预测或保证未来的表现或财务结果。通过 USDC 购买策略订阅并不保证财务回报。Nirium 不提供投资合同或带有收益的证券。"
+                "title": "2. 数字资产分类 (SEC/CFTC 2026)",
+                "content": "根据 2026 年 3 月的 SEC/CFTC 联合指南，与 NiriumVaults 的交互被归类为“非证券数字资产管理代理服务”。资本保持在用户私钥的主权控制下。Nirium 不保证收益。ELO 声誉系统纯属信息性质，反映历史算法表现，而非对未来收益的承诺。"
             },
-            "hallucination": {
-                "title": "3. 神经矩阵波动性 (算法幻觉)",
-                "content": "Nirium 代理咨询由 LLM 提供商组成的矩阵 (包括 OpenAI, Anthropic, Gemini, Grok, MiniMax 等) 进行定性信号分析。这些模型是实验性的，可能会产生不可预测的、延迟的或事实错误的内容 ('幻觉')。Nirium 对因 LLM 延迟、API 停机或错误计算信号而导致的交易损失、遗漏套利窗口或 Gas 消耗不承担任何责任。"
+            "ai_liability": {
+                "title": "3. 自主代理与人工智能责任",
+                "content": "通过激活代理“集群”(Swarm) 或“循环”(Loop)，用户授予代码 (LLM/代理) 有限的技术授权，以根据预配置参数代表其签署交易。用户承认大语言模型 (OpenAI, Anthropic 等) 可能会出现“算法幻觉”或关键延迟。Nirium 对人工智能做出的决策或价格预言机的系统性故障不承担任何责任。"
             },
-            "fees": {
-                "title": "4. 网络费用和矩阵费用",
-                "content": "用户负责支付所有 Stellar 网络操作费用。此外，通过 Nirium 的算法智能合约执行策略，即表示您同意支付 1% 的协议矩阵费用。该费用由智能合约代码强制执行，仅从实现的毛利润中原子扣除，而非从本金中扣除。"
+            "rwa_disclaimer": {
+                "title": "4. 现实世界资产 (RWA) 风险",
+                "content": "涉及 CETES 和其他政府债券的操作受传统金融系统的可用性和监管限制。Nirium 仅作为技术桥梁。这些资产的交易对手、托管和流动性风险完全由发行人和最终托管人承担。"
             },
             "dispute": {
-                "title": "5. 争议解决与管辖法律",
-                "content": "通过与 Nirium 协议进行交互，您同意任何法律争议或索赔将通过具有约束力的、机密的仲裁进行解决。您放弃针对开发人员或维护者提起或参与集体诉讼的任何权利。本条款受墨西哥墨西哥州 (Estado de México) 法律管辖。"
+                "title": "5. 管辖权与加密仲裁",
+                "content": "任何争议应根据墨西哥城商会的规则通过具有约束力的仲裁解决。通过连接您的钱包，用户明确放弃集体诉讼权利。本条款受墨西哥合众国联邦法律管辖。"
+            },
+            "infrastructure": {
+                "title": "6. 基础设施与可用性 (SaaS/IaaS)",
+                "content": "Nirium 按“原样”提供基础设施服务。由于最终执行取决于公共 Stellar 网络、外部 LLM 提供商和数据预言机，Nirium 不保证 100% 的可用性。网络故障、区块链拥堵或外部 API 中断被视为“不可抗力”事件。Nirium 对因服务暂时不可用而导致的损失不承担责任。"
+            },
+            "reverse_solicitation": {
+                "title": "7. 反向招揽与国际合规",
+                "content": "Nirium 不在未注册的司法管辖区公开提供证券或金融服务。来自受限司法管辖区的用户访问被视为主动的、私人的和个人的请求（“反向招揽”）。用户声明其未受到定向营销的诱导，并全权负责遵守其居住地的法律。"
+            },
+            "intellectual_property": {
+                "title": "8. 算法知识产权",
+                "content": "所有算法、代理逻辑 (“集群”)、网络架构和专有可视化效果均为 Nirium 的独家知识产权。使用本平台即授予有限的、非排他性的、可撤销的使用许可。使用界面并不授予对核心人工智能引擎的所有权、修改或反向工程权利。"
             }
         }
     },
@@ -312,7 +327,7 @@
         "item_liability": "您对部署到 NiriumVaults 的任何资本承担全部责任。",
         "button_sign": "签署并进入矩阵",
         "button_signing": "等待 FREIGHTER 签名...",
-        "governing_law": "受墨西哥州 (Estado de México, MX) 法律管辖。",
+        "governing_law": "受墨西哥金融科技法和 2026 年全球标准管辖。",
         "read_more_prefix": "请查看我们的完整 ",
         "terms_link": "服务条款",
         "risk_link": "风险披露"
@@ -331,5 +346,59 @@
             }
         },
         "footer": "连接钱包即表示您接受上述所有风险。"
+    },
+    "docs": {
+        "nav": {
+            "overview": "任务概述",
+            "architecture": "架构与 SLA",
+            "api": "API 与 沙盒",
+            "security": "安全与合规",
+            "ideas": "RFC 与 策略",
+            "previous": "上一页",
+            "next": "下一页"
+        },
+        "api": {
+            "title": "集成协议 (SDK)",
+            "explorer_title": "通用端点目录",
+            "contracts_title": "合约目录 (Stellar 主网)",
+            "download_postman": "下载/导入 Postman",
+            "categories": {
+                "auth": "公开与授权",
+                "market": "市场与信号",
+                "exec": "执行与循环",
+                "sandbox": "沙盒与配额",
+                "events": "事件 (WS/Webhooks)"
+            },
+            "sla_title": "服务水平协议 (SLA)",
+            "sla_subtitle": "机构运营绩效承诺 (附件 A).",
+            "status_button": "查看实时状态"
+        },
+        "security": {
+            "title": "安全与攻击矩阵",
+            "atomic_enforcement": "强制原子执行",
+            "matrix_title": "攻击防御矩阵",
+            "rls_title": "数据安全 (行级安全)",
+            "audit_trail": "取证审计追踪",
+            "ipfs_archive": "神经档案 (IPFS)"
+        },
+        "ideas": {
+            "title": "该构建什么？ 🏗️",
+            "subtitle": "Nirium 提供金融导轨。您负责建造车辆。",
+            "difficulty": "难度"
+        },
+        "overview": {
+            "title": "文档中心",
+            "subtitle": "Stellar 网络自主金融操作现场手册。",
+            "back": "返回协议",
+            "summary_title": "执行摘要",
+            "progressive_title": "渐进式自动化",
+            "stats": {
+                "version": "测试网版本",
+                "tests": "单元测试",
+                "plugins": "神经插件",
+                "fee": "闪电贷手续费",
+                "assets": "支持资产"
+            }
+        }
     }
 }

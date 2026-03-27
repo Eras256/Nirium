@@ -238,7 +238,10 @@
         "dashboard": "Dashboard",
         "strategies": "Strategies",
         "marketplace": "Marketplace",
-        "analytics": "Analytics"
+        "analytics": "Analytics",
+        "component": "Component",
+        "address": "Address",
+        "description": "Description"
     },
     "dashboard": {
         "fleet_status": "Fleet Operational Status",
@@ -339,9 +342,63 @@
             },
             "custody": {
                 "title": "2. Use At Your Own Risk",
-                "content": "Nirium does NOT take custody of your funds. All capital is stored in non-custodial Vault smart contracts controlled by your cryptographic keys. As such, the developers, maintainers, and creators of Nirium bear absolutely NO LIABILITY for any losses incurred."
+                "content": "Nirium NO toma la custodia de sus fondos. Todo el capital se almacena en contratos inteligentes de Bóveda no custodiales controlados por sus llaves criptográficas. Como tal, los desarrolladores, mantenedores y creadores de Nirium no asumen ABSOLUTAMENTE NINGUNA RESPONSABILIDAD por las pérdidas incurridas."
             }
         },
         "footer": "By connecting your wallet, you accept all risks outlined above."
+    },
+    "docs": {
+        "nav": {
+            "overview": "MISSION OVERVIEW",
+            "architecture": "ARCHITECTURE & SLA",
+            "api": "API & SANDBOX",
+            "security": "SECURITY & COMPLIANCE",
+            "ideas": "RFCS & STRATEGIES",
+            "previous": "PREVIOUS",
+            "next": "NEXT"
+        },
+        "api": {
+            "title": "Integration Protocols (SDK)",
+            "explorer_title": "Universal Endpoint Directory",
+            "contracts_title": "Contract Directory (Stellar Mainnet)",
+            "download_postman": "Download/Import into Postman",
+            "categories": {
+                "auth": "PUBLIC & AUTH",
+                "market": "MARKET & SIGNALS",
+                "exec": "EXECUTION & LOOP",
+                "sandbox": "SANDBOX & QUOTAS",
+                "events": "EVENTS (WS/WEBHOOKS)"
+            },
+            "sla_title": "Service Level Agreement (SLA)",
+            "sla_subtitle": "Performance commitments for institutional operations (Annex A).",
+            "status_button": "View Live Status"
+        },
+        "security": {
+            "title": "Security & Attack Matrices",
+            "atomic_enforcement": "Atomic Operation Enforcement",
+            "matrix_title": "Attack Prevention Matrix",
+            "rls_title": "Data Security (Row Level Security)",
+            "audit_trail": "Forensic Audit Trails",
+            "ipfs_archive": "Neural Archive (IPFS)"
+        },
+        "ideas": {
+            "title": "What to Build? 🏗️",
+            "subtitle": "Nirium provides the financial rails. You build the vehicles.",
+            "difficulty": "Difficulty"
+        },
+        "overview": {
+            "title": "DOCUMENTACIÓN",
+            "subtitle": "Manual de Campo para Operaciones Financieras Autónomas en Stellar.",
+            "back": "Back to Protocol",
+            "summary_title": "Executive Summary",
+            "progressive_title": "Progressive Automation",
+            "stats": {
+                "version": "Testnet Version",
+                "tests": "Unit Tests",
+                "plugins": "Neural Plugins",
+                "fee": "Flash Loan Fee",
+                "assets": "Assets"
+            }
+        }
     }
 }
