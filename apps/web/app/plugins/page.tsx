@@ -1,5 +1,6 @@
 "use client";
 
+import { SectionBrandLogo } from "@/components/ui/SectionBrandLogo";
 import { useState, useEffect } from "react";
 import Navbar from "@/components/layout/Navbar";
 import { motion } from "framer-motion";
@@ -328,59 +329,64 @@ export default function PluginsPage() {
                 <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full h-full bg-[url('/grid.svg')] bg-repeat opacity-[0.03]" />
             </div>
 
-            <div className="relative z-10 pt-32 pb-20 px-4 sm:px-6 lg:px-8">
+            <div className="relative z-10 pt-52 pb-20 px-4 sm:px-6 lg:px-8">
                 <div className="max-w-[1600px] w-full mx-auto">
 
                     {/* Header */}
-                    <div className="text-center mb-16 section-lift">
-                        <motion.div
-                            initial={{ opacity: 0, y: 20 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            className="inline-flex items-center gap-2 px-3 py-1 bg-stellar-teal/10 border border-stellar-teal/30 rounded-full text-stellar-teal text-xs font-mono mb-6"
-                        >
-                            <Cpu size={14} />
-                            CORE NEURAL EXTENSIONS
-                        </motion.div>
+                    <div className="flex flex-col lg:flex-row items-center lg:items-center justify-between gap-12 mb-20 px-4 section-lift">
+                        <div className="flex flex-col items-center lg:items-start text-center lg:text-left">
+                            <motion.div
+                                initial={{ opacity: 0, y: 20 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                className="inline-flex items-center gap-2 px-3 py-1 bg-stellar-teal/10 border border-stellar-teal/30 rounded-full text-stellar-teal text-xs font-mono mb-8 self-center lg:self-start"
+                            >
+                                <Cpu size={14} />
+                                CORE NEURAL EXTENSIONS
+                            </motion.div>
 
-                        <motion.h1
-                            initial={{ opacity: 0, y: 20 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            transition={{ delay: 0.1 }}
-                            className="text-4xl md:text-6xl font-black tracking-tighter mb-6"
-                        >
-                            <span className="text-white">NIRIUM</span> <span className="text-gradient">HUB</span>
-                        </motion.h1>
+                            <div className="flex flex-col lg:flex-row items-center lg:items-center gap-6 mb-6">
+                                <SectionBrandLogo className="!justify-start mb-0" size="w-32 lg:w-40" />
+                                <motion.h1
+                                    initial={{ opacity: 0, y: 20 }}
+                                    animate={{ opacity: 1, y: 0 }}
+                                    transition={{ delay: 0.1 }}
+                                    className="text-4xl md:text-7xl font-black tracking-tighter leading-none"
+                                >
+                                    <span className="text-white">NIRIUM</span> <span className="text-gradient">HUB</span>
+                                </motion.h1>
+                            </div>
 
-                        <motion.p
-                            initial={{ opacity: 0, y: 20 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            transition={{ delay: 0.2 }}
-                            className="text-xl text-gray-400 max-w-2xl mx-auto leading-relaxed"
-                        >
-                            Upgrade your agents with advanced cognitive capabilities.<br />
-                            From atomic DeFi execution and decentralized forensic logging to social intelligence and MEV capture.
-                        </motion.p>
+                            <motion.p
+                                initial={{ opacity: 0, y: 20 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                transition={{ delay: 0.2 }}
+                                className="text-xl text-gray-400 max-w-2xl leading-relaxed"
+                            >
+                                Upgrade your agents with advanced cognitive capabilities.<br />
+                                From atomic DeFi execution and decentralized forensic logging to social intelligence and MEV capture.
+                            </motion.p>
 
-                        {/* Plugin Count */}
-                        <motion.div
-                            initial={{ opacity: 0 }}
-                            animate={{ opacity: 1 }}
-                            transition={{ delay: 0.3 }}
-                            className="mt-6 flex flex-wrap items-center justify-center gap-3"
-                        >
-                            <span className="px-4 py-1.5 bg-white/5 border border-white/10 rounded-full text-sm font-mono text-gray-400">
-                                {CORE_PLUGINS.length} plugins available
-                            </span>
-                            <span className="px-4 py-1.5 bg-green-500/10 border border-green-500/20 rounded-full text-sm font-mono text-green-400">
-                                ✓ All Soroban-verified
-                            </span>
-                            <span className="px-4 py-1.5 bg-blue-500/10 border border-blue-500/20 rounded-full text-sm font-mono text-[#4ca2ff]">
-                                ✓ XLM + USDC compatible
-                            </span>
-                            <span className="px-4 py-1.5 bg-pink-500/10 border border-pink-500/20 rounded-full text-sm font-mono text-pink-400">
-                                ✓ Forensic logging
-                            </span>
-                        </motion.div>
+                            {/* Status Badges */}
+                            <motion.div
+                                initial={{ opacity: 0 }}
+                                animate={{ opacity: 1 }}
+                                transition={{ delay: 0.3 }}
+                                className="mt-8 flex flex-wrap items-center gap-3"
+                            >
+                                <span className="px-4 py-1.5 bg-white/5 border border-white/10 rounded-full text-sm font-mono text-gray-400">
+                                    {CORE_PLUGINS.length} plugins available
+                                </span>
+                                <span className="px-4 py-1.5 bg-green-500/10 border border-green-500/20 rounded-full text-sm font-mono text-green-400">
+                                    ✓ All Soroban-verified
+                                </span>
+                                <span className="px-4 py-1.5 bg-blue-500/10 border border-blue-500/20 rounded-full text-sm font-mono text-[#4ca2ff]">
+                                    ✓ XLM + USDC compatible
+                                </span>
+                                <span className="px-4 py-1.5 bg-pink-500/10 border border-pink-500/20 rounded-full text-sm font-mono text-pink-400">
+                                    ✓ Forensic logging
+                                </span>
+                            </motion.div>
+                        </div>
                     </div>
 
                     {/* Plugins Grid */}

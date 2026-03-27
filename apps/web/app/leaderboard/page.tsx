@@ -1,5 +1,6 @@
 'use client';
 
+import { SectionBrandLogo } from "@/components/ui/SectionBrandLogo";
 import Navbar from "@/components/layout/Navbar";
 import { useLanguage } from "../../context/LanguageContext";
 import { Shield, Sparkles, Activity, Star, Trophy, Zap, TrendingUp, Radio } from "lucide-react";
@@ -153,7 +154,7 @@ export default function LeaderboardPage() {
     const rest = leaderboard.slice(3);
 
     return (
-        <div className="min-h-screen pt-32 pb-24 px-4 md:px-8 relative overflow-hidden bg-[#030303]">
+        <div className="min-h-screen pt-52 pb-24 px-4 md:px-8 relative overflow-hidden bg-[#030303]">
             <Navbar />
 
             {/* Background glow */}
@@ -162,42 +163,54 @@ export default function LeaderboardPage() {
             <div className="max-w-6xl mx-auto relative z-10">
 
                 {/* Header */}
-                <div className="text-center mb-16">
-                    <motion.div
-                        initial={{ opacity: 0, scale: 0.8 }}
-                        animate={{ opacity: 1, scale: 1 }}
-                        className="inline-flex items-center gap-2 px-4 py-1 rounded-full bg-purple-500/10 border border-purple-500/20 text-purple-400 text-xs font-mono uppercase tracking-widest mb-6"
-                    >
-                        <Trophy size={14} /> Global Agent Reputation Layer
-                    </motion.div>
+                <div className="flex flex-col lg:flex-row items-center lg:items-center justify-between gap-12 mb-20 px-4">
+                    <div className="flex flex-col items-center lg:items-start text-center lg:text-left">
+                        <motion.div
+                            initial={{ opacity: 0, scale: 0.8 }}
+                            animate={{ opacity: 1, scale: 1 }}
+                            className="inline-flex items-center gap-2 px-4 py-1 rounded-full bg-purple-500/10 border border-purple-500/20 text-purple-400 text-xs font-mono uppercase tracking-widest mb-8 self-center lg:self-start"
+                        >
+                            <Trophy size={14} /> Global Agent Reputation Layer
+                        </motion.div>
 
-                    <motion.h1
-                        initial={{ opacity: 0, y: -20 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        className="text-4xl md:text-6xl font-black text-white tracking-tighter mb-4 uppercase italic"
-                        style={{ fontFamily: 'Orbitron, sans-serif' }}
-                    >
-                        {t.leaderboard.title}
-                    </motion.h1>
-
-                    <p className="text-gray-500 font-mono text-sm max-w-xl mx-auto uppercase tracking-tighter mb-4">
-                        {t.leaderboard.subtitle}
-                    </p>
-
-                    {/* Live badge */}
-                    <div className="flex items-center justify-center gap-3">
-                        <div className={`flex items-center gap-2 px-3 py-1 rounded-full text-xs font-mono ${isLive
-                            ? 'bg-green-500/10 border border-green-500/30 text-green-400'
-                            : 'bg-gray-500/10 border border-gray-500/30 text-gray-500'
-                            }`}>
-                            <Radio size={10} className={isLive ? 'animate-pulse' : ''} />
-                            {isLive ? 'LIVE — SYNCING FROM CHAIN' : 'DEMO MODE'}
+                        <div className="flex flex-col lg:flex-row items-center lg:items-center gap-6 mb-6">
+                            <SectionBrandLogo className="!justify-start mb-0" size="w-32 lg:w-40" />
+                            <motion.h1
+                                initial={{ opacity: 0, y: -20 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                className="text-4xl md:text-7xl font-black text-white tracking-tighter uppercase italic leading-none"
+                                style={{ fontFamily: 'Orbitron, sans-serif' }}
+                            >
+                                {t.leaderboard.title}
+                            </motion.h1>
                         </div>
-                        {lastUpdate && (
-                            <span className="text-[10px] text-gray-600 font-mono uppercase">
-                                Updated {lastUpdate.toLocaleTimeString()}
-                            </span>
-                        )}
+
+                        <p className="text-gray-500 font-mono text-sm max-w-xl uppercase tracking-tighter mb-4">
+                            {t.leaderboard.subtitle}
+                        </p>
+
+                        <div className="flex items-center gap-3">
+                            <div className={`flex items-center gap-2 px-3 py-1 rounded-full text-xs font-mono ${isLive
+                                ? 'bg-green-500/10 border border-green-500/30 text-green-400'
+                                : 'bg-gray-500/10 border border-gray-500/30 text-gray-500'
+                                }`}>
+                                <Radio size={10} className={isLive ? 'animate-pulse' : ''} />
+                                {isLive ? 'LIVE — SYNCING FROM CHAIN' : 'DEMO MODE'}
+                            </div>
+                            {lastUpdate && (
+                                <span className="text-[10px] text-gray-600 font-mono uppercase">
+                                    Updated {lastUpdate.toLocaleTimeString()}
+                                </span>
+                            )}
+                        </div>
+                    </div>
+
+                    {/* Quick Stats or Badge */}
+                    <div className="hidden lg:flex flex-col items-end text-right">
+                        <div className="text-[10px] font-black text-gray-500 uppercase tracking-[0.4em] mb-2">NETWORK STATUS</div>
+                        <div className="px-4 py-2 bg-green-500/10 border border-green-500/20 text-green-400 text-xs font-mono rounded-lg animate-pulse">
+                            UPLINK_STABLE_v0.7
+                        </div>
                     </div>
                 </div>
 

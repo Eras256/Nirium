@@ -19,6 +19,7 @@ import {
 import '@xyflow/react/dist/style.css';
 
 import Navbar from "@/components/layout/Navbar";
+import { SectionBrandLogo } from "@/components/ui/SectionBrandLogo";
 import { useLanguage } from "@/context/LanguageContext";
 import {
     Plus, Play, Save, Box, Activity, Zap, ArrowRight, Trash2,
@@ -458,13 +459,9 @@ function StrategyBuilderInner() {
                 w-80 h-full bg-[#0d0d0d] border-r border-white/5 flex flex-col z-40
                 transition-all duration-500 ease-[cubic-bezier(0.4,0,0.2,1)]
             `}>
-                <div className="p-6 border-b border-white/5 space-y-6">
-                    <div className="flex items-center justify-between">
-                        <div className="flex items-center gap-2">
-                            <Terminal size={14} className="text-stellar-teal" />
-                            <h2 className="text-[10px] font-black tracking-[0.3em] text-gray-500 uppercase font-mono">NEURAL_LAB</h2>
-                        </div>
-                        <button onClick={() => setSidebarOpen(false)} className="lg:hidden text-gray-500 hover:text-white">
+                <div className="p-4 pt-3 border-b border-white/5 space-y-4">
+                    <div className="flex items-center justify-end lg:hidden">
+                        <button onClick={() => setSidebarOpen(false)} className="text-gray-500 hover:text-white">
                             <X size={18} />
                         </button>
                     </div>
@@ -684,7 +681,7 @@ export default function StrategyBuilderPro() {
     return (
         <main className="h-screen w-screen bg-[#080808] text-white flex flex-col font-sans selection:bg-stellar-teal/30 overflow-hidden">
             <Navbar />
-            <div className="h-[90px] w-full shrink-0"></div>
+            <div className="h-[115px] w-full shrink-0"></div>
             <div className="flex-1 flex overflow-hidden">
                 <ReactFlowProvider>
                     <StrategyBuilderInner />

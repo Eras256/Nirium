@@ -9,6 +9,7 @@ import {
     Terminal, Globe, Lock, TrendingUp, ChevronRight, ExternalLink,
     Play, Settings, Users, Workflow, Key, Lightbulb, HardDrive, FileCheck, BookOpen
 } from "lucide-react";
+import { SectionBrandLogo } from "@/components/ui/SectionBrandLogo";
 import Navbar from "@/components/layout/Navbar";
 import ApiKeyManager from "@/components/docs/ApiKeyManager";
 
@@ -57,22 +58,25 @@ function DocsContent() {
                         Back to Protocol
                     </Link>
 
-                    <div className="flex flex-col lg:flex-row lg:items-end lg:justify-between gap-6">
-                        <div>
-                            <div className="flex items-center gap-3 mb-4">
-                                <div className="bg-gradient-to-r from-stellar-teal to-stellar-yellow p-2 rounded-lg">
-                                    <Book className="w-6 h-6 text-white" />
+                    <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-12">
+                        <div className="flex flex-col lg:flex-row items-center lg:items-center gap-8">
+                            <SectionBrandLogo className="!justify-start mb-0" size="w-32 lg:w-48" />
+                            <div>
+                                <div className="flex items-center gap-3 mb-4">
+                                    <div className="bg-gradient-to-r from-stellar-teal to-stellar-yellow p-2 rounded-lg">
+                                        <Book className="w-6 h-6 text-white" />
+                                    </div>
+                                    <div className="flex items-center gap-3">
+                                        <h1 className="text-4xl md:text-7xl font-black font-mono tracking-tighter uppercase leading-none">DOCUMENTATION</h1>
+                                        <span className="px-2 py-0.5 bg-green-500/20 text-green-400 text-xs font-mono rounded-full border border-green-500/30 animate-pulse">
+                                            v0.0.7
+                                        </span>
+                                    </div>
                                 </div>
-                                <div className="flex items-center gap-3">
-                                    <h1 className="text-4xl md:text-5xl font-bold font-mono tracking-tight">DOCUMENTATION</h1>
-                                    <span className="px-2 py-0.5 bg-green-500/20 text-green-400 text-xs font-mono rounded-full border border-green-500/30">
-                                        v0.0.7
-                                    </span>
-                                </div>
+                                <p className="text-xl text-gray-400 max-w-2xl leading-relaxed">
+                                    Field Manual for Autonomous Financial Operations on the Stellar Network.
+                                </p>
                             </div>
-                            <p className="text-xl text-gray-400 max-w-2xl">
-                                Field Manual for Autonomous Financial Operations on the Stellar Network.
-                            </p>
                         </div>
 
                         <div className="flex gap-3">

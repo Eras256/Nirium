@@ -2,6 +2,7 @@
 'use client';
 
 import Navbar from "@/components/layout/Navbar";
+import { SectionBrandLogo } from "@/components/ui/SectionBrandLogo";
 
 import { Suspense, useState, useEffect, useMemo, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
@@ -1643,6 +1644,19 @@ function DashboardContent() {
     return (
         <div className="min-h-screen bg-nirium-obsidian pt-36 pb-12 px-4 md:px-8 relative overflow-hidden">
             <Navbar />
+            <div className="flex items-center gap-6 mb-10 px-2 lg:px-0">
+                <SectionBrandLogo size="w-32 sm:w-40" className="!justify-start mb-0" />
+                <div className="hidden sm:block">
+                    <h1 className="text-3xl font-black text-white tracking-tight uppercase italic" style={{ fontFamily: 'Orbitron, sans-serif' }}>ORBITAL_DASHBOARD</h1>
+                    <div className="flex items-center gap-3">
+                        <p className="text-[10px] font-mono text-gray-500 tracking-[0.3em]">NEURAL_COMMAND_v0.7</p>
+                        <div className="flex gap-1">
+                            <div className="w-1.5 h-1.5 rounded-full bg-stellar-teal animate-pulse" />
+                            <div className="w-1.5 h-1.5 rounded-full bg-stellar-yellow animate-pulse delay-75" />
+                        </div>
+                    </div>
+                </div>
+            </div>
 
             {/* Auto-Start Confirmation Modal */}
             <AnimatePresence>
