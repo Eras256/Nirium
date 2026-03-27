@@ -100,12 +100,8 @@ export default function Footer() {
                 {/* Brand Column */}
                 <div className="col-span-1 xs:col-span-2 md:col-span-1 space-y-4 sm:space-y-6 flex flex-col items-center xs:items-start">
                     <Link href="/" className="flex items-center gap-3 group w-fit">
-                        <div className="relative flex items-center justify-center w-10 h-10 group-hover:scale-110 transition-transform bg-black border border-white/10 rounded-lg p-2">
-                            <Cpu className="w-full h-full text-stellar-teal" />
-                        </div>
-                        <div className="flex flex-col text-left">
-                            <span className="font-black text-white text-xl leading-none group-hover:text-stellar-teal transition-colors uppercase tracking-tighter">NIRIUM</span>
-                            <span className="text-[9px] text-gray-500 font-mono tracking-widest leading-none uppercase">Neural Matrix</span>
+                        <div className="relative flex items-center justify-center w-40 h-20 group-hover:scale-105 transition-all bg-black border border-white/5 rounded-xl overflow-hidden shadow-2xl p-2">
+                            <img src="/brand/NiLo.png" alt="Nirium Logo" className="w-full h-full object-contain" />
                         </div>
                     </Link>
 

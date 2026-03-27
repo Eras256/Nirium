@@ -64,20 +64,12 @@ export default function Navbar() {
             <div className={`max-w-[1600px] w-full mx-auto px-4 sm:px-6 flex items-center justify-between transition-all duration-500 ${!isScrolled ? "bg-black/40 sm:rounded-2xl border border-white/5 sm:border-white/10 backdrop-blur-md py-3 sm:py-4" : ""
                 }`}>
                 {/* Logo */}
-                <Link href="/" className="flex items-center gap-2 sm:gap-3 group shrink-0">
+                <Link href="/" className="flex items-center gap-3 group shrink-0">
                     <div className="relative">
-                        <div className="absolute inset-0 bg-stellar-teal/20 blur-lg rounded-full group-hover:bg-stellar-teal/40 transition-all"></div>
-                        <div className="relative bg-black border border-white/20 p-1.5 sm:p-2 rounded-lg group-hover:border-stellar-teal/50 transition-all transform group-hover:rotate-12">
-                            <Cpu className="w-5 h-5 sm:w-6 sm:h-6 text-stellar-teal" />
+                        <div className="absolute inset-0 bg-stellar-teal/10 blur-xl rounded-full group-hover:bg-stellar-teal/30 transition-all"></div>
+                        <div className="relative bg-black border border-white/5 rounded-xl group-hover:border-stellar-teal/30 transition-all transform group-hover:scale-105 overflow-hidden w-20 sm:w-28 h-10 sm:h-12 flex items-center justify-center p-1">
+                            <img src="/brand/NiLo.png" alt="Nirium Logo" className="w-full h-full object-contain" />
                         </div>
-                    </div>
-                    <div className="flex flex-col">
-                        <span className="text-lg sm:text-xl font-black tracking-tighter text-white leading-none">
-                            NIRIUM
-                        </span>
-                        <span className="text-[8px] sm:text-[10px] font-mono text-gray-500 tracking-[0.2em] uppercase">
-                            Stellar Matrix
-                        </span>
                     </div>
                 </Link>
 
@@ -95,7 +87,7 @@ export default function Navbar() {
                                     : "text-gray-400 hover:text-stellar-yellow hover:bg-white/5"
                                     }`}
                             >
-                                <Icon className={`w-3 h-3 xl:w-3.5 xl:h-3.5 transition-transform ${isActive ? "scale-110" : "group-hover:scale-110"}`} />
+                                <Icon className={`w-3 h-3 xl:w-3.5 xl:h-3.5 transition-transform shrink-0 ${isActive ? "scale-110" : "group-hover:scale-110"}`} />
                                 <span className="hidden xl:inline">{link.name}</span>
                                 {isActive && <span className="xl:hidden">{link.name}</span>}
                             </Link>
@@ -191,7 +183,7 @@ export default function Navbar() {
                                             : "bg-white/5 text-gray-400 border-white/5 hover:text-stellar-yellow"
                                             }`}
                                     >
-                                        <Icon className="w-5 h-5 sm:w-6 sm:h-6" />
+                                        <Icon className="w-5 h-5 sm:w-6 sm:h-6 shrink-0" />
                                         {link.name}
                                     </Link>
                                 );

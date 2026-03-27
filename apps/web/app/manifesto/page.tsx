@@ -4,13 +4,14 @@ import Navbar from "@/components/layout/Navbar";
 import Link from "next/link";
 import { ArrowRight, Zap, Layers, Cpu, Database, Network } from "lucide-react";
 import { motion } from "framer-motion";
+import { SectionBrandLogo } from "@/components/ui/SectionBrandLogo";
 
 export default function ManifestoPage() {
     return (
         <main className="min-h-screen bg-black text-white selection:bg-stellar-teal/30">
             <Navbar />
 
-            <div className="max-w-4xl mx-auto px-6 pt-40 pb-24 relative overflow-hidden">
+            <div className="max-w-5xl mx-auto px-6 pt-40 pb-24 relative overflow-hidden">
                 {/* Background Decor */}
                 <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-stellar-yellow/5 rounded-full blur-[100px] pointer-events-none -z-10" />
                 <div className="absolute bottom-0 left-0 w-[500px] h-[500px] bg-stellar-teal/5 rounded-full blur-[100px] pointer-events-none -z-10" />
@@ -20,14 +21,20 @@ export default function ManifestoPage() {
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.8 }}
                 >
-                    <div className="inline-block px-3 py-1 mb-6 border border-white/20 rounded-full text-xs font-mono text-gray-400 uppercase tracking-widest">
-                        THE INTELLIGENCE SUPREMACY THESIS
+                    <div className="flex flex-col md:flex-row items-center md:items-start gap-8 mb-12">
+                        <SectionBrandLogo className="!justify-start mb-0" size="w-32 lg:w-48" />
+                        <div className="flex flex-col items-center md:items-start text-center md:text-left">
+                            <div className="inline-block px-3 py-1 mb-6 border border-white/20 rounded-full text-xs font-mono text-gray-400 uppercase tracking-widest">
+                                THE INTELLIGENCE SUPREMACY THESIS
+                            </div>
+                            <h1 className="text-4xl md:text-7xl font-black tracking-tighter leading-[0.9] uppercase italic mb-0">
+                                THE <span className="text-stellar-teal">SWARM</span> IS COMING.
+                            </h1>
+                            <h2 className="text-3xl md:text-5xl font-black tracking-tighter text-transparent bg-clip-text bg-gradient-to-r from-gray-500 to-white mt-2">
+                                ADAPT OR LIQUIDATE.
+                            </h2>
+                        </div>
                     </div>
-
-                    <h1 className="text-5xl md:text-7xl font-black tracking-tighter leading-tight mb-8">
-                        THE <span className="text-stellar-teal">SWARM</span> IS COMING. <br />
-                        <span className="text-transparent bg-clip-text bg-gradient-to-r from-gray-500 to-white">ADAPT OR LIQUIDATE.</span>
-                    </h1>
 
                     <p className="text-xl md:text-2xl text-gray-400 font-light leading-relaxed mb-16 max-w-2xl">
                         Why the Autonomous Economy requires a fundamental shift in blockchain architecture, and why Stellar is the only viable substrate for High-Frequency Agentic Finance.

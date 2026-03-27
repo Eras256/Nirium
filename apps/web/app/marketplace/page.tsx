@@ -1,5 +1,6 @@
 "use client";
 
+import { SectionBrandLogo } from "@/components/ui/SectionBrandLogo";
 import Navbar from "@/components/layout/Navbar";
 import {
     Download, Star, Search, Filter, TrendingUp, Sparkles,
@@ -612,29 +613,33 @@ export default function MarketplacePage() {
             <Navbar />
 
             {/* Hero Section */}
-            <section className="relative pt-36 pb-12 px-4 sm:px-6 lg:px-8">
+            <section className="relative pt-52 pb-12 px-4 sm:px-6 lg:px-8">
                 <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,rgba(45,235,232,0.1),transparent_70%)]" />
 
-                <div className="max-w-[1600px] w-full mx-auto relative z-10">
+                <div className="max-w-[1600px] w-full mx-auto relative z-10 px-4">
                     <motion.div
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
-                        className="text-center mb-12"
+                        className="flex flex-col lg:flex-row items-center lg:items-center justify-between gap-12 mb-16"
                     >
-                        <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-stellar-teal/10 border border-stellar-teal/30 mb-6">
-                            <Package className="w-4 h-4 text-stellar-teal" />
-                            <span className="text-sm text-stellar-teal">Nirium Matrix Hub</span>
+                        <div className="flex flex-col items-center lg:items-start text-center lg:text-left">
+                            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-stellar-teal/10 border border-stellar-teal/30 mb-8 self-center lg:self-start">
+                                <Package className="w-4 h-4 text-stellar-teal" />
+                                <span className="text-sm text-stellar-teal">Nirium Matrix Hub</span>
+                            </div>
+                            <div className="flex flex-col lg:flex-row items-center lg:items-center gap-6 mb-6">
+                                <SectionBrandLogo className="!justify-start mb-0" size="w-32 lg:w-40" />
+                                <h1 className="text-5xl md:text-7xl font-black tracking-tighter bg-gradient-to-r from-white via-white to-gray-400 bg-clip-text text-transparent leading-none">
+                                    Extend Your Agent
+                                </h1>
+                            </div>
+                            <p className="text-lg text-slate-400 max-w-2xl mt-4">
+                                Discover and install community-built skills to supercharge your Nirium agent.
+                            </p>
                         </div>
 
-                        <h1 className="text-5xl md:text-7xl font-black tracking-tighter bg-gradient-to-r from-white via-white to-gray-400 bg-clip-text text-transparent mb-4">
-                            Extend Your Agent
-                        </h1>
-                        <p className="text-lg text-slate-400 max-w-2xl mx-auto">
-                            Discover and install community-built skills to supercharge your Nirium agent.
-                        </p>
-
-                        {/* Stats */}
-                        <div className="flex justify-center gap-8 mt-8">
+                        {/* Stats - moved next to title on lg */}
+                        <div className="flex gap-8 px-8 py-6 bg-white/5 border border-white/10 rounded-3xl backdrop-blur-md">
                             <div className="text-center">
                                 <div className="text-4xl font-black font-mono text-stellar-teal animate-pulse-slow">{stats.totalSkills}</div>
                                 <div className="text-[10px] text-gray-500 uppercase tracking-widest font-bold mt-1">Local Skills</div>

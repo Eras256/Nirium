@@ -3,6 +3,7 @@
 import { motion } from "framer-motion";
 import { Area, AreaChart, ResponsiveContainer, Tooltip, XAxis, YAxis, CartesianGrid } from "recharts";
 import { Activity, TrendingUp, DollarSign, Zap, Server, Wallet, Database } from "lucide-react";
+import { SectionBrandLogo } from "@/components/ui/SectionBrandLogo";
 import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
 import { useFreighter } from "@/hooks/useFreighter";
@@ -134,20 +135,25 @@ export default function AnalyticsPage() {
 
             <div className="max-w-[1600px] w-full mx-auto relative z-10 flex-1">
                 {/* Header */}
-                <header className="mb-10 flex flex-col md:flex-row justify-between items-start md:items-end gap-6">
-                    <div>
-                        <div className="flex items-center gap-3 mb-2">
-                            <h1 className="text-4xl font-bold text-white tracking-tight">INTELLIGENCE OPS</h1>
-                            <span className="px-2 py-0.5 bg-stellar-teal/10 text-stellar-teal text-[10px] font-mono rounded border border-stellar-teal/20">
-                                v0.0.7
-                            </span>
+                <header className="mb-12 flex flex-col md:flex-row justify-between items-start md:items-center gap-8 px-4">
+                    <div className="flex flex-col md:flex-row items-center gap-6">
+                        <SectionBrandLogo className="!justify-start mb-0" size="w-32 md:w-40" />
+                        <div>
+                            <div className="flex items-center gap-3 mb-2">
+                                <h1 className="text-4xl font-black text-white tracking-tight uppercase italic" style={{ fontFamily: 'Orbitron, sans-serif' }}>
+                                    INTELLIGENCE OPS
+                                </h1>
+                                <span className="px-2 py-0.5 bg-stellar-teal/10 text-stellar-teal text-[10px] font-mono rounded border border-stellar-teal/20 animate-pulse">
+                                    v0.0.7
+                                </span>
+                            </div>
+                            <p className="text-gray-500 font-mono text-[11px] uppercase tracking-widest">
+                                Real-time surveillance of on-chain liquidity vectors{" "}
+                                {account && account.address
+                                    ? `// TARGET: ${account.address.slice(0, 8)}...${account.address.slice(-4)}`
+                                    : '// GUEST_SESSION'}
+                            </p>
                         </div>
-                        <p className="text-gray-400 font-mono text-sm">
-                            Real-time surveillance of on-chain liquidity vectors{" "}
-                            {account && account.address
-                                ? `// TARGET: ${account.address.slice(0, 6)}...${account.address.slice(-4)}`
-                                : '// GUEST MODE'}
-                        </p>
                     </div>
 
                     {/* Asset breakdown pill */}

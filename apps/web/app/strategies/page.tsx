@@ -1,7 +1,8 @@
 "use client";
 
+import { SectionBrandLogo } from "@/components/ui/SectionBrandLogo";
 import Navbar from "@/components/layout/Navbar";
-import { Copy, ArrowRight, Zap, TrendingUp, ShieldAlert, Cpu } from "lucide-react";
+import { Copy, ArrowRight, Zap, TrendingUp, ShieldAlert, Cpu, Plus } from "lucide-react";
 import { motion } from "framer-motion";
 import Link from "next/link";
 import { useState, useEffect } from "react";
@@ -301,14 +302,30 @@ export default function StrategiesPage() {
             <div className="max-w-[1600px] w-full mx-auto px-6 relative z-10">
 
                 {/* Header */}
-                <div className="mb-12">
-                    <h1 className="text-5xl md:text-7xl font-black tracking-tighter mb-6 relative">
-                        PROTOCOL <span className="text-stellar-teal">ARSENAL</span>
-                    </h1>
-                    <p className="text-gray-400 max-w-2xl text-lg">
-                        Deploy autonomous kernels to the Stellar Network targeting <span className="text-[#4ca2ff] font-bold">XLM</span> or <span className="text-stellar-yellow font-bold">USDC</span> vaults.
-                        Clone institutional-grade logic or architect your own in the Builder.
-                    </p>
+                <div className="flex flex-col lg:flex-row items-center lg:items-center justify-between gap-12 mb-20 px-4">
+                    <div className="flex flex-col lg:flex-row items-center lg:items-center gap-8">
+                        <SectionBrandLogo className="!justify-start mb-0" size="w-32 lg:w-48" />
+                        <div className="flex flex-col items-center lg:items-start text-center lg:text-left">
+                            <h1 className="text-5xl md:text-7xl font-black tracking-tighter mb-4 leading-none uppercase">
+                                PROTOCOL <span className="text-stellar-teal italic">ARSENAL</span>
+                            </h1>
+                            <p className="text-gray-400 max-w-2xl text-lg leading-relaxed">
+                                Deploy autonomous kernels to the Stellar Network targeting <span className="text-stellar-teal font-bold uppercase tracking-widest text-[11px] border border-stellar-teal/20 px-2 rounded ml-1 mr-1">XLM</span> or <span className="text-stellar-yellow font-bold uppercase tracking-widest text-[11px] border border-stellar-yellow/20 px-2 rounded">USDC</span> vaults.
+                            </p>
+                        </div>
+                    </div>
+
+                    {/* Stats or Action */}
+                    <Link href="/strategies/builder" className="group relative px-8 py-4 bg-white/5 border border-white/10 rounded-2xl hover:bg-white/10 transition-all overflow-hidden hidden xl:block">
+                        <div className="absolute inset-0 bg-gradient-to-r from-stellar-teal/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+                        <div className="relative flex items-center gap-3">
+                            <Plus className="w-5 h-5 text-stellar-teal" />
+                            <div className="text-left">
+                                <div className="text-xs font-mono text-gray-500 uppercase tracking-widest mb-1">Architect Unit</div>
+                                <div className="text-sm font-bold text-white tracking-tight leading-none group-hover:text-stellar-teal transition-colors">Launch Strategy Builder</div>
+                            </div>
+                        </div>
+                    </Link>
                 </div>
 
                 {/* Strategies Grid */}

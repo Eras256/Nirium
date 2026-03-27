@@ -19,6 +19,7 @@ import {
 import { motion } from "framer-motion";
 import Link from "next/link";
 import Footer from "@/components/layout/Footer";
+import { SectionBrandLogo } from "@/components/ui/SectionBrandLogo";
 
 export default function HowToUsePage() {
     return (
@@ -34,17 +35,20 @@ export default function HowToUsePage() {
             <div className="relative z-10 pt-40 pb-20">
                 <div className="max-w-5xl mx-auto px-6">
                     {/* Header */}
-                    <div className="text-center mb-20 section-lift">
-                        <div className="inline-flex items-center gap-2 px-3 py-1 bg-stellar-teal/10 border border-stellar-teal/30 rounded-full text-stellar-teal text-xs font-mono mb-6">
-                            <BookOpen size={14} />
-                            OPERATIONS MANUAL v0.0.7
+                    <div className="flex flex-col lg:flex-row items-center lg:items-center gap-12 mb-20 section-lift">
+                        <SectionBrandLogo className="!justify-start mb-0" size="w-32 lg:w-48" />
+                        <div className="flex flex-col items-center lg:items-start text-center lg:text-left">
+                            <div className="inline-flex items-center gap-2 px-3 py-1 bg-stellar-teal/10 border border-stellar-teal/30 rounded-full text-stellar-teal text-xs font-mono mb-6 self-center lg:self-start">
+                                <BookOpen size={14} />
+                                OPERATIONS MANUAL v0.0.7
+                            </div>
+                            <h1 className="text-4xl md:text-7xl font-black tracking-tighter mb-6 leading-none uppercase">
+                                HOW TO <span className="text-gradient">OPERATE</span>
+                            </h1>
+                            <p className="text-xl text-gray-400 max-w-2xl leading-relaxed">
+                                Master the Nirium Neural Matrix. From visual strategy architecture to autonomous agent deployment.
+                            </p>
                         </div>
-                        <h1 className="text-5xl md:text-7xl font-black tracking-tighter mb-6">
-                            HOW TO <span className="text-gradient">OPERATE</span>
-                        </h1>
-                        <p className="text-xl text-gray-400 max-w-2xl mx-auto">
-                            Master the Nirium Neural Matrix. From visual strategy architecture to autonomous agent deployment.
-                        </p>
                     </div>
 
                     {/* Step by Step Guide */}

@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, useRef } from 'react';
+import { SectionBrandLogo } from "@/components/ui/SectionBrandLogo";
 import Navbar from "@/components/layout/Navbar";
 import ApiKeyManager from "@/components/docs/ApiKeyManager";
 import { Terminal, Activity, Signal, Shield, Radio, Code, Zap, Copy, Database, CheckCircle, AlertCircle, Loader } from 'lucide-react';
@@ -155,29 +156,53 @@ export default function AgentsPage() {
             <div className="relative z-10 container mx-auto px-4 pt-48 pb-20">
 
                 {/* Header Section */}
-                <div className="text-center mb-16 space-y-4">
-                    <motion.div
-                        initial={{ opacity: 0, y: -20 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        className="inline-flex items-center gap-2 px-3 py-1 bg-white/5 border border-white/10 rounded-full text-xs font-mono text-stellar-teal mb-4"
-                    >
-                        <Radio className="w-3 h-3 animate-pulse" />
-                        SYSTEM ONLINE: v0.0.7 // ENCRYPTED
-                    </motion.div>
+                <div className="flex flex-col lg:flex-row items-center lg:items-center justify-between gap-12 mb-20 px-4">
+                    <div className="flex flex-col items-center lg:items-start text-center lg:text-left">
+                        <motion.div
+                            initial={{ opacity: 0, y: -20 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            className="inline-flex items-center gap-2 px-3 py-1 bg-white/5 border border-white/10 rounded-full text-xs font-mono text-stellar-teal mb-8 self-center lg:self-start"
+                        >
+                            <Radio className="w-3 h-3 animate-pulse" />
+                            SYSTEM ONLINE: v0.0.7 // ENCRYPTED
+                        </motion.div>
 
-                    <motion.h1
-                        initial={{ opacity: 0, scale: 0.9 }}
-                        animate={{ opacity: 1, scale: 1 }}
-                        className="text-5xl md:text-7xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-white via-gray-200 to-gray-500 tracking-tight"
-                    >
-                        OPERATIONS COMMAND CENTER
-                    </motion.h1>
-                    <p className="text-gray-400 max-w-2xl mx-auto text-lg">
-                        Interface for deploying autonomous financial warheads.
-                        Generate credentials, monitor <span className="text-[#4ca2ff] font-bold">XLM</span> &amp; <span className="text-stellar-yellow font-bold">USDC</span> field units,
-                        and inject logic directly into the Nirium Neural Matrix.
-                        All activity immortalized via <span className="text-pink-400 font-bold">Neural Archive</span> forensic logging.
-                    </p>
+                        <div className="flex flex-col lg:flex-row items-center lg:items-center gap-6 mb-6">
+                            <SectionBrandLogo className="!justify-start mb-0" size="w-32 lg:w-40" />
+                            <motion.h1
+                                initial={{ opacity: 0, scale: 0.9 }}
+                                animate={{ opacity: 1, scale: 1 }}
+                                className="text-4xl md:text-7xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-white via-gray-200 to-gray-500 tracking-tight leading-none"
+                            >
+                                OPERATIONS COMMAND
+                            </motion.h1>
+                        </div>
+
+                        <p className="text-gray-400 max-w-2xl text-lg mt-4">
+                            All activity immortalized via <span className="text-pink-400 font-bold">Neural Archive</span> forensic logging.
+                        </p>
+                    </div>
+
+                    {/* Uplink Status Card */}
+                    <div className="hidden lg:block p-6 bg-white/5 border border-white/10 rounded-2xl backdrop-blur-md min-w-[300px]">
+                        <div className="flex items-center justify-between mb-4">
+                            <span className="text-[10px] font-mono text-gray-500 uppercase tracking-widest">Horizon Uplink</span>
+                            <div className="flex gap-2">
+                                <div className="w-2 h-2 rounded-full bg-stellar-teal animate-pulse" />
+                                <div className="w-2 h-2 rounded-full bg-stellar-yellow animate-pulse" />
+                            </div>
+                        </div>
+                        <div className="space-y-4">
+                            <div className="flex justify-between items-center text-[11px] font-mono border-b border-white/5 pb-2">
+                                <span className="text-gray-500">Latency:</span>
+                                <span className="text-stellar-teal font-bold">12ms</span>
+                            </div>
+                            <div className="flex justify-between items-center text-[11px] font-mono">
+                                <span className="text-gray-500">Node:</span>
+                                <span className="text-white font-bold uppercase">HORIZON-PUB1</span>
+                            </div>
+                        </div>
+                    </div>
                 </div>
 
                 {/* Dashboard Grid */}

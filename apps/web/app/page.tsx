@@ -17,6 +17,7 @@ import dynamic from 'next/dynamic';
 
 const NeuralCanvas = dynamic(() => import('@/components/3d/NeuralCanvas').then((mod) => mod.NeuralCanvas), { ssr: false });
 import Navbar from "@/components/layout/Navbar";
+import { SectionBrandLogo } from "@/components/ui/SectionBrandLogo";
 import { useLanguage } from "@/context/LanguageContext";
 import { supabase } from "@/lib/supabase";
 
@@ -149,10 +150,15 @@ export default function Home() {
                             v0.3.0 // {t.footer.testnet_live}
                         </div>
 
-                        <h1 className="text-4xl sm:text-6xl md:text-7xl lg:text-8xl font-black tracking-tighter leading-[0.9] lg:leading-[0.85]">
-                            {t.home.hero_title_1} <br />
-                            <span className="text-transparent bg-clip-text bg-gradient-to-r from-stellar-teal to-stellar-yellow">{t.home.hero_title_2}</span>
-                        </h1>
+                        <div className="flex flex-col xl:flex-row items-center xl:items-start gap-10">
+                            <SectionBrandLogo className="!justify-start mb-0 !opacity-100" size="w-32 md:w-48 lg:w-56" />
+                            <div>
+                                <h1 className="text-4xl sm:text-6xl md:text-7xl lg:text-8xl font-black tracking-tighter leading-[0.9] lg:leading-[0.85] uppercase italic">
+                                    {t.home.hero_title_1} <br />
+                                    <span className="text-transparent bg-clip-text bg-gradient-to-r from-stellar-teal to-stellar-yellow">{t.home.hero_title_2}</span>
+                                </h1>
+                            </div>
+                        </div>
 
                         <p className="text-gray-400 text-lg md:text-xl max-w-xl leading-relaxed">
                             {t.home.hero_subtitle}
@@ -234,7 +240,21 @@ export default function Home() {
             {/* ── PROTOCOL INTEGRATIONS ──────────────────────────────────────── */}
             <section className="py-20 border-y border-white/5 bg-black/50">
                 <div className="container mx-auto px-4">
-                    <h3 className="text-center text-[10px] font-mono text-gray-500 mb-12 tracking-[0.4em] uppercase">{t.home.built_for_stellar}</h3>
+                    <div className="flex flex-col items-center gap-6 mb-12">
+                        <motion.div 
+                            initial={{ opacity: 0, scale: 0.8 }}
+                            whileInView={{ opacity: 1, scale: 1 }}
+                            transition={{ duration: 1 }}
+                            className="relative"
+                        >
+                            <img 
+                                src="/brand/NiLo.png" 
+                                alt="Nirium Logo" 
+                                className="w-48 sm:w-64 h-auto object-contain drop-shadow-[0_0_40px_rgba(45,235,232,0.4)]"
+                            />
+                        </motion.div>
+                        <h3 className="text-center text-[10px] font-mono text-gray-500 tracking-[0.4em] uppercase font-bold">{t.home.built_for_stellar}</h3>
+                    </div>
                     <div className="flex flex-wrap justify-center gap-6 sm:gap-12 md:gap-24 items-center grayscale opacity-50 hover:grayscale-0 hover:opacity-100 transition-all duration-700">
                         <ProtocolItem icon={Landmark} name="BLEND Protocol" />
                         <ProtocolItem icon={Zap} name="SOROSWAP" />
@@ -268,6 +288,7 @@ export default function Home() {
                             </motion.div>
                         ))}
                     </div>
+
                 </div>
             </section>
 
@@ -512,9 +533,23 @@ export default function Home() {
                 <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_50%_50%,rgba(45,235,232,0.05),transparent_60%)]" />
                 <div className="container mx-auto px-4 relative z-10">
                     <motion.div {...fadeUp()} className="text-center mb-4">
-                        <div className="inline-flex items-center gap-2 px-4 py-1.5 bg-stellar-teal/10 border border-stellar-teal/30 rounded-full text-xs font-mono text-stellar-teal mb-6">
-                            <span className="w-1.5 h-1.5 rounded-full bg-stellar-teal animate-ping" />
-                            {t.home.deploy_cta_badge}
+                        <div className="flex flex-col items-center gap-8 mb-6">
+                            <motion.div 
+                                initial={{ opacity: 0, scale: 0.8 }}
+                                whileInView={{ opacity: 1, scale: 1 }}
+                                transition={{ duration: 1 }}
+                                className="relative"
+                            >
+                                <img 
+                                    src="/brand/NiLo.png" 
+                                    alt="Nirium Logo" 
+                                    className="w-48 sm:w-64 h-auto object-contain drop-shadow-[0_0_40px_rgba(45,235,232,0.4)]"
+                                />
+                            </motion.div>
+                            <div className="inline-flex items-center gap-2 px-4 py-1.5 bg-stellar-teal/10 border border-stellar-teal/30 rounded-full text-xs font-mono text-stellar-teal">
+                                <span className="w-1.5 h-1.5 rounded-full bg-stellar-teal animate-ping" />
+                                {t.home.deploy_cta_badge}
+                            </div>
                         </div>
                         <h2 className="text-4xl md:text-6xl font-black tracking-tighter mb-4">
                             {t.home.deploy_cta_title} <span className="text-transparent bg-clip-text bg-gradient-to-r from-stellar-teal to-stellar-yellow">{t.home.deploy_cta_span}</span>
