@@ -49,12 +49,13 @@ export function verifySignature(
 
         // Convert message to bytes
         const messageBytes = new TextEncoder().encode(message);
+        const messageBuffer = Buffer.from(messageBytes);
 
         // Decode signature from base64
         const signatureBuffer = Buffer.from(signatureBase64, 'base64');
 
         // Verify signature
-        const isValid = keypair.verify(messageBytes, signatureBuffer);
+        const isValid = keypair.verify(messageBuffer, signatureBuffer);
 
         if (!isValid) {
             console.warn('[SECURITY] Invalid signature for wallet:', walletAddress);
