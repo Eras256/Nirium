@@ -67,3 +67,4 @@ implementation_plan.json
 pyrightconfig.json
 apps/web/.env.local
 nirium-soroban-contracts/
+*.map
