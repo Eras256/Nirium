@@ -1,0 +1,70 @@
+# dependencies
+/node_modules
+/.pnpm-debug.log*
+/.next-internal
+
+# next.js
+/.next/
+/out/
+
+# production
+/build
+
+# misc
+.DS_Store
+*.pem
+
+# debug
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# local env files
+.env*.local
+
+# vercel
+.vercel
+
+# typescript
+*.tsbuildinfo
+next-env.d.ts
+
+# Rust / Soroban
+/target/
+target/
+**/target/
+Cargo.lock
+*.wasm
+
+
+
+# ---------------------------------------------
+# AI Agent Generated Documentation (Ignored)
+# ---------------------------------------------
+# Ignoring prompts and plans generated for other networks/hackathons
+# Ignore all root markdown files except core documentation
+*.md
+!README.md
+!NIRIUM_TECHNICAL_PAPER.md
+!claude.md
+
+# Ignoring plans generated if any
+implementation_plan.json
+
+# Secrets
+.env
+.env.*
+
+# AI config
+.gemini/
+
+# Benchmarking
+# Python / Local Dev Extras
+.venv/
+**/.venv/
+*.log
+.pyre_configuration
+pyrightconfig.json
+apps/web/.env.local
+nirium-soroban-contracts/
+*.map
