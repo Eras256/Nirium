@@ -11,7 +11,7 @@ export default function ManifestoPage() {
         <main className="min-h-screen bg-black text-white selection:bg-stellar-teal/30">
             <Navbar />
 
-            <div className="max-w-5xl mx-auto px-6 pt-40 pb-24 relative overflow-hidden">
+            <div className="max-w-5xl mx-auto px-6 pt-56 pb-24 relative overflow-hidden">
                 {/* Background Decor */}
                 <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-stellar-yellow/5 rounded-full blur-[100px] pointer-events-none -z-10" />
                 <div className="absolute bottom-0 left-0 w-[500px] h-[500px] bg-stellar-teal/5 rounded-full blur-[100px] pointer-events-none -z-10" />

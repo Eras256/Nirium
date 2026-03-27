@@ -277,45 +277,57 @@
         "broadcast_failed": "Uplink Error"
     },
     "terms": {
-        "title": "Terms of Service",
-        "last_updated": "Last Updated: March 2026",
+        "title": "Terms of Service and Enterprise License",
+        "last_updated": "Regulatory Update: March 27, 2026",
         "sections": {
-            "open_source": {
-                "title": "1. Open Source Framework",
-                "content": "Nirium is a set of open-source Soroban smart contracts deployed on the Stellar network. The interface provided here is merely a client explicitly interacting with decentralized protocols. By using this interface, you understand you are interacting with public blockchain infrastructure."
+            "nature": {
+                "title": "1. Nature of Service and Regulatory Framework",
+                "content": "Nirium is a technology infrastructure platform designed under the 'Novel Models' (Regulatory Sandbox) standards in accordance with Article 80 of the Fintech Law in Mexico. The platform provides the immutable forensic audit trail and security protocols necessary for experimentation with financial assets in controlled environments, facilitating regulatory compliance for financial entities and institutional users. Custody and execution services for Mexican Treasury Bonds (CETES/RWA) are provided by authorized third-party providers (Etherfuse/Indeval) under their own legal responsibility."
             },
             "no_guarantees": {
-                "title": "2. No Financial Guarantees",
-                "content": "The strategies, plugins, and autonomous agents available via Nirium are created by the community and rank entirely via the Sentinel ELO system. ELO rankings are historical data only and do not predict or guarantee future performance or financial outcomes. Purchasing a strategy subscription via USDC does not guarantee financial returns. Nirium does not offer investment contracts or yield-bearing securities."
+                "title": "2. Digital Asset Taxonomy (SEC/CFTC 2026)",
+                "content": "In accordance with the Joint SEC/CFTC Guidance of March 2026, interactions with NiriumVaults are classified as 'Non-Security Digital Asset Management Proxy Services'. Capital remains under the sovereign control of the user's private keys. Nirium does not guarantee returns. The ELO reputation system is strictly informational and reflects historical algorithmic performance, not a promise of future gain."
             },
-            "hallucination": {
-                "title": "3. Neural Matrix Volatility (Algorithmic Hallucination)",
-                "content": "Nirium agents consult a pluggable matrix of LLM providers (including OpenAI, Anthropic, Gemini, Grok, MiniMax, etc.) for qualitative signal analysis. These models are experimental and can produce unpredictable, delayed, or factually incorrect outputs ('hallucinations'). Nirium bears zero liability for trading losses, missed arbitrage windows, or gas consumption resulting from LLM latency, API downtimes, or miscalculated signals."
+            "ai_liability": {
+                "title": "3. Autonomous Agent & AI Liability",
+                "content": "By activating the agent 'Swarm' or 'Loop', the user grants a limited technical mandate for the code (LLM/Agent) to sign transactions on their behalf based on pre-configured parameters. The user acknowledges that Large Language Models (OpenAI, Anthropic, etc.) may exhibit 'algorithmic hallucinations' or critical latency. Nirium bears no responsibility for decisions made by AI or for systemic failures in price oracles."
             },
-            "fees": {
-                "title": "4. Network Fees & Matrix Fee",
-                "content": "Users are responsible for all Stellar network operation fees. Additionally, by executing strategies through Nirium's algorithmic smart contracts, you agree to the 1% Protocol Matrix Fee. This fee is deducted atomically only from realized gross profit, not principal, as enforced by the smart contract code."
+            "rwa_disclaimer": {
+                "title": "4. Real World Asset (RWA) Risks",
+                "content": "Operations with CETES and other government bonds are subject to the availability and regulation of the traditional financial system. Nirium acts solely as a technical bridge. Counterparty, custody, and liquidity risks for these assets rest entirely with the issuer and the final custodian."
             },
             "dispute": {
-                "title": "5. Dispute Resolution & Governing Law",
-                "content": "By interacting with the Nirium Protocol, you agree that any legal dispute or claim will be resolved exclusively through binding, confidential arbitration. You waive any right to bring or participate in a class action lawsuit against the developers or maintainers. These Terms are governed by the laws of the State of Mexico (Estado de México), Mexico."
+                "title": "5. Jurisdiction and Cryptographic Arbitration",
+                "content": "Any controversy shall be resolved through binding arbitration under the rules of the Mexico City Chamber of Commerce. By connecting your wallet, the user expressly waives class-action lawsuits. These terms are governed by the federal laws of the United Mexican States."
+            },
+            "infrastructure": {
+                "title": "6. Infrastructure and Availability (SaaS/IaaS)",
+                "content": "Nirium provides infrastructure services on an 'as is' basis. As final execution depends on the public Stellar network, external LLM providers (OpenAI/Anthropic), and data oracles, Nirium does not guarantee 100% availability. Network failures, blockchain congestion, or external API outages are considered 'Force Majeure' events. Nirium is not liable for losses resulting from temporary service unavailability."
+            },
+            "reverse_solicitation": {
+                "title": "7. Reverse Solicitation and International Compliance",
+                "content": "Nirium does not make a public offering of securities or financial services in jurisdictions where it is not registered. User access from restricted jurisdictions is considered a proactive, private, and individual request ('Reverse Solicitation'). The user declares they have not been induced by targeted marketing and is solely responsible for complying with the laws of their country of residence."
+            },
+            "intellectual_property": {
+                "title": "8. Algorithmic Intellectual Property",
+                "content": "All algorithms, agent logic ('Swarm'), network architectures, and proprietary visualizations are the exclusive intellectual property of Nirium. Use of the platform grants a limited, non-exclusive, and revocable license. Use of the interface does not grant ownership, modification, or reverse engineering rights to the core artificial intelligence engine."
             }
         }
     },
     "legal_modal": {
-        "title": "Matrix Access: Authorization Required",
-        "consent_required": "CRYPTOGRAPHIC CONSENT REQUIRED:",
-        "acknowledge_prefix": "By signing this payload, you acknowledge that:",
-        "item_non_custodial": "Nirium is experimental, non-custodial software. All vault logic resides on-chain.",
-        "item_elo_historical": "ELO rankings are strictly historical. They do not guarantee future yields.",
-        "item_systemic_risk": "Autonomous agents operate with systemic market risks. You accept LLM 'hallucinations'.",
-        "item_liability": "You assume full liability for any capital deployed to NiriumVaults.",
-        "button_sign": "SIGN PAYLOAD & ENTER MATRIX",
+        "title": "Matrix Access: Consent Protocol",
+        "consent_required": "CRYPTOGRAPHIC CONSENT SIGNATURE:",
+        "acknowledge_prefix": "By signing this payload, you declare under penalty of perjury that:",
+        "item_non_custodial": "You understand that Nirium is non-custodial and experimental software; your keys are your responsibility.",
+        "item_elo_historical": "You acknowledge that historical performance (ELO) does not imply guaranteed future yields.",
+        "item_systemic_risk": "You accept the systemic risk of AI and acknowledge that model 'hallucinations' are an operational risk vector.",
+        "item_liability": "You release Nirium developers from all liability for capital losses derived from volatility or network failures.",
+        "button_sign": "SIGN & ESTABLISH NEURAL LINK",
         "button_signing": "AWAITING FREIGHTER UPLINK...",
-        "governing_law": "Governed by the laws of terms of Estado de México, MX.",
-        "read_more_prefix": "Please review our full ",
+        "governing_law": "Governed by the Fintech Law (Mexico) and 2026 Global Standards.",
+        "read_more_prefix": "Please consult our full ",
         "terms_link": "Terms of Service",
-        "risk_link": "Risk Disclosure"
+        "risk_link": "CETES (RWA) Disclosure"
     },
     "risk_disclosure": {
         "title": "Algorithmic Risk Disclosure",

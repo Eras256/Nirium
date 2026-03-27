@@ -8,7 +8,7 @@ export default function TermsPage() {
     const terms = t.terms || { title: "Terms of Service", last_updated: "", sections: {} };
 
     return (
-        <div className="min-h-screen pt-32 pb-12 px-4 md:px-8 relative bg-[#050505]">
+        <div className="min-h-screen pt-56 pb-12 px-4 md:px-8 relative bg-[#050505]">
             <Navbar />
             <div className="max-w-3xl mx-auto relative z-10 glass-panel p-8 md:p-12 rounded-2xl border border-white/10 text-gray-300 space-y-6">
                 <h1 className="text-3xl font-black text-white uppercase tracking-tighter mb-8">{terms.title}</h1>

@@ -290,7 +290,7 @@ export default function StrategiesPage() {
     };
 
     return (
-        <main className="min-h-screen relative overflow-x-hidden flex flex-col pt-36 pb-20">
+        <main className="min-h-screen relative overflow-x-hidden flex flex-col pt-56 pb-20">
             {/* Background elements */}
             <div className="fixed inset-0 z-0 pointer-events-none">
                 <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-stellar-yellow/20 rounded-full blur-[120px] opacity-50"></div>

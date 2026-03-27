@@ -17,7 +17,7 @@ export default function RiskDisclosurePage() {
     };
 
     return (
-        <div className="min-h-screen pt-32 pb-12 px-4 md:px-8 relative bg-[#050505] overflow-x-hidden">
+        <div className="min-h-screen pt-56 pb-12 px-4 md:px-8 relative bg-[#050505] overflow-x-hidden">
             <Navbar />
 
             {/* Background Decorative Elements */}

@@ -73,7 +73,7 @@ export default function SandboxPage() {
     };
 
     return (
-        <main className="min-h-screen pt-24 pb-20 relative">
+        <main className="min-h-screen pt-56 pb-20 relative">
             <Navbar />
             
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
@@ -192,7 +192,7 @@ export default function SandboxPage() {
                                                     value={formData.companyName}
                                                     onChange={(e) => setFormData({...formData, companyName: e.target.value})}
                                                     className="w-full bg-black/50 border border-white/10 rounded-xl py-3 pl-10 pr-4 text-white focus:outline-none focus:border-[#00f0ff]/50 focus:ring-1 focus:ring-[#00f0ff]/50 transition-all"
-                                                    placeholder="Isacap Essential S.A.P.I de C.V."
+                                                    placeholder="Nexus Global Solutions S.A."
                                                 />
                                             </div>
                                         </div>

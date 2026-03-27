@@ -154,7 +154,7 @@ export default function LeaderboardPage() {
     const rest = leaderboard.slice(3);
 
     return (
-        <div className="min-h-screen pt-52 pb-24 px-4 md:px-8 relative overflow-hidden bg-[#030303]">
+        <div className="min-h-screen pt-56 pb-24 px-4 md:px-8 relative overflow-hidden bg-[#030303]">
             <Navbar />
 
             {/* Background glow */}

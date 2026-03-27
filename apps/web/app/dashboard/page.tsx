@@ -1642,7 +1642,7 @@ function DashboardContent() {
     // --- ACCESS GUARD (Removed for guest viewing) ---
 
     return (
-        <div className="min-h-screen bg-nirium-obsidian pt-36 pb-12 px-4 md:px-8 relative overflow-hidden">
+        <div className="min-h-screen bg-nirium-obsidian pt-56 pb-12 px-4 md:px-8 relative overflow-hidden">
             <Navbar />
             <div className="flex items-center gap-6 mb-10 px-2 lg:px-0">
                 <SectionBrandLogo size="w-32 sm:w-40" className="!justify-start mb-0" />
