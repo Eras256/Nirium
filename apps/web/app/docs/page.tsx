@@ -527,16 +527,16 @@ impl NiriumAgent {
                     <CheckCircle className="text-green-400" />
                     Integration Tests
                 </h2>
-                <div className="font-mono text-sm space-y-1">
+                <div className="font-mono text-[10px] sm:text-sm space-y-2 overflow-x-hidden">
                     {[
                         'test_authorize_agent',
                         'test_revoke_agent',
                         'test_atomic_path_payment',
                         'test_flash_loan_callback',
                     ].map((test) => (
-                        <div key={test} className="flex items-center gap-2">
-                            <span className="text-green-400">[PASS]</span>
-                            <span className="text-gray-400">nirium::contracts::{test}</span>
+                        <div key={test} className="flex flex-col xs:flex-row xs:items-center gap-1 xs:gap-2 py-1 border-b border-white/5 xs:border-0">
+                            <span className="text-green-400 font-bold shrink-0">[PASS]</span>
+                            <span className="text-gray-400 break-all md:break-normal">nirium::contracts::{test}</span>
                         </div>
                     ))}
                     <div className="mt-4 pt-4 border-t border-white/10 text-green-400">
@@ -580,8 +580,8 @@ function AgentSection() {
             {/* File Structure */}
             <section>
                 <h2 className="text-2xl font-bold mb-6">File Structure</h2>
-                <div className="bg-[#0A0A0A] border border-white/10 rounded-xl p-4 font-mono text-sm">
-                    <pre className="text-gray-400">
+                <div className="bg-[#0A0A0A] border border-white/10 rounded-xl p-4 font-mono text-[10px] xs:text-xs sm:text-sm overflow-x-auto scrollbar-thin scrollbar-thumb-white/10">
+                    <pre className="text-gray-400 whitespace-pre">
                         {`packages/agent/src/
 ├── actions/
 │   ├── executeAtomicPath.ts        # Path payment builder (XLM + USDC)
@@ -593,7 +593,7 @@ function AgentSection() {
 │   ├── archiveService.ts           # IPFS audit log uploader
 │   ├── llmService.ts               # Neural brain integration
 │   ├── browserService.ts           # Web scraping & deep research
-│   ├── twitterService.ts           # Social sentiment analysis
+│   ├── xService.ts                 # Social sentiment analysis (X)
 │   └── knowledgeService.ts         # Market context engine
 ├── providers/
 │   └── stellarProvider.ts          # Blockchain interface
@@ -1124,18 +1124,18 @@ function IdeasSection() {
 
             <div className="grid md:grid-cols-2 gap-8">
                 {/* Idea 1 */}
-                <div className="bg-[#0A0A0A] border border-white/10 rounded-2xl p-8 hover:border-yellow-500/50 transition-colors group">
-                    <div className="flex items-start justify-between mb-6">
-                        <div className="p-3 bg-yellow-500/10 rounded-xl text-yellow-500">
+                <div className="bg-[#0A0A0A] border border-white/10 rounded-2xl p-6 sm:p-8 hover:border-yellow-500/50 transition-colors group">
+                    <div className="flex flex-col xs:flex-row items-start xs:items-center justify-between gap-4 mb-6">
+                        <div className="p-3 bg-yellow-500/10 rounded-xl text-yellow-500 shrink-0">
                             <Shield size={32} />
                         </div>
-                        <span className="px-3 py-1 rounded-full bg-white/5 text-xs font-mono text-gray-400">Difficulty: Medium</span>
+                        <span className="px-3 py-1 rounded-full bg-white/5 text-[10px] sm:text-xs font-mono text-gray-400 self-start xs:self-center">Difficulty: Medium</span>
                     </div>
-                    <h3 className="text-2xl font-bold text-white mb-2">PortfolioGuard Bot</h3>
-                    <p className="text-gray-400 mb-6 min-h-[60px]">
+                    <h3 className="text-xl sm:text-2xl font-bold text-white mb-2">PortfolioGuard Bot</h3>
+                    <p className="text-gray-400 mb-6 sm:min-h-[60px] text-sm sm:text-base leading-relaxed">
                         A Telegram bot that monitors user portfolios 24/7. If collateral health drops below 1.1, it automatically rebalances via Nirium to repay debt and prevent liquidation.
                     </p>
-                    <div className="bg-black/50 rounded-lg p-4 font-mono text-sm text-yellow-500/80">
+                    <div className="bg-black/50 rounded-lg p-4 font-mono text-[10px] sm:text-sm text-yellow-500/80 overflow-x-auto scrollbar-thin">
                         <span className="text-gray-500"># Use Python SDK</span><br />
                         agent.listen(portfolio_health, (health) =&gt; {'{'}<br />
                         &nbsp;&nbsp;if health &lt; 1.1: agent.execute("Repay")<br />
@@ -1144,18 +1144,18 @@ function IdeasSection() {
                 </div>
 
                 {/* Idea 2 */}
-                <div className="bg-[#0A0A0A] border border-white/10 rounded-2xl p-8 hover:border-stellar-teal/50 transition-colors group">
-                    <div className="flex items-start justify-between mb-6">
-                        <div className="p-3 bg-stellar-teal/10 rounded-xl text-stellar-teal">
+                <div className="bg-[#0A0A0A] border border-white/10 rounded-2xl p-6 sm:p-8 hover:border-stellar-teal/50 transition-colors group">
+                    <div className="flex flex-col xs:flex-row items-start xs:items-center justify-between gap-4 mb-6">
+                        <div className="p-3 bg-stellar-teal/10 rounded-xl text-stellar-teal shrink-0">
                             <Zap size={32} />
                         </div>
-                        <span className="px-3 py-1 rounded-full bg-white/5 text-xs font-mono text-gray-400">Difficulty: Hard</span>
+                        <span className="px-3 py-1 rounded-full bg-white/5 text-[10px] sm:text-xs font-mono text-gray-400 self-start xs:self-center">Difficulty: Hard</span>
                     </div>
-                    <h3 className="text-2xl font-bold text-white mb-2">ArbSwarm DAO</h3>
-                    <p className="text-gray-400 mb-6 min-h-[60px]">
+                    <h3 className="text-xl sm:text-2xl font-bold text-white mb-2">ArbSwarm DAO</h3>
+                    <p className="text-gray-400 mb-6 sm:min-h-[60px] text-sm sm:text-base leading-relaxed">
                         A DAO where users pool XLM. Thousands of micro-agents scan DEXs for 0.5% discrepancies and execute atomic path payments. Profits are split 80/20 between Agent and DAO.
                     </p>
-                    <div className="bg-black/50 rounded-lg p-4 font-mono text-sm text-stellar-teal/80">
+                    <div className="bg-black/50 rounded-lg p-4 font-mono text-[10px] sm:text-sm text-stellar-teal/80 overflow-x-auto scrollbar-thin">
                         <span className="text-gray-500"># Use TypeScript SDK</span><br />
                         const profit = await calculateArb(poolA, poolB);<br />
                         if (profit &gt; gas) await loop.execute(flashLoan);
@@ -1163,18 +1163,18 @@ function IdeasSection() {
                 </div>
 
                 {/* Idea 3 */}
-                <div className="bg-[#0A0A0A] border border-white/10 rounded-2xl p-8 hover:border-purple-500/50 transition-colors group">
-                    <div className="flex items-start justify-between mb-6">
-                        <div className="p-3 bg-purple-500/10 rounded-xl text-purple-500">
+                <div className="bg-[#0A0A0A] border border-white/10 rounded-2xl p-6 sm:p-8 hover:border-purple-500/50 transition-colors group">
+                    <div className="flex flex-col xs:flex-row items-start xs:items-center justify-between gap-4 mb-6">
+                        <div className="p-3 bg-purple-500/10 rounded-xl text-purple-500 shrink-0">
                             <Globe size={32} />
                         </div>
-                        <span className="px-3 py-1 rounded-full bg-white/5 text-xs font-mono text-gray-400">Difficulty: Easy</span>
+                        <span className="px-3 py-1 rounded-full bg-white/5 text-[10px] sm:text-xs font-mono text-gray-400 self-start xs:self-center">Difficulty: Easy</span>
                     </div>
-                    <h3 className="text-2xl font-bold text-white mb-2">NewsTrader Oracle</h3>
-                    <p className="text-gray-400 mb-6 min-h-[60px]">
-                        Connect standard Web2 news APIs (Bloomberg, Twitter) to Stellar. When "Regulatory Approval" is detected, buy the related token via Nirium Swaps instantly.
+                    <h3 className="text-xl sm:text-2xl font-bold text-white mb-2">NewsTrader Oracle</h3>
+                    <p className="text-gray-400 mb-6 sm:min-h-[60px] text-sm sm:text-base leading-relaxed">
+                        Connect standard Web2 news APIs (Bloomberg, X) to Stellar. When "Regulatory Approval" is detected, buy the related token via Nirium Swaps instantly.
                     </p>
-                    <div className="bg-black/50 rounded-lg p-4 font-mono text-sm text-purple-500/80">
+                    <div className="bg-black/50 rounded-lg p-4 font-mono text-[10px] sm:text-sm text-purple-500/80 overflow-x-auto scrollbar-thin">
                         <span className="text-gray-500"># Use JS SDK + Vercel</span><br />
                         onNewsReceived(async (headline) =&gt; {'{'}<br />
                         &nbsp;&nbsp;if (isBullish(headline)) loop.buy("XLM")<br />
@@ -1183,18 +1183,18 @@ function IdeasSection() {
                 </div>
 
                 {/* Idea 4 */}
-                <div className="bg-[#0A0A0A] border border-white/10 rounded-2xl p-8 hover:border-green-500/50 transition-colors group">
-                    <div className="flex items-start justify-between mb-6">
-                        <div className="p-3 bg-green-500/10 rounded-xl text-green-500">
+                <div className="bg-[#0A0A0A] border border-white/10 rounded-2xl p-6 sm:p-8 hover:border-green-500/50 transition-colors group">
+                    <div className="flex flex-col xs:flex-row items-start xs:items-center justify-between gap-4 mb-6">
+                        <div className="p-3 bg-green-500/10 rounded-xl text-green-500 shrink-0">
                             <Users size={32} />
                         </div>
-                        <span className="px-3 py-1 rounded-full bg-white/5 text-xs font-mono text-gray-400">Difficulty: Hard</span>
+                        <span className="px-3 py-1 rounded-full bg-white/5 text-[10px] sm:text-xs font-mono text-gray-400 self-start xs:self-center">Difficulty: Hard</span>
                     </div>
-                    <h3 className="text-2xl font-bold text-white mb-2">GameFi NPC Economy</h3>
-                    <p className="text-gray-400 mb-6 min-h-[60px]">
+                    <h3 className="text-xl sm:text-2xl font-bold text-white mb-2">GameFi NPC Economy</h3>
+                    <p className="text-gray-400 mb-6 sm:min-h-[60px] text-sm sm:text-base leading-relaxed">
                         Fully autonomous NPCs in a Stellar game that manage their own inventory shops. They buy items low from players and sell high, managing their own capital via Nirium.
                     </p>
-                    <div className="bg-black/50 rounded-lg p-4 font-mono text-sm text-green-500/80">
+                    <div className="bg-black/50 rounded-lg p-4 font-mono text-[10px] sm:text-sm text-green-500/80 overflow-x-auto scrollbar-thin">
                         <span className="text-gray-500"># Use Unity + C# (API)</span><br />
                         npc.OnTradeOffer((item) =&gt; {'{'}<br />
                         &nbsp;&nbsp;if (market.val(item) &gt; offer) npc.pay(offer)<br />

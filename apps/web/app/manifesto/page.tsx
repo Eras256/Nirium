@@ -169,7 +169,7 @@ export default function ManifestoPage() {
                     <h2 className="text-4xl font-black text-white mb-8 tracking-tighter">BUILD THE HIVEMIND.</h2>
                     <div className="flex justify-center gap-4">
                         <Link href="/docs" className="text-gray-400 hover:text-white transition-colors underline underline-offset-4 decoration-stellar-teal/50">Documentation</Link>
-                        <Link href="https://x.com/Vaiosx" className="text-gray-400 hover:text-white transition-colors underline underline-offset-4 decoration-stellar-teal/50">Twitter</Link>
+                        <Link href="https://x.com/Niriumstellar" className="text-gray-400 hover:text-white transition-colors underline underline-offset-4 decoration-stellar-teal/50">X</Link>
                     </div>
                 </div>
 
