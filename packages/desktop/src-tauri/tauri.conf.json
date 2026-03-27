@@ -1,0 +1,36 @@
+{
+    "productName": "Nirium",
+    "version": "0.1.0",
+    "identifier": "com.nirium.app",
+    "build": {
+        "beforeDevCommand": "pnpm --filter nirium-web dev",
+        "devPath": "http://localhost:3000",
+        "beforeBuildCommand": "pnpm --filter nirium-web build",
+        "distDir": "../../apps/web/out"
+    },
+    "app": {
+        "windows": [
+            {
+                "title": "Nirium — Stellar Autonomous Matrix",
+                "width": 1280,
+                "height": 800,
+                "transparent": true,
+                "decorations": true
+            }
+        ],
+        "security": {
+            "csp": null
+        }
+    },
+    "bundle": {
+        "active": true,
+        "targets": "all",
+        "icon": [
+            "icons/32x32.png",
+            "icons/128x128.png",
+            "icons/icon.icns",
+            "icons/icon.ico",
+            "icons/png/512x512.png"
+        ]
+    }
+}

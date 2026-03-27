@@ -1,0 +1,52 @@
+version: '3.8'
+
+services:
+  agent:
+    build:
+      context: .
+      dockerfile: packages/agent/Dockerfile
+    ports:
+      - "3001:3001"
+    environment:
+      - STELLAR_NETWORK=testnet
+      - SOROBAN_RPC_URL=https://soroban-testnet.stellar.org
+      - HORIZON_URL=https://horizon-testnet.stellar.org
+      - ACTIVE_LLM_PROVIDER=ollama
+      - OLLAMA_BASE_URL=http://ollama:11434
+      - REDIS_URL=redis://redis:6379
+      - AGENT_PORT=3001
+      - JWT_SECRET=${JWT_SECRET:-nirium-jwt-secret}
+      - ADMIN_API_KEY=${ADMIN_API_KEY:-nirium-admin-key}
+    depends_on:
+      - redis
+    restart: unless-stopped
+    networks:
+      - nirium
+
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    restart: unless-stopped
+    networks:
+      - nirium
+
+  ollama:
+    image: ollama/ollama:latest
+    ports:
+      - "11434:11434"
+    volumes:
+      - ollama_data:/root/.ollama
+    restart: unless-stopped
+    networks:
+      - nirium
+
+networks:
+  nirium:
+    driver: bridge
+
+volumes:
+  redis_data:
+  ollama_data:

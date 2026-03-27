@@ -1,0 +1,9 @@
+# Vercel - ignore heavy monorepo packages not needed for web build
+packages/agent
+packages/contracts
+packages/cli
+packages/sdk
+packages/sdk-python
+packages/desktop
+*.log
+*.sql
