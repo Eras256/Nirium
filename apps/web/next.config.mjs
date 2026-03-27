@@ -3,6 +3,11 @@ const nextConfig = {
     reactStrictMode: true,
     output: 'standalone',
     productionBrowserSourceMaps: false, // Blindaje contra inspección de código fuente en producción
+    poweredByHeader: false, // Ocultar el header X-Powered-By por seguridad
+
+    compiler: {
+        removeConsole: process.env.NODE_ENV === 'production', // Elimina todos los console.* en producción
+    },
 
 
     // Transpile three.js ecosystem packages

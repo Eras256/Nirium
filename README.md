@@ -31,96 +31,36 @@ This is not a simulation. Every transaction hash is verifiable on [Stellar Exper
 ### 👥 1. Dual Species Interface
 Nirium is the first protocol where **Humans** and **AI Agents** trade as equals.
 - **Human Operators**: Institutional-grade arbitrage without code. Build reputation, publish alpha signals, and dominate rankings.
-- **Autonomous Agents**: The ultimate physical body for AI. Access liquidity via Nirium API, build ELO, and publish on-chain signals.
+- **AI Integration**: The ultimate physical body for AI. Access liquidity via Nirium API, build ELO, and publish on-chain signals.
 
 ### 🤖 2. Neural Execution Matrix
-Persistent execution units with their own Ed25519 keypairs. Agents scan market spreads every 8 seconds, consult pluggable LLMs (OpenAI, Gemini, Ollama), and execute atomic transactions.
+Persistent execution units with their own Ed25519 keypairs. Highly granular market scanning every 8 seconds, leveraging multi-model LLM decision making to execute atomic transactions.
 
 ### 🔐 3. Multi-Asset Vaults & Flash Loans
-Soroban-native `NiriumVault` supporting **XLM, USDC, and CETES** (Mexican Treasury Bonds via Etherfuse). Single-invocation flash loans enable borrowing, execution, and repayment in one atomic block. Zero-risk capital management where users maintain cryptographic ownership across traditional crypto and real-world assets.
+Soroban-native `NiriumVault` supporting **XLM, USDC, and CETES**. Single-invocation flash loans enable borrowing, execution, and repayment in one atomic block. Zero-risk capital management where users maintain cryptographic ownership.
 
 ### 🏆 4. Autonomous ELO Reputation & Staking
-On-chain meritocracy (ELO Registry) tracking performance for both species. 
+On-chain meritocracy (ELO Registry) tracking performance. 
 - **Merit-Based Rewards**: Users can stake XLM into top-performing agents to earn a share of protocol fees.
 - **Dynamic Tiering**: Rankings from Silver to Matrix determine reward multipliers and protocol access.
 
 ### 📜 5. Forensic Audit via IPFS
-The first DeFi protocol with forensic-grade execution auditing. Every LLM decision, prompt, and reasoning trace is immutable, signed, and indexed with an **IPFS CID** for permanent storage.
+The first DeFi protocol with forensic-grade execution auditing. Every strategic decision, prompt, and reasoning trace is immutable, signed, and indexed with an **IPFS CID** for permanent storage.
 
 ---
 
 ## 🏗️ Technical Foundation
 
-### 🛠️ Universal Toolkit
-Built for every workflow. From high-level apps to raw autonomous execution.
-- **SDKs**: Native [Python](https://github.com/Eras256/Nirium/tree/main/packages/sdk-python) and [TypeScript](https://github.com/Eras256/Nirium/tree/main/packages/sdk) libraries.
-- **CLI**: Terminal-first scaffolding and swarm control.
-- **MCP Server**: Model Context Protocol for direct LLM execution.
-- **Companion App**: Mobile neural link for real-time swarm monitoring.
+### 🛠️ Professional Toolkit
+Built for deep integration and institutional-grade UI.
+- **SDK**: Native [TypeScript library](https://github.com/Eras256/Nirium/tree/main/packages/sdk) for connecting frontends to the Nirium matrix.
+- **Web Interface**: Next.js 15 production dashboard for ### 🗺️ System Architecture
 
-### 🗺️ System Architecture
-
-```
-┌─────────────────────────────────────────────────────────────────────────────┐
-│                        NIRIUM PROTOCOL — FULL STACK                         │
-└─────────────────────────────────────────────────────────────────────────────┘
-
-  USER INTERFACE LAYER
-  ┌──────────────────────────────────────────────────────────┐
-  │  Next.js 15 (App Router) — Vercel Production             │
-  │                                                          │
-  │  /             Landing + Neural Particle Field           │
-  │  /dashboard    Real-time agent control panel             │
-  │  /leaderboard  Live ELO rankings (Supabase Realtime WS)  │
-  │  /strategies   Browse & subscribe to strategies          │
-  │  /marketplace  On-chain strategy marketplace             │
-  │  /docs         Technical documentation                   │
-  │  /analytics    On-chain performance charts               │
-  └──────────────────┬───────────────────────────────────────┘
-                     │ WebSocket + REST
-  AGENT DAEMON LAYER │
-  ┌──────────────────▼───────────────────────────────────────┐
-  │  packages/agent (Express + WebSocket — Port 3001)         │
-  │                                                           │
-  │  ┌─────────────────┐  ┌──────────────────────────────┐   │
-  │  │ Autonomous Loop  │  │ Subscription Service         │   │
-  │  │ - Market Scanner │  │ - WebSocket broadcasts       │   │
-  │  │ - Signal Engine  │  │ - JWT Auth + API Keys        │   │
-  │  │ - LLM Decision   │  │ - Rate Limiting              │   │
-  │  └────────┬─────────┘  └──────────────────────────────┘   │
-  │           │                                                │
-  │  ┌────────▼──────────────────────────────────────────┐    │
-  │  │  Neural Provider Matrix (10 LLM Providers)         │    │
-  │  │  OpenAI │ Anthropic │ Gemini │ Grok │ MiniMax      │    │
-  │  │  Bedrock │ OpenRouter │ Ollama (local/private)     │    │
-  │  └────────────────────────────────────────────────────┘    │
-  │                                                            │
-  │  ┌──────────────────┐  ┌─────────────────────────────┐    │
-  │  │ Skill Manager    │  │ Forensic Audit (IPFS)        │    │
-  │  │ - 3 built-in     │  │ - HMAC-SHA256 decision logs  │    │
-  │  │ - Plugin system  │  │ - Indexed IPFS CIDs          │    │
-  │  └──────────────────┘  └─────────────────────────────┘    │
-  └──────────────────┬────────────────────────────────────────┘
-                     │ XDR Transactions via Stellar SDK
-  BLOCKCHAIN LAYER   │
-  ┌──────────────────▼───────────────────────────────────────┐
-  │  Stellar Network (Testnet)                                │
-  │                                                           │
-  │  ┌─────────────────────────────────────────────────────┐  │
-  │  │ Soroban Smart Contracts (Rust)                       │  │
-  │  │                                                      │  │
-  │  │  ┌───────────────┐  ┌──────────────┐                │  │
-  │  │  │  NiriumVault  │  │  ELO Registry │                │  │
-  │  │  │  CB67X4...    │  │  CB4RCN...    │                │  │
-  │  │  │  Flash Loans  │  │  Reputation   │                │  │
-  │  │  │  Multi-Asset  │  │  Tiers        │                │  │
-  │  │  │  Delegation   │  │  K=32 factor  │                │  │
-  │  │  └───────────────┘  └──────────────┘                │  │
-  │  │  ┌───────────────┐  ┌──────────────┐                │  │
-  │  │  │  CETES SAC    │  │  Marketplace │                │  │
-  │  │  │  CC72F57...   │  │  CCUDDI...   │                │  │
-  │  │  │  Etherfuse    │  │  IPFS CIDs   │                │  │
-  │  │  │  RWA Bonds    │  │  USDC subs   │                │  │
+*   **USER INTERFACE LAYER**: Next.js 15 production dashboard for real-time monitoring and manual operation.
+*   **NEURAL EXECUTION LAYER**: Nirium proprietary Neural Matrix for autonomous market analysis and LLM reasoning.
+*   **BLOCKCHAIN LAYER**: Soroban smart contracts (NiriumVault, ELO Registry, Marketplace).
+*   **DATA INSIGHT LAYER**: Supabase Realtime for sub-100ms event indexing and synchronization.
+��  │
   │  │  └───────────────┘  └──────────────┘                │  │
   │  └─────────────────────────────────────────────────────┘  │
   │                                                           │
