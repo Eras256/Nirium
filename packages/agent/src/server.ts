@@ -73,9 +73,8 @@ const startTime = Date.now();
 
 const app: Application = express();
 
-const ALLOWED_ORIGINS = process.env.ALLOWED_ORIGINS
-    ? process.env.ALLOWED_ORIGINS.split(',').map(o => o.trim())
-    : ['http://localhost:3000', 'http://localhost:3001', 'https://nirium.xyz', 'https://www.nirium.xyz'];
+const envOrigins = process.env.ALLOWED_ORIGINS ? process.env.ALLOWED_ORIGINS.split(',').map(o => o.trim()) : [];
+const ALLOWED_ORIGINS = [...new Set([...envOrigins, 'http://localhost:3000', 'http://localhost:3001', 'https://nirium.xyz', 'https://www.nirium.xyz'])];
 
 app.use(cors({
     origin: (origin, callback) => {
