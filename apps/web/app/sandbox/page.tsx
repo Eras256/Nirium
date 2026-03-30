@@ -47,7 +47,7 @@ export default function SandboxPage() {
         const loadingToast = toast.loading("Provisioning institutional sandbox...");
 
         try {
-            const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
+            const API_URL = process.env.NEXT_PUBLIC_API_URL || (process.env.NODE_ENV === 'production' ? 'https://api.nirium.xyz' : 'http://localhost:3001');
             const response = await fetch(`${API_URL}/api/sandbox/request`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },

@@ -1,4 +1,4 @@
-export const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
+export const API_URL = process.env.NEXT_PUBLIC_API_URL || (process.env.NODE_ENV === 'production' ? 'https://api.nirium.xyz' : 'http://localhost:3001');
 
 export const getWebSocketUrl = (path: string) => {
     // If running in browser and API is localhost (default), but we are on Verce, use the current host relative path proxy if needed, 
