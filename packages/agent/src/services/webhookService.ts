@@ -1,8 +1,53 @@
 // ═══════════════════════════════════════════════════════════════
-// Nirium — Webhook Service (Real Implementation)
+// Nirium — Webhook Service (Supabase-persisted + in-memory fallback)
 // ═══════════════════════════════════════════════════════════════
 
 import crypto from 'crypto';
+import { supabase } from '../providers/database.js';
+
+const SUPABASE_AVAILABLE = !!(process.env.SUPABASE_URL && process.env.SUPABASE_ANON_KEY);
+
+// ═══════════════════════════════════════════════════════════════
+// SSRF PROTECTION — Block requests to internal/private networks
+// ═══════════════════════════════════════════════════════════════
+
+const PRIVATE_IP_PATTERNS = [
+    /^localhost$/i,
+    /^127\./,
+    /^10\./,
+    /^172\.(1[6-9]|2\d|3[01])\./,
+    /^192\.168\./,
+    /^169\.254\./,          // Link-local
+    /^::1$/,                // IPv6 loopback
+    /^fc00:/i,              // IPv6 unique local
+    /^fe80:/i,              // IPv6 link-local
+    /^0\./,                 // Invalid
+    /^metadata\.google/i,  // GCP metadata
+    /^169\.254\.169\.254/, // AWS/Azure metadata
+];
+
+function validateWebhookUrl(rawUrl: string): { valid: boolean; reason?: string } {
+    let parsed: URL;
+    try {
+        parsed = new URL(rawUrl);
+    } catch {
+        return { valid: false, reason: 'Invalid URL format' };
+    }
+
+    if (!['https:', 'http:'].includes(parsed.protocol)) {
+        return { valid: false, reason: 'Only http/https protocols allowed' };
+    }
+
+    const hostname = parsed.hostname;
+
+    for (const pattern of PRIVATE_IP_PATTERNS) {
+        if (pattern.test(hostname)) {
+            return { valid: false, reason: 'Webhook URL must point to a public internet endpoint' };
+        }
+    }
+
+    return { valid: true };
+}
 
 export interface Webhook {
     id: string;
@@ -28,37 +73,112 @@ export async function registerWebhook(
     events: string[],
     secret?: string
 ): Promise<Webhook> {
+    const urlCheck = validateWebhookUrl(url);
+    if (!urlCheck.valid) {
+        throw new Error(`Invalid webhook URL: ${urlCheck.reason}`);
+    }
+
+    const ALLOWED_EVENTS = [
+        'execution.started', 'execution.completed', 'execution.failed',
+        'signal.generated', 'loop.started', 'loop.stopped', 'test',
+    ];
+    const invalidEvents = events.filter(e => !ALLOWED_EVENTS.includes(e));
+    if (invalidEvents.length > 0) {
+        throw new Error(`Unknown events: ${invalidEvents.join(', ')}. Allowed: ${ALLOWED_EVENTS.join(', ')}`);
+    }
+
     const id = crypto.randomUUID();
+    const webhookSecret = secret || crypto.randomBytes(32).toString('hex');
+    const createdAt = new Date().toISOString();
+
     const webhook: Webhook = {
         id,
         userId,
         url,
         events,
-        secret: secret || crypto.randomBytes(32).toString('hex'),
+        secret: webhookSecret,
         active: true,
-        createdAt: new Date().toISOString(),
+        createdAt,
         failureCount: 0,
     };
 
-    webhooks.set(id, webhook);
-    console.log(`[Webhook] Registered: ${url} for events: [${events.join(', ')}]`);
+    // Persist to Supabase
+    if (SUPABASE_AVAILABLE) {
+        try {
+            const { error } = await supabase.from('webhooks').insert({
+                id,
+                user_id: userId,
+                url,
+                events,
+                secret: webhookSecret,
+                active: true,
+                failure_count: 0,
+                created_at: createdAt,
+            });
+            if (error) {
+                console.error('[Webhook] Supabase insert failed, using memory fallback:', error.message);
+                webhooks.set(id, webhook);
+            }
+        } catch {
+            webhooks.set(id, webhook);
+        }
+    } else {
+        webhooks.set(id, webhook);
+    }
+
+    console.log(`[Webhook] Registered ${events.length} event(s) for user`);
     return webhook;
 }
 
 /**
  * Get all webhooks for a user.
  */
-export function getUserWebhooks(userId: string): Webhook[] {
+export async function getUserWebhooks(userId: string): Promise<Webhook[]> {
+    if (SUPABASE_AVAILABLE) {
+        try {
+            const { data, error } = await supabase
+                .from('webhooks')
+                .select('id, user_id, url, events, secret, active, failure_count, created_at, last_triggered_at')
+                .eq('user_id', userId)
+                .eq('active', true);
+
+            if (!error && data) {
+                return data.map((row: any) => ({
+                    id: row.id,
+                    userId: row.user_id,
+                    url: row.url,
+                    events: row.events,
+                    secret: row.secret,
+                    active: row.active,
+                    failureCount: row.failure_count,
+                    createdAt: row.created_at,
+                    lastTriggeredAt: row.last_triggered_at,
+                }));
+            }
+        } catch { /* fallback */ }
+    }
     return Array.from(webhooks.values()).filter(w => w.userId === userId);
 }
 
 /**
  * Delete a webhook.
  */
-export function deleteWebhook(id: string): boolean {
+export async function deleteWebhook(id: string): Promise<boolean> {
+    if (SUPABASE_AVAILABLE) {
+        try {
+            const { error } = await supabase
+                .from('webhooks')
+                .update({ active: false })
+                .eq('id', id);
+            if (!error) {
+                console.log(`[Webhook] Deleted: ${id} (Supabase)`);
+                return true;
+            }
+        } catch { /* fallback */ }
+    }
     const existed = webhooks.has(id);
     webhooks.delete(id);
-    if (existed) console.log(`[Webhook] Deleted: ${id}`);
+    if (existed) console.log(`[Webhook] Deleted: ${id} (memory)`);
     return existed;
 }
 
@@ -66,10 +186,22 @@ export function deleteWebhook(id: string): boolean {
  * Send a test event to a webhook.
  */
 export async function testWebhook(id: string): Promise<{ success: boolean; message: string; statusCode?: number }> {
-    const webhook = webhooks.get(id);
-    if (!webhook) {
-        return { success: false, message: 'Webhook not found' };
+    // Try Supabase first
+    let webhook: Webhook | undefined;
+    if (SUPABASE_AVAILABLE) {
+        try {
+            const { data } = await supabase
+                .from('webhooks')
+                .select('id, user_id, url, events, secret, active, failure_count, created_at')
+                .eq('id', id)
+                .single();
+            if (data) {
+                webhook = { id: data.id, userId: data.user_id, url: data.url, events: data.events, secret: data.secret, active: data.active, failureCount: data.failure_count, createdAt: data.created_at };
+            }
+        } catch { /* fallback */ }
     }
+    if (!webhook) webhook = webhooks.get(id);
+    if (!webhook) return { success: false, message: 'Webhook not found' };
 
     return deliverPayload(webhook, {
         event: 'test',
@@ -82,9 +214,22 @@ export async function testWebhook(id: string): Promise<{ success: boolean; messa
  * Dispatch a real event to all matching webhooks.
  */
 export async function dispatchWebhookEvent(event: string, payload: any): Promise<void> {
-    const matching = Array.from(webhooks.values()).filter(
-        w => w.active && w.events.includes(event)
-    );
+    let matching: Webhook[] = [];
+    if (SUPABASE_AVAILABLE) {
+        try {
+            const { data } = await supabase
+                .from('webhooks')
+                .select('id, user_id, url, events, secret, active, failure_count, created_at')
+                .eq('active', true)
+                .contains('events', [event]);
+            if (data) {
+                matching = data.map((row: any) => ({ id: row.id, userId: row.user_id, url: row.url, events: row.events, secret: row.secret, active: row.active, failureCount: row.failure_count, createdAt: row.created_at }));
+            }
+        } catch { /* fallback */ }
+    }
+    if (matching.length === 0) {
+        matching = Array.from(webhooks.values()).filter(w => w.active && w.events.includes(event));
+    }
 
     if (matching.length === 0) return;
 

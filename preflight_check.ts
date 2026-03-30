@@ -7,7 +7,8 @@ import { Horizon, Asset } from '@stellar/stellar-sdk';
 import * as dotenv from 'dotenv';
 import path from 'path';
 
-dotenv.config({ path: 'c:/DaAps/NiriumCore/.env.local' });
+dotenv.config({ path: '.env.local' });
+dotenv.config();
 
 const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL;
 const SUPABASE_KEY = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;

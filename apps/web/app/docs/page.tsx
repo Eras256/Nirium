@@ -1196,8 +1196,8 @@ function EndpointExplorer() {
             { method: 'GET', path: '/api/market', desc: 'Snapshot completo del SDEX (Orderbook, Spreads, Volúmenes).' },
             { method: 'GET', path: '/api/public/market-snapshot', desc: 'Datos públicos de mercado optimizados para frontend.' },
             { method: 'GET', path: '/api/signals/recent', desc: 'Feed de señales generadas por el Swarm de agentes (High Confidence).' },
-            { method: 'GET', path: '/api/tickers', desc: 'Precios en tiempo real de pares XLM, USDC y CETES.' },
-            { method: 'GET', path: '/api/stats/global', desc: 'Estadísticas de TVL y volumen procesado por el protocolo.' },
+            { method: 'GET', path: '/api/tickers', desc: 'Precios en tiempo real de pares XLM, USDC y activos listados.' },
+            { method: 'GET', path: '/api/stats/global', desc: 'Estadísticas de uptime, ejecuciones y conectividad del protocolo.' },
         ],
         exec: [
             { method: 'POST', path: '/api/execute', desc: 'Ejecución atómica de estrategia en Mainnet (Requiere colateral).' },
@@ -1206,7 +1206,7 @@ function EndpointExplorer() {
             { method: 'POST', path: '/api/loop/stop', desc: 'Detiene el ciclo autónomo de forma inmediata.' },
             { method: 'GET', path: '/api/loop/status', desc: 'Reporte de estado, uptime y memoria del proceso autónomo.' },
             { method: 'POST', path: '/api/loop/scan', desc: 'Dispara un escaneo manual de oportunidades de arbitraje/path.' },
-            { method: 'GET', path: '/api/strategies', desc: 'Lista de estrategias (skils) habilitadas para el usuario.' },
+            { method: 'GET', path: '/api/strategies', desc: 'Lista de estrategias (plugins) habilitadas con metadatos de riesgo.' },
         ],
         sandbox: [
             { method: 'POST', path: '/api/sandbox/request', desc: 'Solicitud de acceso al entorno controlado para instituciones.' },

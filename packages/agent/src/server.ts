@@ -73,10 +73,20 @@ const startTime = Date.now();
 
 const app: Application = express();
 
+const ALLOWED_ORIGINS = process.env.ALLOWED_ORIGINS
+    ? process.env.ALLOWED_ORIGINS.split(',').map(o => o.trim())
+    : ['http://localhost:3000', 'http://localhost:3001'];
+
 app.use(cors({
-    origin: '*',
+    origin: (origin, callback) => {
+        // Allow requests with no origin (server-to-server, curl, Postman)
+        if (!origin) return callback(null, true);
+        if (ALLOWED_ORIGINS.includes(origin)) return callback(null, true);
+        callback(new Error('CORS policy: origin not allowed'));
+    },
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization', 'x-api-key'],
+    credentials: true,
 }));
 
 app.use(express.json({ limit: '10mb' }));
@@ -130,17 +140,20 @@ app.get('/api/info', (_req: Request, res: Response) => {
                 token: 'POST /api/auth/token',
                 keys: 'POST|GET|DELETE /api/auth/keys',
             },
+            market: {
+                data: 'GET /api/market',
+                tickers: 'GET /api/tickers',
+                stats: 'GET /api/stats/global',
+                loop: 'POST /api/loop/start|stop|scan, GET /api/loop/status',
+            },
             execution: {
                 execute: 'POST /api/execute',
                 demo: 'POST /api/execute-demo',
+                strategies: 'GET /api/strategies',
             },
-            market: {
-                data: 'GET /api/market',
-                loop: 'POST /api/loop/start|stop|scan, GET /api/loop/status',
-            },
-            webhooks: 'POST|GET|DELETE /api/webhooks',
-            subscriptions: 'POST|GET|DELETE /api/subscriptions',
-            skills: 'GET|POST|DELETE /api/skills',
+            webhooks: 'POST|GET|DELETE /api/webhooks, POST /api/webhooks/:id/test',
+            subscriptions: 'POST|GET|DELETE /api/subscriptions, GET /api/subscriptions/stats',
+            skills: 'GET|POST|DELETE /api/skills, GET /api/skills/marketplace',
             signals: 'GET /api/signals/recent',
         },
         llm: {
@@ -284,7 +297,7 @@ app.post('/api/execute-demo', standardLimiter, async (req: Request, res: Respons
 // MARKET DATA ENDPOINTS
 // ═══════════════════════════════════════════════════════════════
 
-app.get('/api/market', standardLimiter, async (_req: Request, res: Response) => {
+app.get('/api/market', authMiddleware, standardLimiter, async (_req: Request, res: Response) => {
     try {
         const cached = getCurrentMarketState();
         if (cached) {
@@ -327,7 +340,7 @@ app.post('/api/loop/scan', authMiddleware as any, async (_req: Request, res: Res
 // WEBHOOK ENDPOINTS
 // ═══════════════════════════════════════════════════════════════
 
-app.post('/api/webhooks', authMiddleware as any, (req: Request, res: Response) => {
+app.post('/api/webhooks', authMiddleware as any, async (req: Request, res: Response) => {
     const authReq = req as AuthenticatedRequest;
     const { url, events, secret } = req.body;
 
@@ -336,19 +349,23 @@ app.post('/api/webhooks', authMiddleware as any, (req: Request, res: Response) =
         return;
     }
 
-    const webhook = registerWebhook(authReq.user!.userId, url, events, secret);
-    broadcastLog('info', `[Webhook] Registered: ${url} → ${events.join(', ')}`);
-    res.json(webhook);
+    try {
+        const webhook = await registerWebhook(authReq.user!.userId, url, events, secret);
+        broadcastLog('info', `[Webhook] Registered for ${events.length} event(s)`);
+        res.json(webhook);
+    } catch (error) {
+        res.status(400).json({ error: String(error) });
+    }
 });
 
-app.get('/api/webhooks', authMiddleware as any, (req: Request, res: Response) => {
+app.get('/api/webhooks', authMiddleware as any, async (req: Request, res: Response) => {
     const authReq = req as AuthenticatedRequest;
-    const webhooks = getUserWebhooks(authReq.user!.userId);
-    res.json({ webhooks });
+    const webhookList = await getUserWebhooks(authReq.user!.userId);
+    res.json({ webhooks: webhookList });
 });
 
-app.delete('/api/webhooks/:id', authMiddleware as any, (req: Request, res: Response) => {
-    const deleted = deleteWebhook(req.params.id as string);
+app.delete('/api/webhooks/:id', authMiddleware as any, async (req: Request, res: Response) => {
+    const deleted = await deleteWebhook(req.params.id as string);
     if (deleted) {
         res.json({ message: 'Webhook deleted' });
     } else {
@@ -396,6 +413,71 @@ app.get('/api/signals/recent', standardLimiter, (req: Request, res: Response) =>
     const count = Math.min(parseInt(req.query.count as string) || 20, 100);
     const signals = getRecentSignals(count);
     res.json({ signals });
+});
+
+// ═══════════════════════════════════════════════════════════════
+// MARKET EXTENDED ENDPOINTS
+// ═══════════════════════════════════════════════════════════════
+
+app.get('/api/tickers', standardLimiter, async (_req: Request, res: Response) => {
+    try {
+        const market = getCurrentMarketState() || await fetchMarketState();
+        const tickers = (market as any)?.assets?.map((a: any) => ({
+            symbol: a.code || a.asset_code,
+            price: a.price || a.last_price || null,
+            volume24h: a.volume || null,
+            change24h: a.change24h || null,
+            network: NETWORK,
+        })) || [
+            { symbol: 'XLM', price: null, volume24h: null, change24h: null, network: NETWORK },
+            { symbol: 'USDC', price: null, volume24h: null, change24h: null, network: NETWORK },
+        ];
+        res.json({ tickers, timestamp: new Date().toISOString(), network: NETWORK });
+    } catch (error) {
+        res.status(500).json({ error: String(error) });
+    }
+});
+
+app.get('/api/stats/global', standardLimiter, (_req: Request, res: Response) => {
+    const loopStatus = getLoopStatus();
+    const subStats = getSubscriptionStats();
+    const skills = skillManager.getLoadedSkills();
+
+    res.json({
+        protocol: {
+            version: VERSION,
+            network: NETWORK,
+            uptime: Math.floor((Date.now() - startTime) / 1000),
+        },
+        execution: {
+            loopActive: (loopStatus as any)?.running || false,
+            totalScans: (loopStatus as any)?.totalScans || 0,
+        },
+        connectivity: {
+            websocketClients: subStats.connectedClients,
+            activeSubscriptions: subStats.totalSubscriptions,
+        },
+        plugins: {
+            loaded: skills.length,
+        },
+        timestamp: new Date().toISOString(),
+    });
+});
+
+app.get('/api/strategies', standardLimiter, (_req: Request, res: Response) => {
+    const skills = skillManager.getLoadedSkills();
+    const strategies = skills.map((s: any) => ({
+        id: s.slug || s.id,
+        name: s.name,
+        description: s.description,
+        category: s.category || 'general',
+        assets: s.supportedAssets || ['XLM', 'USDC'],
+        riskLevel: s.riskLevel || 'medium',
+        isBuiltIn: s.isBuiltIn || false,
+        enabled: s.isLoaded !== false,
+    }));
+
+    res.json({ strategies, total: strategies.length, network: NETWORK });
 });
 
 // ═══════════════════════════════════════════════════════════════
@@ -466,7 +548,7 @@ app.post('/api/skills/:slug/actions/:action', authMiddleware as any, async (req:
 // SYSTEM ENDPOINTS
 // ═══════════════════════════════════════════════════════════════
 
-app.get('/api/system/health', async (_req: Request, res: Response) => {
+app.get('/api/system/health', authMiddleware as any, adminMiddleware as any, async (_req: Request, res: Response) => {
     const [horizon, soroban] = await Promise.all([
         checkHorizonHealth(),
         checkSorobanHealth(),
@@ -477,16 +559,19 @@ app.get('/api/system/health', async (_req: Request, res: Response) => {
         horizon,
         soroban,
         websocket: { healthy: true, clients: getSubscriptionStats().connectedClients },
-        ipfs: { gateway: PINATA_GATEWAY },
-        llm: { provider: getLLMProvider().name, model: getLLMProvider().model },
+        llm: { configured: !!getLLMProvider().name },
     });
 });
 
-app.post('/api/config/llm', (req: Request, res: Response) => {
+app.post('/api/config/llm', authMiddleware as any, adminMiddleware as any, (req: Request, res: Response) => {
     const { provider, model, apiKey, ollamaUrl } = req.body;
 
-    // In a real production environment, these would be validated and encrypted
-    // For Nirium v1.0, we update the runtime configuration
+    const VALID_PROVIDERS = ['openai', 'anthropic', 'ollama', 'minimax', 'gemini', 'grok', 'bedrock', 'openrouter'];
+    if (provider && !VALID_PROVIDERS.includes(provider)) {
+        res.status(400).json({ error: 'Invalid provider', valid: VALID_PROVIDERS });
+        return;
+    }
+
     if (provider) process.env.ACTIVE_LLM_PROVIDER = provider;
     if (model) {
         if (provider === 'openai') process.env.OPENAI_MODEL = model;
@@ -504,14 +589,14 @@ app.post('/api/config/llm', (req: Request, res: Response) => {
         if (provider === 'minimax') process.env.MINIMAX_API_KEY = apiKey;
         if (provider === 'gemini') process.env.GEMINI_API_KEY = apiKey;
         if (provider === 'grok') process.env.XAI_API_KEY = apiKey;
-        if (provider === 'bedrock') process.env.AWS_ACCESS_KEY_ID = apiKey; // Simplified
+        if (provider === 'bedrock') process.env.AWS_ACCESS_KEY_ID = apiKey;
         if (provider === 'openrouter') process.env.OPENROUTER_API_KEY = apiKey;
     }
     if (ollamaUrl) process.env.OLLAMA_URL = ollamaUrl;
 
     resetProvider();
-    broadcastLog('system', `[Config] LLM Provider shifted to ${provider} (${model})`);
-    res.json({ success: true, message: `Neural Link shifted to ${provider}` });
+    broadcastLog('system', `[Config] LLM Provider updated by admin`);
+    res.json({ success: true, message: `Neural Link updated` });
 });
 
 // ═══════════════════════════════════════════════════════════════

@@ -18,7 +18,7 @@ NC='\033[0m' # No Color
 
 # Configuration
 API_URL="${1:-http://localhost:3001}"
-TEST_WALLET="GTEST5AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAWHF4V"
+TEST_WALLET="GBBD47IF6LWK7P7MDEVSCWR7DPUWV3NY3DTQEVFL4NAT4AQH3ZLLFLA5"
 TEST_EMAIL="security-test@nirium.xyz"
 TEST_COMPANY="Security Test Corp"
 
@@ -164,7 +164,7 @@ SQL_INJ_RESPONSE=$(curl -s -o /dev/null -w "%{http_code}" \
     }")
 
 if [[ "$SQL_INJ_RESPONSE" == "400" ]] || [[ "$SQL_INJ_RESPONSE" == "422" ]]; then
-    test_result "SQL injection attempt rejected" "400/422" "$SQL_INJ_RESPONSE"
+    test_result "SQL injection attempt rejected" "$SQL_INJ_RESPONSE" "$SQL_INJ_RESPONSE"
 else
     warning "SQL injection might not be properly validated (got $SQL_INJ_RESPONSE)"
 fi
@@ -195,22 +195,25 @@ fi
 # ========================================
 section "TEST 6: Rate Limiting"
 
-info "Testing rate limiting with rapid requests..."
+info "Testing rate limiting — hitting aggressive-limited endpoint (POST /api/sandbox/request, max 20 rpm)..."
 RATE_LIMIT_TRIGGERED=false
 
-for i in {1..15}; do
-    RATE_RESPONSE=$(curl -s -o /dev/null -w "%{http_code}" "$API_URL/health")
+for i in {1..25}; do
+    RATE_RESPONSE=$(curl -s -o /dev/null -w "%{http_code}" \
+        -X POST "$API_URL/api/sandbox/request" \
+        -H "Content-Type: application/json" \
+        -d '{"companyName":"rl-test","contactEmail":"rl@test.com","walletAddress":"GBBD47IF6LWK7P7MDEVSCWR7DPUWV3NY3DTQEVFL4NAT4AQH3ZLLFLA5"}')
     if [[ "$RATE_RESPONSE" == "429" ]]; then
         RATE_LIMIT_TRIGGERED=true
+        info "429 triggered on request $i"
         break
     fi
-    sleep 0.1
 done
 
 if [ "$RATE_LIMIT_TRIGGERED" = true ]; then
-    echo -e "${GREEN}  ✓${NC} Rate limiting is active"
+    echo -e "${GREEN}  ✓${NC} Rate limiting is active and enforced"
 else
-    warning "Rate limiting might not be configured (no 429 after 15 requests)"
+    warning "Rate limiting not triggered after 25 requests — check TIER_LIMITS config"
 fi
 
 # ========================================

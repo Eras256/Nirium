@@ -17,7 +17,7 @@ YELLOW='\033[1;33m'
 NC='\033[0m'
 
 API_URL="${1:-http://localhost:3001}"
-TEST_WALLET="GTEST5AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAWHF4V"
+TEST_WALLET="GBBD47IF6LWK7P7MDEVSCWR7DPUWV3NY3DTQEVFL4NAT4AQH3ZLLFLA5"
 
 echo -e "${BLUE}╔══════════════════════════════════════════════════════════╗${NC}"
 echo -e "${BLUE}║       NIRIUM QA FUNCTIONAL TEST SUITE v1.0.0             ║${NC}"
@@ -228,6 +228,7 @@ if [ -n "$JWT_TOKEN" ]; then
     info "Test 6.2: Execute Strategy with Auth (Production)"
     EXEC_PROD=$(curl -s -X POST "$API_URL/api/execute" \
         -H "Authorization: Bearer $JWT_TOKEN" \
+        -H "x-stellar-account: $TEST_WALLET" \
         -H "Content-Type: application/json" \
         -d '{
             "strategy": "scan",
@@ -338,23 +339,54 @@ if [ -n "$JWT_TOKEN" ]; then
 fi
 
 # ========================================
-# FLOW 10: SYSTEM HEALTH
+# FLOW 10: NEW MARKET ENDPOINTS
 # ========================================
-section "FLOW 10: System Health Checks"
+section "FLOW 10: Extended Market Endpoints"
 
-info "Test 10.1: Detailed System Health"
-SYS_HEALTH=$(curl -s "$API_URL/api/system/health")
-if echo "$SYS_HEALTH" | grep -q "agent\|horizon\|soroban"; then
-    pass "System health endpoint accessible"
+info "Test 10.1: Tickers"
+TICKERS=$(curl -s "$API_URL/api/tickers")
+if echo "$TICKERS" | grep -q "tickers\|timestamp"; then
+    pass "Tickers endpoint operational"
+else
+    fail "Tickers endpoint failed"
+    echo "Response: $TICKERS"
+fi
 
-    # Check individual components
-    if echo "$SYS_HEALTH" | grep -q '"healthy":true'; then
-        info "Components appear healthy"
+info "Test 10.2: Global Stats"
+GLOBAL_STATS=$(curl -s "$API_URL/api/stats/global")
+if echo "$GLOBAL_STATS" | grep -q "protocol\|connectivity\|timestamp"; then
+    pass "Global stats endpoint operational"
+else
+    fail "Global stats endpoint failed"
+    echo "Response: $GLOBAL_STATS"
+fi
+
+info "Test 10.3: Strategies List"
+STRATEGIES=$(curl -s "$API_URL/api/strategies")
+if echo "$STRATEGIES" | grep -q "strategies\|total"; then
+    pass "Strategies endpoint operational"
+    STRAT_COUNT=$(echo "$STRATEGIES" | grep -o '"total":[0-9]*' | grep -o '[0-9]*')
+    info "Total strategies: $STRAT_COUNT"
+else
+    fail "Strategies endpoint failed"
+    echo "Response: $STRATEGIES"
+fi
+
+# ========================================
+# FLOW 11: SYSTEM HEALTH (Admin)
+# ========================================
+section "FLOW 11: System Health Checks (Admin)"
+
+info "Test 11.1: Detailed System Health (requires admin auth)"
+if [ -n "$JWT_TOKEN" ]; then
+    SYS_HEALTH=$(curl -s -H "Authorization: Bearer $JWT_TOKEN" "$API_URL/api/system/health")
+    if echo "$SYS_HEALTH" | grep -q "agent\|horizon\|soroban\|Forbidden"; then
+        pass "System health endpoint responds (auth enforced)"
     else
-        info "Some components might be unhealthy - check details"
+        fail "System health check failed unexpectedly"
     fi
 else
-    fail "System health check failed"
+    info "Skipping - no JWT token available"
 fi
 
 # ========================================

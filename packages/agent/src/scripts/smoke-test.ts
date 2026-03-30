@@ -9,6 +9,11 @@ const API_URL = process.env.API_URL || 'http://127.0.0.1:3001';
 const HORIZON_URL = process.env.HORIZON_URL || 'https://horizon-testnet.stellar.org';
 const SOROBAN_RPC_URL = process.env.SOROBAN_RPC_URL || 'https://soroban-testnet.stellar.org';
 
+// USDC issuers — testnet and mainnet differ; smoke test targets testnet by default
+const USDC_ISSUER_TESTNET = 'GBBD47IF6LWK7P7MDEVSCWR7DPUWV3NY3DTQEVFL4NAT4AQH3ZLLFLA5';
+const USDC_ISSUER_MAINNET = 'GA5ZSEJYB37JRC5AVCIA5MOP4RHTM335X2KGX3IHOJAPP5RE34K4KZVN';
+const USDC_ISSUER = HORIZON_URL.includes('testnet') ? USDC_ISSUER_TESTNET : USDC_ISSUER_MAINNET;
+
 interface TestResult {
     name: string;
     passed: boolean;
@@ -95,7 +100,7 @@ async function main() {
             source_asset_type: 'native',
             destination_asset_type: 'credit_alphanum4',
             destination_asset_code: 'USDC',
-            destination_asset_issuer: 'GA5ZSEJYB37JRC5AVCIA5MOP4RHTM335X2KGX3IHOJAPP5RE34K4KZVN',
+            destination_asset_issuer: USDC_ISSUER,
             destination_amount: '10',
             source_account: 'GAIH3ULLFQ4DGSECF2AR555KZ4KNDGEKN4AFI4SU2M7B43MGK3QJZNSR',
         });
@@ -114,7 +119,7 @@ async function main() {
             selling_asset_type: 'native',
             buying_asset_type: 'credit_alphanum4',
             buying_asset_code: 'USDC',
-            buying_asset_issuer: 'GA5ZSEJYB37JRC5AVCIA5MOP4RHTM335X2KGX3IHOJAPP5RE34K4KZVN',
+            buying_asset_issuer: USDC_ISSUER,
             limit: '5',
         });
         const res = await fetch(`${HORIZON_URL}/order_book?${params.toString()}`, {
@@ -135,9 +140,29 @@ async function main() {
         return `Status: ${data.status || 'ok'}`;
     });
 
-    // 8. Agent Market Data (if running)
+    // 7b. Get demo token for authenticated tests
+    let smokeToken = '';
+    const SMOKE_WALLET = 'GBBD47IF6LWK7P7MDEVSCWR7DPUWV3NY3DTQEVFL4NAT4AQH3ZLLFLA5';
+    try {
+        const tokenRes = await fetch(`${API_URL}/api/public/demo-auth`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ walletAddress: SMOKE_WALLET }),
+            signal: AbortSignal.timeout(5000),
+        });
+        if (tokenRes.ok) {
+            const tokenData = await tokenRes.json();
+            smokeToken = tokenData.token || '';
+        }
+    } catch { /* token unavailable — authenticated tests will skip */ }
+
+    // 8. Agent Market Data (requires auth)
     await runTest('Agent Market Data', async () => {
-        const res = await fetch(`${API_URL}/api/market`, { signal: AbortSignal.timeout(5000) });
+        if (!smokeToken) throw new Error('No demo token available — skipping');
+        const res = await fetch(`${API_URL}/api/market`, {
+            headers: { 'Authorization': `Bearer ${smokeToken}` },
+            signal: AbortSignal.timeout(5000),
+        });
         if (!res.ok) throw new Error(`HTTP ${res.status}`);
         const data = await res.json();
         if (!data.xlmPrice || data.xlmPrice <= 0) throw new Error(`Invalid XLM price: ${data.xlmPrice}`);
@@ -155,6 +180,31 @@ async function main() {
         if (!res.ok) throw new Error(`HTTP ${res.status}`);
         const data = await res.json();
         return `Success: ${data.success} | TX: ${data.txHash?.substring(0, 16) || 'N/A'}...`;
+    });
+
+    // 9b. Agent Tickers
+    await runTest('Agent Tickers', async () => {
+        const res = await fetch(`${API_URL}/api/tickers`, { signal: AbortSignal.timeout(5000) });
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        const data = await res.json();
+        if (!Array.isArray(data.tickers)) throw new Error('Invalid response shape');
+        return `${data.tickers.length} ticker(s) | network: ${data.network}`;
+    });
+
+    // 9c. Agent Global Stats
+    await runTest('Agent Global Stats', async () => {
+        const res = await fetch(`${API_URL}/api/stats/global`, { signal: AbortSignal.timeout(5000) });
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        const data = await res.json();
+        return `Uptime: ${data.protocol?.uptime}s | WS clients: ${data.connectivity?.websocketClients}`;
+    });
+
+    // 9d. Agent Strategies
+    await runTest('Agent Strategies', async () => {
+        const res = await fetch(`${API_URL}/api/strategies`, { signal: AbortSignal.timeout(5000) });
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        const data = await res.json();
+        return `${data.total} strategies loaded`;
     });
 
     // 10. IPFS (Pinata) — verify keys configured

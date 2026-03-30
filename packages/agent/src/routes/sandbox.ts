@@ -50,6 +50,18 @@ router.post('/request', sandboxLimiter, async (req: Request, res: Response) => {
         return;
     }
 
+    // Sanitize free-text fields: strip HTML tags and limit length to prevent stored XSS
+    const sanitize = (s: string, max: number) =>
+        String(s).replace(/<[^>]*>/g, '').replace(/[<>'"]/g, '').trim().slice(0, max);
+
+    const safeCompanyName = sanitize(companyName, 100);
+    const safeMessage     = message ? sanitize(message, 500) : undefined;
+
+    if (!safeCompanyName) {
+        res.status(400).json({ error: 'companyName contains only invalid characters' });
+        return;
+    }
+
     // Email validation
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(contactEmail)) {
@@ -70,13 +82,13 @@ router.post('/request', sandboxLimiter, async (req: Request, res: Response) => {
         // Determine tier (default to sandbox for requests)
         const requestedTier: UserTier = tier === 'institutional' ? 'institutional' : 'sandbox';
 
-        // Create sandbox account (30 days expiration)
+        // Create sandbox account (90 days expiration — consistent with Next.js route)
         const account = await createSandboxAccount(
-            companyName,
+            safeCompanyName,
             contactEmail,
             walletAddress,
             requestedTier,
-            30
+            90
         );
 
         res.json({
@@ -117,7 +129,7 @@ router.get('/info', (_req: Request, res: Response) => {
             sandbox: {
                 description: 'For testing and integration development',
                 quotas: TIER_QUOTAS.sandbox,
-                duration: '30 days',
+                duration: '90 days',
                 cost: 'Free',
             },
             institutional: {
@@ -188,8 +200,8 @@ router.get('/status', authMiddleware as any, sandboxMiddleware, (req: Request, r
  * GET /api/sandbox/accounts
  * List all sandbox accounts (admin only)
  */
-router.get('/accounts', authMiddleware as any, adminMiddleware, (_req: Request, res: Response) => {
-    const accounts = listSandboxAccounts();
+router.get('/accounts', authMiddleware as any, adminMiddleware, async (_req: Request, res: Response) => {
+    const accounts = await listSandboxAccounts();
 
     res.json({
         total: accounts.length,
@@ -203,7 +215,6 @@ router.get('/accounts', authMiddleware as any, adminMiddleware, (_req: Request, 
             createdAt: acc.createdAt,
             expiresAt: acc.expiresAt,
             isActive: acc.isActive,
-            // Don't expose API key in list
         })),
     });
 });
@@ -212,9 +223,9 @@ router.get('/accounts', authMiddleware as any, adminMiddleware, (_req: Request, 
  * DELETE /api/sandbox/accounts/:id
  * Revoke a sandbox account (admin only)
  */
-router.delete('/accounts/:id', authMiddleware as any, adminMiddleware, (req: Request, res: Response) => {
+router.delete('/accounts/:id', authMiddleware as any, adminMiddleware, async (req: Request, res: Response) => {
     const id = Array.isArray(req.params.id) ? req.params.id[0] : req.params.id;
-    const revoked = revokeSandboxAccount(id);
+    const revoked = await revokeSandboxAccount(id);
 
     if (revoked) {
         res.json({ success: true, message: 'Sandbox account revoked' });
