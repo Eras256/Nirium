@@ -922,7 +922,7 @@ function ApiSection() {
                         {[
                             { label: 'Uptime SLA', val: '99.5%', icon: Activity, color: 'text-stellar-teal' },
                             { label: 'Latencia P95', val: '< 500ms', icon: Clock, color: 'text-stellar-yellow' },
-                            { label: 'Endpoints', val: '32+', icon: Layers, color: 'text-purple-400' },
+                            { label: 'Endpoints', val: '41', icon: Layers, color: 'text-purple-400' },
                             { label: 'Security', val: 'AES-256', icon: Shield, color: 'text-green-400' },
                         ].map((stat) => (
                             <div key={stat.label} className="bg-white/5 border border-white/10 rounded-xl p-4 hover:border-white/20 transition-colors">
@@ -951,9 +951,10 @@ function ApiSection() {
                             </h4>
                             <p className="text-sm text-gray-400 mb-4">Recomendado para servidores, bots y sistemas institucionales que requieren acceso persistente.</p>
                             <div className="bg-black/50 p-4 rounded-lg font-mono text-xs text-stellar-teal border border-stellar-teal/20 mb-4">
-                                curl -H "x-api-key: nrm_live_[TU_KEY]" \ <br />
-                                &nbsp;&nbsp;https://api.nirium.xyz/health
+                                curl -H "x-api-key: sk_inst_[TU_KEY]" \ <br />
+                                &nbsp;&nbsp;https://api.nirium.xyz/api/market
                             </div>
+                            <p className="text-[10px] text-gray-500">Prefijos: <span className="text-gray-400 font-mono">sk_free_</span> · <span className="text-gray-400 font-mono">sk_sbox_</span> · <span className="text-gray-400 font-mono">sk_inst_</span> · <span className="text-gray-400 font-mono">sk_ent_</span></p>
                         </div>
 
                         <div className="bg-[#0A0A0A] border border-white/10 rounded-2xl p-6">
@@ -971,22 +972,28 @@ function ApiSection() {
                         <h4 className="text-white font-bold mb-6">Matriz de Cuotas de Sandbox</h4>
                         <div className="space-y-4">
                             {[
-                                { tier: 'Sandbox Personal', req: '1,000 req/día', speed: '60 rpm' },
-                                { tier: 'Tier Institucional', req: '10,000 req/día', speed: '300 rpm' },
-                                { tier: 'Enterprise Custom', req: '100,000+ req/día', speed: '1,000+ rpm' },
+                                { tier: 'Free', req: '100 req/día', speed: '10 rpm', prefix: 'sk_free_' },
+                                { tier: 'Sandbox', req: '1,000 req/día', speed: '60 rpm', prefix: 'sk_sbox_' },
+                                { tier: 'Institucional', req: '10,000 req/día', speed: '300 rpm', prefix: 'sk_inst_' },
+                                { tier: 'Enterprise', req: '100,000+ req/día', speed: '1,000+ rpm', prefix: 'sk_ent_' },
                             ].map((tier, idx) => (
                                 <div key={tier.tier} className="flex items-center justify-between p-3 bg-white/5 rounded-lg border border-white/5">
                                     <div>
                                         <div className="text-sm font-bold text-white">{tier.tier}</div>
-                                        <div className="text-xs text-gray-500">{tier.speed}</div>
+                                        <div className="text-xs text-gray-500">{tier.speed} · <span className="font-mono text-gray-600">{(tier as any).prefix}</span></div>
                                     </div>
                                     <div className="text-stellar-teal font-mono text-sm">{tier.req}</div>
                                 </div>
                             ))}
                         </div>
-                        <p className="text-[10px] text-gray-500 mt-6 text-center italic">
-                            * Para incrementar límites, contacte a institutional@nirium.xyz
-                        </p>
+                        <div className="mt-6 p-3 bg-stellar-yellow/5 border border-stellar-yellow/20 rounded-lg">
+                            <p className="text-[10px] text-stellar-yellow/80 font-mono">
+                                🔒 SANDBOX INSTITUCIONAL — ACCESO PRIVADO
+                            </p>
+                            <p className="text-[10px] text-gray-500 mt-1">
+                                El tier Institucional y Enterprise se asignan por invitación durante el período de evaluación NBO. Para solicitar acceso: <span className="text-gray-400">institutional@nirium.xyz</span>
+                            </p>
+                        </div>
                     </div>
                 </div>
             </section>
@@ -1067,8 +1074,12 @@ def get_compliance_status():
     res = requests.get(URL, headers=headers)
     if res.status_code == 200:
         data = res.json()
-        print(f"✅ Protocol Status: {data['account']['tier']}")
-        print(f"📊 Daily Usage: {data['usage']['dailyRequests']}/100000")
+        tier = data['account']['tier']
+        used = data['usage']['dailyRequests']
+        limit = data['quotas']['requestsPerDay']
+        remaining = data['usage']['remainingToday']
+        print(f"✅ Tier: {tier}")
+        print(f"📊 Daily: {used}/{limit} ({remaining} remaining)")
 
 get_compliance_status()`}
                         </pre>
@@ -1095,10 +1106,14 @@ ws.on('open', () => {
 });
 
 ws.on('message', (payload) => {
-  const signal = JSON.parse(payload);
-  if (signal.confidence > 0.90) {
-    console.log('🔥 CRITICAL SIGNAL DETECTED:', signal.action);
-    // Execute trade logic here
+  const msg = JSON.parse(payload);
+  if (msg.type === 'signal') {
+    const confidence = msg.data?.confidence ?? 0;
+    if (confidence > 0.90) {
+      console.log('🔥 SIGNAL:', msg.signal_type);
+      console.log('   Pair:', msg.pair);
+      console.log('   Profit:', msg.data.profitPercentage + '%');
+    }
   }
 });`}
                         </pre>
@@ -1110,7 +1125,7 @@ ws.on('message', (payload) => {
             <section id="endpoints-directory">
                 <div className="flex items-center gap-3 mb-8">
                     <Workflow className="text-stellar-teal w-6 h-6" />
-                    <h3 className="text-2xl font-bold uppercase tracking-tighter">{t.docs.api.explorer_title} (32+)</h3>
+                    <h3 className="text-2xl font-bold uppercase tracking-tighter">{t.docs.api.explorer_title} (41)</h3>
                 </div>
 
                 <EndpointExplorer />
@@ -1179,49 +1194,63 @@ function EndpointExplorer() {
         { id: 'market', label: t.docs.api.categories.market, icon: TrendingUp },
         { id: 'exec', label: t.docs.api.categories.exec, icon: Cpu },
         { id: 'sandbox', label: t.docs.api.categories.sandbox, icon: Shield },
+        { id: 'skills', label: 'SKILLS', icon: Layers },
         { id: 'events', label: t.docs.api.categories.events, icon: Zap },
     ];
 
     const endpoints: Record<string, any[]> = {
         auth: [
-            { method: 'GET', path: '/health', desc: 'Verifica el estado de salud del cluster API.' },
-            { method: 'GET', path: '/api/info', desc: 'Retorna metadatos del protocolo, versión y red activa.' },
-            { method: 'POST', path: '/api/public/authenticate', desc: 'Autenticación mediante firma criptográfica de wallet Stellar.' },
-            { method: 'POST', path: '/api/public/demo-auth', desc: 'Genera token de acceso para entorno de pruebas (24h).' },
-            { method: 'POST', path: '/api/auth/token', desc: 'Renovación de JWT Bearer Token.' },
-            { method: 'POST', path: '/api/auth/keys', desc: 'Creación de API Keys institucionales permanentes.' },
-            { method: 'GET', path: '/api/auth/keys', desc: 'Lista de llaves activas vinculadas a la cuenta.' },
+            { method: 'GET', path: '/health', desc: 'Estado operativo del cluster API (versión, uptime, network).' },
+            { method: 'GET', path: '/api/info', desc: 'Metadatos del protocolo: versión, red, directorio de endpoints y LLM activo.' },
+            { method: 'GET', path: '/api/public/market-snapshot', desc: 'Snapshot público de mercado sin autenticación (para frontends).' },
+            { method: 'GET', path: '/api/public/quickstart', desc: 'Guía de inicio rápido con pasos numerados y referencias.' },
+            { method: 'GET', path: '/api/public/examples', desc: 'Ejemplos de código listos en curl, JavaScript y Python.' },
+            { method: 'POST', path: '/api/public/authenticate', desc: 'Autenticación con verificación Ed25519 real. Requiere Timestamp en mensaje (anti-replay 5 min).' },
+            { method: 'POST', path: '/api/public/demo-auth', desc: 'Token JWT de prueba 24h sin verificación de firma. Solo testnet.' },
+            { method: 'POST', path: '/api/auth/token', desc: 'JWT desde wallet address. Siempre tier free — usar /api/auth/keys para tiers superiores.' },
+            { method: 'POST', path: '/api/auth/keys', desc: '🔐 [auth] Crea API Key de larga duración. Especificar tier: free | sandbox | institutional | enterprise.' },
+            { method: 'GET', path: '/api/auth/keys', desc: '🔐 [auth] Lista llaves activas de la cuenta (sin mostrar valor completo).' },
+            { method: 'DELETE', path: '/api/auth/keys/:id', desc: '🔐 [auth] Revoca una API Key por ID. Registra revoked_at.' },
         ],
         market: [
-            { method: 'GET', path: '/api/market', desc: 'Snapshot completo del SDEX (Orderbook, Spreads, Volúmenes).' },
-            { method: 'GET', path: '/api/public/market-snapshot', desc: 'Datos públicos de mercado optimizados para frontend.' },
-            { method: 'GET', path: '/api/signals/recent', desc: 'Feed de señales generadas por el Swarm de agentes (High Confidence).' },
-            { method: 'GET', path: '/api/tickers', desc: 'Precios en tiempo real de pares XLM, USDC y activos listados.' },
-            { method: 'GET', path: '/api/stats/global', desc: 'Estadísticas de uptime, ejecuciones y conectividad del protocolo.' },
+            { method: 'GET', path: '/api/market', desc: '🔐 [auth] Snapshot SDEX en vivo: precio XLM, fee, orderbook XLM/USDC, spread, rutas path payment.' },
+            { method: 'GET', path: '/api/signals/recent', desc: 'Feed de señales del swarm. Campos: signal_type, pair, data.confidence, data.profitPercentage. Max 100.' },
+            { method: 'GET', path: '/api/tickers', desc: 'Precios de activos listados en el protocolo (XLM, USDC).' },
+            { method: 'GET', path: '/api/stats/global', desc: 'Uptime, scans totales, clientes WebSocket activos y plugins cargados.' },
         ],
         exec: [
-            { method: 'POST', path: '/api/execute', desc: 'Ejecución atómica de estrategia en Mainnet (Requiere colateral).' },
-            { method: 'POST', path: '/api/execute-demo', desc: 'Simulación de estrategia en Sandbox sin riesgo de capital.' },
-            { method: 'POST', path: '/api/loop/start', desc: 'Inicia ciclo autónomo de escaneo y ejecución para un agente.' },
-            { method: 'POST', path: '/api/loop/stop', desc: 'Detiene el ciclo autónomo de forma inmediata.' },
-            { method: 'GET', path: '/api/loop/status', desc: 'Reporte de estado, uptime y memoria del proceso autónomo.' },
-            { method: 'POST', path: '/api/loop/scan', desc: 'Dispara un escaneo manual de oportunidades de arbitraje/path.' },
-            { method: 'GET', path: '/api/strategies', desc: 'Lista de estrategias (plugins) habilitadas con metadatos de riesgo.' },
+            { method: 'POST', path: '/api/execute', desc: '🔐 [auth+legal] Ejecución real en Testnet. Requiere x-stellar-account header y TOS firmado.' },
+            { method: 'POST', path: '/api/execute-demo', desc: 'Simulación sin riesgo. Requiere CONTRACT_ID configurado para modo Soroban completo.' },
+            { method: 'POST', path: '/api/loop/start', desc: '🔐 [auth+legal] Inicia ciclo autónomo. Body: config { interval, strategies[], minProfitPercentage }.' },
+            { method: 'POST', path: '/api/loop/stop', desc: '🔐 [auth] Detiene el loop autónomo de forma inmediata.' },
+            { method: 'GET', path: '/api/loop/status', desc: 'Estado del loop: isRunning, scanCount, uptime, marketState actual.' },
+            { method: 'POST', path: '/api/loop/scan', desc: '🔐 [auth] Dispara un escaneo único sin iniciar el loop continuo.' },
         ],
         sandbox: [
-            { method: 'POST', path: '/api/sandbox/request', desc: 'Solicitud de acceso al entorno controlado para instituciones.' },
-            { method: 'GET', path: '/api/sandbox/info', desc: 'Especificaciones de tiers, límites y capacidades del sandbox.' },
-            { method: 'GET', path: '/api/sandbox/status', desc: 'Uso de cuotas y reporte de cumplimiento del entorno institucional.' },
-            { method: 'GET', path: '/api/sandbox/accounts', desc: 'Gestión de sub-cuentas para equipos de auditoría.' },
+            { method: 'POST', path: '/api/sandbox/request', desc: '🔒 Solicitud de acceso sandbox institucional. Genera API Key con tier y cuotas asignados (90 días).' },
+            { method: 'GET', path: '/api/sandbox/info', desc: 'Especificaciones públicas de tiers, límites y capacidades del sandbox.' },
+            { method: 'GET', path: '/api/sandbox/status', desc: '🔐 [sandbox+] Uso de cuotas en tiempo real, remaining today y tier activo.' },
+            { method: 'GET', path: '/api/sandbox/accounts', desc: '🛡️ [admin] Gestión de todas las cuentas sandbox activas.' },
+            { method: 'DELETE', path: '/api/sandbox/accounts/:id', desc: '🛡️ [admin] Revoca una cuenta sandbox por ID.' },
+        ],
+        skills: [
+            { method: 'GET', path: '/api/skills', desc: 'Lista todos los plugins instalados y activos en el agente.' },
+            { method: 'GET', path: '/api/skills/marketplace', desc: 'Catálogo de plugins disponibles con metadatos de instalación.' },
+            { method: 'POST', path: '/api/skills/install', desc: '🔐 [auth] Instala un plugin desde GitHub URL o NiriumHub slug.' },
+            { method: 'DELETE', path: '/api/skills/:slug', desc: '🔐 [auth] Desinstala un plugin por su identificador.' },
+            { method: 'POST', path: '/api/skills/:slug/actions/:action', desc: '🔐 [auth] Ejecuta una acción específica de un plugin (ej: path-arbitrage/scan).' },
+            { method: 'GET', path: '/api/strategies', desc: 'Lista estrategias con metadatos de riesgo, activos compatibles y estado.' },
         ],
         events: [
-            { method: 'POST', path: '/api/webhooks', desc: 'Registro de endpoint para notificaciones HMAC-Signed.' },
-            { method: 'GET', path: '/api/webhooks', desc: 'Lista de webhooks configurados.' },
-            { method: 'POST', path: '/api/webhooks/{id}/test', desc: 'Envío de evento de prueba para validar integración.' },
-            { method: 'POST', path: '/api/subscriptions', desc: 'Creación de subscripción WebSocket de baja latencia.' },
-            { method: 'GET', path: '/api/subscriptions', desc: 'Monitoreo de conexiones socket activas.' },
-            { method: 'WS', path: 'wss://api.nirium.xyz/ws/signals', desc: 'Stream de señales de mercado en tiempo real.' },
-            { method: 'WS', path: 'wss://api.nirium.xyz/ws/telemetry', desc: 'Logs de ejecución y pensamiento de agentes en vivo.' },
+            { method: 'POST', path: '/api/webhooks', desc: '🔐 [auth] Registra endpoint HTTPS para notificaciones HMAC-SHA256 firmadas.' },
+            { method: 'GET', path: '/api/webhooks', desc: '🔐 [auth] Lista webhooks configurados en la cuenta.' },
+            { method: 'POST', path: '/api/webhooks/:id/test', desc: '🔐 [auth] Envía evento test al webhook para validar entrega.' },
+            { method: 'DELETE', path: '/api/webhooks/:id', desc: '🔐 [auth] Elimina un webhook registrado.' },
+            { method: 'POST', path: '/api/subscriptions', desc: '🔐 [auth] Crea suscripción REST con filtros (asset, minConfidence).' },
+            { method: 'GET', path: '/api/subscriptions', desc: '🔐 [auth] Lista suscripciones activas de la cuenta.' },
+            { method: 'DELETE', path: '/api/subscriptions/:id', desc: '🔐 [auth] Cancela una suscripción.' },
+            { method: 'GET', path: '/api/subscriptions/stats', desc: 'Stats globales: clientes WS conectados, suscripciones activas.' },
+            { method: 'WS', path: 'wss://api.nirium.xyz/ws/signals', desc: 'Stream en tiempo real. Mensajes: type=signal (signal_type, pair, data), type=log, type=ping.' },
         ]
     };
 
