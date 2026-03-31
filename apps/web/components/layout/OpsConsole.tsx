@@ -3,7 +3,6 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { Terminal, Maximize2, Minimize2 } from 'lucide-react';
 import { motion } from 'framer-motion';
-import { supabase } from '@/lib/supabase';
 
 const DEMO_LOGS = [
     { agent_id: 'Matrix', message: 'Neural Matrix Uplink established. Swarm broadcasting on-chain...', level: 'system', timestamp: new Date().toISOString() },
@@ -18,23 +17,17 @@ const DEMO_LOGS = [
 
 export default function OpsConsole({ isExpanded, onToggleExpand, walletAddress }: { isExpanded: boolean, onToggleExpand: () => void, walletAddress?: string }) {
     const [logs, setLogs] = useState<any[]>(DEMO_LOGS);
-    const [status, setStatus] = useState<'connecting' | 'online' | 'unavailable'>('online');
+    const [status, setStatus] = useState<'connecting' | 'online' | 'unavailable'>('connecting');
     const logContainerRef = useRef<HTMLDivElement>(null);
     const lastTimestampRef = useRef<string | null>(null);
 
-    // Fetch logs from Supabase via REST (polling — works without Realtime enabled)
     const fetchLogs = useCallback(async () => {
-        if (!supabase) return;
         try {
-            const { data, error } = await supabase
-                .from('logs')
-                .select('*')
-                .order('timestamp', { ascending: false })
-                .limit(50);
+            const res = await fetch('/api/logs');
+            if (!res.ok) return;
+            const rows: any[] = await res.json();
 
-            const rows = data as any[] | null;
-            if (rows && !error && rows.length > 0) {
-                // Only update if we got new data
+            if (rows && rows.length > 0) {
                 const newestTimestamp = rows[0]?.timestamp;
                 if (newestTimestamp !== lastTimestampRef.current) {
                     lastTimestampRef.current = newestTimestamp;
@@ -42,56 +35,17 @@ export default function OpsConsole({ isExpanded, onToggleExpand, walletAddress }
                     setStatus('online');
                 }
             }
-            // If data is empty, keep showing whatever we already have (demo or previous real data)
         } catch (e) {
             console.warn('[Neural Feed] Fetch error (will retry):', e);
         }
     }, []);
 
     useEffect(() => {
-        if (!supabase) {
-            setStatus('unavailable');
-            return;
-        }
-
-        // Initial fetch
         fetchLogs();
-
-        // Poll every 5 seconds — reliable regardless of Realtime configuration
         const pollInterval = setInterval(fetchLogs, 5000);
-
-        // Also try Realtime subscription as a bonus (instant updates if enabled)
-        let channel: any = null;
-        try {
-            channel = supabase
-                .channel('realtime-ops-console')
-                .on(
-                    'postgres_changes',
-                    { event: 'INSERT', schema: 'public', table: 'logs' },
-                    (payload) => {
-                        const newLog = payload.new as any;
-                        setStatus('online');
-                        setLogs(prev => {
-                            const exists = prev.some(l => l.id === newLog.id);
-                            if (exists) return prev;
-                            return [...prev, newLog].slice(-50);
-                        });
-                    }
-                )
-                .subscribe();
-        } catch {
-            // Realtime not available — polling handles it
-        }
-
-        return () => {
-            clearInterval(pollInterval);
-            if (channel && supabase) {
-                supabase.removeChannel(channel);
-            }
-        };
+        return () => clearInterval(pollInterval);
     }, [fetchLogs]);
 
-    // Auto-scroll to bottom
     useEffect(() => {
         if (logContainerRef.current) {
             logContainerRef.current.scrollTop = logContainerRef.current.scrollHeight;
@@ -110,7 +64,6 @@ export default function OpsConsole({ isExpanded, onToggleExpand, walletAddress }
             layout
             className={`bg-[#050505] border border-white/10 rounded-xl overflow-hidden flex flex-col transition-all duration-300 ${isExpanded ? 'fixed inset-4 z-[100] h-auto shadow-2xl' : 'h-[300px]'}`}
         >
-            {/* Header */}
             <div className="bg-white/5 border-b border-white/5 px-4 py-3 flex justify-between items-center shrink-0">
                 <div className="flex items-center gap-2">
                     <Terminal className="w-4 h-4 text-stellar-teal" />
@@ -120,30 +73,20 @@ export default function OpsConsole({ isExpanded, onToggleExpand, walletAddress }
                         {s.label}
                     </span>
                 </div>
-                <button
-                    onClick={onToggleExpand}
-                    className="text-gray-500 hover:text-white transition-colors"
-                >
+                <button onClick={onToggleExpand} className="text-gray-500 hover:text-white transition-colors">
                     {isExpanded ? <Minimize2 size={16} /> : <Maximize2 size={16} />}
                 </button>
             </div>
 
-            {/* Logs Area */}
-            <div 
-                ref={logContainerRef}
-                className="flex-1 bg-black/50 p-4 font-mono text-[10px] overflow-y-auto custom-scrollbar"
-            >
+            <div ref={logContainerRef} className="flex-1 bg-black/50 p-4 font-mono text-[10px] overflow-y-auto custom-scrollbar">
                 <div className="space-y-1.5">
                     {status === 'unavailable' && (
-                        <div className="text-yellow-600 italic">
-                            No database connection. Check Supabase configuration.
-                        </div>
+                        <div className="text-yellow-600 italic">No database connection. Check Supabase configuration.</div>
                     )}
                     {logs.map((log, i) => {
                         const parts = (log.message || '').split('|');
                         const mainMsg = parts[0];
                         const hashPart = parts[1];
-
                         return (
                             <div key={log.id || i} className="break-all flex flex-wrap gap-x-1 items-start leading-relaxed">
                                 <span className="text-gray-600">[{new Date(log.timestamp).toLocaleTimeString()}]</span>

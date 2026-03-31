@@ -61,46 +61,30 @@ export default function Home() {
     };
 
     useEffect(() => {
-        const client = supabase;
         const FALLBACK_LOGS = [
             "[Matrix] Neural Matrix Uplink established. Swarm broadcasting on-chain...",
             "[Titan] Vault architecture synchronized — 3 asset classes active",
             "[Astra] DeFindex USDC yield route optimized — APY 14.2%",
         ];
 
-        if (!client) {
-            setAgentLog(FALLBACK_LOGS);
-            return;
-        }
-
-        // Fetch logs via REST polling (reliable without Realtime enabled)
         const fetchLogs = async () => {
             try {
-                const { data } = await client
-                    .from('logs')
-                    .select('*')
-                    .order('timestamp', { ascending: false })
-                    .limit(8);
+                const res = await fetch('/api/logs');
+                if (!res.ok) return;
+                const data: any[] = await res.json();
                 
                 if (data && data.length > 0) {
-                    setAgentLog(data.map((l: any) => `[${l.agent_id}] ${l.message}`).reverse());
+                    setAgentLog(data.slice(0, 8).map((l: any) => `[${l.agent_id}] ${l.message}`).reverse());
                 }
-                // If empty, keep whatever is currently shown
             } catch (e) {
                 console.warn("[Neural Feed] fetch error:", e);
             }
         };
 
-        // Show fallback immediately, then replace with real data
         setAgentLog(FALLBACK_LOGS);
         fetchLogs();
-
-        // Poll every 5 seconds
         const pollInterval = setInterval(fetchLogs, 5000);
-
-        return () => {
-            clearInterval(pollInterval);
-        };
+        return () => clearInterval(pollInterval);
     }, []);
 
     // Animate swarm count ticker
