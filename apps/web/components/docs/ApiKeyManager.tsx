@@ -70,7 +70,7 @@ export default function ApiKeyManager() {
             }
 
             const tokenData = await tokenRes.json();
-            if (!tokenData.success) throw new Error(tokenData.error || 'Failed to authenticate');
+            if (!tokenData.success && !tokenData.token) throw new Error(tokenData.error || 'Failed to authenticate');
 
             const jwt = tokenData.token;
             console.log("JWT obtained.");
@@ -90,7 +90,7 @@ export default function ApiKeyManager() {
             });
 
             const keyData = await keyRes.json();
-            if (!keyData.success) throw new Error(keyData.error || 'Failed to generate key');
+            if (!keyData.success && !keyData.apiKey) throw new Error(keyData.error || 'Failed to generate key');
 
             setGeneratedKey(keyData);
             toast.success("API Key Generated Successfully!");
