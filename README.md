@@ -128,9 +128,19 @@ Nirium/
 
 ---
 
+## 🌐 Institutional API Infrastructure (`api.nirium.xyz`)
+
+Nirium provides a high-availability, low-latency API gateway designed for both **Free Tier** experimentation and **Enterprise-Grade** institutional orchestration. Our infrastructure is optimized for seamless consumption by both humans (frontend dashboards) and autonomous agents (LLMs/trading bots).
+
+-   **Endpoint:** `https://api.nirium.xyz`
+-   **Capabilities:** Full access to Strategy Hub, Real-time Market Data, Webhook HMAC notifications, and Agent Execution Enclaves.
+-   **Scalability:** Multi-cluster deployment on Railway with automatic path-based scaling.
+
+---
+
 ## 🧪 Test Coverage & Institutional QA
 
-The repository is rigorously tested across both the Smart Contract and Backend Agent layers to ensure institutional-grade resilience:
+The repository is rigorously tested across both the Smart Contract and Backend Agent layers to ensure institutional-grade resilience. As of **March 30th, 2026**, the protocol has achieved a **100% QA Pass Rate** across all critical modules:
 
 ### 1. Smart Contracts (Soroban Rust)
 - **Vault Operations**: Creation, fee collection, deposit/withdraw passing.
@@ -138,10 +148,10 @@ The repository is rigorously tested across both the Smart Contract and Backend A
 - **Flash Loans (SIFL)**: Successful atomic borrowing & repayment logic.
 
 ### 2. Core API Backend & Autonomous Agent (`@nirium/agent`)
-- **🛡️ Institutional E2E Health Check**: 7/7 automated pipeline coverage for Sandbox Provisioning, API Key Auth, Oracles, Webhook Delivery (HMAC), and Demo Execution.
-- **🔒 Security Test Suite**: 10/10 compliance across SQL Injections, XSS Sanitization, Anti-Replay (Ed25519 signatures), JWT Bypasses, and aggressive Rate Limiting.
-- **⚙️ Functional QA Suite**: 24/24 operational flows successfully executed across 11 modules (Loop Engine, API Keys, Execution, Market Data, Webhooks).
-- **🟢 Smoke Tests**: 13/13 backend subsystems operational (Horizon, RPC, IPFS, Redis/Supabase state).
+-   **🛡️ Institutional E2E Health Check**: **7/7** automated pipeline coverage for Sandbox Provisioning, API Key Auth, Oracles, Webhook Delivery (HMAC), and Demo Execution.
+-   **🔒 Security & PEN Testing**: **10/10** compliance across SQL Injections, XSS Sanitization, Anti-Replay (Ed25519 signatures), JWT Bypasses, and aggressive Rate Limiting.
+-   **⚙️ Functional QA Suite**: **24/24** operational flows successfully executed across 11 modules (Loop Engine, API Keys, Execution, Market Data, Webhooks).
+-   **🟢 Smoke Tests**: **13/13** backend subsystems operational (Horizon, RPC, IPFS, Redis/Supabase state).
 
 ---
 
