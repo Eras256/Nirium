@@ -58,9 +58,9 @@ export declare function getUserApiKeys(userId: string): Promise<Array<{
 }>>;
 export declare function revokeApiKey(keyId: string): Promise<boolean>;
 export declare function createSandboxAccount(companyName: string, contactEmail: string, walletAddress: string, tier?: UserTier, durationDays?: number): Promise<SandboxAccount>;
-export declare function getSandboxAccount(apiKey: string): SandboxAccount | null;
-export declare function listSandboxAccounts(): SandboxAccount[];
-export declare function revokeSandboxAccount(id: string): boolean;
+export declare function getSandboxAccount(apiKey: string): Promise<SandboxAccount | null>;
+export declare function listSandboxAccounts(): Promise<SandboxAccount[]>;
+export declare function revokeSandboxAccount(id: string): Promise<boolean>;
 export declare function createHmacSignature(payload: string, secret: string): string;
 export declare function verifyHmacSignature(payload: string, signature: string, secret: string): boolean;
 export declare function authMiddleware(req: AuthenticatedRequest, res: Response, next: NextFunction): Promise<void>;

@@ -4,14 +4,50 @@
 //
 // Public endpoints that don't require authentication:
 // - Demo wallet authentication
+// - Wallet signature authentication (real Ed25519 verification)
 // - Sample market data
 // - Public health checks
 // - API documentation
 //
 // ═══════════════════════════════════════════════════════════════
 import { Router } from 'express';
+import { Keypair } from '@stellar/stellar-sdk';
 import { generateToken, TIER_QUOTAS } from '../middleware/index.js';
 import { createRateLimiter } from '../middleware/rateLimit.js';
+// ═══════════════════════════════════════════════════════════════
+// STELLAR SIGNATURE VERIFICATION (Ed25519)
+// ═══════════════════════════════════════════════════════════════
+/**
+ * Verifies an Ed25519 signature produced by a Stellar wallet (Freighter, etc.)
+ *
+ * Supports two formats:
+ *  1. Raw base64-encoded signature (Freighter / stellar-wallets-kit output)
+ *  2. Hex-encoded signature
+ */
+function verifyStellarSignature(walletAddress, message, signature) {
+    try {
+        const keypair = Keypair.fromPublicKey(walletAddress);
+        const messageBuffer = Buffer.from(message);
+        // Try base64 first (Freighter default)
+        try {
+            const sigBuffer = Buffer.from(signature, 'base64');
+            if (keypair.verify(messageBuffer, sigBuffer))
+                return true;
+        }
+        catch { /* not base64 */ }
+        // Try hex
+        try {
+            const sigBuffer = Buffer.from(signature, 'hex');
+            if (keypair.verify(messageBuffer, sigBuffer))
+                return true;
+        }
+        catch { /* not hex */ }
+        return false;
+    }
+    catch {
+        return false;
+    }
+}
 const router = Router();
 const publicLimiter = createRateLimiter('standard');
 // ═══════════════════════════════════════════════════════════════
@@ -45,49 +81,78 @@ router.post('/demo-auth', publicLimiter, (req, res) => {
         warning: '⚠️ This is a DEMO token for testing only. For production, use proper wallet signature authentication.',
         usage: {
             authentication: `Authorization: Bearer ${token}`,
-            example: `curl -H "Authorization: Bearer ${token}" https://api.nirium.dev/api/market`,
+            example: `curl -H "Authorization: Bearer ${token}" https://api.nirium.xyz/api/market`,
         },
     });
 });
 /**
  * POST /api/public/authenticate
- * Proper wallet signature authentication
- * For production use
+ * Wallet signature authentication — real Ed25519 verification.
+ * Works on both testnet and mainnet.
  */
 router.post('/authenticate', publicLimiter, (req, res) => {
     const { walletAddress, signature, message } = req.body;
-    if (!walletAddress || !signature) {
+    if (!walletAddress || !signature || !message) {
         res.status(400).json({
             error: 'Missing required fields',
-            required: ['walletAddress', 'signature'],
-            hint: 'Sign the message with your Stellar wallet',
+            required: ['walletAddress', 'signature', 'message'],
+            hint: 'Sign the message with your Stellar wallet (Freighter or compatible)',
+            example: {
+                walletAddress: 'G...',
+                message: 'Login to Nirium Agent API\nTimestamp: 1711710000000',
+                signature: '<base64_or_hex_ed25519_signature>',
+            },
         });
         return;
     }
-    // TODO: Implement proper Stellar signature verification
-    // For now, we'll accept any signature for testnet
-    const isTestnet = process.env.STELLAR_NETWORK !== 'mainnet';
-    if (isTestnet) {
-        // In testnet, be lenient
-        const token = generateToken(walletAddress, ['user'], 'free');
-        res.json({
-            success: true,
-            token,
-            expiresIn: '24h',
-            userId: walletAddress,
-            tier: 'free',
-            quotas: TIER_QUOTAS.free,
-            network: 'testnet',
+    // Validate Stellar address format
+    if (!/^G[A-Z0-9]{55}$/.test(walletAddress)) {
+        res.status(400).json({
+            error: 'Invalid wallet address',
+            hint: 'Must be a valid Stellar address (G..., 56 chars)',
         });
+        return;
     }
-    else {
-        // In mainnet, require proper verification
-        res.status(501).json({
-            error: 'Not implemented',
-            message: 'Signature verification for mainnet not yet implemented',
-            hint: 'Use demo-auth for testing or contact support',
+    // Enforce message freshness — timestamp is REQUIRED in the message to prevent replay attacks
+    const timestampMatch = message.match(/Timestamp:\s*(\d+)/);
+    if (!timestampMatch) {
+        res.status(400).json({
+            error: 'Message missing required timestamp',
+            hint: 'The signed message must include "Timestamp: <unix_ms>" to prevent replay attacks.',
+            example: `Login to Nirium Agent API\nTimestamp: ${Date.now()}`,
         });
+        return;
     }
+    const msgTime = parseInt(timestampMatch[1], 10);
+    const ageSeconds = (Date.now() - msgTime) / 1000;
+    if (ageSeconds > 300) {
+        res.status(401).json({
+            error: 'Message expired',
+            hint: 'The signed message timestamp is older than 5 minutes. Generate a new message and sign again.',
+        });
+        return;
+    }
+    // Verify Ed25519 signature
+    const isValid = verifyStellarSignature(walletAddress, message, signature);
+    if (!isValid) {
+        res.status(401).json({
+            error: 'Invalid signature',
+            hint: 'The signature does not match the wallet address. Ensure you are signing the exact message string.',
+        });
+        return;
+    }
+    const network = process.env.STELLAR_NETWORK || 'testnet';
+    const token = generateToken(walletAddress, ['user'], 'free');
+    res.json({
+        success: true,
+        token,
+        expiresIn: '24h',
+        userId: walletAddress,
+        tier: 'free',
+        quotas: TIER_QUOTAS.free,
+        network,
+        authenticated: true,
+    });
 });
 // ═══════════════════════════════════════════════════════════════
 // PUBLIC MARKET DATA (LIMITED)
@@ -129,24 +194,24 @@ router.get('/market-snapshot', publicLimiter, async (_req, res) => {
 router.get('/examples', (_req, res) => {
     res.json({
         curl: {
-            'Get Demo Token': `curl -X POST https://api.nirium.dev/api/public/demo-auth \\
+            'Get Demo Token': `curl -X POST https://api.nirium.xyz/api/public/demo-auth \\
   -H "Content-Type: application/json" \\
   -d '{"walletAddress": "GABC..."}'`,
             'Get Market Data': `curl -H "Authorization: Bearer <token>" \\
-  https://api.nirium.dev/api/market`,
-            'Execute Strategy': `curl -X POST https://api.nirium.dev/api/execute \\
+  https://api.nirium.xyz/api/market`,
+            'Execute Strategy': `curl -X POST https://api.nirium.xyz/api/execute \\
   -H "Authorization: Bearer <token>" \\
   -H "Content-Type: application/json" \\
   -d '{"strategy": "buy", "asset": "XLM", "params": {"amount": 1000}}'`,
         },
         javascript: {
-            'Get Demo Token': `const response = await fetch('https://api.nirium.dev/api/public/demo-auth', {
+            'Get Demo Token': `const response = await fetch('https://api.nirium.xyz/api/public/demo-auth', {
   method: 'POST',
   headers: { 'Content-Type': 'application/json' },
   body: JSON.stringify({ walletAddress: 'GABC...' })
 });
 const { token } = await response.json();`,
-            'Get Market Data': `const response = await fetch('https://api.nirium.dev/api/market', {
+            'Get Market Data': `const response = await fetch('https://api.nirium.xyz/api/market', {
   headers: { 'Authorization': \`Bearer \${token}\` }
 });
 const marketData = await response.json();`,
@@ -154,14 +219,14 @@ const marketData = await response.json();`,
         python: {
             'Get Demo Token': `import requests
 
-response = requests.post('https://api.nirium.dev/api/public/demo-auth',
+response = requests.post('https://api.nirium.xyz/api/public/demo-auth',
     json={'walletAddress': 'GABC...'})
 token = response.json()['token']`,
-            'Get Market Data': `response = requests.get('https://api.nirium.dev/api/market',
+            'Get Market Data': `response = requests.get('https://api.nirium.xyz/api/market',
     headers={'Authorization': f'Bearer {token}'})
 market_data = response.json()`,
         },
-        documentation: 'https://nirium.dev/docs',
+        documentation: 'https://nirium.xyz/docs',
         support: 'https://discord.gg/nirium',
     });
 });
@@ -221,10 +286,10 @@ router.get('/quickstart', (_req, res) => {
             },
         },
         resources: {
-            documentation: 'https://nirium.dev/docs',
+            documentation: 'https://nirium.xyz/docs',
             examples: 'GET /api/public/examples',
             status: 'GET /health',
-            support: 'sandbox@nirium.dev',
+            support: 'sandbox@nirium.xyz',
         },
     });
 });

@@ -89,6 +89,10 @@ export default function ApiKeyManager() {
                 })
             });
 
+            if (!keyRes.ok) {
+                const errData = await keyRes.json().catch(() => ({}));
+                throw new Error(errData.error || errData.message || `Server error (${keyRes.status})`);
+            }
             const keyData = await keyRes.json();
             if (!keyData.success && !keyData.apiKey) throw new Error(keyData.error || 'Failed to generate key');
 

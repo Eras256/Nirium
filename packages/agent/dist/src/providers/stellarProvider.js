@@ -2,11 +2,10 @@
 // Nirium — Stellar Market Data Provider (100% REAL)
 // Fetches live data from Horizon & Soroban RPC
 // ═══════════════════════════════════════════════════════════════
-import { Horizon, rpc } from '@stellar/stellar-sdk';
+import { rpc } from '@stellar/stellar-sdk';
 export const NETWORK = process.env.STELLAR_NETWORK || 'testnet';
 const HORIZON_URL = NETWORK === 'mainnet' ? 'https://horizon.stellar.org' : 'https://horizon-testnet.stellar.org';
 const SOROBAN_RPC_URL = process.env.SOROBAN_RPC_URL || 'https://soroban-testnet.stellar.org';
-const horizonServer = new Horizon.Server(HORIZON_URL);
 const sorobanServer = new rpc.Server(SOROBAN_RPC_URL);
 // USDC issuer on testnet (standard Circle/SDF testnet asset)
 const USDC_ISSUER_TESTNET = 'GBBD47IF6LWK7P7MDEVSCWR7DPUWV3NY3DTQEVFL4NAT4AQH3ZLLFLA5';
@@ -60,7 +59,7 @@ async function fetchXlmPrice() {
  */
 async function fetchSdexSpread() {
     try {
-        const res = await fetch(`${HORIZON_URL}/order_book?selling_asset_type=native&buying_asset_type=credit_alphanum4&buying_asset_code=USDC&buying_asset_issuer=${USDC_ISSUER}&limit=5`);
+        const res = await fetch(`${HORIZON_URL}/order_book?selling_asset_type=native&buying_asset_type=credit_alphanum4&buying_asset_code=USDC&buying_asset_issuer=${USDC_ISSUER}&limit=5`, { signal: AbortSignal.timeout(8000) });
         if (!res.ok)
             return 20; // Default spread
         const data = await res.json();
@@ -86,7 +85,7 @@ async function fetchSdexSpread() {
  */
 async function fetchBaseFee() {
     try {
-        const res = await fetch(`${HORIZON_URL}/fee_stats`);
+        const res = await fetch(`${HORIZON_URL}/fee_stats`, { signal: AbortSignal.timeout(5000) });
         if (!res.ok)
             return 100;
         const data = await res.json();

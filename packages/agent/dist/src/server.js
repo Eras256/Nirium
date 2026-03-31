@@ -23,7 +23,7 @@ import { initializeWebSocket, broadcastLog, broadcastSignal, createSubscription,
 import { initializeLoop, startLoop, stopLoop, getLoopStatus, performScan, getCurrentMarketState, } from './services/autonomousLoop.js';
 import { registerWebhook, getUserWebhooks, deleteWebhook, testWebhook, dispatchWebhookEvent, } from './services/webhookService.js';
 import * as skillManager from './services/skillManager.js';
-import { uploadToIpfs, PINATA_GATEWAY } from './services/ipfsService.js';
+import { uploadToIpfs } from './services/ipfsService.js';
 import { routeExecution } from './execution/router.js';
 import { fetchMarketState, checkHorizonHealth, checkSorobanHealth, NETWORK } from './providers/stellarProvider.js';
 import { getLLMProvider, getAvailableProviders, resetProvider } from './providers/llm/index.js';
@@ -34,10 +34,20 @@ const startTime = Date.now();
 // EXPRESS APP SETUP
 // ═══════════════════════════════════════════════════════════════
 const app = express();
+const envOrigins = process.env.ALLOWED_ORIGINS ? process.env.ALLOWED_ORIGINS.split(',').map(o => o.trim()) : [];
+const ALLOWED_ORIGINS = [...new Set([...envOrigins, 'http://localhost:3000', 'http://localhost:3001', 'https://nirium.xyz', 'https://www.nirium.xyz'])];
 app.use(cors({
-    origin: '*',
+    origin: (origin, callback) => {
+        // Allow requests with no origin (server-to-server, curl, Postman)
+        if (!origin)
+            return callback(null, true);
+        if (ALLOWED_ORIGINS.includes(origin))
+            return callback(null, true);
+        callback(new Error('CORS policy: origin not allowed'));
+    },
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization', 'x-api-key'],
+    credentials: true,
 }));
 app.use(express.json({ limit: '10mb' }));
 const standardLimiter = createRateLimiter('standard');
@@ -64,7 +74,7 @@ app.get('/api/info', (_req, res) => {
         name: 'Nirium Agent',
         version: VERSION,
         network: NETWORK,
-        documentation: 'https://nirium.dev/docs',
+        documentation: 'https://nirium.xyz/docs',
         endpoints: {
             health: 'GET /health',
             public: {
@@ -84,17 +94,20 @@ app.get('/api/info', (_req, res) => {
                 token: 'POST /api/auth/token',
                 keys: 'POST|GET|DELETE /api/auth/keys',
             },
+            market: {
+                data: 'GET /api/market',
+                tickers: 'GET /api/tickers',
+                stats: 'GET /api/stats/global',
+                loop: 'POST /api/loop/start|stop|scan, GET /api/loop/status',
+            },
             execution: {
                 execute: 'POST /api/execute',
                 demo: 'POST /api/execute-demo',
+                strategies: 'GET /api/strategies',
             },
-            market: {
-                data: 'GET /api/market',
-                loop: 'POST /api/loop/start|stop|scan, GET /api/loop/status',
-            },
-            webhooks: 'POST|GET|DELETE /api/webhooks',
-            subscriptions: 'POST|GET|DELETE /api/subscriptions',
-            skills: 'GET|POST|DELETE /api/skills',
+            webhooks: 'POST|GET|DELETE /api/webhooks, POST /api/webhooks/:id/test',
+            subscriptions: 'POST|GET|DELETE /api/subscriptions, GET /api/subscriptions/stats',
+            skills: 'GET|POST|DELETE /api/skills, GET /api/skills/marketplace',
             signals: 'GET /api/signals/recent',
         },
         llm: {
@@ -118,6 +131,7 @@ app.post('/api/auth/token', standardLimiter, (req, res) => {
     const token = generateToken(walletAddress, ['user'], 'free');
     broadcastLog('info', `[Auth] Token issued for ${walletAddress.substring(0, 12)}...`);
     res.json({
+        success: true,
         token,
         expiresIn: '24h',
         userId: walletAddress,
@@ -125,13 +139,14 @@ app.post('/api/auth/token', standardLimiter, (req, res) => {
         tier: 'free',
     });
 });
-app.post('/api/auth/keys', authMiddleware, adminMiddleware, async (req, res) => {
+app.post('/api/auth/keys', authMiddleware, async (req, res) => {
     const authReq = req;
     const { name, tier } = req.body;
     try {
         const apiKey = await generateApiKey(authReq.user.userId, name || 'Default Key', ['user'], tier || authReq.user.tier || 'free');
         broadcastLog('info', `[Auth] API key generated for ${authReq.user.userId}`);
         res.json({
+            success: true,
             apiKey,
             name: name || 'Default Key',
             tier: tier || authReq.user.tier || 'free',
@@ -209,7 +224,7 @@ app.post('/api/execute-demo', standardLimiter, async (req, res) => {
 // ═══════════════════════════════════════════════════════════════
 // MARKET DATA ENDPOINTS
 // ═══════════════════════════════════════════════════════════════
-app.get('/api/market', standardLimiter, async (_req, res) => {
+app.get('/api/market', authMiddleware, standardLimiter, async (_req, res) => {
     try {
         const cached = getCurrentMarketState();
         if (cached) {
@@ -248,24 +263,29 @@ app.post('/api/loop/scan', authMiddleware, async (_req, res) => {
 // ═══════════════════════════════════════════════════════════════
 // WEBHOOK ENDPOINTS
 // ═══════════════════════════════════════════════════════════════
-app.post('/api/webhooks', authMiddleware, (req, res) => {
+app.post('/api/webhooks', authMiddleware, async (req, res) => {
     const authReq = req;
     const { url, events, secret } = req.body;
     if (!url || !events?.length) {
         res.status(400).json({ error: 'url and events[] required' });
         return;
     }
-    const webhook = registerWebhook(authReq.user.userId, url, events, secret);
-    broadcastLog('info', `[Webhook] Registered: ${url} → ${events.join(', ')}`);
-    res.json(webhook);
+    try {
+        const webhook = await registerWebhook(authReq.user.userId, url, events, secret);
+        broadcastLog('info', `[Webhook] Registered for ${events.length} event(s)`);
+        res.json(webhook);
+    }
+    catch (error) {
+        res.status(400).json({ error: String(error) });
+    }
 });
-app.get('/api/webhooks', authMiddleware, (req, res) => {
+app.get('/api/webhooks', authMiddleware, async (req, res) => {
     const authReq = req;
-    const webhooks = getUserWebhooks(authReq.user.userId);
-    res.json({ webhooks });
+    const webhookList = await getUserWebhooks(authReq.user.userId);
+    res.json({ webhooks: webhookList });
 });
-app.delete('/api/webhooks/:id', authMiddleware, (req, res) => {
-    const deleted = deleteWebhook(req.params.id);
+app.delete('/api/webhooks/:id', authMiddleware, async (req, res) => {
+    const deleted = await deleteWebhook(req.params.id);
     if (deleted) {
         res.json({ message: 'Webhook deleted' });
     }
@@ -308,6 +328,66 @@ app.get('/api/signals/recent', standardLimiter, (req, res) => {
     const count = Math.min(parseInt(req.query.count) || 20, 100);
     const signals = getRecentSignals(count);
     res.json({ signals });
+});
+// ═══════════════════════════════════════════════════════════════
+// MARKET EXTENDED ENDPOINTS
+// ═══════════════════════════════════════════════════════════════
+app.get('/api/tickers', standardLimiter, async (_req, res) => {
+    try {
+        const market = getCurrentMarketState() || await fetchMarketState();
+        const tickers = market?.assets?.map((a) => ({
+            symbol: a.code || a.asset_code,
+            price: a.price || a.last_price || null,
+            volume24h: a.volume || null,
+            change24h: a.change24h || null,
+            network: NETWORK,
+        })) || [
+            { symbol: 'XLM', price: null, volume24h: null, change24h: null, network: NETWORK },
+            { symbol: 'USDC', price: null, volume24h: null, change24h: null, network: NETWORK },
+        ];
+        res.json({ tickers, timestamp: new Date().toISOString(), network: NETWORK });
+    }
+    catch (error) {
+        res.status(500).json({ error: String(error) });
+    }
+});
+app.get('/api/stats/global', standardLimiter, (_req, res) => {
+    const loopStatus = getLoopStatus();
+    const subStats = getSubscriptionStats();
+    const skills = skillManager.getLoadedSkills();
+    res.json({
+        protocol: {
+            version: VERSION,
+            network: NETWORK,
+            uptime: Math.floor((Date.now() - startTime) / 1000),
+        },
+        execution: {
+            loopActive: loopStatus?.running || false,
+            totalScans: loopStatus?.totalScans || 0,
+        },
+        connectivity: {
+            websocketClients: subStats.connectedClients,
+            activeSubscriptions: subStats.totalSubscriptions,
+        },
+        plugins: {
+            loaded: skills.length,
+        },
+        timestamp: new Date().toISOString(),
+    });
+});
+app.get('/api/strategies', standardLimiter, (_req, res) => {
+    const skills = skillManager.getLoadedSkills();
+    const strategies = skills.map((s) => ({
+        id: s.slug || s.id,
+        name: s.name,
+        description: s.description,
+        category: s.category || 'general',
+        assets: s.supportedAssets || ['XLM', 'USDC'],
+        riskLevel: s.riskLevel || 'medium',
+        isBuiltIn: s.isBuiltIn || false,
+        enabled: s.isLoaded !== false,
+    }));
+    res.json({ strategies, total: strategies.length, network: NETWORK });
 });
 // ═══════════════════════════════════════════════════════════════
 // SKILL/PLUGIN ENDPOINTS
@@ -369,7 +449,7 @@ app.post('/api/skills/:slug/actions/:action', authMiddleware, async (req, res) =
 // ═══════════════════════════════════════════════════════════════
 // SYSTEM ENDPOINTS
 // ═══════════════════════════════════════════════════════════════
-app.get('/api/system/health', async (_req, res) => {
+app.get('/api/system/health', authMiddleware, adminMiddleware, async (_req, res) => {
     const [horizon, soroban] = await Promise.all([
         checkHorizonHealth(),
         checkSorobanHealth(),
@@ -379,14 +459,16 @@ app.get('/api/system/health', async (_req, res) => {
         horizon,
         soroban,
         websocket: { healthy: true, clients: getSubscriptionStats().connectedClients },
-        ipfs: { gateway: PINATA_GATEWAY },
-        llm: { provider: getLLMProvider().name, model: getLLMProvider().model },
+        llm: { configured: !!getLLMProvider().name },
     });
 });
-app.post('/api/config/llm', (req, res) => {
+app.post('/api/config/llm', authMiddleware, adminMiddleware, (req, res) => {
     const { provider, model, apiKey, ollamaUrl } = req.body;
-    // In a real production environment, these would be validated and encrypted
-    // For Nirium v1.0, we update the runtime configuration
+    const VALID_PROVIDERS = ['openai', 'anthropic', 'ollama', 'minimax', 'gemini', 'grok', 'bedrock', 'openrouter'];
+    if (provider && !VALID_PROVIDERS.includes(provider)) {
+        res.status(400).json({ error: 'Invalid provider', valid: VALID_PROVIDERS });
+        return;
+    }
     if (provider)
         process.env.ACTIVE_LLM_PROVIDER = provider;
     if (model) {
@@ -419,15 +501,15 @@ app.post('/api/config/llm', (req, res) => {
         if (provider === 'grok')
             process.env.XAI_API_KEY = apiKey;
         if (provider === 'bedrock')
-            process.env.AWS_ACCESS_KEY_ID = apiKey; // Simplified
+            process.env.AWS_ACCESS_KEY_ID = apiKey;
         if (provider === 'openrouter')
             process.env.OPENROUTER_API_KEY = apiKey;
     }
     if (ollamaUrl)
         process.env.OLLAMA_URL = ollamaUrl;
     resetProvider();
-    broadcastLog('system', `[Config] LLM Provider shifted to ${provider} (${model})`);
-    res.json({ success: true, message: `Neural Link shifted to ${provider}` });
+    broadcastLog('system', `[Config] LLM Provider updated by admin`);
+    res.json({ success: true, message: `Neural Link updated` });
 });
 // ═══════════════════════════════════════════════════════════════
 // SERVER INITIALIZATION

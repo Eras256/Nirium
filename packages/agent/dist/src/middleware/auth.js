@@ -25,16 +25,25 @@ catch (error) {
     console.warn('⚠️ Supabase not available, using in-memory fallback');
 }
 // ⚠️ SECURITY: These secrets MUST be set in environment variables
+const IS_PRODUCTION = process.env.NODE_ENV === 'production';
 let secret = process.env.JWT_SECRET;
 if (!secret || secret.length < 32) {
-    console.warn('⚠️ WARNING: JWT_SECRET environment variable not set or too short. Using a dummy secret for development.');
-    secret = 'dummy_secret_that_is_at_least_32_characters_long_for_dev_only';
+    if (IS_PRODUCTION) {
+        console.error('FATAL: JWT_SECRET environment variable not set or too short in production. Exiting.');
+        process.exit(1);
+    }
+    console.warn('⚠️ WARNING: JWT_SECRET not set — using ephemeral dev secret. DO NOT use in production.');
+    secret = crypto.randomBytes(32).toString('hex');
 }
 export const JWT_SECRET = secret;
 let adminKey = process.env.ADMIN_API_KEY;
 if (!adminKey || adminKey.length < 32) {
-    console.warn('⚠️ WARNING: ADMIN_API_KEY environment variable not set. Using dummy for dev only.');
-    adminKey = 'dummy_admin_key_that_is_at_least_32_characters_long_for_dev';
+    if (IS_PRODUCTION) {
+        console.error('FATAL: ADMIN_API_KEY environment variable not set in production. Exiting.');
+        process.exit(1);
+    }
+    console.warn('⚠️ WARNING: ADMIN_API_KEY not set — using ephemeral dev key. DO NOT use in production.');
+    adminKey = crypto.randomBytes(32).toString('hex');
 }
 const ADMIN_API_KEY = adminKey;
 // ═══════════════════════════════════════════════════════════════
@@ -118,7 +127,8 @@ export function verifyToken(token) {
 // API KEY MANAGEMENT
 // ═══════════════════════════════════════════════════════════════
 export async function generateApiKey(userId, name, permissions = ['user'], tier = 'free', durationDays) {
-    const key = `nrm_${tier.substring(0, 3)}_${crypto.randomBytes(32).toString('hex')}`;
+    const tierPrefix = tier === 'institutional' ? 'inst' : tier === 'sandbox' ? 'sbox' : tier === 'enterprise' ? 'ent' : 'free';
+    const key = `sk_${tierPrefix}_${crypto.randomBytes(32).toString('hex')}`;
     const keyHash = crypto.createHash('sha256').update(key).digest('hex');
     const expiresAt = durationDays
         ? new Date(Date.now() + durationDays * 24 * 60 * 60 * 1000).toISOString()
@@ -274,9 +284,11 @@ export async function revokeApiKey(keyId) {
 // ═══════════════════════════════════════════════════════════════
 // SANDBOX ACCOUNT MANAGEMENT (Institutional Clients)
 // ═══════════════════════════════════════════════════════════════
-export async function createSandboxAccount(companyName, contactEmail, walletAddress, tier = 'sandbox', durationDays = 30) {
+export async function createSandboxAccount(companyName, contactEmail, walletAddress, tier = 'sandbox', durationDays = 90) {
     const id = crypto.randomBytes(16).toString('hex');
     const apiKey = await generateApiKey(walletAddress, `${companyName} Sandbox`, ['user', 'sandbox'], tier, durationDays);
+    const expiresAt = new Date(Date.now() + durationDays * 24 * 60 * 60 * 1000).toISOString();
+    const createdAt = new Date().toISOString();
     const account = {
         id,
         companyName,
@@ -285,18 +297,78 @@ export async function createSandboxAccount(companyName, contactEmail, walletAddr
         apiKey,
         tier,
         quotas: TIER_QUOTAS[tier],
-        createdAt: new Date().toISOString(),
-        expiresAt: new Date(Date.now() + durationDays * 24 * 60 * 60 * 1000).toISOString(),
+        createdAt,
+        expiresAt,
         isActive: true,
     };
-    sandboxAccountsMemory.set(id, account);
-    console.log(`[Sandbox] ✅ Created ${tier} account for ${companyName} (${contactEmail})`);
+    // Persist to Supabase first
+    if (SUPABASE_AVAILABLE && supabase) {
+        try {
+            const apiKeyHash = crypto.createHash('sha256').update(apiKey).digest('hex');
+            const { error } = await supabase.from('sandbox_accounts').insert({
+                id,
+                company_name: companyName,
+                contact_email: contactEmail,
+                wallet_address: walletAddress,
+                api_key_hash: apiKeyHash,
+                tier,
+                quotas: TIER_QUOTAS[tier],
+                is_active: true,
+                expires_at: expiresAt,
+                created_at: createdAt,
+            });
+            if (error) {
+                console.error('[Sandbox] Supabase insert error, using memory fallback:', error.message);
+                sandboxAccountsMemory.set(id, account);
+            }
+            else {
+                console.log(`[Sandbox] ✅ Created ${tier} account for ${companyName} (Supabase)`);
+            }
+        }
+        catch (err) {
+            console.error('[Sandbox] Supabase unavailable, using memory fallback:', err);
+            sandboxAccountsMemory.set(id, account);
+        }
+    }
+    else {
+        sandboxAccountsMemory.set(id, account);
+        console.log(`[Sandbox] ✅ Created ${tier} account for ${companyName} (memory)`);
+    }
     return account;
 }
-export function getSandboxAccount(apiKey) {
+export async function getSandboxAccount(apiKey) {
+    // Try Supabase first
+    if (SUPABASE_AVAILABLE && supabase) {
+        try {
+            const apiKeyHash = crypto.createHash('sha256').update(apiKey).digest('hex');
+            const { data, error } = await supabase
+                .from('sandbox_accounts')
+                .select('id, company_name, contact_email, wallet_address, tier, quotas, is_active, expires_at, created_at')
+                .eq('api_key_hash', apiKeyHash)
+                .eq('is_active', true)
+                .single();
+            if (!error && data) {
+                if (new Date(data.expires_at) < new Date())
+                    return null;
+                return {
+                    id: data.id,
+                    companyName: data.company_name,
+                    contactEmail: data.contact_email,
+                    walletAddress: data.wallet_address,
+                    apiKey,
+                    tier: data.tier,
+                    quotas: data.quotas,
+                    createdAt: data.created_at,
+                    expiresAt: data.expires_at,
+                    isActive: true,
+                };
+            }
+        }
+        catch { /* fallback below */ }
+    }
+    // Memory fallback
     for (const account of sandboxAccountsMemory.values()) {
         if (account.apiKey === apiKey && account.isActive) {
-            // Check expiration
             if (new Date(account.expiresAt) < new Date()) {
                 account.isActive = false;
                 return null;
@@ -306,14 +378,50 @@ export function getSandboxAccount(apiKey) {
     }
     return null;
 }
-export function listSandboxAccounts() {
+export async function listSandboxAccounts() {
+    if (SUPABASE_AVAILABLE && supabase) {
+        try {
+            const { data, error } = await supabase
+                .from('sandbox_accounts')
+                .select('id, company_name, contact_email, wallet_address, tier, quotas, is_active, expires_at, created_at')
+                .order('created_at', { ascending: false });
+            if (!error && data) {
+                return data.map((row) => ({
+                    id: row.id,
+                    companyName: row.company_name,
+                    contactEmail: row.contact_email,
+                    walletAddress: row.wallet_address,
+                    apiKey: '[hidden]',
+                    tier: row.tier,
+                    quotas: row.quotas,
+                    createdAt: row.created_at,
+                    expiresAt: row.expires_at,
+                    isActive: row.is_active,
+                }));
+            }
+        }
+        catch { /* fallback */ }
+    }
     return Array.from(sandboxAccountsMemory.values());
 }
-export function revokeSandboxAccount(id) {
+export async function revokeSandboxAccount(id) {
+    if (SUPABASE_AVAILABLE && supabase) {
+        try {
+            const { error } = await supabase
+                .from('sandbox_accounts')
+                .update({ is_active: false })
+                .eq('id', id);
+            if (!error) {
+                console.log(`[Sandbox] ❌ Revoked sandbox account: ${id} (Supabase)`);
+                return true;
+            }
+        }
+        catch { /* fallback */ }
+    }
     const account = sandboxAccountsMemory.get(id);
     if (account) {
         account.isActive = false;
-        console.log(`[Sandbox] ❌ Revoked sandbox account: ${account.companyName}`);
+        console.log(`[Sandbox] ❌ Revoked sandbox account: ${account.companyName} (memory)`);
         return true;
     }
     return false;
@@ -387,7 +495,7 @@ export async function authMiddleware(req, res, next) {
         error: 'Unauthorized',
         message: 'Valid JWT token or API key required',
         hint: 'Use Authorization: Bearer <token> or x-api-key: <key>',
-        docs: 'https://nirium.dev/docs/authentication',
+        docs: 'https://nirium.xyz/docs/authentication',
     });
 }
 // ═══════════════════════════════════════════════════════════════
@@ -412,7 +520,7 @@ export function sandboxMiddleware(req, res, next) {
         res.status(403).json({
             error: 'Forbidden',
             message: 'Sandbox, institutional, or enterprise access required',
-            hint: 'Request a sandbox account at https://nirium.dev/sandbox',
+            hint: 'Request a sandbox account at https://nirium.xyz/sandbox',
         });
         return;
     }

@@ -16,11 +16,11 @@ export declare function registerWebhook(userId: string, url: string, events: str
 /**
  * Get all webhooks for a user.
  */
-export declare function getUserWebhooks(userId: string): Webhook[];
+export declare function getUserWebhooks(userId: string): Promise<Webhook[]>;
 /**
  * Delete a webhook.
  */
-export declare function deleteWebhook(id: string): boolean;
+export declare function deleteWebhook(id: string): Promise<boolean>;
 /**
  * Send a test event to a webhook.
  */

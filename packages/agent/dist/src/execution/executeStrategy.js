@@ -122,9 +122,8 @@ export async function executeStrategy(strategy, asset, params, log) {
                 log('warn', '[Execute] Could not parse simulation return value');
             }
         }
-        // 5. Assemble with fee
-        // @ts-ignore
-        transaction = StellarSdk.rpc.assembleTransaction(transaction, networkPassphrase, simResponse).build();
+        // 5. Assemble with fee (SDK v14: assembleTransaction(tx, simResponse) — no networkPassphrase arg)
+        transaction = StellarSdk.rpc.assembleTransaction(transaction, simResponse).build();
         // 6. Sign
         log('info', '[Execute] Signing transaction...');
         transaction.sign(sourceKeypair);
@@ -169,8 +168,8 @@ export async function executeStrategy(strategy, asset, params, log) {
             log('warn', `[Execute] ⚠️ Transaction polling timeout after ${MAX_ATTEMPTS * 2}s. Tx may still succeed. Hash: ${txHash}`);
         }
         const executionTime = Date.now() - startTime;
-        // @ts-ignore
-        const gasUsed = parseInt(simResponse.minResourceFee || '100', 10);
+        const successSim = simResponse;
+        const gasUsed = parseInt(successSim.minResourceFee || '100', 10);
         log('success', `[Execute] TX Hash: ${txHash}`);
         log('success', `[Execute] Profit: ${finalProfit ?? 'pending confirmation'}`);
         log('info', `[Execute] Gas: ${gasUsed} stroops | Time: ${executionTime}ms`);

@@ -61,8 +61,8 @@ function ensureInit() {
             metadata: {
                 name: 'Nirium Protocol',
                 description: 'Institutional-grade autonomous Stellar AI Agent Swarm.',
-                url: 'https://nirium-stellar.vercel.app',
-                icons: ['https://nirium-stellar.vercel.app/icon.png']
+                url: 'https://nirium.xyz',
+                icons: ['https://nirium.xyz/icon.png']
             }
         });
 
