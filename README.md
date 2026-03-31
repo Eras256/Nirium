@@ -130,6 +130,9 @@ Nirium/
 
 ## 🌐 Institutional API Infrastructure (`api.nirium.xyz`)
 
+> [!NOTE]
+> Following our graduation from the **Stellar Scale Program** and the signing of our first **Institutional NBO**, we have opened our production API gateway to enable our institutional partners to conduct deep technical due diligence and live pilot testing.
+
 Nirium provides a high-availability, low-latency API gateway designed for both **Free Tier** experimentation and **Enterprise-Grade** institutional orchestration. Our infrastructure is optimized for seamless consumption by both humans (frontend dashboards) and autonomous agents (LLMs/trading bots).
 
 -   **Endpoint:** `https://api.nirium.xyz`
@@ -140,7 +143,7 @@ Nirium provides a high-availability, low-latency API gateway designed for both *
 
 ## 🧪 Test Coverage & Institutional QA
 
-The repository is rigorously tested across both the Smart Contract and Backend Agent layers to ensure institutional-grade resilience. As of **March 30th, 2026**, the protocol has achieved a **100% QA Pass Rate** across all critical modules:
+The repository is rigorously tested across both the Smart Contract and Backend Agent layers to ensure institutional-grade resilience. Reaffirming our commitment to the pilot phase post-NBO, as of **March 30th, 2026**, the protocol has achieved a **100% QA Pass Rate** across all critical modules:
 
 ### 1. Smart Contracts (Soroban Rust)
 - **Vault Operations**: Creation, fee collection, deposit/withdraw passing.
