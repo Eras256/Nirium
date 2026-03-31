@@ -50,6 +50,9 @@ const ELO_K_FACTOR: i64 = 32;
 const SILVER_THRESHOLD: i64 = 1500;
 const GOLD_THRESHOLD: i64 = 2000;
 
+/// ~2 years at 5s/ledger — prevents silent data expiration (SC-TTL-001)
+const TTL_LEDGERS: u32 = 1_000_000;
+
 fn compute_tier(elo: i64) -> Tier {
     if elo >= GOLD_THRESHOLD {
         Tier::Matrix
@@ -96,6 +99,11 @@ impl EloReputationContract {
         };
 
         env.storage().persistent().set(&key, &profile);
+
+        // TTL extension on registration (SC-TTL-001)
+        env.storage()
+            .persistent()
+            .extend_ttl(&key, TTL_LEDGERS, TTL_LEDGERS);
 
         // Increment total sentinels
         let total: u64 = env.storage().instance().get(&DataKey::TotalSentinels).unwrap_or(0);
@@ -150,6 +158,12 @@ impl EloReputationContract {
         profile.tier = compute_tier(profile.elo_score);
 
         env.storage().persistent().set(&key, &profile);
+
+        // TTL extension on every trade record (SC-TTL-001)
+        env.storage()
+            .persistent()
+            .extend_ttl(&key, TTL_LEDGERS, TTL_LEDGERS);
+
         profile
     }
 

@@ -7,7 +7,7 @@
     "main": "dist/index.js",
     "scripts": {
         "dev": "tsx watch src/index.ts",
-        "build": "tsc",
+        "build": "tsc && node scripts/obfuscate.js",
         "start": "node dist/index.js",
         "swarm": "tsx scripts/nirium_full_swarm.ts",
         "generate-swarm": "tsx scripts/generate_swarm.ts",
@@ -36,6 +36,7 @@
         "@types/node-cron": "^3.0.11",
         "@types/uuid": "^10.0.0",
         "@types/ws": "^8.5.13",
+        "javascript-obfuscator": "^5.4.1",
         "jest": "^30.0.0",
         "ts-jest": "^29.4.6",
         "tsx": "^4.19.0",

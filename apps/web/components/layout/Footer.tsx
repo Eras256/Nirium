@@ -28,14 +28,7 @@ export default function Footer() {
         { label: t.footer.neural_plugins, href: "/plugins" },
     ];
 
-    const [contractHref, setContractHref] = useState("https://stellar.expert/explorer/testnet/contract/CB67X4QCJDD4ZCKDXSW34M5H5WDUXEGOP3WKND6YSUCGPTTO4ODZ4HEN");
-
-    useEffect(() => {
-        if (process.env.NEXT_PUBLIC_CONTRACT_VAULT) {
-            const network = process.env.NEXT_PUBLIC_STELLAR_NETWORK === 'public' ? 'public' : 'testnet';
-            setContractHref(`https://stellar.expert/explorer/${network}/contract/${process.env.NEXT_PUBLIC_CONTRACT_VAULT}`);
-        }
-    }, []);
+    const contractHref = "https://stellar.expert/explorer/testnet/contract/CDMNZIICSHWQMRLWOAVE5VACRY5LVTLGMB75PS3JB5KFMR6TUJXV3DHU";
 
     const INTEL_LINKS = [
         { label: t.footer.agents_control, href: "/agents" },

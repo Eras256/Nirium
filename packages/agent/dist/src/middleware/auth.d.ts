@@ -39,6 +39,13 @@ export declare function getUsageStats(userId: string): {
     requests: number;
     lastReset: number;
     dailyRequests: number;
+    requestsThisMinute: number;
+} | {
+    requestsThisMinute: number;
+    requests: number;
+    lastReset: number;
+    dailyRequests: number;
+    minuteWindow: number[];
 };
 export declare function resetUsageStats(userId: string): void;
 export declare function generateToken(userId: string, permissions?: string[], tier?: UserTier): string;

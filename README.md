@@ -95,9 +95,9 @@ On-chain meritocracy (ELO Registry) tracking performance.
 
 | Contract | Address | Role | Explorer |
 |:---|:---|:---|:---|
-| **NiriumVault** | `CB67X4QCJDD4ZCKDXSW34M5H5WDUXEGOP3WKND6YSUCGPTTO4ODZ4HEN` | Multi-Asset Treasury + Flash Loans | [🔍 View](https://stellar.expert/explorer/testnet/contract/CB67X4QCJDD4ZCKDXSW34M5H5WDUXEGOP3WKND6YSUCGPTTO4ODZ4HEN) |
-| **ELO Reputation** | `CB4RCN4YHLCX2SIFMEJJSMDBWO6NPJHMDLSSKA4CT4HRTD2TFCU6XW4H` | Sentinel ELO scoring & tiering | [🔍 View](https://stellar.expert/explorer/testnet/contract/CB4RCN4YHLCX2SIFMEJJSMDBWO6NPJHMDLSSKA4CT4HRTD2TFCU6XW4H) |
-| **Strategy Marketplace** | `CCUDDIF6BIIA6NZNSDD63KNWMEAPYTB5WHRDMU2IGOATBCZF6KV6BLEN` | Permissionless strategy registry | [🔍 View](https://stellar.expert/explorer/testnet/contract/CCUDDIF6BIIA6NZNSDD63KNWMEAPYTB5WHRDMU2IGOATBCZF6KV6BLEN) |
+| **NiriumVault** | `CDMNZIICSHWQMRLWOAVE5VACRY5LVTLGMB75PS3JB5KFMR6TUJXV3DHU` | Multi-Asset Treasury + Flash Loans | [🔍 View](https://stellar.expert/explorer/testnet/contract/CDMNZIICSHWQMRLWOAVE5VACRY5LVTLGMB75PS3JB5KFMR6TUJXV3DHU) |
+| **ELO Reputation** | `CC6Z3WJWRKVEAXEKIQ5S3LFEMKRF4L2FTN5YZDQU27MQRQAWA5QBJWF2` | Sentinel ELO scoring & tiering | [🔍 View](https://stellar.expert/explorer/testnet/contract/CC6Z3WJWRKVEAXEKIQ5S3LFEMKRF4L2FTN5YZDQU27MQRQAWA5QBJWF2) |
+| **Strategy Marketplace** | `CB6Q3LKBJ7CAAZY4MK7EG5R6FDDTJHB52ZEENI6BQLBJNFKBQRIAUABC` | Permissionless strategy registry | [🔍 View](https://stellar.expert/explorer/testnet/contract/CB6Q3LKBJ7CAAZY4MK7EG5R6FDDTJHB52ZEENI6BQLBJNFKBQRIAUABC) |
 | **CETES SAC** | `CC72F57YTPX76HAA64JQOEGHQAPSADQWSY5DWVBR66JINPFDLNCQYHIC` | Mexican Treasury Bonds (Etherfuse) | [🔍 View](https://stellar.expert/explorer/testnet/contract/CC72F57YTPX76HAA64JQOEGHQAPSADQWSY5DWVBR66JINPFDLNCQYHIC) |
 
 ## 🏆 Milestones & Traction

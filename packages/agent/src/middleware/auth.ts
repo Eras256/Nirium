@@ -141,22 +141,58 @@ export const TIER_QUOTAS: Record<UserTier, { requestsPerMinute: number; requests
 // ═══════════════════════════════════════════════════════════════
 // USAGE TRACKING & RATE LIMITING
 // ═══════════════════════════════════════════════════════════════
+// Implements a sliding-window rate limiter with BOTH:
+//   1. Per-minute enforcement (requestsPerMinute quota)
+//   2. Per-day enforcement (requestsPerDay quota)
+// Fix: Previous version only enforced daily quotas. Per-minute
+// enforcement was tracked but never checked (OWASP API4 gap).
+
+interface UsageEntry {
+    requests: number;
+    lastReset: number;
+    dailyRequests: number;
+    // Sliding window for per-minute tracking
+    minuteWindow: number[];    // timestamps of requests in last 60s
+}
 
 function checkQuota(userId: string, quotas: typeof TIER_QUOTAS.free): boolean {
     const now = Date.now();
-    const usage = usageTracking.get(userId) || { requests: 0, lastReset: now, dailyRequests: 0 };
+    const MINUTE_MS = 60 * 1000;
+    const DAY_MS = 24 * 60 * 60 * 1000;
+
+    const usage: UsageEntry = usageTracking.get(userId) as UsageEntry || {
+        requests: 0,
+        lastReset: now,
+        dailyRequests: 0,
+        minuteWindow: [],
+    };
+
+    // Ensure minuteWindow exists (backward compat with old entries)
+    if (!usage.minuteWindow) usage.minuteWindow = [];
 
     // Reset daily counter (every 24 hours)
-    if (now - usage.lastReset > 24 * 60 * 60 * 1000) {
+    if (now - usage.lastReset > DAY_MS) {
         usage.dailyRequests = 0;
         usage.lastReset = now;
     }
 
-    // Check daily limit
-    if (usage.dailyRequests >= quotas.requestsPerDay) {
-        return false;
+    // Slide the per-minute window — keep only timestamps within last 60s
+    usage.minuteWindow = usage.minuteWindow.filter(ts => now - ts < MINUTE_MS);
+
+    // ── Check per-minute limit ──
+    if (usage.minuteWindow.length >= quotas.requestsPerMinute) {
+        usageTracking.set(userId, usage);
+        return false; // 429 — per-minute quota exhausted
     }
 
+    // ── Check per-day limit ──
+    if (usage.dailyRequests >= quotas.requestsPerDay) {
+        usageTracking.set(userId, usage);
+        return false; // 429 — daily quota exhausted
+    }
+
+    // Record this request
+    usage.minuteWindow.push(now);
     usage.requests++;
     usage.dailyRequests++;
     usageTracking.set(userId, usage);
@@ -164,7 +200,12 @@ function checkQuota(userId: string, quotas: typeof TIER_QUOTAS.free): boolean {
 }
 
 export function getUsageStats(userId: string) {
-    return usageTracking.get(userId) || { requests: 0, lastReset: Date.now(), dailyRequests: 0 };
+    const now = Date.now();
+    const MINUTE_MS = 60 * 1000;
+    const entry = usageTracking.get(userId) as UsageEntry | undefined;
+    if (!entry) return { requests: 0, lastReset: now, dailyRequests: 0, requestsThisMinute: 0 };
+    const requestsThisMinute = (entry.minuteWindow || []).filter(ts => now - ts < MINUTE_MS).length;
+    return { ...entry, requestsThisMinute };
 }
 
 export function resetUsageStats(userId: string) {
@@ -267,9 +308,17 @@ export async function generateApiKey(
 }
 
 async function validateApiKey(key: string): Promise<{ userId: string; permissions: string[]; tier: UserTier } | null> {
-    // Check admin key first
-    if (key === ADMIN_API_KEY) {
-        return { userId: 'admin', permissions: ['admin', 'user'], tier: 'enterprise' };
+    // ═══ SECURITY FIX: Timing-Safe Admin Key Comparison (CWE-208) ═══
+    // Using crypto.timingSafeEqual prevents timing side-channel attacks
+    // that could leak the admin key length or prefix via response time differences.
+    try {
+        const keyBuf = Buffer.from(key);
+        const adminBuf = Buffer.from(ADMIN_API_KEY);
+        if (keyBuf.length === adminBuf.length && crypto.timingSafeEqual(keyBuf, adminBuf)) {
+            return { userId: 'admin', permissions: ['admin', 'user'], tier: 'enterprise' };
+        }
+    } catch {
+        // Buffer comparison failed (different lengths handled above) — not admin
     }
 
     const keyHash = crypto.createHash('sha256').update(key).digest('hex');

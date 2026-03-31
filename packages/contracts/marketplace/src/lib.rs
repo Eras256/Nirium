@@ -1,3 +1,4 @@
+
 //! ═══════════════════════════════════════════════════════
 //! Nirium — Strategy Marketplace Contract (Soroban)
 //! ═══════════════════════════════════════════════════════
@@ -37,26 +38,39 @@ pub struct StrategyListing {
 pub enum DataKey {
     Admin,
     Treasury,
+    /// SECURITY FIX: Store canonical USDC token address to prevent token spoofing.
+    /// The subscribe() function previously accepted a `usdc_token: Address` parameter,
+    /// allowing attackers to pass a fake token contract that does nothing on transfer.
+    /// Now the token address is set at initialization and retrieved from storage.
+    UsdcToken,
     NextId,
     Strategy(u64),
     StrategyCount,
 }
 
-const CREATOR_SHARE_BPS: i128 = 10000; // 100%
-// Treasury share removed to avoid being classified as a financial institution in Mexico.
+const CREATOR_SHARE_BPS: i128 = 9900; // 99% to creator
+const PROTOCOL_SHARE_BPS: i128 = 100;  // 1% to protocol treasury
+
+/// ~2 years at 5s/ledger — prevents silent data expiration (SC-TTL-001)
+const TTL_LEDGERS: u32 = 1_000_000;
 
 #[contract]
 pub struct StrategyMarketplaceContract;
 
 #[contractimpl]
 impl StrategyMarketplaceContract {
-    /// Initialize with admin and treasury addresses
-    pub fn initialize(env: Env, admin: Address, treasury: Address) {
+    /// Initialize with admin, treasury, and canonical USDC token addresses.
+    /// SECURITY (SC04 — Front-Run Prevention): admin must sign this call.
+    pub fn initialize(env: Env, admin: Address, treasury: Address, usdc_token: Address) {
+        // Require admin authorization to prevent front-running initialization
+        admin.require_auth();
         if env.storage().instance().has(&DataKey::Admin) {
             panic!("Already initialized");
         }
         env.storage().instance().set(&DataKey::Admin, &admin);
         env.storage().instance().set(&DataKey::Treasury, &treasury);
+        // SECURITY: Store canonical USDC token address to prevent token spoofing in subscribe()
+        env.storage().instance().set(&DataKey::UsdcToken, &usdc_token);
         env.storage().instance().set(&DataKey::NextId, &1u64);
         env.storage().instance().set(&DataKey::StrategyCount, &0u64);
     }
@@ -89,6 +103,11 @@ impl StrategyMarketplaceContract {
         env.storage().persistent().set(&DataKey::Strategy(id), &listing);
         env.storage().instance().set(&DataKey::NextId, &(id + 1));
 
+        // TTL extension on publish (SC-TTL-001)
+        env.storage()
+            .persistent()
+            .extend_ttl(&DataKey::Strategy(id), TTL_LEDGERS, TTL_LEDGERS);
+
         let count: u64 = env.storage().instance()
             .get(&DataKey::StrategyCount).unwrap_or(0);
         env.storage().instance().set(&DataKey::StrategyCount, &(count + 1));
@@ -102,12 +121,17 @@ impl StrategyMarketplaceContract {
         id
     }
 
-    /// Subscribe to a strategy — pays fee, splits to creator + treasury
+    /// Subscribe to a strategy — pays fee, splits to creator + treasury.
+    ///
+    /// SECURITY FIX (Token Spoofing — SC04 variant):
+    /// The `usdc_token` parameter has been REMOVED. The canonical USDC token address
+    /// is now read from contract storage (set at initialization), preventing an attacker
+    /// from passing a fake token contract that implements the token interface but does
+    /// nothing on `transfer()`, effectively bypassing the payment.
     pub fn subscribe(
         env: Env,
         subscriber: Address,
         strategy_id: u64,
-        usdc_token: Address,
     ) {
         subscriber.require_auth();
 
@@ -121,17 +145,36 @@ impl StrategyMarketplaceContract {
         }
 
         let fee = listing.subscription_fee_usdc;
+        if fee <= 0 {
+            panic!("Invalid subscription fee");
+        }
+
+        // SECURITY: Read canonical token address from storage — not from caller input
+        let usdc_token: Address = env.storage().instance()
+            .get(&DataKey::UsdcToken).expect("USDC token not configured");
         let treasury: Address = env.storage().instance()
             .get(&DataKey::Treasury).expect("Not initialized");
 
-        // Transfer fee from subscriber (100% to creator)
+        // Calculate 1% protocol fee and 99% creator royalty
+        let protocol_fee = (fee * PROTOCOL_SHARE_BPS) / 10000;
+        let creator_royalty = fee - protocol_fee;
+
         let token_client = token::Client::new(&env, &usdc_token);
-        token_client.transfer(&subscriber, &listing.creator, &fee);
+
+        // Transfer 99% to creator
+        token_client.transfer(&subscriber, &listing.creator, &creator_royalty);
+        // Transfer 1% to protocol treasury
+        token_client.transfer(&subscriber, &treasury, &protocol_fee);
 
         // Update listing stats
         listing.subscriber_count += 1;
         listing.total_revenue_usdc += fee;
         env.storage().persistent().set(&key, &listing);
+
+        // TTL extension on subscribe (SC-TTL-001)
+        env.storage()
+            .persistent()
+            .extend_ttl(&key, TTL_LEDGERS, TTL_LEDGERS);
 
         // Emit subscribe event
         env.events().publish(
@@ -155,6 +198,11 @@ impl StrategyMarketplaceContract {
             .expect("Strategy not found");
         listing.elo_score = new_elo;
         env.storage().persistent().set(&key, &listing);
+
+        // TTL extension on ELO update (SC-TTL-001)
+        env.storage()
+            .persistent()
+            .extend_ttl(&key, TTL_LEDGERS, TTL_LEDGERS);
     }
 
     /// Deactivate a strategy (creator or admin only)
@@ -174,6 +222,11 @@ impl StrategyMarketplaceContract {
 
         listing.is_active = false;
         env.storage().persistent().set(&key, &listing);
+
+        // TTL extension on deactivate (SC-TTL-001)
+        env.storage()
+            .persistent()
+            .extend_ttl(&key, TTL_LEDGERS, TTL_LEDGERS);
     }
 
     /// Get a strategy listing

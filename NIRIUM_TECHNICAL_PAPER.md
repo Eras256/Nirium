@@ -19,7 +19,7 @@ A Sentinel in Nirium can be either a Human or an AI Agent. Both are tracked by t
 ## 3. On-Chain Protocol Architecture (Soroban-Native)
 
 ### 3.1 NiriumVault: Multi-Asset Orchestration Engine
-The `NiriumVault` contract (`CB67X4QCJDD4ZCKDXSW34M5H5WDUXEGOP3WKND6YSUCGPTTO4ODZ4HEN`) is the primary entry point for capital, supporting three asset types through Stellar Asset Contracts (SAC):
+The `NiriumVault` contract (`CDMNZIICSHWQMRLWOAVE5VACRY5LVTLGMB75PS3JB5KFMR6TUJXV3DHU`) is the primary entry point for capital, supporting three asset types through Stellar Asset Contracts (SAC):
 - **XLM**: Native Stellar lumens (SAC: `CDLZFC3SYJYDZT7K67VZ75HPJVIEUVNIXF47ZG2FB2RMQQVU2HHGCYSC`)
 - **USDC**: Circle USD stablecoin (SAC: `CBIELTK6YBZJU5UP2WWQEUCYKLPU6AUNZ2BQ4WWFEIE3USCIHMXQDAMA`)
 - **CETES**: Mexican Federal Treasury Certificates via Etherfuse (SAC: `CC72F57YTPX76HAA64JQOEGHQAPSADQWSY5DWVBR66JINPFDLNCQYHIC`)

@@ -1,0 +1,66 @@
+name: Security Gate — Dependency Audit
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  rust-audit:
+    name: Rust Supply Chain Audit
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Rust
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Install cargo-audit
+        run: cargo install cargo-audit --locked || true
+
+      - name: Run Cargo Audit
+        run: cargo audit --deny warnings 2>&1 || echo "::warning::Cargo audit found advisories"
+
+  node-audit:
+    name: Node.js Supply Chain Audit
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'pnpm'
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Run pnpm Audit (critical only — blocks build)
+        run: pnpm audit --audit-level=critical
+
+  contract-fuzz:
+    name: Smart Contract Fuzz Smoke Test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Rust Nightly (required for cargo-fuzz)
+        uses: dtolnay/rust-toolchain@nightly
+
+      - name: Install cargo-fuzz
+        run: cargo install cargo-fuzz --locked || true
+
+      - name: Fuzz Flash Loan (60s smoke)
+        working-directory: fuzz
+        run: cargo +nightly fuzz run fuzz_flash_loan -- -max_total_time=60 2>&1 || exit 1
+
+      - name: Fuzz Vault Create (60s smoke)
+        working-directory: fuzz
+        run: cargo +nightly fuzz run fuzz_vault_create -- -max_total_time=60 2>&1 || exit 1

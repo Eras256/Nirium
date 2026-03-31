@@ -16,6 +16,16 @@
 import express, { Request, Response, Application } from 'express';
 import cors from 'cors';
 import { createServer } from 'http';
+import {
+    helmetConfig,
+    requestSizeLimit,
+    sqlInjectionGuard,
+    promptInjectionGuard,
+    xdrValidator,
+    stellarAddressValidator,
+    cryptoCurveValidator,
+    rateLimitPerMinute,
+} from './middleware/security.js';
 
 import {
     authMiddleware,
@@ -89,6 +99,34 @@ app.use(cors({
 }));
 
 app.use(express.json({ limit: '10mb' }));
+
+// ═══════════════════════════════════════════════════════════════
+// SECURITY MIDDLEWARE — applied before all route handlers
+// ═══════════════════════════════════════════════════════════════
+
+// 1. Harden HTTP response headers
+app.use(helmetConfig());
+
+// 2. Block oversized payloads (belt-and-suspenders on top of express.json limit)
+app.use(requestSizeLimit(10 * 1024 * 1024)); // 10 MiB
+
+// 3. Block SQL injection in body / query / params
+app.use(sqlInjectionGuard());
+
+// 4. Sanitize LLM prompt inputs
+app.use(promptInjectionGuard());
+
+// 5. Validate any XDR fields in request bodies
+app.use(xdrValidator());
+
+// 6. Validate Stellar G-addresses in request bodies
+app.use(stellarAddressValidator());
+
+// 7. Validate Ed25519 signature/key fields (CVE-2026-32323 curve confusion)
+app.use(cryptoCurveValidator());
+
+// 8. Per-minute sliding window rate limiter (supplements tier-based daily quotas)
+app.use(rateLimitPerMinute(120));
 
 const standardLimiter = createRateLimiter('standard');
 const aggressiveLimiter = createRateLimiter('aggressive');
@@ -175,6 +213,15 @@ app.post('/api/auth/token', standardLimiter, (req: Request, res: Response) => {
         return;
     }
 
+    // SECURITY FIX (OWASP API2): Validate Stellar address format before issuing JWT
+    if (typeof walletAddress !== 'string' || !/^G[A-Z2-7]{55}$/.test(walletAddress)) {
+        res.status(400).json({
+            error: 'Invalid Stellar wallet address',
+            hint: 'Must be a valid Stellar public key starting with G (56 chars, base32)',
+        });
+        return;
+    }
+
     // In production: verify the Stellar signature against the public key
     // For now, issue a token for any valid-looking address
     const token = generateToken(walletAddress, ['user'], 'free');
@@ -193,28 +240,56 @@ app.post('/api/auth/token', standardLimiter, (req: Request, res: Response) => {
 
 app.post('/api/auth/keys', authMiddleware as any, async (req: Request, res: Response) => {
     const authReq = req as AuthenticatedRequest;
-    const { name, tier } = req.body;
+    const { name, tier: requestedTier } = req.body;
+
+    // ═══ SECURITY FIX: Tier Escalation Prevention (OWASP API3) ═══
+    // Users cannot self-elevate to a higher tier than their current auth tier.
+    // Only admins can issue keys of any tier. Everyone else is capped at their own tier.
+    const TIER_RANK: Record<string, number> = { free: 0, sandbox: 1, institutional: 2, enterprise: 3 };
+    const callerTier = authReq.user!.tier;
+    const isAdmin = authReq.user!.permissions.includes('admin');
+
+    let resolvedTier = (requestedTier as string) || callerTier || 'free';
+    if (!isAdmin) {
+        const requestedRank = TIER_RANK[resolvedTier] ?? 0;
+        const callerRank = TIER_RANK[callerTier] ?? 0;
+        if (requestedRank > callerRank) {
+            res.status(403).json({
+                error: 'Forbidden',
+                message: `Cannot create a key with tier '${resolvedTier}' — your current tier is '${callerTier}'.`,
+                hint: 'Contact institutional@nirium.xyz to upgrade your account.',
+            });
+            return;
+        }
+    }
+
+    // Validate tier is a known value
+    const VALID_TIERS = ['free', 'sandbox', 'institutional', 'enterprise'];
+    if (!VALID_TIERS.includes(resolvedTier)) {
+        res.status(400).json({ error: 'Invalid tier. Must be: free | sandbox | institutional | enterprise' });
+        return;
+    }
 
     try {
         const apiKey = await generateApiKey(
             authReq.user!.userId,
             name || 'Default Key',
             ['user'],
-            tier || authReq.user!.tier || 'free'
+            resolvedTier as any
         );
 
-        broadcastLog('info', `[Auth] API key generated for ${authReq.user!.userId}`);
+        broadcastLog('info', `[Auth] API key generated for ${authReq.user!.userId} (tier: ${resolvedTier})`);
 
         res.json({
             success: true,
             apiKey,
             name: name || 'Default Key',
-            tier: tier || authReq.user!.tier || 'free',
+            tier: resolvedTier,
             message: 'Store this key securely — it will not be shown again.',
         });
     } catch (error) {
         console.error('[Auth] Key generation failed:', error);
-        res.status(500).json({ error: 'Failed to generate API key (v1.0.2-fix)' });
+        res.status(500).json({ error: 'Failed to generate API key' });
     }
 });
 

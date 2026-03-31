@@ -64,6 +64,8 @@ pub enum DataKey {
     PoolFeeBps(u64),
     TotalFeesCollected,
     AdminAddress,
+    /// Emergency pause flag — checked on every state-mutating function
+    Paused,
 }
 
 // ═══════════════════════════════════════════════════════════════
@@ -125,16 +127,91 @@ pub struct MockPool {
 // CONTRACT
 // ═══════════════════════════════════════════════════════════════
 
+// ═══════════════════════════════════════════════════════════════
+// TTL CONSTANT
+// ═══════════════════════════════════════════════════════════════
+
+/// ~2 years at 5s/ledger — used for all persistent storage TTL extensions
+const TTL_LEDGERS: u32 = 1_000_000;
+
 #[contract]
 pub struct NiriumVaultContract;
 
 #[contractimpl]
 impl NiriumVaultContract {
+    // ─── Emergency Pause (IR-001) ────────────────────────────
+
+    /// Check that the contract is not paused. Called at the top of every
+    /// state-mutating function. Panics if paused.
+    fn check_not_paused(env: &Env) {
+        let paused: bool = env
+            .storage()
+            .instance()
+            .get(&DataKey::Paused)
+            .unwrap_or(false);
+        if paused {
+            panic!("contract is paused — emergency stop active");
+        }
+    }
+
+    /// Emergency pause — immediately freezes all state-mutating operations.
+    /// Only the admin can call this. Agents and users are blocked instantly.
+    pub fn pause(env: Env, admin: Address) {
+        let stored_admin: Address = env
+            .storage()
+            .instance()
+            .get(&DataKey::AdminAddress)
+            .expect("not initialized");
+        admin.require_auth();
+        if admin != stored_admin {
+            panic!("only admin can pause");
+        }
+        env.storage().instance().set(&DataKey::Paused, &true);
+        env.events().publish(
+            (symbol_short!("system"), symbol_short!("paused")),
+            true,
+        );
+    }
+
+    /// Unpause — resumes normal operations. Only the admin can call this.
+    pub fn unpause(env: Env, admin: Address) {
+        let stored_admin: Address = env
+            .storage()
+            .instance()
+            .get(&DataKey::AdminAddress)
+            .expect("not initialized");
+        admin.require_auth();
+        if admin != stored_admin {
+            panic!("only admin can unpause");
+        }
+        env.storage().instance().set(&DataKey::Paused, &false);
+        env.events().publish(
+            (symbol_short!("system"), symbol_short!("resumed")),
+            false,
+        );
+    }
+
+    /// Query whether the contract is currently paused.
+    pub fn is_paused(env: Env) -> bool {
+        env.storage()
+            .instance()
+            .get(&DataKey::Paused)
+            .unwrap_or(false)
+    }
     // ─── Initialization ──────────────────────────────────────
 
     /// Initialize the contract with a treasury address for fee collection
     /// and an admin address for privileged operations.
+    ///
+    /// SECURITY (SC04 — Front-Run Prevention):
+    /// `admin` must sign this transaction. Without this requirement, an attacker
+    /// could call initialize() immediately after deployment (in the same or next
+    /// ledger) and set a malicious treasury, hijacking all platform fees.
     pub fn initialize(env: Env, treasury: Address, admin: Address) {
+        // Require the designated admin to authorize initialization.
+        // This prevents front-running: only the intended admin can set the treasury.
+        admin.require_auth();
+
         if env.storage().instance().has(&DataKey::Treasury) {
             panic!("already initialized");
         }
@@ -152,6 +229,7 @@ impl NiriumVaultContract {
     /// Create a new vault. The caller becomes the owner.
     /// A deployment fee is collected and sent to the treasury.
     pub fn create_vault(env: Env, owner: Address, token_address: Address, name: String, xlm_address: Address) -> Vault {
+        Self::check_not_paused(&env);
         owner.require_auth();
 
         // Platform fee: 12.5 XLM (always charged in XLM regardless of Vault's base currency)
@@ -193,6 +271,19 @@ impl NiriumVaultContract {
             .set(&DataKey::VaultBalance(vault_id), &0i128);
         env.storage().instance().set(&DataKey::VaultCount, &vault_id);
 
+        // SECURITY FIX — Storage TTL Extension:
+        // Soroban persistent storage entries expire after ~1 year (535,000 ledgers at ~5s/ledger).
+        // Without calling extend_ttl(), vault and balance entries would silently disappear,
+        // causing all future operations on this vault to panic with "vault not found".
+        // We extend TTL to ~2 years (TTL_LEDGERS) on creation.
+        // TTL is also extended on every deposit/withdraw/delegate interaction.
+        env.storage()
+            .persistent()
+            .extend_ttl(&DataKey::Vault(vault_id), TTL_LEDGERS, TTL_LEDGERS);
+        env.storage()
+            .persistent()
+            .extend_ttl(&DataKey::VaultBalance(vault_id), TTL_LEDGERS, TTL_LEDGERS);
+
         env.events().publish(
             (symbol_short!("vault"), symbol_short!("created")),
             (vault_id, owner, name),
@@ -203,6 +294,7 @@ impl NiriumVaultContract {
 
     /// Deposit assets into a vault. Only the vault owner can deposit.
     pub fn deposit(env: Env, vault_id: u64, amount: i128) {
+        Self::check_not_paused(&env);
         if amount <= 0 {
             panic!("amount must be positive");
         }
@@ -231,6 +323,14 @@ impl NiriumVaultContract {
             .persistent()
             .set(&DataKey::VaultBalance(vault_id), &new_balance);
 
+        // TTL extension on every deposit interaction (SC-TTL-001)
+        env.storage()
+            .persistent()
+            .extend_ttl(&DataKey::Vault(vault_id), TTL_LEDGERS, TTL_LEDGERS);
+        env.storage()
+            .persistent()
+            .extend_ttl(&DataKey::VaultBalance(vault_id), TTL_LEDGERS, TTL_LEDGERS);
+
         env.events().publish(
             (symbol_short!("vault"), symbol_short!("deposit")),
             (vault_id, amount, new_balance),
@@ -240,6 +340,7 @@ impl NiriumVaultContract {
     /// Withdraw assets from a vault. Only the vault owner can withdraw.
     /// Agents CANNOT call this function.
     pub fn withdraw(env: Env, vault_id: u64, amount: i128) {
+        Self::check_not_paused(&env);
         if amount <= 0 {
             panic!("amount must be positive");
         }
@@ -273,6 +374,14 @@ impl NiriumVaultContract {
             .persistent()
             .set(&DataKey::VaultBalance(vault_id), &new_balance);
 
+        // TTL extension on every withdraw interaction (SC-TTL-001)
+        env.storage()
+            .persistent()
+            .extend_ttl(&DataKey::Vault(vault_id), TTL_LEDGERS, TTL_LEDGERS);
+        env.storage()
+            .persistent()
+            .extend_ttl(&DataKey::VaultBalance(vault_id), TTL_LEDGERS, TTL_LEDGERS);
+
         env.events().publish(
             (symbol_short!("vault"), symbol_short!("withdraw")),
             (vault_id, amount, new_balance),
@@ -303,6 +412,7 @@ impl NiriumVaultContract {
         agent_address: Address,
         max_execution_amount: i128,
     ) -> AgentDelegation {
+        Self::check_not_paused(&env);
         let vault: Vault = env
             .storage()
             .persistent()
