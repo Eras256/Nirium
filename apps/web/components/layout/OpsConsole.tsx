@@ -32,12 +32,13 @@ export default function OpsConsole({ isExpanded, onToggleExpand, walletAddress }
                 .order('timestamp', { ascending: false })
                 .limit(50);
 
-            if (data && !error && data.length > 0) {
+            const rows = data as any[] | null;
+            if (rows && !error && rows.length > 0) {
                 // Only update if we got new data
-                const newestTimestamp = data[0]?.timestamp;
+                const newestTimestamp = rows[0]?.timestamp;
                 if (newestTimestamp !== lastTimestampRef.current) {
                     lastTimestampRef.current = newestTimestamp;
-                    setLogs(data.reverse());
+                    setLogs(rows.reverse());
                     setStatus('online');
                 }
             }
