@@ -7,3 +7,7 @@ packages/sdk-python
 packages/desktop
 *.log
 *.sql
+target/
+tests/
+fuzz/
+.git/

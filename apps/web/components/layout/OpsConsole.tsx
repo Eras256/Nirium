@@ -1,106 +1,96 @@
 "use client";
 
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import { Terminal, Maximize2, Minimize2 } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { supabase } from '@/lib/supabase';
-import { writeLog } from '@/lib/logger';
+
+const DEMO_LOGS = [
+    { agent_id: 'Matrix', message: 'Neural Matrix Uplink established. Swarm broadcasting on-chain...', level: 'system', timestamp: new Date().toISOString() },
+    { agent_id: 'Titan', message: 'Vault architecture synchronized — 3 asset classes active', level: 'info', timestamp: new Date().toISOString() },
+    { agent_id: 'Chronos', message: 'Temporal arbitrage scan: 12 opportunities identified', level: 'info', timestamp: new Date().toISOString() },
+    { agent_id: 'Astra', message: 'DeFindex USDC yield route optimized — APY 14.2%', level: 'success', timestamp: new Date().toISOString() },
+    { agent_id: 'Gaia', message: 'Blend CETES farm deposit confirmed — 500 CETES staked', level: 'success', timestamp: new Date().toISOString() },
+    { agent_id: 'Orion', message: 'Soroswap XLM/USDC pair liquidity depth: $42,817', level: 'info', timestamp: new Date().toISOString() },
+    { agent_id: 'Sentinel', message: 'Vault audit passed — all storage TTLs within threshold', level: 'success', timestamp: new Date().toISOString() },
+    { agent_id: 'Nexus', message: 'Inter-agent signal relay: 30 agents online, consensus reached', level: 'system', timestamp: new Date().toISOString() },
+];
 
 export default function OpsConsole({ isExpanded, onToggleExpand, walletAddress }: { isExpanded: boolean, onToggleExpand: () => void, walletAddress?: string }) {
-    const [logs, setLogs] = useState<any[]>([]);
-    const [status, setStatus] = useState<'connecting' | 'online' | 'unavailable'>('connecting');
+    const [logs, setLogs] = useState<any[]>(DEMO_LOGS);
+    const [status, setStatus] = useState<'connecting' | 'online' | 'unavailable'>('online');
     const logContainerRef = useRef<HTMLDivElement>(null);
+    const lastTimestampRef = useRef<string | null>(null);
+
+    // Fetch logs from Supabase via REST (polling — works without Realtime enabled)
+    const fetchLogs = useCallback(async () => {
+        if (!supabase) return;
+        try {
+            const { data, error } = await supabase
+                .from('logs')
+                .select('*')
+                .order('timestamp', { ascending: false })
+                .limit(50);
+
+            if (data && !error && data.length > 0) {
+                // Only update if we got new data
+                const newestTimestamp = data[0]?.timestamp;
+                if (newestTimestamp !== lastTimestampRef.current) {
+                    lastTimestampRef.current = newestTimestamp;
+                    setLogs(data.reverse());
+                    setStatus('online');
+                }
+            }
+            // If data is empty, keep showing whatever we already have (demo or previous real data)
+        } catch (e) {
+            console.warn('[Neural Feed] Fetch error (will retry):', e);
+        }
+    }, []);
 
     useEffect(() => {
-        // ... (existing Supabase logic remains same)
-        // Guard: if Supabase is not configured, show graceful message
         if (!supabase) {
             setStatus('unavailable');
             return;
         }
-        const db = supabase;
 
-        // Initial fetch of recent logs from the swarm logs table
-        const DEMO_LOGS = [
-            { agent_id: 'Matrix', message: 'Neural Matrix Uplink established. Swarm broadcasting on-chain...', level: 'system', timestamp: new Date().toISOString() },
-            { agent_id: 'Titan', message: 'Vault architecture synchronized — 3 asset classes active', level: 'info', timestamp: new Date().toISOString() },
-            { agent_id: 'Chronos', message: 'Temporal arbitrage scan: 12 opportunities identified', level: 'info', timestamp: new Date().toISOString() },
-            { agent_id: 'Astra', message: 'DeFindex USDC yield route optimized — APY 14.2%', level: 'success', timestamp: new Date().toISOString() },
-            { agent_id: 'Gaia', message: 'Blend CETES farm deposit confirmed — 500 CETES staked', level: 'success', timestamp: new Date().toISOString() },
-            { agent_id: 'Orion', message: 'Soroswap XLM/USDC pair liquidity depth: $42,817', level: 'info', timestamp: new Date().toISOString() },
-            { agent_id: 'Sentinel', message: 'Vault audit passed — all storage TTLs within threshold', level: 'success', timestamp: new Date().toISOString() },
-            { agent_id: 'Nexus', message: 'Inter-agent signal relay: 30 agents online, consensus reached', level: 'system', timestamp: new Date().toISOString() },
-        ];
+        // Initial fetch
+        fetchLogs();
 
-        const fetchInitialLogs = async () => {
-            try {
-                const { data, error } = await db
-                    .from('logs')
-                    .select('*')
-                    .order('timestamp', { ascending: false })
-                    .limit(50);
+        // Poll every 5 seconds — reliable regardless of Realtime configuration
+        const pollInterval = setInterval(fetchLogs, 5000);
 
-                if (data && !error && data.length > 0) {
-                    setLogs(data.reverse()); // oldest first
-                    setStatus('online');
-                } else {
-                    // Table exists but is empty — show demo logs until real data arrives
-                    setLogs(DEMO_LOGS);
-                    setStatus('online');
-                }
-            } catch (e) {
-                console.error("Failed to fetch initial logs", e);
-                // Even on error, show demo logs so the feed isn't dead
-                setLogs(DEMO_LOGS);
-                setStatus('online');
-            }
-        };
-        fetchInitialLogs();
-
-        // Realtime subscription for new logs in the swarm logs table
-        const channel = db
-            .channel(`realtime-ops-console-global`)
-            .on(
-                'postgres_changes',
-                {
-                    event: 'INSERT',
-                    schema: 'public',
-                    table: 'logs'
-                },
-                (payload) => {
-                    const newLog = payload.new as any;
-                    
-                    // Fallback: if we are getting data, we are online
-                    if (status !== 'online') setStatus('online');
-
-                    setLogs(prev => {
-                        const exists = prev.some(l => l.id === payload.new.id);
-                        if (exists) return prev;
-                        return [...prev, newLog].slice(-50);
-                    });
-                }
-            )
-            .subscribe((status, err) => {
-                if (status === 'SUBSCRIBED') {
-                    setStatus('online');
-                } else if (status === 'CLOSED' || status === 'CHANNEL_ERROR' || status === 'TIMED_OUT') {
-                    // Transient disconnects are normal — only warn, don't error
-                    console.warn(`[Supabase Realtime] ${status} (will auto-reconnect)`);
-                    // Keep 'online' status if we already loaded logs via REST
-                    setLogs(prev => {
-                        if (prev.length === 0) setStatus('unavailable');
-                        return prev;
-                    });
-                }
-            });
+        // Also try Realtime subscription as a bonus (instant updates if enabled)
+        let channel: any = null;
+        try {
+            channel = supabase
+                .channel('realtime-ops-console')
+                .on(
+                    'postgres_changes',
+                    { event: 'INSERT', schema: 'public', table: 'logs' },
+                    (payload) => {
+                        const newLog = payload.new as any;
+                        setStatus('online');
+                        setLogs(prev => {
+                            const exists = prev.some(l => l.id === newLog.id);
+                            if (exists) return prev;
+                            return [...prev, newLog].slice(-50);
+                        });
+                    }
+                )
+                .subscribe();
+        } catch {
+            // Realtime not available — polling handles it
+        }
 
         return () => {
-            console.log(`[Supabase Realtime] Cleaning up channel...`);
-            db.removeChannel(channel);
+            clearInterval(pollInterval);
+            if (channel && supabase) {
+                supabase.removeChannel(channel);
+            }
         };
-    }, []);
+    }, [fetchLogs]);
 
-    // Secure scroll: only scroll the container, not the window
+    // Auto-scroll to bottom
     useEffect(() => {
         if (logContainerRef.current) {
             logContainerRef.current.scrollTop = logContainerRef.current.scrollHeight;
@@ -148,16 +138,13 @@ export default function OpsConsole({ isExpanded, onToggleExpand, walletAddress }
                             No database connection. Check Supabase configuration.
                         </div>
                     )}
-                    {status === 'connecting' && logs.length === 0 && (
-                        <div className="text-gray-600 italic">Establishing Neural Uplink...</div>
-                    )}
                     {logs.map((log, i) => {
-                        const parts = log.message.split('|');
+                        const parts = (log.message || '').split('|');
                         const mainMsg = parts[0];
                         const hashPart = parts[1];
 
                         return (
-                            <div key={i} className="break-all flex flex-wrap gap-x-1 items-start leading-relaxed">
+                            <div key={log.id || i} className="break-all flex flex-wrap gap-x-1 items-start leading-relaxed">
                                 <span className="text-gray-600">[{new Date(log.timestamp).toLocaleTimeString()}]</span>
                                 <span className={`${log.level === 'error' ? 'text-red-500' :
                                     log.level === 'warn' ? 'text-yellow-500' :

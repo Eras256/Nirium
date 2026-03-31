@@ -62,19 +62,19 @@ export default function Home() {
 
     useEffect(() => {
         const client = supabase;
+        const FALLBACK_LOGS = [
+            "[Matrix] Neural Matrix Uplink established. Swarm broadcasting on-chain...",
+            "[Titan] Vault architecture synchronized — 3 asset classes active",
+            "[Astra] DeFindex USDC yield route optimized — APY 14.2%",
+        ];
+
         if (!client) {
-            // Fallback for local development without Supabase
-            const initialLogs = [
-                "Initializing Nirium Neural Kernel...",
-                "Establishing Stellar Horizon Uplink...",
-                "Uplink Status: OPERATIONAL — All systems nominal."
-            ];
-            setAgentLog(initialLogs);
+            setAgentLog(FALLBACK_LOGS);
             return;
         }
 
-        // Fetch historic logs
-        const fetchInitialLogs = async () => {
+        // Fetch logs via REST polling (reliable without Realtime enabled)
+        const fetchLogs = async () => {
             try {
                 const { data } = await client
                     .from('logs')
@@ -85,28 +85,21 @@ export default function Home() {
                 if (data && data.length > 0) {
                     setAgentLog(data.map((l: any) => `[${l.agent_id}] ${l.message}`).reverse());
                 }
+                // If empty, keep whatever is currently shown
             } catch (e) {
-                console.error("Failed to load initial logs", e);
+                console.warn("[Neural Feed] fetch error:", e);
             }
         };
-        fetchInitialLogs();
 
-        // Subscribe to NEW logs
-        const channel = client
-            .channel('log_feed')
-            .on(
-                'postgres_changes',
-                { event: 'INSERT', schema: 'public', table: 'logs' },
-                (payload) => {
-                    const newLog = payload.new as any;
-                    const logMessage = `[${newLog.agent_id}] ${newLog.message}`;
-                    setAgentLog(prev => [...prev, logMessage].slice(-8));
-                }
-            )
-            .subscribe();
+        // Show fallback immediately, then replace with real data
+        setAgentLog(FALLBACK_LOGS);
+        fetchLogs();
+
+        // Poll every 5 seconds
+        const pollInterval = setInterval(fetchLogs, 5000);
 
         return () => {
-            client.removeChannel(channel);
+            clearInterval(pollInterval);
         };
     }, []);
 
