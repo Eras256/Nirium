@@ -213,7 +213,8 @@ app.post('/api/auth/keys', authMiddleware as any, async (req: Request, res: Resp
             message: 'Store this key securely — it will not be shown again.',
         });
     } catch (error) {
-        res.status(500).json({ error: 'Failed to generate API key' });
+        console.error('[Auth] Key generation failed:', error);
+        res.status(500).json({ error: 'Failed to generate API key (v1.0.2-fix)' });
     }
 });
 
