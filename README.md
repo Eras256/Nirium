@@ -128,6 +128,17 @@ Nirium/
 
 ---
 
+## 🌐 Institutional API Infrastructure (`api.nirium.xyz`)
+
+> [!NOTE]
+> Following our graduation from the **Stellar Scale Program** and the signing of our first **Institutional NBO**, we have opened our production API gateway to enable our institutional partners to conduct deep technical due diligence and live pilot testing.
+
+Nirium provides a high-availability, low-latency API gateway designed for both **Free Tier** experimentation and **Enterprise-Grade** institutional orchestration.
+
+-   **Endpoint:** `https://api.nirium.xyz`
+-   **Capabilities:** Full access to Strategy Hub, Real-time Market Data, Webhook HMAC notifications, and Agent Execution Enclaves.
+-   **Scalability:** Multi-cluster deployment on Railway with automatic path-based scaling.
+
 ## 📦 Official Integration SDKs
 
 To simplify institutional integration, Nirium provides official, light-weight SDKs for the most common enterprise environments:
