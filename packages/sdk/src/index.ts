@@ -8,6 +8,8 @@ export interface AgentConfig {
     apiKey: string;
     baseUrl?: string;
     wsUrl?: string;
+    /** JWT token for WebSocket auth (obtained from /api/auth/token) */
+    token?: string;
 }
 
 export interface Signal {
@@ -145,10 +147,13 @@ export class Agent {
     private signalCallbacks: Array<(signal: Signal) => void> = [];
     private logCallbacks: Array<(log: Record<string, unknown>) => void> = [];
 
+    private token: string | null = null;
+
     constructor(config: AgentConfig) {
         this.apiKey = config.apiKey;
         this.baseUrl = (config.baseUrl || 'http://localhost:3001').replace(/\/$/, '');
         this.wsUrl = config.wsUrl || this.baseUrl.replace(/^http/, 'ws') + '/ws/signals';
+        this.token = config.token || null;
     }
 
     // ─── HTTP Methods ────────────────────────────────────────
@@ -277,7 +282,7 @@ export class Agent {
 
     /** Uninstall a user-installed skill by slug. */
     async uninstallSkill(slug: string): Promise<{ success: boolean }> {
-        return this.request('POST', '/api/skills/uninstall', { slug });
+        return this.request('DELETE', `/api/skills/${slug}`);
     }
 
     // ─── Webhooks ────────────────────────────────────────────
@@ -331,7 +336,8 @@ export class Agent {
     private connectWebSocket(subscriptionId?: string): void {
         if (this.ws?.readyState === WebSocket.OPEN) return;
 
-        this.ws = new WebSocket(this.wsUrl);
+        const authQuery = this.token ? `?token=${this.token}` : '';
+        this.ws = new WebSocket(`${this.wsUrl}${authQuery}`);
 
         this.ws.on('open', () => {
             console.log('[Nirium SDK] WebSocket connected');

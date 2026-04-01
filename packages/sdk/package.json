@@ -1,10 +1,13 @@
 {
-    "name": "@nirium/sdk",
-    "version": "0.1.0",
-    "description": "Official TypeScript SDK for the Nirium autonomous DeFi agent",
+    "name": "nirium",
+    "version": "0.2.1",
+    "description": "Official TypeScript SDK for the Nirium autonomous DeFi agent on Stellar",
     "main": "dist/index.js",
-    "module": "dist/index.mjs",
     "types": "dist/index.d.ts",
+    "files": [
+        "dist",
+        "README.md"
+    ],
     "scripts": {
         "build": "tsc",
         "dev": "tsc --watch",
@@ -26,9 +29,5 @@
         "soroban",
         "agent"
     ],
-    "license": "MIT",
-    "repository": {
-        "type": "git",
-        "url": "https://github.com/nirium/nirium"
-    }
+    "license": "MIT"
 }

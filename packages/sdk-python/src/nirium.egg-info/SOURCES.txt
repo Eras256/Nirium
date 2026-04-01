@@ -1,0 +1,10 @@
+README.md
+pyproject.toml
+setup.py
+src/nirium/__init__.py
+src/nirium/client.py
+src/nirium.egg-info/PKG-INFO
+src/nirium.egg-info/SOURCES.txt
+src/nirium.egg-info/dependency_links.txt
+src/nirium.egg-info/requires.txt
+src/nirium.egg-info/top_level.txt

@@ -2,10 +2,12 @@ export interface AgentConfig {
     apiKey: string;
     baseUrl?: string;
     wsUrl?: string;
+    /** JWT token for WebSocket auth (obtained from /api/auth/token) */
+    token?: string;
 }
 export interface Signal {
     id: string;
-    type: string;
+    signal_type: string;
     pair: string;
     data: {
         expectedProfit: number;
@@ -40,17 +42,18 @@ export interface MarketState {
     xlmPrice: number;
     /** Stellar base fee in stroops */
     baseFee: number;
-    lastUpdate: string;
+    /** Best bid/ask spread on the native SDEX in basis points */
+    sdexSpread: number;
+    /** Soroswap AMM pool depth (XLM/USDC) */
+    soroswapPoolDepth: number;
     blendApy: {
         supply: number;
         borrow: number;
     };
-    soroswapPoolDepth: number;
-    /** Best bid/ask spread on the native SDEX in basis points */
-    sdexSpread: number;
     /** Discovered profitable multi-hop paths from Horizon */
     pathPaymentRoutes: PathPaymentRoute[];
-    network: string;
+    /** ISO timestamp of when market data was fetched */
+    timestamp: string;
 }
 export interface LoopStatus {
     isRunning: boolean;
@@ -59,6 +62,50 @@ export interface LoopStatus {
     marketState: MarketState | null;
     config: Record<string, unknown>;
     lastAiDecision: Record<string, unknown> | null;
+}
+export interface SystemHealth {
+    agent: {
+        healthy: boolean;
+        uptime: number;
+    };
+    horizon: {
+        healthy: boolean;
+        latencyMs?: number;
+        error?: string;
+    };
+    soroban: {
+        healthy: boolean;
+        latencyMs?: number;
+        error?: string;
+    };
+    websocket: {
+        healthy: boolean;
+        clients: number;
+    };
+    ipfs: {
+        gateway: string;
+    };
+    llm: {
+        provider: string;
+        model: string;
+    };
+}
+export interface Webhook {
+    id: string;
+    url: string;
+    events: string[];
+    active: boolean;
+    createdAt: string;
+    lastTriggeredAt?: string;
+    failureCount: number;
+}
+export interface Skill {
+    slug: string;
+    name: string;
+    version: string;
+    description?: string;
+    isBuiltIn: boolean;
+    installedAt?: string;
 }
 export interface SubscriptionOptions {
     signal_types?: string[];
@@ -82,17 +129,17 @@ export interface SubscriptionOptions {
  * const healthy = await agent.ping();
  * console.log('Agent alive:', healthy);
  *
- * // Get market data
+ * // Get market data (REAL data from Horizon)
  * const market = await agent.getMarket();
  * console.log('XLM Price:', market.xlmPrice);
  *
  * // Execute a strategy
- * const result = await agent.execute('flash-loan-arb', 'XLM', { amount: 5000 });
+ * const result = await agent.execute('flash-loan-arb', 'XLM-USDC', { amount: 5000 });
  * console.log('Profit:', result.profit);
  *
  * // Subscribe to real-time signals
  * agent.subscribe((signal) => {
- *   console.log('Signal:', signal.type, signal.data.details);
+ *   console.log('Signal:', signal.signal_type, signal.data.details);
  * });
  * ```
  */
@@ -105,19 +152,25 @@ export declare class Agent {
     private maxReconnectAttempts;
     private signalCallbacks;
     private logCallbacks;
+    private token;
     constructor(config: AgentConfig);
     private request;
     /** Health check — returns true if agent is reachable. */
     ping(): Promise<boolean>;
     /** Detailed health information. */
     health(): Promise<Record<string, unknown>>;
-    /** Detailed system health (Horizon, Soroban, WebSocket, IPFS). */
-    systemHealth(): Promise<Record<string, unknown>>;
-    /** Execute a strategy (routed through Testnet/Mainnet). */
+    /** Detailed system health (Horizon, Soroban, WebSocket, IPFS, LLM). */
+    systemHealth(): Promise<SystemHealth>;
+    /**
+     * Execute a strategy (routed to actual Soroban contract).
+     * Strategy names: flash-loan-arb, path-arbitrage, cross-dex, blend-yield, soroswap-swap
+     */
     execute(strategy: string, asset: string, params?: Record<string, unknown>): Promise<ExecutionResult>;
-    /** Demo execution (rate-limited, public). */
+    /**
+     * Demo execution (Soroban dry-run simulation, no TX submitted).
+     */
     executeDemo(strategy: string, asset: string): Promise<ExecutionResult>;
-    /** Get current market state. */
+    /** Get current market state (real data from Horizon). */
     getMarket(): Promise<MarketState>;
     /** Get autonomous loop status. */
     getLoopStatus(): Promise<LoopStatus>;
@@ -142,13 +195,30 @@ export declare class Agent {
     getRecentSignals(count?: number): Promise<{
         signals: Signal[];
     }>;
-    /** List all loaded skills. */
+    /** List all loaded skills (built-in + user-installed). */
     getSkills(): Promise<{
-        skills: Record<string, unknown>[];
+        skills: Skill[];
         total: number;
     }>;
-    /** Install a skill from source. */
-    installSkill(source: string): Promise<Record<string, unknown>>;
+    /** Install a skill by slug. */
+    installSkill(source: string): Promise<Skill>;
+    /** Uninstall a user-installed skill by slug. */
+    uninstallSkill(slug: string): Promise<{
+        success: boolean;
+    }>;
+    /** Register a webhook endpoint. */
+    registerWebhook(url: string, events: string[], secret?: string): Promise<Webhook>;
+    /** List all registered webhooks. */
+    getWebhooks(): Promise<Webhook[]>;
+    /** Delete a webhook by ID. */
+    deleteWebhook(id: string): Promise<{
+        success: boolean;
+    }>;
+    /** Test a webhook (sends a test event). */
+    testWebhook(id: string): Promise<{
+        success: boolean;
+        message: string;
+    }>;
     /**
      * Subscribe to real-time signals via WebSocket.
      * Optionally filter by subscription ID.

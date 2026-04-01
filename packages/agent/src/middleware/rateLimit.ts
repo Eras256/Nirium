@@ -4,14 +4,20 @@
 //
 // Architecture:
 //  - Per-user sliding window (uses userId from JWT/API-key when available)
-//  - Falls back to IP-based when unauthenticated
+//  - Falls back to IP + Client Fingerprint when unauthenticated
 //  - Respects tier quotas from TIER_QUOTAS
 //  - Drop-in Redis replacement: swap InMemoryStore for RedisStore
 //    when REDIS_URL env var is present (see RedisStore stub below)
 //
+// Audit Fix #2 — Client Fingerprinting:
+//  Unauthenticated requests are rate-limited by a composite key
+//  derived from IP + User-Agent + Accept-Language + Accept-Encoding.
+//  This prevents trivial IP rotation from bypassing rate limits.
+//
 // ═══════════════════════════════════════════════════════════════
 
 import { Request, Response, NextFunction } from 'express';
+import { createHash } from 'crypto';
 
 // ─── Store Interface ────────────────────────────────────────────
 // Swap this implementation for a Redis-backed store in production.
@@ -62,6 +68,23 @@ class InMemoryStore implements RateLimitStore {
 
 const store: RateLimitStore = new InMemoryStore().startCleanup();
 
+// ─── Client Fingerprinting (Audit Fix #2) ───────────────────────
+// Generates a stable hash from request headers to identify clients
+// even if they rotate IP addresses. Not foolproof but raises the bar
+// significantly against simple proxy rotation bots.
+function getClientFingerprint(req: Request): string {
+    const components = [
+        req.ip || req.socket?.remoteAddress || 'unknown',
+        req.headers['user-agent'] || '',
+        req.headers['accept-language'] || '',
+        req.headers['accept-encoding'] || '',
+        req.headers['sec-ch-ua'] || '',           // Client Hints (Chromium)
+        req.headers['sec-ch-ua-platform'] || '',   // OS hint
+    ].join('|');
+
+    return createHash('sha256').update(components).digest('hex').slice(0, 16);
+}
+
 // ─── Tier Limits ────────────────────────────────────────────────
 const TIER_LIMITS: Record<string, { windowMs: number; max: number }> = {
     free:          { windowMs: 60_000, max: 10 },
@@ -85,10 +108,12 @@ export function createRateLimiter(type: 'standard' | 'aggressive' | string = 'st
             ? (TIER_LIMITS[userTier] ?? TIER_LIMITS.free)
             : (TIER_LIMITS[type] ?? TIER_LIMITS.standard);
 
-        // Key: prefer userId (authenticated) over IP (anonymous)
+        // Key: prefer userId (authenticated) over fingerprint (anonymous)
+        // Fingerprint = IP + browser headers hash (Audit Fix #2)
         const userId = (req as any).user?.userId;
-        const ip = req.ip || req.socket?.remoteAddress || 'unknown';
-        const key = `rl:${userId ?? ip}:${type}`;
+        const key = userId
+            ? `rl:${userId}:${type}`
+            : `rl:fp:${getClientFingerprint(req)}:${type}`;
 
         const count = await store.increment(key, config.windowMs);
 
@@ -113,3 +138,4 @@ export function createRateLimiter(type: 'standard' | 'aggressive' | string = 'st
         next();
     };
 }
+

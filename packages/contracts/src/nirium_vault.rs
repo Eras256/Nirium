@@ -66,6 +66,9 @@ pub enum DataKey {
     AdminAddress,
     /// Emergency pause flag — checked on every state-mutating function
     Paused,
+    /// Multisig cosigners for emergency operations (2-of-3 pattern)
+    Cosigner1,
+    Cosigner2,
 }
 
 // ═══════════════════════════════════════════════════════════════
@@ -154,9 +157,9 @@ impl NiriumVaultContract {
         }
     }
 
-    /// Emergency pause — immediately freezes all state-mutating operations.
-    /// Only the admin can call this. Agents and users are blocked instantly.
-    pub fn pause(env: Env, admin: Address) {
+    /// Set cosigners for multisig emergency operations (2-of-3 pattern).
+    /// Only the admin can register cosigners. Typically: Admin, Legal, CTO.
+    pub fn set_cosigners(env: Env, admin: Address, cosigner1: Address, cosigner2: Address) {
         let stored_admin: Address = env
             .storage()
             .instance()
@@ -164,30 +167,92 @@ impl NiriumVaultContract {
             .expect("not initialized");
         admin.require_auth();
         if admin != stored_admin {
-            panic!("only admin can pause");
+            panic!("only admin can set cosigners");
+        }
+        env.storage().instance().set(&DataKey::Cosigner1, &cosigner1);
+        env.storage().instance().set(&DataKey::Cosigner2, &cosigner2);
+        env.events().publish(
+            (symbol_short!("system"), symbol_short!("cosign")),
+            (cosigner1, cosigner2),
+        );
+    }
+
+    /// Internal: Verify multisig 2-of-3 for emergency operations.
+    /// Requires the admin's auth PLUS at least one cosigner's auth.
+    fn verify_multisig(env: &Env, signer: &Address, cosigner: &Address) {
+        let stored_admin: Address = env
+            .storage()
+            .instance()
+            .get(&DataKey::AdminAddress)
+            .expect("not initialized");
+
+        // Signer must be the admin
+        signer.require_auth();
+        if *signer != stored_admin {
+            panic!("only admin can initiate emergency ops");
+        }
+
+        // Cosigner must be one of the registered cosigners
+        cosigner.require_auth();
+        let cs1: Option<Address> = env.storage().instance().get(&DataKey::Cosigner1);
+        let cs2: Option<Address> = env.storage().instance().get(&DataKey::Cosigner2);
+
+        let is_valid_cosigner = match (&cs1, &cs2) {
+            (Some(c1), _) if *cosigner == *c1 => true,
+            (_, Some(c2)) if *cosigner == *c2 => true,
+            _ => false,
+        };
+        if !is_valid_cosigner {
+            panic!("cosigner not recognized — multisig 2-of-3 failed");
+        }
+    }
+
+    /// Emergency pause — immediately freezes all state-mutating operations.
+    /// Requires multisig 2-of-3: admin + at least 1 cosigner must both sign.
+    /// If cosigners are not set, falls back to admin-only (backward compatible).
+    pub fn pause(env: Env, admin: Address, cosigner: Address) {
+        let has_cosigners: bool = env.storage().instance().has(&DataKey::Cosigner1);
+        if has_cosigners {
+            Self::verify_multisig(&env, &admin, &cosigner);
+        } else {
+            // Backward compatible: admin-only if cosigners not yet registered
+            let stored_admin: Address = env
+                .storage()
+                .instance()
+                .get(&DataKey::AdminAddress)
+                .expect("not initialized");
+            admin.require_auth();
+            if admin != stored_admin {
+                panic!("only admin can pause");
+            }
         }
         env.storage().instance().set(&DataKey::Paused, &true);
         env.events().publish(
             (symbol_short!("system"), symbol_short!("paused")),
-            true,
+            (true, admin),
         );
     }
 
-    /// Unpause — resumes normal operations. Only the admin can call this.
-    pub fn unpause(env: Env, admin: Address) {
-        let stored_admin: Address = env
-            .storage()
-            .instance()
-            .get(&DataKey::AdminAddress)
-            .expect("not initialized");
-        admin.require_auth();
-        if admin != stored_admin {
-            panic!("only admin can unpause");
+    /// Unpause — resumes normal operations. Requires multisig 2-of-3.
+    pub fn unpause(env: Env, admin: Address, cosigner: Address) {
+        let has_cosigners: bool = env.storage().instance().has(&DataKey::Cosigner1);
+        if has_cosigners {
+            Self::verify_multisig(&env, &admin, &cosigner);
+        } else {
+            let stored_admin: Address = env
+                .storage()
+                .instance()
+                .get(&DataKey::AdminAddress)
+                .expect("not initialized");
+            admin.require_auth();
+            if admin != stored_admin {
+                panic!("only admin can unpause");
+            }
         }
         env.storage().instance().set(&DataKey::Paused, &false);
         env.events().publish(
             (symbol_short!("system"), symbol_short!("resumed")),
-            false,
+            (false, admin),
         );
     }
 

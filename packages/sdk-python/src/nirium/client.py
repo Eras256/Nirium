@@ -154,8 +154,8 @@ class Agent:
         return await self._post("/api/skills/install", {"source": source})
 
     async def uninstall_skill(self, slug: str) -> Dict[str, Any]:
-        """Uninstall a user-installed skill."""
-        return await self._post("/api/skills/uninstall", {"slug": slug})
+        """Uninstall a user-installed skill by slug."""
+        return await self._delete(f"/api/skills/{slug}")
 
     # ─── Webhooks ────────────────────────────────────────────
 
@@ -182,7 +182,7 @@ class Agent:
         if callback:
             self.callbacks.setdefault("signal", []).append(callback)
 
-        auth_query = f"?apiKey={self.api_key}" if self.api_key else ""
+        auth_query = f"?token={self.token}" if self.token else ""
         url = f"{self.ws_url}{auth_query}"
 
         while True:

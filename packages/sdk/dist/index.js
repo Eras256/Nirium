@@ -1,5 +1,5 @@
 // ═══════════════════════════════════════════════════════════════
-// @nirium/sdk v0.1.0 — Official TypeScript SDK
+// @nirium/sdk v0.2.0 — Official TypeScript SDK (Synced with Backend)
 // ═══════════════════════════════════════════════════════════════
 import WebSocket from 'ws';
 /**
@@ -18,17 +18,17 @@ import WebSocket from 'ws';
  * const healthy = await agent.ping();
  * console.log('Agent alive:', healthy);
  *
- * // Get market data
+ * // Get market data (REAL data from Horizon)
  * const market = await agent.getMarket();
  * console.log('XLM Price:', market.xlmPrice);
  *
  * // Execute a strategy
- * const result = await agent.execute('flash-loan-arb', 'XLM', { amount: 5000 });
+ * const result = await agent.execute('flash-loan-arb', 'XLM-USDC', { amount: 5000 });
  * console.log('Profit:', result.profit);
  *
  * // Subscribe to real-time signals
  * agent.subscribe((signal) => {
- *   console.log('Signal:', signal.type, signal.data.details);
+ *   console.log('Signal:', signal.signal_type, signal.data.details);
  * });
  * ```
  */
@@ -41,10 +41,12 @@ export class Agent {
     maxReconnectAttempts = 5;
     signalCallbacks = [];
     logCallbacks = [];
+    token = null;
     constructor(config) {
         this.apiKey = config.apiKey;
         this.baseUrl = (config.baseUrl || 'http://localhost:3001').replace(/\/$/, '');
         this.wsUrl = config.wsUrl || this.baseUrl.replace(/^http/, 'ws') + '/ws/signals';
+        this.token = config.token || null;
     }
     // ─── HTTP Methods ────────────────────────────────────────
     async request(method, path, body) {
@@ -79,21 +81,26 @@ export class Agent {
     async health() {
         return this.request('GET', '/health');
     }
-    /** Detailed system health (Horizon, Soroban, WebSocket, IPFS). */
+    /** Detailed system health (Horizon, Soroban, WebSocket, IPFS, LLM). */
     async systemHealth() {
         return this.request('GET', '/api/system/health');
     }
     // ─── Execution ───────────────────────────────────────────
-    /** Execute a strategy (routed through Testnet/Mainnet). */
+    /**
+     * Execute a strategy (routed to actual Soroban contract).
+     * Strategy names: flash-loan-arb, path-arbitrage, cross-dex, blend-yield, soroswap-swap
+     */
     async execute(strategy, asset, params) {
         return this.request('POST', '/api/execute', { strategy, asset, params });
     }
-    /** Demo execution (rate-limited, public). */
+    /**
+     * Demo execution (Soroban dry-run simulation, no TX submitted).
+     */
     async executeDemo(strategy, asset) {
         return this.request('POST', '/api/execute-demo', { strategy, asset });
     }
     // ─── Market Data ─────────────────────────────────────────
-    /** Get current market state. */
+    /** Get current market state (real data from Horizon). */
     async getMarket() {
         return this.request('GET', '/api/market');
     }
@@ -123,13 +130,34 @@ export class Agent {
         return this.request('GET', `/api/signals/recent?count=${count}`);
     }
     // ─── Skills ──────────────────────────────────────────────
-    /** List all loaded skills. */
+    /** List all loaded skills (built-in + user-installed). */
     async getSkills() {
         return this.request('GET', '/api/skills');
     }
-    /** Install a skill from source. */
+    /** Install a skill by slug. */
     async installSkill(source) {
         return this.request('POST', '/api/skills/install', { source });
+    }
+    /** Uninstall a user-installed skill by slug. */
+    async uninstallSkill(slug) {
+        return this.request('DELETE', `/api/skills/${slug}`);
+    }
+    // ─── Webhooks ────────────────────────────────────────────
+    /** Register a webhook endpoint. */
+    async registerWebhook(url, events, secret) {
+        return this.request('POST', '/api/webhooks', { url, events, secret });
+    }
+    /** List all registered webhooks. */
+    async getWebhooks() {
+        return this.request('GET', '/api/webhooks');
+    }
+    /** Delete a webhook by ID. */
+    async deleteWebhook(id) {
+        return this.request('DELETE', `/api/webhooks/${id}`);
+    }
+    /** Test a webhook (sends a test event). */
+    async testWebhook(id) {
+        return this.request('POST', `/api/webhooks/${id}/test`);
     }
     // ─── WebSocket ───────────────────────────────────────────
     /**
@@ -150,7 +178,8 @@ export class Agent {
     connectWebSocket(subscriptionId) {
         if (this.ws?.readyState === WebSocket.OPEN)
             return;
-        this.ws = new WebSocket(this.wsUrl);
+        const authQuery = this.token ? `?token=${this.token}` : '';
+        this.ws = new WebSocket(`${this.wsUrl}${authQuery}`);
         this.ws.on('open', () => {
             console.log('[Nirium SDK] WebSocket connected');
             this.reconnectAttempts = 0;
