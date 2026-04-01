@@ -121,23 +121,27 @@ Nirium/
 │   │   ├── src/elo_reputation.rs    # ELO meritocracy system
 │   │   ├── src/strategy_marketplace.rs  # Permissionless registry
 │   │   └── src/agent_auth.rs        # Delegation & Auth
-│   └── sdk/                    # @nirium/sdk (TypeScript)
+│   └── sdk/                    # nirium (TypeScript SDK)
 ├── vercel.json                 # Security & Deployment configuration
 └── pnpm-workspace.yaml         # Monorepo management
 ```
 
 ---
 
-## 🌐 Institutional API Infrastructure (`api.nirium.xyz`)
+## 📦 Official Integration SDKs
 
-> [!NOTE]
-> Following our graduation from the **Stellar Scale Program** and the signing of our first **Institutional NBO**, we have opened our production API gateway to enable our institutional partners to conduct deep technical due diligence and live pilot testing.
+To simplify institutional integration, Nirium provides official, light-weight SDKs for the most common enterprise environments:
 
-Nirium provides a high-availability, low-latency API gateway designed for both **Free Tier** experimentation and **Enterprise-Grade** institutional orchestration. Our infrastructure is optimized for seamless consumption by both humans (frontend dashboards) and autonomous agents (LLMs/trading bots).
+- **TypeScript/Node.js SDK (`nirium`):** Available on [**NPM**](https://www.npmjs.com/package/nirium).
+  ```bash
+  npm install nirium
+  ```
+- **Python SDK (`nirium`):** Available on [**PyPI**](https://pypi.org/project/nirium/).
+  ```bash
+  pip install nirium
+  ```
 
--   **Endpoint:** `https://api.nirium.xyz`
--   **Capabilities:** Full access to Strategy Hub, Real-time Market Data, Webhook HMAC notifications, and Agent Execution Enclaves.
--   **Scalability:** Multi-cluster deployment on Railway with automatic path-based scaling.
+Our SDKs are distributed under the **MIT License**, providing full transparency while protecting the proprietary Core logic of the Nirium Neural Matrix.
 
 ---
 
