@@ -7,7 +7,7 @@
 
 > [!IMPORTANT]
 > ### 🛡️ Institutional & Enterprise Disclosure
-> This repository serves as the **Official Public Distribution & Showroom** for the Nirium Protocol. It contains the complete Institutional Frontend, Soroban Smart Contracts, and Integration SDKs.
+> This repository serves as the **Primary Technical Distribution & Showroom** for the Nirium Protocol ecosystem, managed by its founding architects. It contains the core Institutional Frontend, Soroban Smart Contracts, and Integration SDKs.
 >
 > To protect proprietary Intellectual Property (IP) and ensure the security of our neural execution matrix, the **Core AI Swarm Orchestration** and **Internal Agent Logic** are maintained in a private, enterprise-grade repository.
 >
