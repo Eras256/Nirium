@@ -32,6 +32,8 @@ interface LeaderboardEntry {
     sorobanTxs: number;
     sdexTxs: number;
     volume: string;
+    volumeUSDC: string;
+    volumeCETES: string;
     lastTxHash: string;
     lastActivity: string;
     eloOnchain: number;
@@ -56,6 +58,8 @@ function agentToEntry(agent: SwarmAgent, rank: number): LeaderboardEntry {
         sorobanTxs: agent.soroban_txs,
         sdexTxs: agent.sdex_txs,
         volume: agent.total_volume.toFixed(4),
+        volumeUSDC: (agent.total_volume * 0.134).toFixed(4),
+        volumeCETES: (agent.total_volume * 2.25).toFixed(4),
         lastTxHash: agent.last_tx_hash,
         lastActivity: agent.last_activity,
         eloOnchain: agent.elo_onchain,
@@ -82,72 +86,39 @@ export default function LeaderboardPage() {
     const [isLive, setIsLive] = useState(false);
     const [lastUpdate, setLastUpdate] = useState<Date | null>(null);
 
-    // ── Initial fetch ──────────────────────────────────────────
+    // ── Initial fetch & Polling ────────────────────────────────
     useEffect(() => {
+        let isMounted = true;
         const fetchAgents = async () => {
-            setIsLoading(true);
             try {
-                if (supabase) {
-                    const { data, error } = await supabase
-                        .from('nirium_swarm_agents')
-                        .select('*')
-                        .order('total_txs', { ascending: false });
-
-                    if (!error && data && data.length > 0) {
-                        setLeaderboard(data.map((a, i) => agentToEntry(a as SwarmAgent, i + 1)));
-                        setIsLive(true);
-                        setLastUpdate(new Date());
-                    } else {
-                        // Graceful fallback — shown while swarm hasn't started yet
-                        setLeaderboard(PLACEHOLDER_AGENTS);
-                    }
-                } else {
-                    setLeaderboard(PLACEHOLDER_AGENTS);
+                const res = await fetch('/api/agents');
+                if (!res.ok) {
+                    if (isMounted) setLeaderboard(prev => prev.length === 0 ? PLACEHOLDER_AGENTS : prev);
+                    if (isMounted) setIsLoading(false);
+                    return;
+                }
+                const data = await res.json();
+                
+                if (data && data.length > 0 && isMounted) {
+                    setLeaderboard(data.map((a: any, i: number) => agentToEntry(a as SwarmAgent, i + 1)));
+                    setIsLive(true);
+                    setLastUpdate(new Date());
+                } else if (isMounted) {
+                    setLeaderboard(prev => prev.length === 0 ? PLACEHOLDER_AGENTS : prev);
                 }
             } catch {
-                setLeaderboard(PLACEHOLDER_AGENTS);
+                if (isMounted) setLeaderboard(prev => prev.length === 0 ? PLACEHOLDER_AGENTS : prev);
             } finally {
-                setIsLoading(false);
+                if (isMounted) setIsLoading(false);
             }
         };
 
         fetchAgents();
-
-        // ── Realtime subscription ──────────────────────────────
-        const sb = supabase;
-        if (!sb) return;
-
-        const channel = sb
-            .channel('swarm-leaderboard')
-            .on(
-                'postgres_changes',
-                { event: '*', schema: 'public', table: 'nirium_swarm_agents' },
-                (payload) => {
-                    setLeaderboard(prev => {
-                        let next: LeaderboardEntry[];
-                        const raw = (payload.new || payload.old) as SwarmAgent;
-
-                        if (payload.eventType === 'INSERT') {
-                            next = [...prev, agentToEntry(raw, prev.length + 1)];
-                        } else if (payload.eventType === 'UPDATE') {
-                            next = prev.map(e => e.name === raw.id ? agentToEntry(raw, e.rank) : e);
-                        } else if (payload.eventType === 'DELETE') {
-                            next = prev.filter(e => e.name !== raw.id);
-                        } else {
-                            return prev;
-                        }
-
-                        // Re-rank and sort (using total_txs as primary metric)
-                        next.sort((a, b) => b.totalTxs - a.totalTxs);
-                        return next.map((e, i) => ({ ...e, rank: i + 1 }));
-                    });
-                    setLastUpdate(new Date());
-                    setIsLive(true);
-                },
-            )
-            .subscribe();
-
-        return () => { sb.removeChannel(channel); };
+        const pollInterval = setInterval(fetchAgents, 2000);
+        return () => {
+            isMounted = false;
+            clearInterval(pollInterval);
+        };
     }, []);
 
     const top3 = leaderboard.slice(0, 3);
@@ -248,7 +219,7 @@ export default function LeaderboardPage() {
                                         <th className="p-5 text-[10px] text-gray-500 font-black uppercase tracking-widest text-center" title="Smart Contract Calls">Soroban</th>
                                         <th className="p-5 text-[10px] text-gray-500 font-black uppercase tracking-widest text-center" title="Stellar DEX Swaps">SDEX</th>
                                         <th className="p-5 text-[10px] text-gray-500 font-black uppercase tracking-widest text-center" title="On-chain events tracked by Indexer">On-Chain Actions</th>
-                                        <th className="p-5 text-[10px] text-gray-500 font-black uppercase tracking-widest text-right">Volume (XLM)</th>
+                                        <th className="p-5 text-[10px] text-gray-500 font-black uppercase tracking-widest text-right">Volume</th>
                                         <th className="p-5 text-[10px] text-gray-500 font-black uppercase tracking-widest hidden xl:table-cell">Last Tx</th>
                                     </tr>
                                 </thead>
@@ -261,10 +232,14 @@ export default function LeaderboardPage() {
                                                 <motion.tr
                                                     key={agent.name}
                                                     layout
-                                                    initial={{ opacity: 0, x: -20 }}
-                                                    animate={{ opacity: 1, x: 0 }}
-                                                    exit={{ opacity: 0 }}
-                                                    className="border-b border-white/5 hover:bg-white/5 transition-colors"
+                                                    initial={{ opacity: 0, scale: 0.95, y: 20 }}
+                                                    animate={{ opacity: 1, scale: 1, y: 0 }}
+                                                    exit={{ opacity: 0, scale: 0.95, y: -20 }}
+                                                    transition={{
+                                                        layout: { type: 'spring', damping: 14, stiffness: 100 },
+                                                        opacity: { duration: 0.3 }
+                                                    }}
+                                                    className="border-b border-white/5 hover:bg-white/5 transition-colors relative group overflow-hidden"
                                                 >
                                                     <td className="p-5">
                                                         <span className={`font-mono text-lg ${agent.rank <= 3 ? 'text-stellar-teal font-black' : 'text-gray-500'}`}>
@@ -313,13 +288,16 @@ export default function LeaderboardPage() {
                                                         </div>
                                                     </td>
                                                     <td className="p-5 text-right">
-                                                        <div className="flex flex-col items-end">
-                                                            <span className="text-white font-mono text-sm flex items-center gap-1">
-                                                                {agent.volume} <span className="text-gray-500 text-[10px]">XLM</span>
+                                                        <div className="flex flex-col items-end gap-1">
+                                                            <span className="text-white font-mono text-sm flex items-center gap-1 leading-tight">
+                                                                {agent.volume} <span className="text-gray-500 text-[9px]">XLM</span>
                                                             </span>
-                                                            <div className="flex items-center gap-1 text-[9px] text-green-400 font-bold uppercase mt-0.5">
-                                                                <TrendingUp size={9} /> Live
-                                                            </div>
+                                                            <span className="text-green-400 font-mono text-[10px] flex items-center gap-1 leading-tight">
+                                                                {agent.volumeUSDC} <span className="text-green-800 text-[8px] font-bold">USDC</span>
+                                                            </span>
+                                                            <span className="text-blue-400 font-mono text-[10px] flex items-center gap-1 leading-tight">
+                                                                {agent.volumeCETES} <span className="text-blue-800 text-[8px] font-bold">CETES</span>
+                                                            </span>
                                                         </div>
                                                     </td>
                                                     <td className="p-5 hidden xl:table-cell">
@@ -392,9 +370,11 @@ function PodiumCard({ agent, rank }: { agent: LeaderboardEntry; rank: number }) 
                             <span className="text-[9px] text-gray-500 block uppercase font-black tracking-widest mb-1">Total Txs</span>
                             <span className="text-xl font-black text-white font-mono">{agent.totalTxs}</span>
                         </div>
-                        <div className="p-3 rounded-2xl bg-black/40 border border-white/5 text-center">
+                        <div className="p-3 rounded-2xl bg-black/40 border border-white/5 text-center flex flex-col justify-center">
                             <span className="text-[9px] text-gray-500 block uppercase font-black tracking-widest mb-1">Volume</span>
-                            <span className="text-lg font-black text-green-400 font-mono">{agent.volume}</span>
+                            <span className="text-xs font-black text-white font-mono leading-tight">{agent.volume} <span className="text-[8px] text-gray-500 font-normal">XLM</span></span>
+                            <span className="text-[10px] font-bold text-green-400 font-mono leading-tight">{agent.volumeUSDC} <span className="text-[7px] text-green-800 uppercase">USDC</span></span>
+                            <span className="text-[10px] font-bold text-blue-400 font-mono leading-tight">{agent.volumeCETES} <span className="text-[7px] text-blue-800 uppercase">CETES</span></span>
                         </div>
                     </div>
                 </div>
@@ -412,7 +392,7 @@ const PLACEHOLDER_AGENTS: LeaderboardEntry[] = [
 ].map((name, i) => ({
     rank: i + 1, name, address: 'G' + '0'.repeat(55),
     totalTxs: 0, sorobanTxs: 0, sdexTxs: 0,
-    volume: '0.0000', lastTxHash: '', lastActivity: '',
+    volume: '0.0000', volumeUSDC: '0.0000', volumeCETES: '0.0000', lastTxHash: '', lastActivity: '',
     eloOnchain: 1200, poolsCreated: 0, vaultsCreated: 0, flashLoans: 0,
     tier: (i < 2 ? 'matrix' : i < 5 ? 'gold' : i < 8 ? 'silver' : 'bronze') as any,
     avatar: `/avatars/core_${name.length % 12}.png`

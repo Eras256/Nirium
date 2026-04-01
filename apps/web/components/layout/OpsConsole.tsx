@@ -7,43 +7,43 @@ import { motion } from 'framer-motion';
 const DEMO_LOGS = [
     { agent_id: 'Matrix', message: 'Neural Matrix Uplink established. Swarm broadcasting on-chain...', level: 'system', timestamp: new Date().toISOString() },
     { agent_id: 'Titan', message: 'Vault architecture synchronized — 3 asset classes active', level: 'info', timestamp: new Date().toISOString() },
-    { agent_id: 'Chronos', message: 'Temporal arbitrage scan: 12 opportunities identified', level: 'info', timestamp: new Date().toISOString() },
     { agent_id: 'Astra', message: 'DeFindex USDC yield route optimized — APY 14.2%', level: 'success', timestamp: new Date().toISOString() },
-    { agent_id: 'Gaia', message: 'Blend CETES farm deposit confirmed — 500 CETES staked', level: 'success', timestamp: new Date().toISOString() },
-    { agent_id: 'Orion', message: 'Soroswap XLM/USDC pair liquidity depth: $42,817', level: 'info', timestamp: new Date().toISOString() },
-    { agent_id: 'Sentinel', message: 'Vault audit passed — all storage TTLs within threshold', level: 'success', timestamp: new Date().toISOString() },
     { agent_id: 'Nexus', message: 'Inter-agent signal relay: 30 agents online, consensus reached', level: 'system', timestamp: new Date().toISOString() },
 ];
+
+function formatTime(ts: string) {
+    const d = new Date(ts);
+    return `${d.getHours().toString().padStart(2,'0')}:${d.getMinutes().toString().padStart(2,'0')}:${d.getSeconds().toString().padStart(2,'0')}`;
+}
 
 export default function OpsConsole({ isExpanded, onToggleExpand, walletAddress }: { isExpanded: boolean, onToggleExpand: () => void, walletAddress?: string }) {
     const [logs, setLogs] = useState<any[]>(DEMO_LOGS);
     const [status, setStatus] = useState<'connecting' | 'online' | 'unavailable'>('connecting');
     const logContainerRef = useRef<HTMLDivElement>(null);
-    const lastTimestampRef = useRef<string | null>(null);
+    const lastIdRef = useRef<string | null>(null);
 
     const fetchLogs = useCallback(async () => {
         try {
             const res = await fetch('/api/logs');
             if (!res.ok) return;
             const rows: any[] = await res.json();
-
             if (rows && rows.length > 0) {
-                const newestTimestamp = rows[0]?.timestamp;
-                if (newestTimestamp !== lastTimestampRef.current) {
-                    lastTimestampRef.current = newestTimestamp;
+                const newestId = rows[0]?.id;
+                if (newestId !== lastIdRef.current) {
+                    lastIdRef.current = newestId;
                     setLogs(rows.reverse());
                     setStatus('online');
                 }
             }
         } catch (e) {
-            console.warn('[Neural Feed] Fetch error (will retry):', e);
+            console.warn('[Neural Feed] Fetch error:', e);
         }
     }, []);
 
     useEffect(() => {
         fetchLogs();
-        const pollInterval = setInterval(fetchLogs, 5000);
-        return () => clearInterval(pollInterval);
+        const poll = setInterval(fetchLogs, 3000);
+        return () => clearInterval(poll);
     }, [fetchLogs]);
 
     useEffect(() => {
@@ -81,7 +81,7 @@ export default function OpsConsole({ isExpanded, onToggleExpand, walletAddress }
             <div ref={logContainerRef} className="flex-1 bg-black/50 p-4 font-mono text-[10px] overflow-y-auto custom-scrollbar">
                 <div className="space-y-1.5">
                     {status === 'unavailable' && (
-                        <div className="text-yellow-600 italic">No database connection. Check Supabase configuration.</div>
+                        <div className="text-yellow-600 italic">No database connection.</div>
                     )}
                     {logs.map((log, i) => {
                         const parts = (log.message || '').split('|');
@@ -89,7 +89,7 @@ export default function OpsConsole({ isExpanded, onToggleExpand, walletAddress }
                         const hashPart = parts[1];
                         return (
                             <div key={log.id || i} className="break-all flex flex-wrap gap-x-1 items-start leading-relaxed">
-                                <span className="text-gray-600">[{new Date(log.timestamp).toLocaleTimeString()}]</span>
+                                <span className="text-gray-600">[{formatTime(log.timestamp)}]</span>
                                 <span className={`${log.level === 'error' ? 'text-red-500' :
                                     log.level === 'warn' ? 'text-yellow-500' :
                                         log.level === 'success' ? 'text-green-400' :
