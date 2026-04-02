@@ -111,6 +111,18 @@ const apiKeysMemory = new Map<string, ApiKeyData>();
 const sandboxAccountsMemory = new Map<string, SandboxAccount>();
 const usageTracking = new Map<string, { requests: number; lastReset: number; dailyRequests: number }>();
 
+// AUTH-MEMLEAK-01: Clean up expired usageTracking entries every 5 minutes
+// to prevent unbounded memory growth with many unique users.
+setInterval(() => {
+    const now = Date.now();
+    const DAY_MS = 24 * 60 * 60 * 1000;
+    for (const [userId, entry] of usageTracking.entries()) {
+        if (now - entry.lastReset > DAY_MS * 2) {
+            usageTracking.delete(userId);
+        }
+    }
+}, 5 * 60 * 1000);
+
 // ═══════════════════════════════════════════════════════════════
 // TIER CONFIGURATIONS & QUOTAS
 // ═══════════════════════════════════════════════════════════════

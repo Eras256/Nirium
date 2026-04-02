@@ -10,6 +10,10 @@
         "build": "tsc && node scripts/obfuscate.js",
         "start": "node dist/index.js",
         "swarm": "tsx scripts/nirium_full_swarm.ts",
+        "start:swarm": "tsx scripts/nirium_full_swarm.ts",
+        "start:indexer": "tsx scripts/nirium_indexer.ts",
+        "start:pool": "tsx scripts/initialize_pool.ts",
+        "start:protocol": "tsx scripts/initialize_protocol.ts",
         "generate-swarm": "tsx scripts/generate_swarm.ts",
         "lint": "eslint src/",
         "test": "jest --passWithNoTests"

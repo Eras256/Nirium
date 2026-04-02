@@ -539,6 +539,8 @@ impl NiriumVaultContract {
     }
 
     /// Revoke an agent's delegation. Kill switch — immediately disables the agent.
+    /// NOTE: Intentionally callable while paused — owners must always be able to
+    /// revoke agent access, even during an emergency stop.
     pub fn revoke_agent(env: Env, vault_id: u64, agent_address: Address) {
         let vault: Vault = env
             .storage()
@@ -600,6 +602,7 @@ impl NiriumVaultContract {
     // ─── Mock Pool Operations ────────────────────────────────
 
     /// Create a testnet mock liquidity pool.
+    /// SC-POOL-01: Only the admin can create pools to prevent spam/fake pools.
     pub fn create_pool(
         env: Env,
         creator: Address,
@@ -610,6 +613,16 @@ impl NiriumVaultContract {
         fee_bps: u32,
     ) -> MockPool {
         creator.require_auth();
+
+        // SC-POOL-01: Restrict pool creation to admin only.
+        let admin: Address = env
+            .storage()
+            .instance()
+            .get(&DataKey::AdminAddress)
+            .expect("not initialized");
+        if creator != admin {
+            panic!("only admin can create pools");
+        }
 
         if fee_bps > MAX_FLASH_LOAN_FEE_BPS {
             panic!("fee too high");
@@ -678,7 +691,11 @@ impl NiriumVaultContract {
         }
 
         // 3. Calculate fee and minimum repayment
-        let fee = (borrow_amount * pool.flash_loan_fee_bps as i128) / 10_000;
+        // SC-OVERFLOW-01: Use checked_mul to prevent silent i128 wrap in Wasm release builds.
+        let fee = borrow_amount
+            .checked_mul(pool.flash_loan_fee_bps as i128)
+            .expect("fee overflow")
+            / 10_000;
         let min_repay = borrow_amount
             .checked_add(fee)
             .expect("repay amount overflow");
@@ -698,7 +715,11 @@ impl NiriumVaultContract {
             .expect("pool balance underflow");
 
         // 5. Simulate profitable trade (testnet mock: 0.5% profit)
-        let simulated_profit = (borrow_amount * 50) / 10_000;
+        // SC-OVERFLOW-01: checked_mul for consistency with fee calculation above.
+        let simulated_profit = borrow_amount
+            .checked_mul(50)
+            .expect("simulated profit overflow")
+            / 10_000;
         let total_after_trade = borrow_amount
             .checked_add(simulated_profit)
             .expect("trade overflow");

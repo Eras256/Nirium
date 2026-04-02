@@ -29,7 +29,7 @@ export function middleware(request: NextRequest) {
             "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://vercel.live",
             "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
             "font-src 'self' https://fonts.gstatic.com data:",
-            "img-src 'self' data: blob: https:",
+            "img-src 'self' data: blob: https://*.nirium.xyz https://gateway.pinata.cloud https://stellar.expert https://horizon-testnet.stellar.org https://fonts.gstatic.com",
             "connect-src 'self' https://*.nirium.xyz https://horizon-testnet.stellar.org https://soroban-testnet.stellar.org wss://relay.walletconnect.com https://rpc.walletconnect.com https://api.coingecko.com https://vercel.live",
             "frame-src 'self' https://verify.walletconnect.com",
             "object-src 'none'",
