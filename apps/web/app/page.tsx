@@ -40,7 +40,7 @@ const AGENT_NAMES = [
 ];
 
 const CONTRACTS = [
-    { name: 'Nirium Vault', addr: 'CDMN...3DHU', full: 'CDMNZIICSHWQMRLWOAVE5VACRY5LVTLGMB75PS3JB5KFMR6TUJXV3DHU', role_key: 'vault', color: '#00F3FF' },
+    { name: 'Nirium Vault', addr: 'CDYV...J3EE', full: 'CDYVJU7PKC2XHSA6U4GM5QHKFT4LEFTXVUWKGTDUV2T76FO5MVDOJ3EE', role_key: 'vault', color: '#00F3FF' },
     { name: 'ELO Registry', addr: 'CC6Z...JWF2', full: 'CC6Z3WJWRKVEAXEKIQ5S3LFEMKRF4L2FTN5YZDQU27MQRQAWA5QBJWF2', role_key: 'elo', color: '#A78BFA' },
     { name: 'Marketplace', addr: 'CB6Q...UABC', full: 'CB6Q3LKBJ7CAAZY4MK7EG5R6FDDTJHB52ZEENI6BQLBJNFKBQRIAUABC', role_key: 'marketplace', color: '#34D399' },
 ];
