@@ -1015,10 +1015,10 @@ function ApiSection() {
                         </thead>
                         <tbody className="text-sm">
                             {[
-                                { name: 'Vault Principal (Treasury)', id: 'CDYVJU7...J3EE', type: 'Nirium Protocol' },
-                                { name: 'Reputation System (ELO)', id: 'CB4RCN4...TFCU6XW4H', type: 'Reputation' },
-                                { name: 'Marketplace Strategist', id: 'CCUDDIF...BCZF6KV6', type: 'Logic' },
-                                { name: 'CETES RWA (Soroban SAC)', id: 'CC72F57...PFDLNCQY', type: 'Asset' },
+                                { name: 'Vault Principal (Treasury)', id: 'CDYVJU7PKC2XHSA6U4GM5QHKFT4LEFTXVUWKGTDUV2T76FO5MVDOJ3EE', short: 'CDYVJU7...J3EE', type: 'Nirium Protocol' },
+                                { name: 'Reputation System (ELO)', id: 'CC6Z3WJWRKVEAXEKIQ5S3LFEMKRF4L2FTN5YZDQU27MQRQAWA5QBJWF2', short: 'CC6Z3W...JWF2', type: 'Reputation' },
+                                { name: 'Marketplace Strategist', id: 'CB6Q3LKBJ7CAAZY4MK7EG5R6FDDTJHB52ZEENI6BQLBJNFKBQRIAUABC', short: 'CB6Q3L...UABC', type: 'Logic' },
+                                { name: 'CETES RWA (Soroban SAC)', id: 'CC72F57YTPX76HAA64JQOEGHQAPSADQWSY5DWVBR66JINPFDLNCQYHIC', short: 'CC72F5...CQYHIC', type: 'Asset' },
                             ].map((c) => (
                                 <tr key={c.name} className="border-b border-white/5 hover:bg-white/5 transition-colors group">
                                     <td className="py-4 px-6">
@@ -1026,10 +1026,15 @@ function ApiSection() {
                                         <div className="text-[10px] text-gray-500 uppercase">{c.type}</div>
                                     </td>
                                     <td className="py-2 px-6">
-                                        <div className="bg-black/40 px-3 py-1.5 rounded-lg border border-white/5 font-mono text-xs text-stellar-teal group-hover:border-stellar-teal/30 flex items-center gap-2">
-                                            {c.id}
-                                            <ExternalLink size={10} className="text-gray-600" />
-                                        </div>
+                                        <a 
+                                            href={`https://stellar.expert/explorer/testnet/contract/${c.id}`}
+                                            target="_blank"
+                                            rel="noopener noreferrer"
+                                            className="inline-flex bg-black/40 px-3 py-1.5 rounded-lg border border-white/5 font-mono text-xs text-stellar-teal hover:bg-stellar-teal/10 hover:border-stellar-teal/30 transition-all items-center gap-2"
+                                        >
+                                            {c.short}
+                                            <ExternalLink size={10} className="text-gray-600 group-hover:text-stellar-teal transition-colors" />
+                                        </a>
                                     </td>
                                     <td className="py-4 px-6 text-right text-gray-400 font-mono text-xs">Soroban Testnet</td>
                                 </tr>
