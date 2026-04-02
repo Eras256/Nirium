@@ -28,7 +28,7 @@ export default function Footer() {
         { label: t.footer.neural_plugins, href: "/plugins" },
     ];
 
-    const contractHref = "https://stellar.expert/explorer/testnet/contract/CDYVJU7PKC2XHSA6U4GM5QHKFT4LEFTXVUWKGTDUV2T76FO5MVDOJ3EE";
+    const contractHref = "https://stellar.expert/explorer/testnet/contract/CAU2XBJTQUBTMPAUFRX7GMZ337I5WLBI4GYPWHZEVXTMJ66D3CP6DEL4";
 
     const INTEL_LINKS = [
         { label: t.footer.agents_control, href: "/agents" },

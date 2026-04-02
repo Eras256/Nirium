@@ -1015,7 +1015,7 @@ function ApiSection() {
                         </thead>
                         <tbody className="text-sm">
                             {[
-                                { name: 'Vault Principal (Treasury)', id: 'CDYVJU7PKC2XHSA6U4GM5QHKFT4LEFTXVUWKGTDUV2T76FO5MVDOJ3EE', short: 'CDYVJU7...J3EE', type: 'Nirium Protocol' },
+                                { name: 'Vault Principal (Treasury)', id: 'CAU2XBJTQUBTMPAUFRX7GMZ337I5WLBI4GYPWHZEVXTMJ66D3CP6DEL4', short: 'CAU2XBJ...EL4', type: 'Nirium Protocol' },
                                 { name: 'Reputation System (ELO)', id: 'CC6Z3WJWRKVEAXEKIQ5S3LFEMKRF4L2FTN5YZDQU27MQRQAWA5QBJWF2', short: 'CC6Z3W...JWF2', type: 'Reputation' },
                                 { name: 'Marketplace Strategist', id: 'CB6Q3LKBJ7CAAZY4MK7EG5R6FDDTJHB52ZEENI6BQLBJNFKBQRIAUABC', short: 'CB6Q3L...UABC', type: 'Logic' },
                                 { name: 'CETES RWA (Soroban SAC)', id: 'CC72F57YTPX76HAA64JQOEGHQAPSADQWSY5DWVBR66JINPFDLNCQYHIC', short: 'CC72F5...CQYHIC', type: 'Asset' },

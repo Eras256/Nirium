@@ -80,13 +80,13 @@ router.post('/demo-auth', publicLimiter, (req: Request, res: Response) => {
         return;
     }
 
-    // Generate free-tier token (24h validity)
+    // Generate free-tier token (1h validity)
     const token = generateToken(walletAddress, ['user'], 'free');
 
     res.json({
         success: true,
         token,
-        expiresIn: '24h',
+        expiresIn: '1h',
         userId: walletAddress,
         tier: 'free',
         quotas: TIER_QUOTAS.free,
@@ -166,12 +166,87 @@ router.post('/authenticate', publicLimiter, (req: Request, res: Response) => {
     res.json({
         success: true,
         token,
-        expiresIn: '24h',
+        expiresIn: '1h',
         userId: walletAddress,
         tier: 'free',
         quotas: TIER_QUOTAS.free,
         network,
         authenticated: true,
+    });
+});
+
+// ═══════════════════════════════════════════════════════════════
+// PROTOCOL METADATA (CENTRALIZED)
+// ═══════════════════════════════════════════════════════════════
+
+const PROTOCOL_METADATA = {
+    strategies: {
+        "nirium-usdc-loop": { name: "XLM/USDC Kinetic Loop", logPrefix: "ARBITRAGE", emoji: "🔄", category: "arbitrage" },
+        "soroswap-sniper": { name: "Meme Volatility Sniper", logPrefix: "SNIPER", emoji: "🎯", category: "trading" },
+        "peg-arbitrage": { name: "LST Peg Restoration", logPrefix: "PEG-ARB", emoji: "💧", category: "arbitrage" },
+        "eliza-sentiment": { name: "Eliza Sentiment Engine", logPrefix: "AI-SENTIMENT", emoji: "🧠", category: "intelligence" },
+        "lending-loop-max": { name: "Blend-Phoenix Recursive Yield", logPrefix: "LENDING", emoji: "📈", category: "yield" },
+        "blue-chip-dca": { name: "Weighted DCA Accumulator", logPrefix: "DCA", emoji: "💰", category: "portfolio" },
+        "stable-yield-agg": { name: "Stablecoin Optimization Loop", logPrefix: "STABLE", emoji: "🏦", category: "yield" },
+        "soroswap-clmm-active": { name: "CLMM Active Provisioner", logPrefix: "CLMM", emoji: "🛠️", category: "liquidity" },
+        "bluefin-delta-neutral": { name: "Delta Neutral Funding Farmer", logPrefix: "DELTA", emoji: "⚖️", category: "delta-neutral" },
+        "mev-capture": { name: "MEV Extraction Engine", logPrefix: "MEV", emoji: "⚡", category: "mev" },
+        "perp-funding-arb": { name: "Perp Funding Rate Arbitrage", logPrefix: "PERP-FUND", emoji: "📊", category: "arbitrage" },
+        "pyth-oracle-sniper": { name: "Oracle Latency Arbitrageur", logPrefix: "ORACLE-ARB", emoji: "🔭", category: "arbitrage" },
+        "dual-yield-compounder": { name: "Dual Token Yield Compounder", logPrefix: "DUAL-YIELD", emoji: "🌀", category: "yield" },
+        "liquidation-hunter": { name: "Liquidation Vector", logPrefix: "LIQUIDATION", emoji: "🩸", category: "liquidation" },
+        "cross-chain-bridge-arb": { name: "Cross-Chain Spread Capture", logPrefix: "BRIDGE-ARB", emoji: "🌉", category: "arbitrage" },
+    },
+    skills: {
+        'flash-loan-executor': { slug: 'flash-loan-executor', name: 'Flash Loan Executor', version: '0.0.7', category: 'trading', isGlobal: false },
+        'price-oracle': { slug: 'price-oracle', name: 'Multi-Source Price Oracle', version: '1.5.0', category: 'data', isGlobal: true },
+        'telegram-alerts-pro': { slug: 'telegram-alerts-pro', name: 'Telegram Alerts Pro', version: '3.0.0', category: 'notification', isGlobal: true },
+        'whale-tracker': { slug: 'whale-tracker', name: 'Whale Tracker', version: '1.2.0', category: 'analysis', isGlobal: false },
+        'lst-arbitrage': { slug: 'lst-arbitrage', name: 'LST Arbitrage Bot', version: '2.0.0', category: 'trading', isGlobal: false },
+        'blend-optimizer': { slug: 'blend-optimizer', name: 'Blend Yield Optimizer', version: '1.8.0', category: 'trading', isGlobal: false },
+        'discord-integration': { slug: 'discord-integration', name: 'Discord Bot Integration', version: '2.5.0', category: 'integration', isGlobal: true },
+        'portfolio-tracker': { slug: 'portfolio-tracker', name: 'Portfolio Tracker', version: '1.3.0', category: 'analysis', isGlobal: false },
+        'pyth-oracle': { slug: 'pyth-oracle', name: 'Pyth Network Oracle', version: '2.1.0', category: 'data', isGlobal: true },
+        'twitter-sentiment': { slug: 'twitter-sentiment', name: 'Twitter/X Sentiment Analyzer', version: '0.0.7', category: 'analysis', isGlobal: false },
+        'phoenix-lp-manager': { slug: 'phoenix-lp-manager', name: 'Phoenix LP Manager', version: '2.0.0', category: 'trading', isGlobal: false },
+        'gas-optimizer': { slug: 'gas-optimizer', name: 'Gas Optimizer', version: '1.0.0', category: 'utility', isGlobal: false },
+        'nirium-deep-research': { slug: 'nirium-deep-research', name: 'Stellar Deep Research', version: '0.1.0', category: 'intelligence', isGlobal: true },
+        'social-sentiment': { slug: 'social-sentiment', name: 'Social Sentiment', version: '0.0.7', category: 'intelligence', isGlobal: true },
+        'knowledge-graph': { slug: 'knowledge-graph', name: 'Knowledge Graph', version: '0.0.7', category: 'intelligence', isGlobal: true },
+        'flash-loan-engine': { slug: 'flash-loan-engine', name: 'Flash Loan Engine', version: '0.0.7', category: 'defi', isGlobal: false },
+        'onchain-oracle': { slug: 'onchain-oracle', name: 'On-Chain Oracle', version: '0.0.7', category: 'data', isGlobal: true },
+        'risk-shield': { slug: 'risk-shield', name: 'Risk Shield', version: '0.0.7', category: 'risk', isGlobal: false },
+        'auto-compounder': { slug: 'auto-compounder', name: 'Auto-Compounder', version: '0.0.7', category: 'yield', isGlobal: false },
+        'portfolio-rebalancer': { slug: 'portfolio-rebalancer', name: 'Portfolio Rebalancer', version: '0.0.7', category: 'portfolio', isGlobal: false },
+        'mev-interceptor': { slug: 'mev-interceptor', name: 'MEV Interceptor', version: '0.0.7', category: 'mev', isGlobal: false },
+        'liquidity-sniper': { slug: 'liquidity-sniper', name: 'Liquidity Sniper', version: '0.0.7', category: 'sniping', isGlobal: false },
+        'blend-lending-bot': { slug: 'blend-lending-bot', name: 'Blend Lending Bot', version: '1.1.0', category: 'trading', isGlobal: false },
+        'sdex-market-maker': { slug: 'sdex-market-maker', name: 'SDEX Market Maker', version: '0.9.2', category: 'trading', isGlobal: false },
+        'stop-loss-guardian': { slug: 'stop-loss-guardian', name: 'Stop-Loss Guardian', version: '2.2.0', category: 'utility', isGlobal: false },
+        'eliza-trading-brain': { slug: 'eliza-trading-brain', name: 'ElizaOS Trading Brain', version: '0.0.7', category: 'analysis', isGlobal: true },
+        'neural-archive-logger': { slug: 'neural-archive-logger', name: 'Neural Archive Logger', version: '1.0.0', category: 'utility', isGlobal: true },
+        'cross-dex-aggregator': { slug: 'cross-dex-aggregator', name: 'Cross-DEX Aggregator', version: '3.1.0', category: 'trading', isGlobal: true },
+        'pnl-reporter': { slug: 'pnl-reporter', name: 'P&L Real-Time Reporter', version: '1.4.0', category: 'analysis', isGlobal: false },
+        'webhook-trigger': { slug: 'webhook-trigger', name: 'Webhook Event Trigger', version: '2.0.0', category: 'integration', isGlobal: false },
+        'nirium-blackbox-logger': { slug: 'nirium-blackbox-logger', name: 'Neural Blackbox Logger', version: '0.0.7', category: 'utility', isGlobal: true },
+        'usdc-vault-manager': { slug: 'usdc-vault-manager', name: 'USDC Vault Manager', version: '0.0.7', category: 'trading', isGlobal: false },
+    },
+    bootLogs: {
+        'nirium-usdc-loop': [{ msg: 'ARBITRAGE: Scanning XLM/USDC spread on SDEX...', level: 'info' }, { msg: 'ARBITRAGE: Spread window detected (0.47%). Executing atomic swap.', level: 'success' }],
+        'soroswap-sniper': [{ msg: 'SNIPER: Monitoring Soroswap for new liquidity...', level: 'info' }, { msg: 'SNIPER: Entry point confirmed. Strategy live.', level: 'warn' }],
+        'blend-loop-max': [{ msg: 'LENDING: Optimizing Blend recursive positions...', level: 'info' }, { msg: 'LENDING: Yield loop active on Stellar Testnet.', level: 'success' }],
+    }
+};
+
+/**
+ * GET /api/public/protocol-meta
+ * Get centralized strategy and skill metadata for the frontend
+ */
+router.get('/protocol-meta', publicLimiter, (_req: Request, res: Response) => {
+    res.json({
+        success: true,
+        ...PROTOCOL_METADATA,
+        timestamp: new Date().toISOString()
     });
 });
 
@@ -242,7 +317,7 @@ const marketData = await response.json();`,
         },
         python: {
             'Get Demo Token': `import requests
-
+ 
 response = requests.post('https://api.nirium.xyz/api/public/demo-auth',
     json={'walletAddress': 'GABC...'})
 token = response.json()['token']`,

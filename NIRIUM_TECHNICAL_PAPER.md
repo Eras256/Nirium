@@ -19,7 +19,7 @@ A Sentinel in Nirium can be either a Human or an AI Agent. Both are tracked by t
 ## 3. On-Chain Protocol Architecture (Soroban-Native)
 
 ### 3.1 NiriumVault: Multi-Asset Orchestration Engine
-The `NiriumVault` contract (`CDYVJU7PKC2XHSA6U4GM5QHKFT4LEFTXVUWKGTDUV2T76FO5MVDOJ3EE`) is the primary entry point for capital, supporting three asset types through Stellar Asset Contracts (SAC):
+The `NiriumVault` contract (`CAU2XBJTQUBTMPAUFRX7GMZ337I5WLBI4GYPWHZEVXTMJ66D3CP6DEL4`) is the primary entry point for capital, supporting three asset types through Stellar Asset Contracts (SAC):
 - **XLM**: Native Stellar lumens (SAC: `CDLZFC3SYJYDZT7K67VZ75HPJVIEUVNIXF47ZG2FB2RMQQVU2HHGCYSC`)
 - **USDC**: Circle USD stablecoin (SAC: `CBIELTK6YBZJU5UP2WWQEUCYKLPU6AUNZ2BQ4WWFEIE3USCIHMXQDAMA`)
 - **CETES**: Mexican Federal Treasury Certificates via Etherfuse (SAC: `CC72F57YTPX76HAA64JQOEGHQAPSADQWSY5DWVBR66JINPFDLNCQYHIC`)
@@ -218,7 +218,7 @@ The protocol infrastructure is centered around a consolidated **Supabase Master 
 During the final development phases, critical architectural adjustments were made to solidify the protocol's execution guarantees:
 
 1. **Eradication of Simulated State:** Early UI prototypes relied on `localStorage` and simulated zero-value interactions. The Next.js client is now exclusively wired to raw Soroban contract calls, guaranteeing that every vault creation, deposit (XLM, USDC, CETES), and withdrawal is a cryptographically verifiable transaction on the Stellar Testnet.
-2. **Sentinel→Vault Contract Migration:** A new `NiriumVault` contract (`CDYVJU7...J3EE`) was deployed to replace the original instance, consolidating the vault orchestration engine with full multi-asset support and the critical fee decoupling architecture.
+2. **Sentinel→Vault Contract Migration:** A new `NiriumVault` contract (`CAU2XBJ...EL4`) was deployed to replace the original instance, consolidating the vault orchestration engine with full multi-asset support, the critical fee decoupling architecture, and JARGUS security hardening (structured error codes).
 3. **Multi-Asset Fee Decoupling:** A critical bug was resolved in the `NiriumVault` contract where non-native vaults (like USDC or CETES) attempted to charge the platform deployment fee in their base asset. We introduced a decoupled `xlm_address` parameter to the `create_vault` ABI, ensuring the 12.5 XLM platform fee is consistently settled in native XLM without compromising the vault's internal asset accounting.
 4. **CETES Expansion Operations:** The Soroban smart contracts and Swarm agent pipelines were expanded to fully support the Mexican Treasury Bond (CETES) tokenization layer via Etherfuse. The AI swarm now seamlessly distributes its actions across XLM, USDC, and CETES operations (Vault Creation, Deposits, and Withdrawals).
 5. **Etherfuse Fiat On-Ramp:** Full API integration with Etherfuse Sandbox for SPEI-based MXN→CETES conversion, including KYC onboarding, quote generation, and order lifecycle tracking.

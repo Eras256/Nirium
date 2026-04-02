@@ -298,43 +298,8 @@ function DashboardContent() {
 
         setIsSkillsLoading(true);
         try {
-            // Skills/Plugins catalog (matches Marketplace + Plugins pages)
-            const SKILL_CATALOG: Record<string, any> = {
-                'flash-loan-executor': { slug: 'flash-loan-executor', name: 'Flash Loan Executor', version: '0.0.7', category: 'trading', isGlobal: false },
-                'price-oracle': { slug: 'price-oracle', name: 'Multi-Source Price Oracle', version: '1.5.0', category: 'data', isGlobal: true },
-                'telegram-alerts-pro': { slug: 'telegram-alerts-pro', name: 'Telegram Alerts Pro', version: '3.0.0', category: 'notification', isGlobal: true },
-                'whale-tracker': { slug: 'whale-tracker', name: 'Whale Tracker', version: '1.2.0', category: 'analysis', isGlobal: false },
-                'lst-arbitrage': { slug: 'lst-arbitrage', name: 'LST Arbitrage Bot', version: '2.0.0', category: 'trading', isGlobal: false },
-                'blend-optimizer': { slug: 'blend-optimizer', name: 'Blend Yield Optimizer', version: '1.8.0', category: 'trading', isGlobal: false },
-                'discord-integration': { slug: 'discord-integration', name: 'Discord Bot Integration', version: '2.5.0', category: 'integration', isGlobal: true },
-                'portfolio-tracker': { slug: 'portfolio-tracker', name: 'Portfolio Tracker', version: '1.3.0', category: 'analysis', isGlobal: false },
-                'pyth-oracle': { slug: 'pyth-oracle', name: 'Pyth Network Oracle', version: '2.1.0', category: 'data', isGlobal: true },
-                'twitter-sentiment': { slug: 'twitter-sentiment', name: 'Twitter/X Sentiment Analyzer', version: '0.0.7', category: 'analysis', isGlobal: false },
-                'phoenix-lp-manager': { slug: 'phoenix-lp-manager', name: 'Phoenix LP Manager', version: '2.0.0', category: 'trading', isGlobal: false },
-                'gas-optimizer': { slug: 'gas-optimizer', name: 'Gas Optimizer', version: '1.0.0', category: 'utility', isGlobal: false },
-                // Core Plugins (from /plugins page)
-                'nirium-deep-research': { slug: 'nirium-deep-research', name: 'Stellar Deep Research', version: '0.1.0', category: 'intelligence', isGlobal: true },
-                'social-sentiment': { slug: 'social-sentiment', name: 'Social Sentiment', version: '0.0.7', category: 'intelligence', isGlobal: true },
-                'knowledge-graph': { slug: 'knowledge-graph', name: 'Knowledge Graph', version: '0.0.7', category: 'intelligence', isGlobal: true },
-                'flash-loan-engine': { slug: 'flash-loan-engine', name: 'Flash Loan Engine', version: '0.0.7', category: 'defi', isGlobal: false },
-                'onchain-oracle': { slug: 'onchain-oracle', name: 'On-Chain Oracle', version: '0.0.7', category: 'data', isGlobal: true },
-                'risk-shield': { slug: 'risk-shield', name: 'Risk Shield', version: '0.0.7', category: 'risk', isGlobal: false },
-                'auto-compounder': { slug: 'auto-compounder', name: 'Auto-Compounder', version: '0.0.7', category: 'yield', isGlobal: false },
-                'portfolio-rebalancer': { slug: 'portfolio-rebalancer', name: 'Portfolio Rebalancer', version: '0.0.7', category: 'portfolio', isGlobal: false },
-                'mev-interceptor': { slug: 'mev-interceptor', name: 'MEV Interceptor', version: '0.0.7', category: 'mev', isGlobal: false },
-                'liquidity-sniper': { slug: 'liquidity-sniper', name: 'Liquidity Sniper', version: '0.0.7', category: 'sniping', isGlobal: false },
-                // Marketplace Skills — 10 new
-                'blend-lending-bot': { slug: 'blend-lending-bot', name: 'Blend Lending Bot', version: '1.1.0', category: 'trading', isGlobal: false },
-                'sdex-market-maker': { slug: 'sdex-market-maker', name: 'SDEX Market Maker', version: '0.9.2', category: 'trading', isGlobal: false },
-                'stop-loss-guardian': { slug: 'stop-loss-guardian', name: 'Stop-Loss Guardian', version: '2.2.0', category: 'utility', isGlobal: false },
-                'eliza-trading-brain': { slug: 'eliza-trading-brain', name: 'ElizaOS Trading Brain', version: '0.0.7', category: 'analysis', isGlobal: true },
-                'neural-archive-logger': { slug: 'neural-archive-logger', name: 'Neural Archive Logger', version: '1.0.0', category: 'utility', isGlobal: true },
-                'cross-dex-aggregator': { slug: 'cross-dex-aggregator', name: 'Cross-DEX Aggregator', version: '3.1.0', category: 'trading', isGlobal: true },
-                'pnl-reporter': { slug: 'pnl-reporter', name: 'P&L Real-Time Reporter', version: '1.4.0', category: 'analysis', isGlobal: false },
-                'webhook-trigger': { slug: 'webhook-trigger', name: 'Webhook Event Trigger', version: '2.0.0', category: 'integration', isGlobal: false },
-                'nirium-blackbox-logger': { slug: 'nirium-blackbox-logger', name: 'Neural Blackbox Logger', version: '0.0.7', category: 'utility', isGlobal: true },
-                'usdc-vault-manager': { slug: 'usdc-vault-manager', name: 'USDC Vault Manager', version: '0.0.7', category: 'trading', isGlobal: false },
-            };
+            // Skills/Plugins catalog (now fetched from protocol-meta)
+            const SKILL_CATALOG = protocolMeta.skills || {};
 
             // Read from localStorage PER-AGENT (where Marketplace + Plugins pages persist installs)
             const localSkills = JSON.parse(localStorage.getItem(`nirium-skills-${agentId}`) || '{}');
@@ -416,23 +381,26 @@ function DashboardContent() {
     // Modals (showAutoStartModal already declared above)
 
     // --- 2. CONSTANTS & MEMOS ---
-    const STRATEGIES: Record<string, { name: string, logPrefix: string, emoji: string }> = {
-        "nirium-usdc-loop": { name: "XLM/USDC Kinetic Loop", logPrefix: "ARBITRAGE", emoji: "🔄" },
-        "soroswap-sniper": { name: "Meme Volatility Sniper", logPrefix: "SNIPER", emoji: "🎯" },
-        "peg-arbitrage": { name: "LST Peg Restoration", logPrefix: "PEG-ARB", emoji: "💧" },
-        "eliza-sentiment": { name: "Eliza Sentiment Engine", logPrefix: "AI-SENTIMENT", emoji: "🧠" },
-        "lending-loop-max": { name: "Blend-Phoenix Recursive Yield", logPrefix: "LENDING", emoji: "📈" },
-        "blue-chip-dca": { name: "Weighted DCA Accumulator", logPrefix: "DCA", emoji: "💰" },
-        "stable-yield-agg": { name: "Stablecoin Optimization Loop", logPrefix: "STABLE", emoji: "🏦" },
-        "soroswap-clmm-active": { name: "CLMM Active Provisioner", logPrefix: "CLMM", emoji: "🛠️" },
-        "bluefin-delta-neutral": { name: "Delta Neutral Funding Farmer", logPrefix: "DELTA", emoji: "⚖️" },
-        "mev-capture": { name: "MEV Extraction Engine", logPrefix: "MEV", emoji: "⚡" },
-        "perp-funding-arb": { name: "Perp Funding Rate Arbitrage", logPrefix: "PERP-FUND", emoji: "📊" },
-        "pyth-oracle-sniper": { name: "Oracle Latency Arbitrageur", logPrefix: "ORACLE-ARB", emoji: "🔭" },
-        "dual-yield-compounder": { name: "Dual Token Yield Compounder", logPrefix: "DUAL-YIELD", emoji: "🌀" },
-        "liquidation-hunter": { name: "Liquidation Vector", logPrefix: "LIQUIDATION", emoji: "🩸" },
-        "cross-chain-bridge-arb": { name: "Cross-Chain Spread Capture", logPrefix: "BRIDGE-ARB", emoji: "🌉" },
-    };
+    // Protocol Metadata state (fetched from API)
+    const [protocolMeta, setProtocolMeta] = useState({ strategies: {}, skills: {}, bootLogs: {} });
+
+    // Fetch Protocol Metadata on mount
+    useEffect(() => {
+        const fetchMeta = async () => {
+            try {
+                const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'https://api.nirium.xyz'}/api/public/protocol-meta`);
+                const data = await res.json();
+                if (data.success) {
+                    setProtocolMeta(data);
+                }
+            } catch (e) {
+                console.warn("[Dashboard] Protocol metadata fetch failed, using fallback empty state.");
+            }
+        };
+        fetchMeta();
+    }, []);
+
+    const STRATEGIES = protocolMeta.strategies || {};
 
     const strategyId = searchParams.get('strategy') || "nirium-usdc-loop";
     const strategyNameParam = searchParams.get('name'); // From Builder redirect
@@ -691,12 +659,8 @@ function DashboardContent() {
                 account?.address
             );
 
-            // Strategy-specific boot logs
-            const STRATEGY_BOOT_LOGS: Record<string, Array<{ msg: string; level: 'info' | 'success' | 'warn' | 'system' }>> = {
-                'nirium-usdc-loop': [{ msg: 'ARBITRAGE: Scanning XLM/USDC spread on SDEX...', level: 'info' }, { msg: 'ARBITRAGE: Spread window detected (0.47%). Executing atomic swap.', level: 'success' }],
-                'soroswap-sniper': [{ msg: 'SNIPER: Monitoring Soroswap for new liquidity...', level: 'info' }, { msg: 'SNIPER: Entry point confirmed. Strategy live.', level: 'warn' }],
-                'blend-loop-max': [{ msg: 'LENDING: Optimizing Blend recursive positions...', level: 'info' }, { msg: 'LENDING: Yield loop active on Stellar Testnet.', level: 'success' }],
-            };
+            // Strategy-specific boot logs (now fetched from protocol-meta)
+            const STRATEGY_BOOT_LOGS = protocolMeta.bootLogs || {};
 
             const bootLogs = STRATEGY_BOOT_LOGS[strategyId];
             if (bootLogs) {
@@ -1598,9 +1562,19 @@ function DashboardContent() {
 
             if (!result.success) {
                 toast.dismiss(toastId);
-                // Detect the common "must have 0 balance" contract error
                 const errorMsg = result.error || "";
-                if (errorMsg.includes("0 balance") || errorMsg.includes("withdraw")) {
+                // Legacy vault from old contract — can't be closed on-chain, just remove from UI
+                if (errorMsg.includes("UnreachableCodeReached") || errorMsg.includes("E_VAULT_NOT_FOUND") || errorMsg.includes("InvalidAction")) {
+                    localStorage.removeItem(`nirium-vault-v2-${baseAsset}-${account.address}`);
+                    localStorage.removeItem(`nirium-vault-balance-${vaultData.vaultId}-${baseAsset}`);
+                    setVaultId(null);
+                    setOwnerCapId(null);
+                    setVaultBalance(0);
+                    toast.success("Legacy Vault Removed", {
+                        description: `Vault #${vaultData.vaultId} was created on a previous contract version and has been removed from your dashboard. No on-chain action required (vault had 0 balance).`,
+                        duration: 8000,
+                    });
+                } else if (errorMsg.includes("0 balance") || errorMsg.includes("withdraw")) {
                     toast.error("Withdraw your funds first", {
                         description: "The contract requires the vault balance to be 0 before closing.",
                         duration: 6000,
@@ -1642,7 +1616,20 @@ function DashboardContent() {
         } catch (error: any) {
             toast.dismiss(toastId);
             console.error("Close Vault Error:", error);
-            handleWalletError(error);
+            const errStr = String(error?.message || error || "");
+            if (errStr.includes("UnreachableCodeReached") || errStr.includes("E_VAULT_NOT_FOUND") || errStr.includes("InvalidAction")) {
+                localStorage.removeItem(`nirium-vault-v2-${baseAsset}-${account.address}`);
+                localStorage.removeItem(`nirium-vault-balance-${vaultData.vaultId}-${baseAsset}`);
+                setVaultId(null);
+                setOwnerCapId(null);
+                setVaultBalance(0);
+                toast.success("Legacy Vault Removed", {
+                    description: `Vault #${vaultData.vaultId} was created on a previous contract version and has been removed from your dashboard.`,
+                    duration: 8000,
+                });
+            } else {
+                handleWalletError(error);
+            }
         }
     };
 

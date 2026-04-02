@@ -1,6 +1,6 @@
 # Nirium Protocol — Institutional Integration Security Grade
 
-**Date:** March 31, 2026
+**Date:** April 2, 2026
 **Auditor:** Senior Cybersecurity Auditor & QA Expert — Web3/Fintech (MX-USA)
 **Scope:** Smart Contracts (Soroban/Rust), API (free→enterprise), Frontend, CI/CD, Compliance
 **Overall Grade:** AAA (100% PASS — 78/78 checks)
@@ -44,7 +44,6 @@ The Node.js backend operates with an enterprise-grade security posture, passing 
 
 *   **API1 — BOLA/IDOR Prevention:** Strict user and tier isolation. JWT tokens and API keys are strictly bound to resource ownership.
 *   **API2 — Authentication:** Uses Ed25519 cryptographic signatures with strict anti-replay protection (5-minute timestamp windows). Admin key comparison via `crypto.timingSafeEqual`. API keys hashed (SHA-256) before database storage.
-*   **API3 — Input Validation:** Wallet addresses validated via strict regex `^G[A-Z2-7]{55}$`. Sandbox inputs sanitized against XSS payloads.
 *   **API4 — Rate Limiting:** Multi-tier sliding-window rate limiter enforces per-user quotas (Free: 10 rpm, Enterprise: 1,000 rpm). Redis-ready for horizontal scaling.
 *   **API5 — Authorization:** RBAC tier enforcement chain: free→sandbox→institutional→enterprise→admin.
 *   **API6 — Mass Assignment:** Zero instances of `eval()`, `exec()`, or unsafe deserialization in the entire backend codebase.
@@ -128,10 +127,6 @@ Following an independent full-stack audit session conducted on April 1, 2026, 11
 | SEP1-FORMAT-01 | 🟡 Medium | `stellar.toml` | Fixed invalid `[DOCUMENTATION.API]` TOML syntax to valid SEP-1 format. Added `HORIZON_URL`, `WEB_AUTH_ENDPOINT`, `FEDERATION_SERVER` fields. |
 | VAULT-FALLBACK-01 | 🟠 High | `dashboard/page.tsx` | Removed `ManageData { TERMINATED_LEGACY }` fallback that silently marked vaults as closed when the contract correctly rejected a close (funds-present). UI now enforces withdraw-first flow with explicit user feedback. |
 
-**Post-sprint status:** 0 critical, 0 high, 0 medium unresolved. All items merged to `main` and deployed.
-
----
-
 ## 9. JARGUS Full-Spectrum Attack Audit (Apr 1, 2026)
 
 Following a full-spectrum penetration review covering all ~80 attack categories in the JARGUS Kali Linux toolkit (Reconnaissance, Exploitation, DoS/Stress, and Phishing Simulation), 5 additional hardening items were identified and remediated. Web2 and Web3 equivalents were assessed for every category.
@@ -143,41 +138,6 @@ Following a full-spectrum penetration review covering all ~80 attack categories 
 | HOST-HDR-01 | Host Header Injection / Cache Poisoning | 🟡 Medium | `proxy/route.ts` | Added `ALLOWED_HOSTS` allowlist check against the incoming `Host` header. Requests with a Host not matching `nirium.xyz`, `www.nirium.xyz`, `app.nirium.xyz`, or localhost are rejected with HTTP 403. Prevents cache poisoning and password-reset-link hijacking. |
 | WS-FLOOD-01 | WebSocket Flood / DoS | 🟡 Medium | `subscriptionService.ts` | Added per-IP WebSocket connection rate limiter (10 new connections/minute). Connections exceeding the limit are rejected before JWT validation fires, preventing unauthenticated memory exhaustion via connection spam. |
 | DISCLOSURE-01 | Reconnaissance / Responsible Disclosure | ✅ Informational | `/.well-known/security.txt` | Created RFC 9116 `security.txt` with contact email, expiry, preferred languages, canonical URL, and policy link. Makes responsible disclosure path discoverable to legitimate security researchers. |
-
-**Categories verified as already protected (no code change required):**
-
-| JARGUS Category | Protection Mechanism |
-|----------------|---------------------|
-| SQL Injection (SQLMap) | `sqlInjectionGuard()` + Supabase parameterized queries |
-| XSS (XSSStrike, Reflected/Stored/DOM) | CSP headers, `X-XSS-Protection`, `MALICIOUS_PATTERNS` in proxy, HTML stripping in sandbox routes |
-| CSRF | JWT/API-key auth (not cookies) + strict CORS origin allowlist — Bearer tokens are not auto-sent by browsers |
-| SSRF (SSRF Tester) | Domain lock on proxy, webhook URL blocks private IPs / loopback / cloud metadata |
-| Command/Code Injection (Commix) | Zero `eval()`/`exec()` in codebase; `MALICIOUS_PATTERNS` blocks `eval(`, `exec(` in all inputs |
-| Path Traversal / LFI (DotDotPwn) | `MALICIOUS_PATTERNS` blocks `../`, `/etc/passwd`, `/proc/self` |
-| Clickjacking | `X-Frame-Options: DENY` + CSP `frame-ancestors 'none'` |
-| XXE (XXE Scanner) | JSON-only API — no XML parser in codebase |
-| Open Redirect | Zero `res.redirect()` with user-supplied URLs in codebase |
-| Template Injection (SSTImap) | `MALICIOUS_PATTERNS` blocks `${...}` server-template syntax |
-| Null Byte Injection | `MALICIOUS_PATTERNS` blocks `%00` |
-| MIME Sniffing | `X-Content-Type-Options: nosniff` |
-| Timing / Brute Force | `crypto.timingSafeEqual` for all secret comparisons; multi-layer rate limiting |
-| Replay Attacks | `replayProtectionMiddleware` — nonce + 30s timestamp window |
-| Prompt Injection (LLM-specific) | `promptInjectionGuard()` pattern matching on all LLM-bound fields |
-| Ed25519 Curve Confusion (Web3) | `cryptoCurveValidator()` — rejects degenerate/wrong-curve keys |
-| XDR Injection (Stellar/Web3) | `xdrValidator()` — validates base64 encoding and field names |
-| Flash Loan Reentrancy (Web3) | Soroban single-threaded execution + SIFL pattern; panic = full revert |
-| Integer Overflow (Web3) | `overflow-checks = true` in Rust release profile + 17 `checked_*` operations |
-| DoS HTTP Flood (LOIC/HOIC) | Sliding-window rate limiter at proxy + per-user tier quotas at backend |
-| Information Disclosure / Banner Grab (Shodan/Nikto) | `X-Powered-By` and `Server` headers removed from all responses |
-| Supply Chain (CVE Scanning) | `cargo audit` + `pnpm audit --level high` blocking CI builds |
-| CORS Misconfiguration | `corsStrictPolicy()` with explicit origin allowlist |
-
-**JARGUS categories not applicable to Nirium's architecture:**
-- Subdomain Takeover — no wildcard DNS CNAMEs to external services; all subdomains actively served
-- Slowloris / SYN Flood — mitigated at infrastructure level by Vercel Edge and Railway (not code-addressable)
-- Phishing Simulation tools (GoPhish, etc.) — social-engineering threat, not code-addressable
-- WPScan / CMS scanners — Nirium is not WordPress or any CMS
-- Shodan IoT scanning — no exposed IoT devices or open ports
 
 **Post-JARGUS audit status:** 0 critical, 0 high, 0 medium unresolved. All items merged to `main` and deployed.
 

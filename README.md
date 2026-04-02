@@ -99,7 +99,7 @@ On-chain meritocracy (ELO Registry) tracking performance.
 
 | Contract | Address | Role | Explorer |
 |:---|:---|:---|:---|
-| **NiriumVault** | `CDYVJU7PKC2XHSA6U4GM5QHKFT4LEFTXVUWKGTDUV2T76FO5MVDOJ3EE` | Multi-Asset Treasury + Flash Loans | [🔍 View](https://stellar.expert/explorer/testnet/contract/CDYVJU7PKC2XHSA6U4GM5QHKFT4LEFTXVUWKGTDUV2T76FO5MVDOJ3EE) |
+| **NiriumVault** | `CAU2XBJTQUBTMPAUFRX7GMZ337I5WLBI4GYPWHZEVXTMJ66D3CP6DEL4` | Multi-Asset Treasury + Flash Loans | [🔍 View](https://stellar.expert/explorer/testnet/contract/CAU2XBJTQUBTMPAUFRX7GMZ337I5WLBI4GYPWHZEVXTMJ66D3CP6DEL4) |
 | **ELO Reputation** | `CC6Z3WJWRKVEAXEKIQ5S3LFEMKRF4L2FTN5YZDQU27MQRQAWA5QBJWF2` | Sentinel ELO scoring & tiering | [🔍 View](https://stellar.expert/explorer/testnet/contract/CC6Z3WJWRKVEAXEKIQ5S3LFEMKRF4L2FTN5YZDQU27MQRQAWA5QBJWF2) |
 | **Strategy Marketplace** | `CB6Q3LKBJ7CAAZY4MK7EG5R6FDDTJHB52ZEENI6BQLBJNFKBQRIAUABC` | Permissionless strategy registry | [🔍 View](https://stellar.expert/explorer/testnet/contract/CB6Q3LKBJ7CAAZY4MK7EG5R6FDDTJHB52ZEENI6BQLBJNFKBQRIAUABC) |
 | **CETES SAC** | `CC72F57YTPX76HAA64JQOEGHQAPSADQWSY5DWVBR66JINPFDLNCQYHIC` | Mexican Treasury Bonds (Etherfuse) | [🔍 View](https://stellar.expert/explorer/testnet/contract/CC72F57YTPX76HAA64JQOEGHQAPSADQWSY5DWVBR66JINPFDLNCQYHIC) |
@@ -163,7 +163,7 @@ Our SDKs are distributed under the **MIT License**, providing full transparency 
 
 ## 🧪 Test Coverage & Institutional QA
 
-The repository is rigorously tested across both the Smart Contract and Backend Agent layers to ensure institutional-grade resilience. Reaffirming our commitment to the pilot phase post-NBO, as of **March 30th, 2026**, the protocol has achieved a **100% QA Pass Rate** across all critical modules:
+The repository is rigorously tested across both the Smart Contract and Backend Agent layers to ensure institutional-grade resilience. Reaffirming our commitment to the pilot phase post-NBO, as of **April 2nd, 2026**, the protocol has achieved a **100% QA Pass Rate** across all critical modules:
 
 ### 1. Smart Contracts (Soroban Rust)
 - **Vault Operations**: Creation, fee collection, deposit/withdraw passing.

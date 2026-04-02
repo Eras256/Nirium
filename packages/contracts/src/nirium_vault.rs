@@ -364,11 +364,15 @@ impl NiriumVaultContract {
             panic!("amount must be positive");
         }
 
-        let mut vault: Vault = env
+        let vault_res: Option<Vault> = env
             .storage()
             .persistent()
-            .get(&DataKey::Vault(vault_id))
-            .expect("vault not found");
+            .get(&DataKey::Vault(vault_id));
+
+        if vault_res.is_none() {
+            panic!("E_VAULT_NOT_FOUND: ensure you are using the correct vault ID for this contract version");
+        }
+        let mut vault = vault_res.unwrap();
 
         vault.owner.require_auth();
 
@@ -457,20 +461,24 @@ impl NiriumVaultContract {
     /// Vault must have zero balance to be closed.
     pub fn close_vault(env: Env, vault_id: u64) {
         Self::check_not_paused(&env);
-        let mut vault: Vault = env
+        let vault_res: Option<Vault> = env
             .storage()
             .persistent()
-            .get(&DataKey::Vault(vault_id))
-            .expect("vault not found");
+            .get(&DataKey::Vault(vault_id));
+        
+        if vault_res.is_none() {
+            panic!("E_VAULT_NOT_FOUND: ensure you are using the correct vault ID for this contract version");
+        }
+        let mut vault = vault_res.unwrap();
 
         vault.owner.require_auth();
 
         if vault.balance > 0 {
-            panic!("vault must have 0 balance before closing — withdraw your funds first");
+            panic!("E_INSUFFICIENT_BALANCE: vault must have 0 balance before closing");
         }
 
         if !vault.is_active {
-            panic!("vault is already inactive");
+            panic!("E_NOT_ACTIVE: vault is already inactive");
         }
 
         vault.is_active = false;
