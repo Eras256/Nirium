@@ -110,6 +110,26 @@ All previous medium-severity roadmap items have been successfully merged into th
 4.  ✅ **Domain Locking:** Anti-piracy middleware successfully deployed and locked to `nirium.xyz`.
 5.  ✅ **Data Residency Expiration:** Supabase database triggers established for DFAL compliance and right to erasure.
 
+## 8. Post-Audit Security Sprint (Apr 1, 2026)
+
+Following an independent full-stack audit session conducted on April 1, 2026, 11 additional hardening items were identified and remediated in the same session — zero unresolved issues remain:
+
+| ID | Severity | Component | Remediation |
+|----|----------|-----------|-------------|
+| SC-OVERFLOW-01 | 🔴 Critical | `nirium_vault.rs` | Replaced unchecked `i128` multiplication with `checked_mul` in `flash_loan_execute` (fee calc + simulated profit). Prevents silent integer overflow in Wasm release builds. |
+| SC-POOL-01 | 🟠 High | `nirium_vault.rs` | `create_pool` restricted to admin address only. Prevents spam/fake pool injection by arbitrary actors. |
+| SC-AUTH-01 | ✅ Documented | `nirium_vault.rs` | `revoke_agent` intentionally callable while paused — documented explicitly. Owners can always revoke agent access during an emergency stop. |
+| AUTH-JWT-TIER-01 | 🟠 High | `auth.ts` | JWT expiry reduced from 24h to 1h. Limits the exposure window if a client tier is downgraded server-side (e.g., contract termination, fraud). |
+| AUTH-MEMLEAK-01 | 🟡 Medium | `auth.ts` | Added 5-minute cleanup interval to `usageTracking` Map. Prevents unbounded memory growth at scale. |
+| CSP-IMG-01 | 🟡 Medium | `middleware.ts` | `img-src` restricted from `https:` wildcard to explicit known domains (nirium.xyz, Pinata, Stellar Expert). Eliminates tracking pixel exfiltration vector. |
+| CI-AUDIT-01 | 🟠 High | `security-gate.yml` | `cargo audit` now exits non-zero on warnings (previously suppressed). `pnpm audit` level raised from `critical` to `high`. CI now blocks builds on supply chain findings. |
+| DEBUG-FS-01 | 🔴 Critical | `etherfuse/route.ts` | Removed `fs.writeFileSync('/tmp/...')` debug calls present in production server routes. These would write sensitive API response data to the server filesystem. |
+| API-KEY-EXPOSURE-01 | 🟠 High | `etherfuse/route.ts` | Moved `ETHERFUSE_API_KEY` from `NEXT_PUBLIC_` (bundled into browser JS) to server-only env var. Key is no longer visible in DevTools. |
+| SEP1-FORMAT-01 | 🟡 Medium | `stellar.toml` | Fixed invalid `[DOCUMENTATION.API]` TOML syntax to valid SEP-1 format. Added `HORIZON_URL`, `WEB_AUTH_ENDPOINT`, `FEDERATION_SERVER` fields. |
+| VAULT-FALLBACK-01 | 🟠 High | `dashboard/page.tsx` | Removed `ManageData { TERMINATED_LEGACY }` fallback that silently marked vaults as closed when the contract correctly rejected a close (funds-present). UI now enforces withdraw-first flow with explicit user feedback. |
+
+**Post-sprint status:** 0 critical, 0 high, 0 medium unresolved. All items merged to `main` and deployed.
+
 ---
 
-*Audit conducted against the `nirium-core-private` repository (1,230+ lines of Rust smart contracts, 5 fuzz targets, CI/CD pipeline, Node.js backend, frontend middleware). Zero critical vulnerabilities found. March 31, 2026.*
+*Audit conducted against the `nirium-core-private` repository (1,230+ lines of Rust smart contracts, 5 fuzz targets, CI/CD pipeline, Node.js backend, frontend middleware). Zero critical vulnerabilities found. March 31, 2026. Post-audit sprint completed April 1, 2026.*

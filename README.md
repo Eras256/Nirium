@@ -106,6 +106,7 @@ On-chain meritocracy (ELO Registry) tracking performance.
 - 📍 **Stellar Scale Program (CDMX)**: Successfully graduated from the official Stellar acceleration program in Mexico City.
 - 🥇 **Instaward 2026**: Formally invited to participate in the prestigious **Instawards** application process.
 - 💼 **Institutional Pipeline**: Currently in advanced negotiations with a major institutional client; **NBO (Non-Binding Offer) signed** by a prominent Web2 Venture Capital firm.
+- 🔒 **Security Sprint (Apr 1, 2026)**: Independent full-stack audit completed. 11 findings identified and remediated in the same session — including a critical `i128` overflow in the flash loan contract, removal of production debug file writes, and API key exposure via `NEXT_PUBLIC_`. Zero unresolved issues. Full report in [`Institutional_Integration_Grade.md`](./Institutional_Integration_Grade.md).
 
 ---
 
