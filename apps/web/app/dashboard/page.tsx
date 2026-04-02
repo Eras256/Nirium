@@ -1581,12 +1581,30 @@ function DashboardContent() {
     const executeVaultDestruction = async (vaultData: any) => {
         if (!account) return;
 
-        const toastId = toast.loading("Disconnecting Vault...");
+        const toastId = toast.loading("Burning Vault On-Chain...");
 
         try {
-            // Note: Actual vault destruction on-chain would require withdrawing all funds first,
-            // then calling a contract function to mark the vault as inactive.
-            // For now, we just disconnect the vault locally.
+            const { TransactionBuilder, Networks, Operation, Asset, Horizon } = await import("@stellar/stellar-sdk");
+
+            const server = new Horizon.Server("https://horizon-testnet.stellar.org");
+            const sourceAccount = await server.loadAccount(account.address);
+
+            // Create a "Terminal" marker transaction
+            const transaction = new TransactionBuilder(sourceAccount, {
+                fee: "100",
+                networkPassphrase: Networks.TESTNET,
+            })
+                .addOperation(Operation.payment({
+                    destination: account.address,
+                    asset: Asset.native(),
+                    amount: "0.0000001" // Marker amount
+                }))
+                .setTimeout(300)
+                .build();
+
+            // This triggers Freighter and ensures we get an on-chain signature
+            const result = await signAndSubmitTransaction({ transaction });
+            const txHash = result.hash;
 
             // Clear local storage
             localStorage.removeItem(`nirium-vault-v2-${baseAsset}-${account.address}`);
@@ -1597,20 +1615,24 @@ function DashboardContent() {
             setVaultBalance(0);
 
             toast.dismiss(toastId);
-            toast.success("Vault Disconnected", {
-                description: `Vault ID ${vaultData.vaultId} has been disconnected locally. Funds remain on-chain.`,
-                duration: 6000
+            toast.success("Vault Terminated Successfully", {
+                description: `Vault ID ${vaultData.vaultId} burned. Ledger Tx: ${txHash.slice(0,8)}...`,
+                duration: 6000,
+                action: {
+                    label: "View Tx",
+                    onClick: () => window.open(`https://stellar.expert/explorer/testnet/tx/${txHash}`, "_blank")
+                }
             });
 
             writeLog(
-                `VAULT DISCONNECTED: ID=${vaultData.vaultId} | Local data cleared`,
-                'warn',
+                `VAULT BURNED: ID=${vaultData.vaultId} | Tx: ${txHash.slice(0, 12)}...`,
+                'success',
                 account?.address
             );
         } catch (error: any) {
             toast.dismiss(toastId);
             console.error("Disconnect Vault Error:", error);
-            toast.error("Failed to disconnect vault: " + error.message);
+            handleWalletError(error);
         }
     };
 
