@@ -1590,15 +1590,14 @@ function DashboardContent() {
             const server = new Horizon.Server("https://horizon-testnet.stellar.org");
             const sourceAccount = await server.loadAccount(account.address);
 
-            // Create a "Terminal" marker transaction
+            // Create a "Terminal" marker transaction via ManageData
             const transaction = new TransactionBuilder(sourceAccount, {
                 fee: "100",
                 networkPassphrase: Networks.TESTNET,
             })
-                .addOperation(Operation.payment({
-                    destination: account.address,
-                    asset: Asset.native(),
-                    amount: "0.0000001" // Marker amount
+                .addOperation(Operation.manageData({
+                    name: `nirium_vault_${vaultData.vaultId}`,
+                    value: "TERMINATED"
                 }))
                 .setTimeout(300)
                 .build();
