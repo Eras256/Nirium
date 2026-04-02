@@ -116,7 +116,9 @@ export async function invokeContract({
         // 4. Sign with Freighter (handles both string and object with error)
         const signedResult = await signTransaction(txXdr, {
             networkPassphrase: NETWORK_PASSPHRASE,
-        });
+            address: callerAddress,
+            accountToSign: callerAddress,
+        } as any);
 
         if (signedResult && typeof signedResult === 'object' && ('error' in signedResult)) {
             return { success: false, error: (signedResult as any).error as string };
