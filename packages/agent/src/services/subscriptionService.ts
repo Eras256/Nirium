@@ -25,6 +25,34 @@ let logBatch: LogEntry[] = [];
 
 let wss: WebSocketServer | null = null;
 
+// ─── WebSocket per-IP connection rate limiter ────────────────────
+// Prevents WebSocket flood attacks by limiting how many new
+// connections a single IP can open per minute (10 max).
+// Without this, an attacker could exhaust server memory with
+// unauthenticated connection spam before the JWT check fires.
+const WS_CONN_LIMIT = 10;
+const WS_CONN_WINDOW_MS = 60_000;
+const wsConnBuckets = new Map<string, { count: number; resetAt: number }>();
+
+function isWsRateLimited(ip: string): boolean {
+    const now = Date.now();
+    let bucket = wsConnBuckets.get(ip);
+    if (!bucket || now >= bucket.resetAt) {
+        wsConnBuckets.set(ip, { count: 1, resetAt: now + WS_CONN_WINDOW_MS });
+        return false;
+    }
+    bucket.count++;
+    return bucket.count > WS_CONN_LIMIT;
+}
+
+// Prune expired buckets every 5 minutes
+setInterval(() => {
+    const now = Date.now();
+    for (const [ip, bucket] of wsConnBuckets) {
+        if (now >= bucket.resetAt) wsConnBuckets.delete(ip);
+    }
+}, 5 * 60 * 1000);
+
 /**
  * Initialize WebSocket server on the given HTTP server.
  */
@@ -32,6 +60,18 @@ export function initializeWebSocket(server: HttpServer): WebSocketServer {
     wss = new WebSocketServer({ server, path: '/ws/signals' });
 
     wss.on('connection', (ws, req) => {
+        // --- WS-FLOOD-01: Per-IP connection rate limit (10 conn/min) ---
+        const clientIp =
+            (req.headers['x-forwarded-for'] as string | undefined)?.split(',')[0].trim() ??
+            req.socket?.remoteAddress ??
+            'unknown';
+
+        if (isWsRateLimited(clientIp)) {
+            ws.send(JSON.stringify({ type: 'error', message: 'Too Many Requests: WebSocket connection rate limit exceeded.' }));
+            ws.close(1008, 'Rate Limited');
+            return;
+        }
+
         // --- JWT SECURITY GUARD (ClawJacked Vulnerability Patch) ---
         const urlParams = new URLSearchParams(req.url?.split('?')[1] || '');
         const token = urlParams.get('token');

@@ -247,7 +247,10 @@ export function generateToken(
 
 export function verifyToken(token: string): { userId: string; permissions: string[]; tier: UserTier; quotas?: typeof TIER_QUOTAS.free } | null {
     try {
-        const decoded = jwt.verify(token, JWT_SECRET) as {
+        // JWT-ALG-01: Explicitly lock to HS256 to prevent alg:none / RS256 confusion attacks.
+        // Without this, a crafted token with "alg":"none" could bypass signature verification
+        // on older jsonwebtoken versions, or RS256 confusion could allow public-key forgery.
+        const decoded = jwt.verify(token, JWT_SECRET, { algorithms: ['HS256'] }) as {
             userId: string;
             permissions: string[];
             tier: UserTier;

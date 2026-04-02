@@ -132,4 +132,55 @@ Following an independent full-stack audit session conducted on April 1, 2026, 11
 
 ---
 
-*Audit conducted against the `nirium-core-private` repository (1,230+ lines of Rust smart contracts, 5 fuzz targets, CI/CD pipeline, Node.js backend, frontend middleware). Zero critical vulnerabilities found. March 31, 2026. Post-audit sprint completed April 1, 2026.*
+## 9. JARGUS Full-Spectrum Attack Audit (Apr 1, 2026)
+
+Following a full-spectrum penetration review covering all ~80 attack categories in the JARGUS Kali Linux toolkit (Reconnaissance, Exploitation, DoS/Stress, and Phishing Simulation), 5 additional hardening items were identified and remediated. Web2 and Web3 equivalents were assessed for every category.
+
+| ID | JARGUS Category | Severity | Component | Remediation |
+|----|----------------|----------|-----------|-------------|
+| JWT-ALG-01 | JWT Cracking / Algorithm Confusion | 🟠 High | `auth.ts` | `jwt.verify()` now explicitly specifies `{ algorithms: ['HS256'] }`. Prevents `alg:none` bypass and RS256-confusion attacks where an attacker presents an HS256 token signed with the server's RSA public key. |
+| PROTO-POLL-01 | Prototype Pollution | 🟠 High | `security.ts` + `server.ts` | Added `prototypePollutionGuard()` middleware that recursively strips `__proto__`, `constructor`, and `prototype` keys from parsed request bodies and rejects them from query strings. Applied before all route handlers. |
+| HOST-HDR-01 | Host Header Injection / Cache Poisoning | 🟡 Medium | `proxy/route.ts` | Added `ALLOWED_HOSTS` allowlist check against the incoming `Host` header. Requests with a Host not matching `nirium.xyz`, `www.nirium.xyz`, `app.nirium.xyz`, or localhost are rejected with HTTP 403. Prevents cache poisoning and password-reset-link hijacking. |
+| WS-FLOOD-01 | WebSocket Flood / DoS | 🟡 Medium | `subscriptionService.ts` | Added per-IP WebSocket connection rate limiter (10 new connections/minute). Connections exceeding the limit are rejected before JWT validation fires, preventing unauthenticated memory exhaustion via connection spam. |
+| DISCLOSURE-01 | Reconnaissance / Responsible Disclosure | ✅ Informational | `/.well-known/security.txt` | Created RFC 9116 `security.txt` with contact email, expiry, preferred languages, canonical URL, and policy link. Makes responsible disclosure path discoverable to legitimate security researchers. |
+
+**Categories verified as already protected (no code change required):**
+
+| JARGUS Category | Protection Mechanism |
+|----------------|---------------------|
+| SQL Injection (SQLMap) | `sqlInjectionGuard()` + Supabase parameterized queries |
+| XSS (XSSStrike, Reflected/Stored/DOM) | CSP headers, `X-XSS-Protection`, `MALICIOUS_PATTERNS` in proxy, HTML stripping in sandbox routes |
+| CSRF | JWT/API-key auth (not cookies) + strict CORS origin allowlist — Bearer tokens are not auto-sent by browsers |
+| SSRF (SSRF Tester) | Domain lock on proxy, webhook URL blocks private IPs / loopback / cloud metadata |
+| Command/Code Injection (Commix) | Zero `eval()`/`exec()` in codebase; `MALICIOUS_PATTERNS` blocks `eval(`, `exec(` in all inputs |
+| Path Traversal / LFI (DotDotPwn) | `MALICIOUS_PATTERNS` blocks `../`, `/etc/passwd`, `/proc/self` |
+| Clickjacking | `X-Frame-Options: DENY` + CSP `frame-ancestors 'none'` |
+| XXE (XXE Scanner) | JSON-only API — no XML parser in codebase |
+| Open Redirect | Zero `res.redirect()` with user-supplied URLs in codebase |
+| Template Injection (SSTImap) | `MALICIOUS_PATTERNS` blocks `${...}` server-template syntax |
+| Null Byte Injection | `MALICIOUS_PATTERNS` blocks `%00` |
+| MIME Sniffing | `X-Content-Type-Options: nosniff` |
+| Timing / Brute Force | `crypto.timingSafeEqual` for all secret comparisons; multi-layer rate limiting |
+| Replay Attacks | `replayProtectionMiddleware` — nonce + 30s timestamp window |
+| Prompt Injection (LLM-specific) | `promptInjectionGuard()` pattern matching on all LLM-bound fields |
+| Ed25519 Curve Confusion (Web3) | `cryptoCurveValidator()` — rejects degenerate/wrong-curve keys |
+| XDR Injection (Stellar/Web3) | `xdrValidator()` — validates base64 encoding and field names |
+| Flash Loan Reentrancy (Web3) | Soroban single-threaded execution + SIFL pattern; panic = full revert |
+| Integer Overflow (Web3) | `overflow-checks = true` in Rust release profile + 17 `checked_*` operations |
+| DoS HTTP Flood (LOIC/HOIC) | Sliding-window rate limiter at proxy + per-user tier quotas at backend |
+| Information Disclosure / Banner Grab (Shodan/Nikto) | `X-Powered-By` and `Server` headers removed from all responses |
+| Supply Chain (CVE Scanning) | `cargo audit` + `pnpm audit --level high` blocking CI builds |
+| CORS Misconfiguration | `corsStrictPolicy()` with explicit origin allowlist |
+
+**JARGUS categories not applicable to Nirium's architecture:**
+- Subdomain Takeover — no wildcard DNS CNAMEs to external services; all subdomains actively served
+- Slowloris / SYN Flood — mitigated at infrastructure level by Vercel Edge and Railway (not code-addressable)
+- Phishing Simulation tools (GoPhish, etc.) — social-engineering threat, not code-addressable
+- WPScan / CMS scanners — Nirium is not WordPress or any CMS
+- Shodan IoT scanning — no exposed IoT devices or open ports
+
+**Post-JARGUS audit status:** 0 critical, 0 high, 0 medium unresolved. All items merged to `main` and deployed.
+
+---
+
+*Audit conducted against the `nirium-core-private` repository (1,230+ lines of Rust smart contracts, 5 fuzz targets, CI/CD pipeline, Node.js backend, frontend middleware). Zero critical vulnerabilities found. March 31, 2026. Post-audit sprint completed April 1, 2026. JARGUS full-spectrum audit completed April 1, 2026.*

@@ -45,6 +45,15 @@ const SENSITIVE_RESPONSE_HEADERS = new Set([
     'cf-ray',
 ]);
 
+/** Allowed Host values — prevents Host Header Injection / cache poisoning */
+const ALLOWED_HOSTS = new Set([
+    'nirium.xyz',
+    'www.nirium.xyz',
+    'app.nirium.xyz',
+    'localhost:3000',
+    'localhost:3001',
+]);
+
 /** Patterns that indicate malicious or scanning traffic */
 const MALICIOUS_PATTERNS = [
     /(\.\.|\/etc\/passwd|\/proc\/self|\/var\/log)/i,
@@ -189,6 +198,24 @@ async function proxyRequest(request: Request): Promise<Response> {
     if (!effectiveOrigin || !ALLOWED_ORIGINS.has(effectiveOrigin)) {
         return new Response(
             JSON.stringify({ error: 'Forbidden', code: 'DOMAIN_LOCK' }),
+            {
+                status: 403,
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-Nirium-Request-ID': requestId,
+                },
+            }
+        );
+    }
+
+    // ── 1b. Host Header Injection guard ────────────────────────
+    // An attacker can forge the Host header to poison HTTP caches,
+    // trigger password-reset links pointing to evil.com, or bypass
+    // virtual-host routing. Reject any Host not on the allowlist.
+    const hostHeader = request.headers.get('host') ?? '';
+    if (hostHeader && !ALLOWED_HOSTS.has(hostHeader)) {
+        return new Response(
+            JSON.stringify({ error: 'Forbidden', code: 'HOST_HEADER_REJECTED' }),
             {
                 status: 403,
                 headers: {

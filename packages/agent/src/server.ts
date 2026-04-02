@@ -24,6 +24,7 @@ import {
     xdrValidator,
     stellarAddressValidator,
     cryptoCurveValidator,
+    prototypePollutionGuard,
     rateLimitPerMinute,
 } from './middleware/security.js';
 
@@ -110,22 +111,25 @@ app.use(helmetConfig());
 // 2. Block oversized payloads (belt-and-suspenders on top of express.json limit)
 app.use(requestSizeLimit(10 * 1024 * 1024)); // 10 MiB
 
-// 3. Block SQL injection in body / query / params
+// 3. Strip prototype-poisoning keys (__proto__, constructor, prototype)
+app.use(prototypePollutionGuard());
+
+// 4. Block SQL injection in body / query / params
 app.use(sqlInjectionGuard());
 
-// 4. Sanitize LLM prompt inputs
+// 5. Sanitize LLM prompt inputs
 app.use(promptInjectionGuard());
 
-// 5. Validate any XDR fields in request bodies
+// 6. Validate any XDR fields in request bodies
 app.use(xdrValidator());
 
-// 6. Validate Stellar G-addresses in request bodies
+// 7. Validate Stellar G-addresses in request bodies
 app.use(stellarAddressValidator());
 
-// 7. Validate Ed25519 signature/key fields (CVE-2026-32323 curve confusion)
+// 8. Validate Ed25519 signature/key fields (CVE-2026-32323 curve confusion)
 app.use(cryptoCurveValidator());
 
-// 8. Per-minute sliding window rate limiter (supplements tier-based daily quotas)
+// 9. Per-minute sliding window rate limiter (supplements tier-based daily quotas)
 app.use(rateLimitPerMinute(120));
 
 const standardLimiter = createRateLimiter('standard');
