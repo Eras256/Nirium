@@ -252,7 +252,7 @@
     "builder": {
         "drag_n_drop": "Drag & Drop Nodes into Matrix",
         "simulate": "Simulate Resource Footprint",
-        "publish": "Deploy to Stellar Mainnet",
+        "publish": "Deploy to Stellar Testnet",
         "categories": {
             "atomic_engine": "Atomic Engine",
             "signal_inputs": "Signal Inputs",
@@ -360,7 +360,7 @@
         "api": {
             "title": "Integration Protocols (SDK)",
             "explorer_title": "Universal Endpoint Directory",
-            "contracts_title": "Contract Directory (Stellar Mainnet)",
+            "contracts_title": "Contract Directory (Soroban Testnet)",
             "download_postman": "Download/Import into Postman",
             "categories": {
                 "auth": "PUBLIC & AUTH",

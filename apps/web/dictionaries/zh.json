@@ -252,7 +252,7 @@
     "builder": {
         "drag_n_drop": "将节点拖入矩阵",
         "simulate": "模拟资源占用",
-        "publish": "部署到 Stellar 主网",
+        "publish": "部署到 Stellar 测试网",
         "categories": {
             "atomic_engine": "原子引擎",
             "signal_inputs": "信号输入",
@@ -360,7 +360,7 @@
         "api": {
             "title": "集成协议 (SDK)",
             "explorer_title": "通用端点目录",
-            "contracts_title": "合约目录 (Stellar 主网)",
+            "contracts_title": "合约目录 (Soroban 测试网)",
             "download_postman": "下载/导入 Postman",
             "categories": {
                 "auth": "公开与授权",

@@ -1002,7 +1002,7 @@ function ApiSection() {
             <section>
                 <div className="flex items-center gap-3 mb-8">
                     <Database className="text-purple-400 w-6 h-6" />
-                    <h3 className="text-2xl font-bold">Directorio de Contratos (Stellar Mainnet)</h3>
+                    <h3 className="text-2xl font-bold">Directorio de Contratos (Soroban Testnet)</h3>
                 </div>
                 <div className="bg-[#0A0A0A] border border-white/10 rounded-2xl overflow-hidden">
                     <table className="w-full text-left">
@@ -1031,7 +1031,7 @@ function ApiSection() {
                                             <ExternalLink size={10} className="text-gray-600" />
                                         </div>
                                     </td>
-                                    <td className="py-4 px-6 text-right text-gray-400 font-mono text-xs">Soroban Mainnet</td>
+                                    <td className="py-4 px-6 text-right text-gray-400 font-mono text-xs">Soroban Testnet</td>
                                 </tr>
                             ))}
                         </tbody>

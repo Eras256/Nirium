@@ -252,7 +252,7 @@
     "builder": {
         "drag_n_drop": "Arrastra Nodos a la Matriz",
         "simulate": "Simular Huella de Recursos",
-        "publish": "Desplegar en Stellar Mainnet",
+        "publish": "Desplegar en Stellar Testnet",
         "categories": {
             "atomic_engine": "Motor Atómico",
             "signal_inputs": "Entradas de Señal",
@@ -360,7 +360,7 @@
         "api": {
             "title": "Protocolos de Integración (SDK)",
             "explorer_title": "Directorio Universal de Endpoints",
-            "contracts_title": "Directorio de Contratos (Stellar Mainnet)",
+            "contracts_title": "Directorio de Contratos (Soroban Testnet)",
             "download_postman": "Descargar/Importar en Postman",
             "categories": {
                 "auth": "PÚBLICOS & AUTH",
