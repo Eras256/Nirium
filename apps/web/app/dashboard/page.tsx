@@ -21,7 +21,7 @@ import { useVault, useEloReputation } from "@/hooks/useNiriumContracts";
 import { getWebSocketUrl } from "@/lib/constants";
 import { simulateSorobanTx } from "@/lib/stellarSim";
 import { handleWalletError } from "@/components/wallet/WalletErrorHandler";
-import { NATIVE_ASSET_ID, USDC_ASSET_ID, CETES_ASSET_ID, vaultDeposit, vaultWithdraw, vaultCreate, vaultGetVaultCount, CETES_ASSET, getCETESBalance, hasCETESTrustline } from "@/lib/sorobanContracts";
+import { NATIVE_ASSET_ID, USDC_ASSET_ID, CETES_ASSET_ID, vaultDeposit, vaultWithdraw, vaultCreate, vaultClose, vaultRevokeAgent, vaultGetVaultCount, CETES_ASSET, getCETESBalance, hasCETESTrustline } from "@/lib/sorobanContracts";
 import { generateOnboardingUrl, getOrCreateCustomerIds } from "@/lib/etherfuseApi";
 import MarketTicker from "@/components/dashboard/MarketTicker";
 import NeuralOrb from "@/components/dashboard/NeuralOrb";
@@ -1582,23 +1582,41 @@ function DashboardContent() {
     const executeVaultDestruction = async (vaultData: any) => {
         if (!account) return;
 
-        const toastId = toast.loading("Burning Vault On-Chain...");
+        // Block close if vault still has balance — user must withdraw first
+        if (vaultBalance > 0) {
+            toast.error("Withdraw your funds first", {
+                description: `Vault #${vaultData.vaultId} still has balance. Withdraw all funds before closing.`,
+                duration: 6000,
+            });
+            return;
+        }
+
+        const toastId = toast.loading("Closing Vault On-Chain...");
 
         try {
-            const { TransactionBuilder, Networks, Operation, Asset, Horizon } = await import("@stellar/stellar-sdk");
+            const result = await vaultClose(account.address, vaultData.vaultId);
 
-            const server = new Horizon.Server("https://horizon-testnet.stellar.org");
-            const sourceAccount = await server.loadAccount(account.address);
-
-            // This triggers Freighter and ensures we get an on-chain signature via the contract level audit log
-            // We use the account's own address as the agent to revoke (this records the event on the contract history)
-            const result = await vaultRevokeAgent(account.address, vaultData.vaultId, account.address);
             if (!result.success) {
-                throw new Error(result.error || "On-chain revocation failed");
+                toast.dismiss(toastId);
+                // Detect the common "must have 0 balance" contract error
+                const errorMsg = result.error || "";
+                if (errorMsg.includes("0 balance") || errorMsg.includes("withdraw")) {
+                    toast.error("Withdraw your funds first", {
+                        description: "The contract requires the vault balance to be 0 before closing.",
+                        duration: 6000,
+                    });
+                } else {
+                    toast.error("Failed to close vault", {
+                        description: errorMsg,
+                        duration: 6000,
+                    });
+                }
+                return;
             }
-            const txHash = result.txHash!;
 
-            // Clear local storage
+            const txHash = result.txHash || "";
+
+            // Clear local storage only after confirmed on-chain close
             localStorage.removeItem(`nirium-vault-v2-${baseAsset}-${account.address}`);
             localStorage.removeItem(`nirium-vault-balance-${vaultData.vaultId}-${baseAsset}`);
 
@@ -1607,8 +1625,8 @@ function DashboardContent() {
             setVaultBalance(0);
 
             toast.dismiss(toastId);
-            toast.success("Vault Terminated Successfully", {
-                description: `Vault ID ${vaultData.vaultId} burned. Ledger Tx: ${txHash.slice(0,8)}...`,
+            toast.success("Vault Closed Successfully", {
+                description: `Vault ID ${vaultData.vaultId} closed on-chain. Tx: ${txHash.slice(0, 8)}...`,
                 duration: 6000,
                 action: {
                     label: "View Tx",
@@ -1617,13 +1635,13 @@ function DashboardContent() {
             });
 
             writeLog(
-                `VAULT BURNED: ID=${vaultData.vaultId} | Tx: ${txHash.slice(0, 12)}...`,
+                `VAULT CLOSED: ID=${vaultData.vaultId} | Tx: ${txHash.slice(0, 12)}...`,
                 'success',
                 account?.address
             );
         } catch (error: any) {
             toast.dismiss(toastId);
-            console.error("Disconnect Vault Error:", error);
+            console.error("Close Vault Error:", error);
             handleWalletError(error);
         }
     };

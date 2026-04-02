@@ -35,7 +35,7 @@ const NETWORK_PASSPHRASE = Networks.TESTNET;
 const HORIZON_URL = process.env.NEXT_PUBLIC_HORIZON_URL || 'https://horizon-testnet.stellar.org';
 
 export const CONTRACT_IDS = {
-    VAULT: process.env.NEXT_PUBLIC_CONTRACT_VAULT || 'CDMNZIICSHWQMRLWOAVE5VACRY5LVTLGMB75PS3JB5KFMR6TUJXV3DHU', // Fixed: was NEXT_PUBLIC_CONTRACT_SENTINEL
+    VAULT: process.env.NEXT_PUBLIC_CONTRACT_VAULT || 'CDMNZIICSHWQMRLWOAVE5VACRY5LVTLGMB75PS3JB5KFMR6TUJXV3DHU',
     ELO: process.env.NEXT_PUBLIC_CONTRACT_ELO || 'CC6Z3WJWRKVEAXEKIQ5S3LFEMKRF4L2FTN5YZDQU27MQRQAWA5QBJWF2',
     MARKETPLACE: process.env.NEXT_PUBLIC_CONTRACT_MARKETPLACE || 'CB6Q3LKBJ7CAAZY4MK7EG5R6FDDTJHB52ZEENI6BQLBJNFKBQRIAUABC',
 } as const;
@@ -83,9 +83,10 @@ export async function invokeContract({
     method,
     args,
     callerAddress,
-}: InvokeParams): Promise<{ success: boolean; result?: unknown; txHash?: string; error?: string }> {
+    silent = false,
+}: InvokeParams & { silent?: boolean }): Promise<{ success: boolean; result?: unknown; txHash?: string; error?: string; isSimulationError?: boolean }> {
     const server = getRpcServer();
-    console.log(`[Soroban] Invoking ${method} on contract ${contractId} with args:`, args);
+    if (!silent) console.log(`[Soroban] Invoking ${method} on contract ${contractId} with args:`, args);
 
     try {
         // 1. Load source account (sequence number)
@@ -105,8 +106,12 @@ export async function invokeContract({
         const simResult = await server.simulateTransaction(transaction);
 
         if (SorobanRpc.Api.isSimulationError(simResult)) {
-            console.error('[Soroban] Simulation error details:', JSON.stringify(simResult));
-            return { success: false, error: `Simulation failed: ${simResult.error}` };
+            if (!silent) console.error('[Soroban] Simulation error details:', JSON.stringify(simResult));
+            return { 
+                success: false, 
+                error: `Simulation failed: ${simResult.error}`,
+                isSimulationError: true 
+            };
         }
 
         // 4. Assemble the final transaction with simulation data
@@ -287,13 +292,28 @@ export async function vaultWithdraw(callerAddress: string, vaultId: number, amou
 /**
  * Revoke an agent's access to a vault (Used as on-chain termination log)
  */
-export async function vaultRevokeAgent(callerAddress: string, vaultId: number, agentAddress: string) {
+export async function vaultRevokeAgent(callerAddress: string, vaultId: number, agentAddress: string, silent = false) {
     return invokeContract({
         contractId: CONTRACT_IDS.VAULT,
         method: 'revoke_agent',
         args: [
             nativeToScVal(vaultId, { type: 'u64' }),
             Address.fromString(agentAddress).toScVal(),
+        ],
+        callerAddress,
+        silent,
+    });
+}
+
+/**
+ * Permanently close a vault on-chain (Final Termination Log)
+ */
+export async function vaultClose(callerAddress: string, vaultId: number) {
+    return invokeContract({
+        contractId: CONTRACT_IDS.VAULT,
+        method: 'close_vault',
+        args: [
+            nativeToScVal(vaultId, { type: 'u64' }),
         ],
         callerAddress,
     });

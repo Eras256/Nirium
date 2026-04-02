@@ -453,6 +453,35 @@ impl NiriumVaultContract {
         );
     }
 
+    /// Close a vault permanently. Only owner can close.
+    /// Vault must have zero balance to be closed.
+    pub fn close_vault(env: Env, vault_id: u64) {
+        Self::check_not_paused(&env);
+        let mut vault: Vault = env
+            .storage()
+            .persistent()
+            .get(&DataKey::Vault(vault_id))
+            .expect("vault not found");
+
+        vault.owner.require_auth();
+
+        if vault.balance > 0 {
+            panic!("vault must have 0 balance before closing — withdraw your funds first");
+        }
+
+        if !vault.is_active {
+            panic!("vault is already inactive");
+        }
+
+        vault.is_active = false;
+        env.storage().persistent().set(&DataKey::Vault(vault_id), &vault);
+
+        env.events().publish(
+            (symbol_short!("vault"), symbol_short!("closed")),
+            (vault_id, vault.owner),
+        );
+    }
+
     pub fn get_vault(env: Env, vault_id: u64) -> Vault {
         env.storage()
             .persistent()
