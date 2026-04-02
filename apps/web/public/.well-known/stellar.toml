@@ -1,9 +1,15 @@
-# https://github.com/nicholasgasior/stellar-toml/blob/main/README.md
-# https://www.stellar.org/protocol/sep-1
 # Nirium Protocol — SEP-1 stellar.toml
+# https://stellar.org/protocol/sep-1
+# Served at: https://nirium.xyz/.well-known/stellar.toml
+# Must include CORS header: Access-Control-Allow-Origin: *
 
-# ═══ General Information ═══
 VERSION = "2.6.0"
+NETWORK_PASSPHRASE = "Test SDF Network ; September 2015"
+FEDERATION_SERVER = "https://nirium.xyz/federation"
+TRANSFER_SERVER = "https://api.nirium.xyz/sep24"
+WEB_AUTH_ENDPOINT = "https://api.nirium.xyz/auth"
+HORIZON_URL = "https://horizon-testnet.stellar.org"
+ACCOUNTS = []
 
 [DOCUMENTATION]
 ORG_NAME = "Nirium Protocol"
@@ -14,26 +20,11 @@ ORG_DESCRIPTION = "AI-powered DeFi infrastructure for autonomous treasury manage
 ORG_OFFICIAL_EMAIL = "institutional@nirium.xyz"
 ORG_SUPPORT_EMAIL = "sandbox@nirium.xyz"
 ORG_GITHUB = "https://github.com/Eras256/Nirium"
+ORG_KEYBASE = ""
+ORG_TWITTER = "@Niriumstellar"
 
-# ═══ Network Passphrase ═══
-NETWORK_PASSPHRASE = "Test SDF Network ; September 2015"
-
-# ═══ Accounts ═══
-# Treasury and protocol accounts are only disclosed under NDA for institutional partners.
-# Contact institutional@nirium.xyz for access.
-
-# ═══ Principals ═══
 [[PRINCIPALS]]
-name = "Nirium Core Team"
-email = "institutional@nirium.xyz"
+name = "Giovanny Amador"
+email = "vaiogioss@gmail.com"
 github = "https://github.com/Eras256"
-
-# ═══ Smart Contracts (Soroban) ═══
-# Contract IDs are available on testnet. Mainnet IDs disclosed under NDA.
-# Documentation: https://nirium.xyz/docs
-
-# ═══ API & Integration ═══
-[DOCUMENTATION.API]
-API_DOCUMENTATION = "https://nirium.xyz/docs"
-OPENAPI_SPEC = "https://nirium.xyz/nirium-api.yaml"
-SANDBOX_REQUEST = "https://nirium.xyz/docs/sandbox"
+twitter = "@Niriumstellar"

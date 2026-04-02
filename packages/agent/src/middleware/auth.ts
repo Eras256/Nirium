@@ -241,7 +241,7 @@ export function generateToken(
             quotas: TIER_QUOTAS[tier],
         },
         JWT_SECRET,
-        { expiresIn: '24h' }
+        { expiresIn: '1h' }  // AUTH-JWT-TIER-01: 1h expiry limits window if tier is downgraded
     );
 }
 

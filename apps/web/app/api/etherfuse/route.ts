@@ -1,8 +1,10 @@
 import { NextResponse } from 'next/server';
 import crypto from 'crypto';
 
-const API_KEY = process.env.NEXT_PUBLIC_ETHERFUSE_API_KEY || 'api_sand:3f778973-fc92-457a-b1a9-6f77f4d25fc7:cd29e3d9-6fa3-446b-82e9-9e52edb1d27d';
-const BASE_URL = 'https://api.sand.etherfuse.com';
+// API-KEY-EXPOSURE: Use server-only env var (no NEXT_PUBLIC_ prefix).
+// NEXT_PUBLIC_ vars are bundled into the client — never use them for secrets.
+const API_KEY = process.env.ETHERFUSE_API_KEY || process.env.NEXT_PUBLIC_ETHERFUSE_API_KEY || '';
+const BASE_URL = process.env.ETHERFUSE_API_URL || 'https://api.sand.etherfuse.com';
 const headers = {
     'Authorization': API_KEY,
     'Content-Type': 'application/json'
@@ -37,9 +39,7 @@ export async function POST(req: Request) {
                 })
             });
             const kycText = await kycRes.text();
-            console.log("Auto-KYC Registration:", kycRes.status, kycText);
-            
-            require('fs').writeFileSync('/tmp/etherfuse_debug.json', JSON.stringify({ step: 'kyc', status: kycRes.status, text: kycText }));
+            // DEBUG-REMOVED: fs.writeFileSync('/tmp/...') removed — never write debug files in server routes
 
             if (!kycRes.ok && kycRes.status !== 409) {
                 console.error("KYC Auto-approve Failed:", kycText);
@@ -67,8 +67,6 @@ export async function POST(req: Request) {
             let data;
             try { data = JSON.parse(reqText); } catch(e) { data = reqText; }
             
-            require('fs').writeFileSync('/tmp/etherfuse_debug.json', JSON.stringify({ step: 'quote', status: res.status, text: data, prevKycStatus: kycRes.status }));
-
             if (!res.ok) return NextResponse.json({ error: data }, { status: res.status });
             return NextResponse.json({ ...data, quoteId, customerId });
         }
