@@ -70,8 +70,9 @@ function DashboardContent() {
 
         // Let Freighter sign the Transaction
         const response = await signTransaction(txXdr, {
-            networkPassphrase: Networks.TESTNET
-        });
+            networkPassphrase: Networks.TESTNET,
+            address: transaction.source, // Ensure Freighter signs with the transaction's source account
+        } as any);
 
         if (response.error) {
             throw new Error(response.error as string);

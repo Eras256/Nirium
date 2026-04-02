@@ -17,6 +17,9 @@ function formatTime(ts: string) {
 }
 
 export default function OpsConsole({ isExpanded, onToggleExpand, walletAddress }: { isExpanded: boolean, onToggleExpand: () => void, walletAddress?: string }) {
+    const [mounted, setMounted] = useState(false);
+    useEffect(() => setMounted(true), []);
+    
     const [logs, setLogs] = useState<any[]>(DEMO_LOGS);
     const [status, setStatus] = useState<'connecting' | 'online' | 'unavailable'>('connecting');
     const logContainerRef = useRef<HTMLDivElement>(null);
@@ -89,7 +92,7 @@ export default function OpsConsole({ isExpanded, onToggleExpand, walletAddress }
                         const hashPart = parts[1];
                         return (
                             <div key={log.id || i} className="break-all flex flex-wrap gap-x-1 items-start leading-relaxed">
-                                <span className="text-gray-600">[{formatTime(log.timestamp)}]</span>
+                                <span className="text-gray-600">[{mounted ? formatTime(log.timestamp) : '--:--:--'}]</span>
                                 <span className={`${log.level === 'error' ? 'text-red-500' :
                                     log.level === 'warn' ? 'text-yellow-500' :
                                         log.level === 'success' ? 'text-green-400' :
