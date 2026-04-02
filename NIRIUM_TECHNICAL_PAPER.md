@@ -77,6 +77,71 @@ Nirium abstracts LLM interaction through a provider-agnostic layer, supporting:
 - **Edge Tiers**: Grok (xAI), MiniMax (Ultra-low latency).
 - **Private Tiers**: **Ollama** (Local Llama/Mistral) for private institutional execution.
 
+Institutional clients select their preferred provider at deploy time via the `ACTIVE_LLM_PROVIDER` environment variable. The Nirium agent runtime hot-swaps providers without downtime via `POST /api/config/llm` (admin-only).
+
+### 4.3 LLM Execution Intelligence — Three Distinct Functions
+
+The Neural Matrix serves three precise roles in the execution pipeline. Each is architecturally isolated to ensure the LLM never becomes a security boundary or a custody risk.
+
+#### 4.3.1 Unstructured Data Analysis
+Markets move on narrative before they move on numbers. The swarm's LLM layer ingests **unstructured real-time inputs** — news articles, on-chain governance announcements, macroeconomic releases (e.g., Banxico rate decisions, Fed minutes, peso/dollar FX alerts) — and translates them into structured trading signals within milliseconds. A headline announcing a Banxico rate hike can trigger a CETES rebalancing signal before the first SDEX price tick reflects the move.
+
+#### 4.3.2 Dynamic Swarm Orchestration
+The Neural Matrix acts as a **swarm conductor**. Rather than running all 30 agents at equal weight at all times, the LLM evaluates current market regime (trending, ranging, high-volatility, low-liquidity) and **dynamically activates or suppresses specific agent classes**:
+
+| Market Regime | LLM Directive |
+|--------------|--------------|
+| High volatility (VIX-equivalent spike) | Activates risk-protection agents; suppresses SDEX scalpers |
+| Deep liquidity (spread < 0.05%) | Activates arbitrage + flash loan agents |
+| Macro news event pending | Issues pause-buffer to execution agents; holds capital in vault |
+| Stable trending | Full swarm racing mode (30 agents, randomized intervals) |
+
+This transforms the swarm from a static pool of bots into an **adaptive organism** that self-configures to market conditions without human intervention.
+
+#### 4.3.3 Natural Language Audit Log Generation
+Every on-chain transaction produces a technical XDR payload that is unreadable to non-engineers. Nirium's LLM layer **translates each transaction into a boardroom-ready summary** in real time:
+
+```
+Raw XDR → BlackBox Archive (HMAC-SHA256 signed) → LLM Summary → Dashboard / Export
+```
+
+Example output:
+> "Agent #14 executed a flash loan of 5,000 USDC at 14:32:07 UTC. Borrowed, deployed in a USDC/XLM arbitrage via SDEX, repaid with a net profit of 12.4 USDC (0.248%). Protocol fee: 0.124 USDC. Vault balance unchanged. Transaction verified on Stellar Testnet: [tx hash]."
+
+This enables institutional compliance teams and non-technical directors to audit every agent decision without requiring blockchain expertise.
+
+### 4.4 LLM Data Privacy Boundary (Non-Negotiable Architecture Constraint)
+
+**The LLM never receives private keys, wallet secrets, or unencrypted fund balances.**
+
+This is enforced at the architecture level, not by policy:
+
+```
+┌─────────────────────────────────────────┐
+│         WHAT THE LLM RECEIVES           │
+│  ✅ Public market data (Horizon prices)  │
+│  ✅ Anonymized on-chain stats (volumes)  │
+│  ✅ Public news and announcements        │
+│  ✅ Sanitized TX summaries (no amounts   │
+│     above institutional disclosure       │
+│     thresholds if configured)            │
+└─────────────────────────────────────────┘
+
+┌─────────────────────────────────────────┐
+│       WHAT THE LLM NEVER RECEIVES       │
+│  ❌ Private keys or seed phrases         │
+│  ❌ Raw wallet balances                  │
+│  ❌ API secrets or auth tokens           │
+│  ❌ User PII (name, email, KYC data)     │
+│  ❌ Execution commands (LLM suggests;    │
+│     smart contract decides)              │
+└─────────────────────────────────────────┘
+```
+
+**The Dual-Authority Principle:** The LLM is the **brain** (pattern recognition, reasoning, orchestration). The Soroban smart contract is the **law** (mathematically enforced rules, final execution authority). An LLM "suggestion" to execute a flash loan cannot bypass the contract's `require_auth`, `max_execution_amount` cap, or profit solvency check. The contract is the immutable arbiter — the LLM is an advisory layer.
+
+This separation means a **compromised LLM provider** cannot drain funds, cannot issue unauthorized transactions, and cannot alter on-chain state. The worst-case outcome of an LLM failure is a missed trade opportunity, not a loss of capital.
+
 ---
 
 ## 5. Security and Auditability
@@ -85,8 +150,11 @@ Nirium abstracts LLM interaction through a provider-agnostic layer, supporting:
 To solve the "AI Hallucination" audit problem, Nirium implements the **BlackBox Archive**. Every decision made by an agent — including the raw prompt, the LLM reasoning, and the resulting TX hash — is:
 1. Signed with HMAC-SHA256.
 2. Written to the **Logs Data Layer** in real-time.
-3. Indexed with an **IPFS CID** (Decentralized Forensic Hash) for long-term immutable storage verification via Pinata.
-4. Exportable as encrypted JSON via the "Black Box Data" operator interface.
+3. Simultaneously translated into a **Natural Language Audit Summary** (see §4.3.3) for compliance consumption — no blockchain expertise required to read the audit trail.
+4. Indexed with an **IPFS CID** (Decentralized Forensic Hash) for long-term immutable storage verification via Pinata.
+5. Exportable as encrypted JSON via the "Black Box Data" operator interface.
+
+The dual-format archive (machine-readable HMAC-signed JSON + human-readable LLM summary) ensures that both technical auditors and institutional directors can independently verify any agent action without relying on each other's expertise.
 
 ### 5.2 Circuit Breakers
 The protocol implements `Pausable` states and `max_execution_amount` per delegation, allowing humans to immediately "kill" any agent that deviates from its expected risk profile.

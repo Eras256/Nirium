@@ -1640,6 +1640,7 @@ Verifica:
 | **WebSocket Flood** | Rate limiter de conexiones WS: máximo 10 nuevas conexiones por IP por minuto. Las que excedan el límite son rechazadas antes de que se procese el JWT, evitando agotamiento de memoria por spam de conexiones no autenticadas. |
 | **Responsible Disclosure** | `/.well-known/security.txt` (RFC 9116) disponible en `https://nirium.xyz/.well-known/security.txt` con contacto, expiración y política de divulgación. |
 | **Persistencia segura** | Cuentas sandbox y webhooks persisten en Supabase (PostgreSQL). API Keys almacenadas solo como hash SHA-256 — valor original no recuperable. `revoked_at` timestamp registrado al revocar keys. |
+| **Aislamiento LLM** | El LLM recibe **únicamente datos públicos de mercado** (precios Horizon, noticias, estadísticas on-chain anonimizadas). Las llaves privadas, balances de wallet y secretos de autenticación **jamás tocan un modelo de lenguaje**. El LLM sugiere — el smart contract de Soroban ejecuta con autoridad final (`require_auth`, `max_execution_amount`). Un LLM comprometido no puede drenar fondos ni emitir transacciones no autorizadas. |
 | **Legal Shield** | Ejecuciones reales (`/api/execute`) requieren firma TOS verificada contra Supabase. En producción: falla cerrado ante cualquier error de DB. En desarrollo sin Supabase: pass-through con advertencia (no bloquea). |
 | **Auditoría** | Logs inmutables archivados en IPFS cada 5 minutos |
 | **Secrets** | Ningún secret hardcodeado — `process.exit(1)` en producción si `JWT_SECRET` o `ADMIN_API_KEY` no están definidos |

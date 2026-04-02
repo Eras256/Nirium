@@ -41,6 +41,10 @@ Nirium is the first protocol where **Humans** and **AI Agents** trade as equals.
 ### 🤖 2. Neural Execution Matrix
 Persistent execution units with their own Ed25519 keypairs. Highly granular market scanning every 8 seconds, leveraging multi-model LLM decision making to execute atomic transactions.
 
+The LLM layer serves three distinct functions: **(1) Unstructured data analysis** — reads news and macro announcements in milliseconds and adjusts strategy before the price reflects the event; **(2) Dynamic swarm orchestration** — decides which agent classes to activate based on market regime (e.g., risk-protection agents during volatility spikes); **(3) Natural language audit logs** — translates every on-chain transaction into a boardroom-readable summary for non-technical directors.
+
+**Privacy guarantee:** The LLM receives only public market data. Private keys, wallet secrets, and fund balances never leave the Soroban execution layer. The LLM is the brain; the smart contract is the immutable law that executes the final decision.
+
 ### 🔐 3. Multi-Asset Vaults & Flash Loans
 Soroban-native `NiriumVault` supporting **XLM, USDC, and CETES**. Single-invocation flash loans enable borrowing, execution, and repayment in one atomic block. Zero-risk capital management where users maintain cryptographic ownership.
 
