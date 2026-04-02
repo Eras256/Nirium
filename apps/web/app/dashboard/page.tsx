@@ -1590,21 +1590,13 @@ function DashboardContent() {
             const server = new Horizon.Server("https://horizon-testnet.stellar.org");
             const sourceAccount = await server.loadAccount(account.address);
 
-            // Create a "Terminal" marker transaction via ManageData
-            const transaction = new TransactionBuilder(sourceAccount, {
-                fee: "100",
-                networkPassphrase: Networks.TESTNET,
-            })
-                .addOperation(Operation.manageData({
-                    name: `nirium_vault_${vaultData.vaultId}`,
-                    value: "TERMINATED"
-                }))
-                .setTimeout(300)
-                .build();
-
-            // This triggers Freighter and ensures we get an on-chain signature
-            const result = await signAndSubmitTransaction({ transaction });
-            const txHash = result.hash;
+            // This triggers Freighter and ensures we get an on-chain signature via the contract level audit log
+            // We use the account's own address as the agent to revoke (this records the event on the contract history)
+            const result = await vaultRevokeAgent(account.address, vaultData.vaultId, account.address);
+            if (!result.success) {
+                throw new Error(result.error || "On-chain revocation failed");
+            }
+            const txHash = result.txHash!;
 
             // Clear local storage
             localStorage.removeItem(`nirium-vault-v2-${baseAsset}-${account.address}`);

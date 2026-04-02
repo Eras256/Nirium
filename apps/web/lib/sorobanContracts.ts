@@ -284,6 +284,21 @@ export async function vaultWithdraw(callerAddress: string, vaultId: number, amou
     });
 }
 
+/**
+ * Revoke an agent's access to a vault (Used as on-chain termination log)
+ */
+export async function vaultRevokeAgent(callerAddress: string, vaultId: number, agentAddress: string) {
+    return invokeContract({
+        contractId: CONTRACT_IDS.VAULT,
+        method: 'revoke_agent',
+        args: [
+            nativeToScVal(vaultId, { type: 'u64' }),
+            Address.fromString(agentAddress).toScVal(),
+        ],
+        callerAddress,
+    });
+}
+
 // ═══════════════════════════════════════════════════════
 // ELO CONTRACT — Reputation System
 // ═══════════════════════════════════════════════════════
