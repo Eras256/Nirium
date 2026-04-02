@@ -1015,7 +1015,7 @@ function ApiSection() {
                         </thead>
                         <tbody className="text-sm">
                             {[
-                                { name: 'Vault Principal (Treasury)', id: 'CB67X4Q...4ODZ4HEN', type: 'Nirium Protocol' },
+                                { name: 'Vault Principal (Treasury)', id: 'CDYVJU7...J3EE', type: 'Nirium Protocol' },
                                 { name: 'Reputation System (ELO)', id: 'CB4RCN4...TFCU6XW4H', type: 'Reputation' },
                                 { name: 'Marketplace Strategist', id: 'CCUDDIF...BCZF6KV6', type: 'Logic' },
                                 { name: 'CETES RWA (Soroban SAC)', id: 'CC72F57...PFDLNCQY', type: 'Asset' },
@@ -1055,6 +1055,9 @@ function ApiSection() {
                             <div className="flex items-center gap-2">
                                 <div className="w-1.5 h-6 bg-stellar-teal rounded-full" />
                                 <span className="text-xs font-mono text-gray-400">PYTHON SDK — AUDIT STATUS</span>
+                                <div className="bg-black/40 px-2 py-0.5 rounded text-[10px] font-mono text-stellar-teal border border-stellar-teal/20">
+                                    pip install nirium
+                                </div>
                             </div>
                         </div>
                         <pre className="p-6 text-xs font-mono text-gray-300 overflow-x-auto leading-relaxed bg-black/40 flex-grow">
@@ -1091,6 +1094,9 @@ get_compliance_status()`}
                             <div className="flex items-center gap-2">
                                 <div className="w-1.5 h-6 bg-purple-500 rounded-full" />
                                 <span className="text-xs font-mono text-gray-400">NODE.JS — REAL-TIME SWARM TELEMETRY</span>
+                                <div className="bg-black/40 px-2 py-0.5 rounded text-[10px] font-mono text-purple-400 border border-purple-500/20">
+                                    npm install nirium
+                                </div>
                             </div>
                         </div>
                         <pre className="p-6 text-xs font-mono text-gray-300 overflow-x-auto leading-relaxed bg-black/40 flex-grow">

@@ -89,7 +89,7 @@ x-api-key: sk_inst_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 
 ### Método 2 — JWT Bearer Token (recomendado para sesiones web)
 
-Tokens de corta duración (24h) obtenidos mediante firma de wallet Stellar.
+Tokens de corta duración (1h, HS256) obtenidos mediante firma de wallet Stellar.
 
 ```http
 GET /api/market HTTP/1.1
@@ -189,7 +189,7 @@ curl https://api.nirium.xyz/api/info
 ---
 
 #### `POST /api/public/demo-auth`
-Genera un token JWT de prueba (24h) sin verificación de firma. Para primeras pruebas únicamente.
+Genera un token JWT de prueba (1h) sin verificación de firma. Para primeras pruebas únicamente.
 
 ```bash
 curl -X POST https://api.nirium.xyz/api/public/demo-auth \
@@ -207,7 +207,7 @@ curl -X POST https://api.nirium.xyz/api/public/demo-auth \
 {
   "success": true,
   "token": "eyJhbGci...",
-  "expiresIn": "24h",
+  "expiresIn": "1h",
   "tier": "free",
   "quotas": { "requestsPerMinute": 10, "requestsPerDay": 100 }
 }
@@ -253,7 +253,7 @@ const result = await window.freighter.signMessage(message, "testnet");
   "success": true,
   "authenticated": true,
   "token": "eyJhbGci...",
-  "expiresIn": "24h",
+  "expiresIn": "1h",
   "tier": "institutional",
   "walletAddress": "G..."
 }
@@ -303,7 +303,7 @@ curl https://api.nirium.xyz/api/public/examples
 ### 4.2 Endpoints de Autenticación
 
 #### `POST /api/auth/token`
-Genera un JWT de 24h a partir de una dirección de wallet. **Siempre emite tier `free`** (10 rpm, 100 req/día). Útil para obtener el JWT con el que luego crear una API Key.
+Genera un JWT de 1h (HS256) a partir de una dirección de wallet. **Siempre emite tier `free`** (10 rpm, 100 req/día). Útil para obtener el JWT con el que luego crear una API Key.
 
 ```bash
 curl -X POST https://api.nirium.xyz/api/auth/token \
@@ -1394,27 +1394,30 @@ echo "Listo. Todos los sistemas verificados."
 | Característica | Valor |
 |---------------|-------|
 | Protocolo | WSS (WebSocket Secure) |
-| Autenticación | `x-api-key` en header de conexión |
+| Autenticación | JWT Bearer vía query param `?token=<jwt>` (obligatorio — conexiones sin token son rechazadas con código 1008) |
+| Rate limit de conexión | 10 nuevas conexiones por IP por minuto |
 | Keepalive | Ping automático cada 30s |
 | Reconexión | Responsabilidad del cliente |
 | Latencia P95 | < 500ms |
+
+> **Nota de seguridad:** El WebSocket requiere un JWT válido (obtenido de `/api/public/demo-auth` o `/api/auth/token`). Los tokens tienen duración de **1h** — implementar renovación automática antes de expirar.
 
 ### Ejemplo de cliente robusto con reconexión automática
 
 ```javascript
 const WebSocket = require('ws');
 
-const API_KEY = process.env.NIRIUM_API_KEY;
-const WS_URL = 'wss://api.nirium.xyz/ws/signals';
+// Obtener JWT previamente con /api/public/demo-auth o /api/auth/token
+const JWT_TOKEN = process.env.NIRIUM_JWT_TOKEN;
+const WS_BASE = 'wss://api.nirium.xyz/ws/signals';
 
 let ws;
 let reconnectDelay = 1000;
 const MAX_RECONNECT_DELAY = 30000;
 
 function connect() {
-  ws = new WebSocket(WS_URL, {
-    headers: { 'x-api-key': API_KEY }
-  });
+  // Autenticación via query param — no via header (el protocolo WS no expone headers custom de forma segura)
+  ws = new WebSocket(`${WS_BASE}?token=${JWT_TOKEN}`);
 
   ws.on('open', () => {
     console.log('[Nirium] WebSocket conectado');
@@ -1624,7 +1627,7 @@ Verifica:
 | Capa | Mecanismo |
 |------|-----------|
 | **Transporte** | TLS 1.3 — todo el tráfico cifrado en tránsito |
-| **Autenticación** | JWT HS256 (24h) + API Keys SHA-256 hashed en base de datos |
+| **Autenticación** | JWT HS256 (1h, algoritmo explícitamente bloqueado — bloquea ataques `alg:none` y RS256-confusion) + API Keys SHA-256 hashed en base de datos |
 | **Firma de wallet** | Verificación criptográfica **real** Ed25519 via Stellar SDK. Acepta base64 (Freighter) y hex (SDK). Sin bypass posible. |
 | **Anti-replay** | Timestamp **obligatorio** en mensaje firmado (campo `Timestamp: <ms>`). Mensajes sin timestamp → `400`. Mensajes con más de 5 minutos → `401 Message expired`. |
 | **Autorización** | RBAC por tier: free → sandbox → institutional → enterprise → admin |
@@ -1632,6 +1635,10 @@ Verifica:
 | **CORS** | Restringido a dominios configurados en `ALLOWED_ORIGINS` (variable de entorno) |
 | **Webhooks** | HMAC-SHA256 firmados (`X-Nirium-Signature`). Validación anti-SSRF bloquea IPs privadas, loopback y endpoints de metadata cloud. |
 | **Sanitización de inputs** | `companyName` y `message` en `/api/sandbox/request` son sanitizados: se eliminan tags HTML (`<script>`, etc.) y caracteres especiales antes de persistir. Protege contra stored XSS en dashboards que rendericen estos valores. |
+| **Prototype Pollution** | Middleware `prototypePollutionGuard()` elimina recursivamente claves `__proto__`, `constructor` y `prototype` de todos los bodies antes de llegar a cualquier route handler. Rechaza con HTTP 400 si aparecen en query params. |
+| **Host Header Injection** | El proxy Edge valida el header `Host` contra la allowlist `nirium.xyz`. Peticiones con hosts arbitrarios reciben HTTP 403. Previene cache poisoning y hijacking de enlaces de reset. |
+| **WebSocket Flood** | Rate limiter de conexiones WS: máximo 10 nuevas conexiones por IP por minuto. Las que excedan el límite son rechazadas antes de que se procese el JWT, evitando agotamiento de memoria por spam de conexiones no autenticadas. |
+| **Responsible Disclosure** | `/.well-known/security.txt` (RFC 9116) disponible en `https://nirium.xyz/.well-known/security.txt` con contacto, expiración y política de divulgación. |
 | **Persistencia segura** | Cuentas sandbox y webhooks persisten en Supabase (PostgreSQL). API Keys almacenadas solo como hash SHA-256 — valor original no recuperable. `revoked_at` timestamp registrado al revocar keys. |
 | **Legal Shield** | Ejecuciones reales (`/api/execute`) requieren firma TOS verificada contra Supabase. En producción: falla cerrado ante cualquier error de DB. En desarrollo sin Supabase: pass-through con advertencia (no bloquea). |
 | **Auditoría** | Logs inmutables archivados en IPFS cada 5 minutos |
@@ -1649,7 +1656,7 @@ Verifica:
 2. Rotar la API Key periódicamente via `POST /api/auth/keys` + `DELETE /api/auth/keys/:id`
 3. Verificar siempre la firma HMAC-SHA256 en los webhooks (`X-Nirium-Signature`) antes de procesar el payload
 4. Usar `execute-demo` para todas las pruebas hasta validar la integración completamente
-5. Implementar reconexión automática en el cliente WebSocket
+5. Implementar reconexión automática en el cliente WebSocket. Los tokens JWT duran **1h** — renovar el token antes de expirar y reconectar con el nuevo `?token=` para evitar desconexiones 1008
 6. Monitorear el endpoint `GET /api/sandbox/status` para rastrear consumo de cuotas
 7. En `/api/public/authenticate`: asegurarse de que el `Timestamp: <ms>` en el mensaje firmado corresponda al tiempo actual — mensajes con más de 5 minutos son rechazados
 8. Para deploys multi-instancia: configurar `REDIS_URL` para que el rate limiting sea consistente entre procesos

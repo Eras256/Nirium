@@ -13,19 +13,25 @@ info:
     - WebSocket subscriptions for live updates
 
     ## Institutional Security & Compliance (AAA Grade)
-    As of Mar 2026, Nirium Protocol adheres to the highest institutional standards:
+    As of Apr 1, 2026, Nirium Protocol adheres to the highest institutional standards:
     - **Data Residency**: Fully compliant with Mexico's LFPDPPP and California's DFAL.
     - **Smart Contract Audits**: Zero critical vulnerabilities. Fuzz-tested with `cargo-fuzz`.
-    - **API Security**: 100% compliant with OWASP API Security Top 10.
+    - **API Security**: 100% compliant with OWASP API Security Top 10. Full-spectrum JARGUS penetration audit passed.
+    - **JWT**: HS256 algorithm locked — `alg:none` / algorithm-confusion attacks blocked.
+    - **Prototype Pollution**: All request bodies stripped of `__proto__`/`constructor`/`prototype` keys before routing.
+    - **Host Header Injection**: Incoming `Host` header validated against `nirium.xyz` allowlist on the Edge proxy.
+    - **WebSocket**: JWT required via query param (`?token=`). Per-IP connection rate limit: 10 connections/min.
+    - **Responsible Disclosure**: `/.well-known/security.txt` (RFC 9116) available at `https://nirium.xyz/.well-known/security.txt`.
     - **SDKs**: Official wrappers available on npm (`nirium`) and PyPI (`nirium`).
 
     ## Authentication
 
     Nirium supports multiple authentication methods:
 
-    1. **JWT Tokens** (short-lived, 24h)
+    1. **JWT Tokens** (short-lived, 1h — HS256 algorithm locked)
        - Obtain via `/api/public/demo-auth` or `/api/auth/token`
        - Use header: `Authorization: Bearer <token>`
+       - WebSocket: pass as query param `wss://api.nirium.xyz/ws/signals?token=<jwt>`
 
     2. **API Keys** (long-lived, institutional)
        - Request via `/api/sandbox/request` or `/api/auth/keys`
@@ -169,7 +175,7 @@ paths:
       summary: Generate demo token
       description: |
         Generate a demo JWT token without signature verification.
-        Useful for testing and onboarding. Returns a free-tier token valid for 24 hours.
+        Useful for testing and onboarding. Returns a free-tier token valid for 1 hour.
       operationId: postDemoAuth
       requestBody:
         required: true
@@ -1114,7 +1120,7 @@ components:
           description: JWT token
         expiresIn:
           type: string
-          example: 24h
+          example: 1h
         userId:
           type: string
         tier:
