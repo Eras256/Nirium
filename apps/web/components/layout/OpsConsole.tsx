@@ -28,18 +28,27 @@ export default function OpsConsole({ isExpanded, onToggleExpand, walletAddress }
     const fetchLogs = useCallback(async () => {
         try {
             const res = await fetch('/api/logs');
-            if (!res.ok) return;
+            if (!res.ok) {
+                setStatus('unavailable');
+                return;
+            }
             const rows: any[] = await res.json();
-            if (rows && rows.length > 0) {
+            setStatus('online');
+            
+            // If we have data, update logs. If empty, clear DEMO_LOGS.
+            if (rows) {
                 const newestId = rows[0]?.id;
                 if (newestId !== lastIdRef.current) {
                     lastIdRef.current = newestId;
-                    setLogs(rows.reverse());
-                    setStatus('online');
+                    setLogs(rows.length > 0 ? rows.reverse() : []);
+                } else if (rows.length === 0 && logs.length !== 0) {
+                    // Specific case: table was purged
+                    setLogs([]);
                 }
             }
         } catch (e) {
             console.warn('[Neural Feed] Fetch error:', e);
+            setStatus('unavailable');
         }
     }, []);
 
@@ -48,6 +57,14 @@ export default function OpsConsole({ isExpanded, onToggleExpand, walletAddress }
         const poll = setInterval(fetchLogs, 3000);
         return () => clearInterval(poll);
     }, [fetchLogs]);
+
+    // If still 'connecting' after 8s, Supabase is unreachable
+    useEffect(() => {
+        const timeout = setTimeout(() => {
+            setStatus(prev => prev === 'connecting' ? 'unavailable' : prev);
+        }, 8000);
+        return () => clearTimeout(timeout);
+    }, []);
 
     useEffect(() => {
         if (logContainerRef.current) {
