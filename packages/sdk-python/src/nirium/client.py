@@ -83,7 +83,7 @@ class Agent:
         """Check if the agent is reachable."""
         try:
             data = await self._get("/health")
-            return data.get("status") == "operational"
+            return data.get("status") in ("operational", "online")
         except Exception:
             return False
 

@@ -190,7 +190,7 @@ export class Agent {
     async ping(): Promise<boolean> {
         try {
             const data = await this.request<{ status: string }>('GET', '/health');
-            return data.status === 'operational';
+            return data.status === 'operational' || data.status === 'online';
         } catch {
             return false;
         }
