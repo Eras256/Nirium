@@ -231,6 +231,20 @@ async function setupAgents() {
     }
 
     for (const agent of agents) {
+        const simulation = async () => {
+            // Micro-desfase (Jitter) para evitar saturación de red
+            const jitter = Math.floor(Math.random() * 3000);
+            await new Promise(r => setTimeout(r, jitter));
+            
+            while (true) {
+                try {
+                    await logToSupabase(agent.name, `Agent ${agent.name} active on ${NETWORK}. Checking for opportunities...`, "info");
+                } catch (e) {}
+                await new Promise(r => setTimeout(r, 60000));
+            }
+        };
+        simulation();
+
         let acc;
         try {
             acc = await horizonServer.loadAccount(agent.keypair.publicKey());
