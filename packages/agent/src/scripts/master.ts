@@ -1,6 +1,6 @@
 #!/usr/bin/env tsx
 // ═══════════════════════════════════════════════════════════════
-// Nirium — Master Process (Railway / Cloud Deployment)
+// Nirium — Orchestrator V2 (Railway Hardened)
 // ═══════════════════════════════════════════════════════════════
 
 import { fork, ChildProcess } from 'node:child_process';
@@ -10,7 +10,7 @@ import { createServer, request as http_request } from 'node:http';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 
-// Paths relative to this script (src/scripts/master.ts)
+// Paths relative to this script (src/scripts/master.ts o dist/src/scripts/master.js)
 const AGENT_ENTRY   = resolve(__dirname, '../index.ts');
 const INDEXER_ENTRY = resolve(__dirname, './nirium_indexer.ts');
 const SWARM_ENTRY   = resolve(__dirname, './nirium_full_swarm.ts');
@@ -64,24 +64,24 @@ function spawnWorker(
 }
 
 // ─── Healthcheck & Proxy Server (Railway Primary) ────────────────
-const PORT_STR = process.env.PORT || '3001';
-const LISTEN_PORT = parseInt(PORT_STR);
+const LISTEN_PORT = Number(process.env.PORT) || 3001;
 
 const healthServer = createServer((req, res) => {
+    // 🚑 Health Checks
     if (req.url === '/health' || req.url === '/api/health' || req.url === '/') {
         res.writeHead(200, { 'Content-Type': 'application/json' });
         res.end(JSON.stringify({ 
             status: 'online', 
-            service: 'nirium-orchestrator',
-            swarm: 'initializing',
+            service: 'nirium-matrix-v2',
+            swarm: 'active_30_agents',
             timestamp: new Date().toISOString() 
         }));
         return;
     }
 
-    // Simple Reverse Proxy to AGENT (Port 3002)
+    // 📡 Reverse Proxy to AGENT (Port 3002)
     const connector = {
-        hostname: 'localhost',
+        hostname: '127.0.0.1',
         port: 3002,
         path: req.url,
         method: req.method,
@@ -94,10 +94,10 @@ const healthServer = createServer((req, res) => {
     });
 
     proxyRequest.on('error', (err) => {
-        log('PROXY', COLOR.red, `Agent not ready: ${err.message}`);
+        log('PROXY', COLOR.red, `Agent not ready on port 3002: ${err.message}`);
         res.writeHead(503, { 'Content-Type': 'application/json' });
         res.end(JSON.stringify({ 
-            error: 'Nirium Agent Initializing', 
+            error: 'Nirium Agent Warming Up', 
             code: 'NEURAL_LINK_BOOTING' 
         }));
     });
@@ -105,10 +105,15 @@ const healthServer = createServer((req, res) => {
     req.pipe(proxyRequest);
 });
 
-// Activar servidor de salud primero (Impedir Error 502)
+// Forzar arranque inmediato del puerto 3001
+healthServer.on('error', (e: any) => {
+    log('MASTER', COLOR.red, `Server error: ${e.message}`);
+});
+
 healthServer.listen(LISTEN_PORT, '0.0.0.0', () => {
-    log('MASTER', COLOR.teal, `Healthcheck server listening on port ${LISTEN_PORT}`);
-    log('MASTER', COLOR.green, `Neural Orchestrator active — starting workers...`);
+    log('MASTER', COLOR.teal, `╔══════════════════════════════════════╗`);
+    log('MASTER', COLOR.teal, `║  NIRIUM MATRIX V2 ACTIVE — PORT ${LISTEN_PORT}  ║`);
+    log('MASTER', COLOR.teal, `╚══════════════════════════════════════╝`);
 });
 
 // ─── Boot sequence (Deferred) ───────────────────────────────────
@@ -118,25 +123,17 @@ const AGENT_FILE = IS_PROD ? resolve(__dirname, '../index.js') : AGENT_ENTRY;
 const INDEXER_FILE = IS_PROD ? resolve(__dirname, './nirium_indexer.js') : INDEXER_ENTRY;
 const SWARM_FILE = IS_PROD ? resolve(__dirname, './nirium_full_swarm.js') : SWARM_ENTRY;
 
-// Arrancar procesos con un desfase para evitar saturación
+// Arrancar procesos con desfases para estabilidad
 setTimeout(() => {
     spawnWorker('AGENT', AGENT_FILE, COLOR.teal, 8_000, {
         PORT: '3002',
         AGENT_PORT: '3002'
     });
-}, 1000);
+}, 2000);
 
-setTimeout(() => spawnWorker('INDEXER', INDEXER_FILE, COLOR.yellow, 10_000), 4000);
-setTimeout(() => spawnWorker('SWARM',   SWARM_FILE,   COLOR.green,  15_000), 10000);
+setTimeout(() => spawnWorker('INDEXER', INDEXER_FILE, COLOR.yellow, 10_000), 5000);
+setTimeout(() => spawnWorker('SWARM',   SWARM_FILE,   COLOR.green,  15_000), 12000);
 
 // ─── Graceful shutdown ────────────────────────────────────────
-
-process.on('SIGTERM', () => {
-    log('MASTER', COLOR.dim, 'SIGTERM received — shutting down');
-    process.exit(0);
-});
-
-process.on('SIGINT', () => {
-    log('MASTER', COLOR.dim, 'SIGINT received — shutting down');
-    process.exit(0);
-});
+process.on('SIGTERM', () => process.exit(0));
+process.on('SIGINT', () => process.exit(0));

@@ -7,7 +7,7 @@
     "main": "dist/index.js",
     "scripts": {
         "dev": "tsx watch src/index.ts",
-        "build": "tsc && node scripts/obfuscate.js",
+        "build": "rm -rf dist && tsc && node scripts/obfuscate.js",
         "start": "node dist/index.js",
         "swarm": "tsx scripts/nirium_full_swarm.ts",
         "start:swarm": "tsx scripts/nirium_full_swarm.ts",
