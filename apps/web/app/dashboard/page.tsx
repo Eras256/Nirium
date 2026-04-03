@@ -2082,7 +2082,7 @@ function DashboardContent() {
                         Global Active Agents
                     </h3>
                     <div className="text-xl font-mono text-white font-bold flex items-baseline gap-2">
-                        {onChainVaultCount !== null ? onChainVaultCount * 2 + 3 : '--'}
+                        30
                         <span className="text-[10px] text-gray-600">NODES</span>
                     </div>
                 </div>

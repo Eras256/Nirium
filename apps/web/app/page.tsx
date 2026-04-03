@@ -143,7 +143,7 @@ export default function Home() {
 
                         {/* Live swarm counter pill */}
                         <div className="flex flex-wrap gap-3">
-                            <StatPill label={t.home.stat_agents} value="15" color="teal" />
+                            <StatPill label={t.home.stat_agents} value="30" color="teal" />
                             <StatPill label={t.home.stat_contracts} value="4" color="yellow" />
                             <StatPill label={t.home.stat_throughput} value="~112 tx/min" color="purple" />
                         </div>
@@ -490,7 +490,7 @@ export default function Home() {
                 </motion.div>
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
                     {[
-                        { label: t.home.stat_agents, value: "15", sub: t.home.stat_agents_sub, icon: Bot, color: "teal" },
+                        { label: t.home.stat_agents, value: "30", sub: t.home.stat_agents_sub, icon: Bot, color: "teal" },
                         { label: t.home.stat_throughput_label, value: "~112", sub: t.home.stat_throughput_sub, icon: Repeat2, color: "yellow" },
                         { label: t.home.stat_latency_label, value: "<100ms", sub: t.home.stat_latency_sub, icon: Activity, color: "purple" },
                         { label: t.home.stat_capacity_label, value: "~1M", sub: t.home.stat_capacity_sub, icon: BarChart3, color: "green" },
