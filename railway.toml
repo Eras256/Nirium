@@ -26,7 +26,7 @@ buildCommand = "cd packages/agent && pnpm build"
 [deploy]
 startCommand = "cd packages/agent && npx tsx scripts/master.ts"
 healthcheckPath = "/health"
-healthcheckTimeout = 30
+healthcheckTimeout = 300
 restartPolicyType = "on_failure"
 restartPolicyMaxRetries = 10
 
