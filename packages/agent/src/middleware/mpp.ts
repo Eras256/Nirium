@@ -22,7 +22,7 @@
 // ═══════════════════════════════════════════════════════════════
 
 import type { Request, Response, NextFunction } from 'express';
-import { Mppx, stellar } from '@stellar/mpp/charge/server';
+import { stellar } from '@stellar/mpp/charge/server';
 import { Mppx as MppxServer } from 'mppx/server';
 import { USDC_SAC_TESTNET, USDC_SAC_MAINNET } from '@stellar/mpp';
 import { supabase } from '../providers/database.js';
@@ -43,7 +43,8 @@ const MPP_SECRET = process.env.MPP_SECRET_KEY || '';
 // No channel setup required. Client transfers USDC in the request.
 //
 
-let chargeMppx: ReturnType<typeof MppxServer.create> | null = null;
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+let chargeMppx: any = null;
 
 if (RECIPIENT && MPP_SECRET) {
     chargeMppx = MppxServer.create({
