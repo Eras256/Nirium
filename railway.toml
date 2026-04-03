@@ -1,40 +1,26 @@
 # ═══════════════════════════════════════════════════════════════
-# Nirium Protocol — Railway Cloud Deployment
-# ═══════════════════════════════════════════════════════════════
-#
-# Deploys the Nirium Agent (API + Indexer + Swarm) as a single
-# long-running service on Railway.
-#
-# Required environment variables (set in Railway dashboard):
-#   SUPABASE_URL              Supabase project URL
-#   SUPABASE_ANON_KEY         Supabase anon key
-#   STELLAR_SECRET_KEY        Funded Stellar keypair
-#   X402_PAY_TO_ADDRESS       Your Stellar address (receives USDC)
-#   STELLAR_NETWORK           testnet | mainnet
-#   ACTIVE_LLM_PROVIDER       ollama | openai | anthropic | groq
-#   OPENAI_API_KEY            (if using openai provider)
-#   ANTHROPIC_API_KEY         (if using anthropic provider)
-#   JWT_SECRET                Strong random secret for JWT tokens
-#   ADMIN_API_KEY             Strong random secret for admin routes
-#
+# NIRIUM PROTOCOL — RAILWAY DEPLOYMENT CONFIG (MONOREPO)
+# Orchestrates Master Process + Indexer + Swarm Agents
 # ═══════════════════════════════════════════════════════════════
 
 [build]
 builder = "nixpacks"
-buildCommand = "cd packages/agent && pnpm build"
+buildCommand = "pnpm install && cd packages/agent && pnpm build"
+watchPatterns = ["/packages/agent/**", "package.json", "pnpm-lock.yaml", "vercel.json", "railway.toml"]
 
 [deploy]
 # Start command — orchestrates all services via master process
 startCommand = "cd packages/agent && node dist/src/scripts/master.js"
 healthcheckPath = "/health"
 healthcheckTimeout = 300
-restartPolicyType = "on_failure"
+restartPolicy = "on-failure"
 restartPolicyMaxRetries = 10
 
-[[services]]
-name = "nirium-agent"
-
-[services.variables]
-PORT = "3001"
-AGENT_PORT = "3001"
+# ═══════════════════════════════════════════════════════════════
+# Environmental Infrastructure
+# ═══════════════════════════════════════════════════════════════
+[env]
 NODE_ENV = "production"
+PORT = "3001"
+AGENT_PORT = "3002"
+# ═══════════════════════════════════════════════════════════════
