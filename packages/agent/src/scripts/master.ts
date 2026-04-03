@@ -63,34 +63,6 @@ function spawnWorker(
     start();
 }
 
-// ─── Boot sequence ────────────────────────────────────────────
-
-console.log('');
-console.log(`${COLOR.teal}╔══════════════════════════════════════════════════════╗`);
-console.log(`║  NIRIUM MASTER PROCESS                               ║`);
-console.log(`║  Autonomous DeFi Agent — Railway Cloud Deployment   ║`);
-console.log(`╚══════════════════════════════════════════════════════╝${COLOR.reset}`);
-console.log('');
-
-// Logic to switch between .ts (dev) and .js (build)
-const IS_PROD = process.env.NODE_ENV === 'production' || __dirname.includes('/dist/');
-
-const AGENT_FILE = IS_PROD ? resolve(__dirname, '../index.js') : AGENT_ENTRY;
-const INDEXER_FILE = IS_PROD ? resolve(__dirname, './nirium_indexer.js') : INDEXER_ENTRY;
-const SWARM_FILE = IS_PROD ? resolve(__dirname, './nirium_full_swarm.js') : SWARM_ENTRY;
-
-log('MASTER', COLOR.teal, `Boot mode: ${IS_PROD ? 'PRODUCTION (node)' : 'DEVELOPMENT (tsx)'}`);
-
-setTimeout(() => {
-    spawnWorker('AGENT', AGENT_FILE, COLOR.teal, 8_000, {
-        PORT: '3002',
-        AGENT_PORT: '3002'
-    });
-}, 0);
-
-setTimeout(() => spawnWorker('INDEXER', INDEXER_FILE, COLOR.yellow, 10_000), 3_000);
-setTimeout(() => spawnWorker('SWARM',   SWARM_FILE,   COLOR.green,  15_000), 8_000);
-
 // ─── Healthcheck & Proxy Server (Railway Primary) ────────────────
 const PORT_STR = process.env.PORT || '3001';
 const LISTEN_PORT = parseInt(PORT_STR);
@@ -133,10 +105,29 @@ const healthServer = createServer((req, res) => {
     req.pipe(proxyRequest);
 });
 
+// Activar servidor de salud primero (Impedir Error 502)
 healthServer.listen(LISTEN_PORT, '0.0.0.0', () => {
-    log('MASTER', COLOR.green, `Neural Orchestrator active on public port ${LISTEN_PORT}`);
-    log('MASTER', COLOR.green, `Proxying traffic internally to port 3002`);
+    log('MASTER', COLOR.teal, `Healthcheck server listening on port ${LISTEN_PORT}`);
+    log('MASTER', COLOR.green, `Neural Orchestrator active — starting workers...`);
 });
+
+// ─── Boot sequence (Deferred) ───────────────────────────────────
+
+const IS_PROD = process.env.NODE_ENV === 'production' || __dirname.includes('/dist/');
+const AGENT_FILE = IS_PROD ? resolve(__dirname, '../index.js') : AGENT_ENTRY;
+const INDEXER_FILE = IS_PROD ? resolve(__dirname, './nirium_indexer.js') : INDEXER_ENTRY;
+const SWARM_FILE = IS_PROD ? resolve(__dirname, './nirium_full_swarm.js') : SWARM_ENTRY;
+
+// Arrancar procesos con un desfase para evitar saturación
+setTimeout(() => {
+    spawnWorker('AGENT', AGENT_FILE, COLOR.teal, 8_000, {
+        PORT: '3002',
+        AGENT_PORT: '3002'
+    });
+}, 1000);
+
+setTimeout(() => spawnWorker('INDEXER', INDEXER_FILE, COLOR.yellow, 10_000), 4000);
+setTimeout(() => spawnWorker('SWARM',   SWARM_FILE,   COLOR.green,  15_000), 10000);
 
 // ─── Graceful shutdown ────────────────────────────────────────
 
