@@ -21,7 +21,7 @@
 
 [build]
 builder = "nixpacks"
-buildCommand = "cd packages/agent && pnpm install && pnpm build"
+buildCommand = "cd packages/agent && pnpm build"
 
 [deploy]
 startCommand = "cd packages/agent && npx tsx scripts/master.ts"
