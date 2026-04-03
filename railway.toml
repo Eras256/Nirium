@@ -1,26 +1,22 @@
 # ═══════════════════════════════════════════════════════════════
-# NIRIUM PROTOCOL — RAILWAY DEPLOYMENT CONFIG (MONOREPO)
-# Orchestrates Master Process + Indexer + Swarm Agents
+# NIRIUM PROTOCOL — RAILWAY DEPLOYMENT CONFIG (HARDENED)
+# Isolated Agent Build — Skipping Web/USB Dependencies
 # ═══════════════════════════════════════════════════════════════
 
 [build]
 builder = "nixpacks"
-buildCommand = "pnpm install && cd packages/agent && pnpm build"
-watchPatterns = ["/packages/agent/**", "package.json", "pnpm-lock.yaml", "vercel.json", "railway.toml"]
+# Usamos --filter @nirium/agent... para instalar solo al agente y sus dependencias internas
+buildCommand = "pnpm install --filter @nirium/agent... && cd packages/agent && pnpm build"
+watchPatterns = ["/packages/agent/**", "package.json", "pnpm-lock.yaml", "railway.toml"]
 
 [deploy]
-# Start command — orchestrates all services via master process
 startCommand = "cd packages/agent && node dist/src/scripts/master.js"
 healthcheckPath = "/health"
 healthcheckTimeout = 300
 restartPolicy = "on-failure"
 restartPolicyMaxRetries = 10
 
-# ═══════════════════════════════════════════════════════════════
-# Environmental Infrastructure
-# ═══════════════════════════════════════════════════════════════
 [env]
 NODE_ENV = "production"
 PORT = "3001"
 AGENT_PORT = "3002"
-# ═══════════════════════════════════════════════════════════════
