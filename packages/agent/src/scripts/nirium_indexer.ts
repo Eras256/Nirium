@@ -20,9 +20,31 @@
  */
 
 import { createClient } from '@supabase/supabase-js';
+import axios from 'axios';
 import dotenv from 'dotenv';
 import chalk from 'chalk';
 import path from 'path';
+
+// Railway's Node.js native fetch (undici/HTTP2) fails with Cloudflare/Supabase.
+// We replace it with axios (HTTP/1.1) so all Supabase REST calls go through it.
+const axiosFetch: typeof fetch = async (url, options) => {
+    try {
+        const res = await axios({
+            url: url.toString(),
+            method: (options?.method as string | undefined) || 'GET',
+            headers: (options?.headers ?? {}) as Record<string, string>,
+            data: options?.body,
+            timeout: 15000,
+            responseType: 'text',
+        });
+        return new Response(res.data as string, { status: res.status, headers: res.headers as HeadersInit });
+    } catch (e: any) {
+        if (e.response) {
+            return new Response(e.response.data as string, { status: e.response.status, headers: e.response.headers as HeadersInit });
+        }
+        throw e;
+    }
+};
 
 dotenv.config({ path: path.resolve(process.cwd(), '../../.env.local') });
 dotenv.config();
@@ -43,7 +65,7 @@ const STELLAR_EXPERT = 'https://stellar.expert/explorer/testnet';
 
 // ─── Supabase ────────────────────────────────────────────────────
 const supabase = (SUPABASE_URL && SUPABASE_KEY)
-    ? createClient(SUPABASE_URL, SUPABASE_KEY)
+    ? createClient(SUPABASE_URL, SUPABASE_KEY, { global: { fetch: axiosFetch } })
     : null;
 
 async function logToSupabase(agentId: string, message: string, level: string = 'info') {
