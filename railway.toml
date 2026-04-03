@@ -24,7 +24,8 @@ builder = "nixpacks"
 buildCommand = "cd packages/agent && pnpm build"
 
 [deploy]
-startCommand = "cd packages/agent && npx tsx scripts/master.ts"
+# Start command — orchestrates all services via master process
+startCommand = "cd packages/agent && node dist/scripts/master.js"
 healthcheckPath = "/health"
 healthcheckTimeout = 300
 restartPolicyType = "on_failure"
