@@ -20,6 +20,7 @@ import {
     Address,
     nativeToScVal,
     scValToNative,
+    xdr,
 } from '@stellar/stellar-sdk';
 import axios from 'axios';
 import { createClient } from '@supabase/supabase-js';
@@ -671,9 +672,7 @@ async function submitSorobanCall(agent: AgentState) {
                             if (txResult.status !== 'NOT_FOUND') break;
                         }
                         if (txResult && txResult.status === rpc.Api.GetTransactionStatus.SUCCESS && txResult.returnValue) {
-                            const { xdr } = require('@stellar/stellar-sdk');
-                            const scVal = xdr.ScVal.fromXDR(txResult.returnValue.toXDR ? txResult.returnValue.toXDR() : txResult.returnValue, "base64");
-                            const result = scValToNative(scVal);
+                            const result = scValToNative(txResult.returnValue);
                             
                             if (result && typeof result === 'object') {
                                 if (result.vault_id) parsedId = result.vault_id;
