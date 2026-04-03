@@ -435,8 +435,8 @@ function DashboardContent() {
             return { name: "Custom Agent Strategy", logPrefix: "BUILDER", emoji: "🛠️" };
         }
 
-        return STRATEGIES["nirium-usdc-loop"];
-    }, [strategyId, activeStrategies, account, strategyNameParam]);
+        return STRATEGIES["nirium-usdc-loop"] || { name: "Nirium Loop", logPrefix: "CORE", emoji: "🧬" };
+    }, [strategyId, activeStrategies, account, strategyNameParam, STRATEGIES]);
 
     // Auto-deploy logic for Navbar CTA
     useEffect(() => {
@@ -1680,7 +1680,7 @@ function DashboardContent() {
 
             {/* Auto-Start Confirmation Modal */}
             <AnimatePresence>
-                {showAutoStartModal && (
+                {(showAutoStartModal && currentStrategy) && (
                     <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
                         <motion.div
                             initial={{ opacity: 0 }}
