@@ -43,6 +43,7 @@ import sandboxRoutes from './routes/sandbox.js';
 import publicRoutes from './routes/public.js';
 import x402PremiumRoutes from './routes/x402Premium.js';
 import { x402Middleware } from './middleware/x402.js';
+import mppRoutes from './routes/mppRoutes.js';
 import { createRateLimiter } from './middleware/rateLimit.js';
 import {
     initializeWebSocket,
@@ -145,11 +146,11 @@ app.use('/api/sandbox', sandboxRoutes);
 app.use('/api/public', publicRoutes);
 
 // ─── x402 Premium Routes (pay-per-request, no account required) ──
-// Must mount x402Middleware BEFORE the router so the 402 challenge
-// fires on unauthenticated requests. Authenticated JWT users also
-// pass through — the middleware only intercepts if no X-PAYMENT header.
 app.use('/api/v1/premium', x402Middleware);
 app.use('/api/v1/premium', x402PremiumRoutes);
+
+// ─── MPP Routes (Charge + Channel, no facilitator required) ───
+app.use('/api/v1/mpp', mppRoutes);
 
 // ═══════════════════════════════════════════════════════════════
 // PUBLIC ENDPOINTS (No Auth)

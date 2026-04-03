@@ -1,14 +1,15 @@
 // ═══════════════════════════════════════════════════════════════
-// Nirium MCP Server v0.3.0 — x402-enabled tool suite
+// Nirium MCP Server v0.4.0 — x402 + MPP tool suite
 // ═══════════════════════════════════════════════════════════════
 //
 // Exposes Nirium Protocol capabilities to any MCP-compatible AI:
 //   Claude, GPT, Codex, Cursor, VS Code Copilot, etc.
 //
-// Two tiers of tools:
+// Three tiers of tools:
 //   FREE  — market data, system status (standard HTTP to agent API)
-//   PAID  — premium signals, enriched market, strategy execution
-//           (automatic x402 micropayment in USDC on Stellar)
+//   PAID (x402) — premium signals via Coinbase facilitator
+//   PAID (MPP)  — same signals via direct Soroban SAC transfer,
+//                 no external facilitator required
 //
 // Usage (stdio transport):
 //   STELLAR_SECRET_KEY=S... AGENT_API_URL=http://localhost:3001 npx tsx src/index.ts
@@ -35,6 +36,8 @@ import { z } from 'zod';
 import { wrapFetchWithPayment, x402Client } from '@x402/fetch';
 import { ExactStellarScheme } from '@x402/stellar';
 import { createEd25519Signer, STELLAR_TESTNET_CAIP2, DEFAULT_TESTNET_RPC_URL } from '@x402/stellar';
+import { Mppx as MppxClient } from 'mppx/client';
+import { stellar as mppStellar } from '@stellar/mpp/charge/client';
 
 // ─── Configuration ────────────────────────────────────────────
 
@@ -47,9 +50,8 @@ const RPC_URL       = process.env.SOROBAN_RPC_URL      || DEFAULT_TESTNET_RPC_UR
 
 // ─── x402 Payment Client ──────────────────────────────────────
 //
-// Set up once; reused for all premium tool calls.
-// If no STELLAR_SECRET_KEY is provided, paid tools will warn
-// and fall back to the free tier where possible.
+// Set up once; reused for all x402 premium tool calls.
+// Requires STELLAR_SECRET_KEY env var with funded testnet wallet.
 //
 
 let paidFetch: typeof fetch = fetch;
@@ -62,6 +64,30 @@ if (STELLAR_KEY) {
     console.error(`[Nirium MCP] x402 wallet: ${signer.address} | network: ${STELLAR_NET}`);
 } else {
     console.error('[Nirium MCP] No STELLAR_SECRET_KEY — premium (paid) tools will return 402 errors');
+}
+
+// ─── MPP Payment Client ───────────────────────────────────────
+//
+// MPP Charge mode: per-request Soroban SAC transfer.
+// No external facilitator — server verifies directly.
+// Same STELLAR_SECRET_KEY funds both x402 and MPP payments.
+//
+
+let mppFetch: typeof fetch = fetch;
+
+if (STELLAR_KEY) {
+    const mppx = MppxClient.create({
+        methods: [
+            mppStellar.charge({
+                secretKey: STELLAR_KEY,
+                rpcUrl: RPC_URL,
+            }),
+        ],
+    });
+    mppFetch = mppx.fetch as typeof fetch;
+    console.error(`[Nirium MCP] MPP Charge enabled | network: ${STELLAR_NET}`);
+} else {
+    console.error('[Nirium MCP] No STELLAR_SECRET_KEY — MPP tools will return 402 errors');
 }
 
 // ─── Server ───────────────────────────────────────────────────
@@ -231,7 +257,7 @@ server.tool(
 
 server.tool(
     'get_wallet_info',
-    'Show the x402 payment wallet address and network configuration for this MCP session. Free.',
+    'Show the x402 + MPP wallet address and payment configuration for this MCP session. Free.',
     {},
     async () => {
         if (!STELLAR_KEY) {
@@ -247,10 +273,61 @@ server.tool(
                     rpcUrl: RPC_URL,
                     agentApiUrl: API_URL,
                     x402Enabled: true,
-                    paidTools: ['get_premium_signals', 'get_premium_market', 'execute_paid_strategy'],
+                    mppEnabled: true,
+                    paidToolsX402: ['get_premium_signals', 'get_premium_market', 'execute_paid_strategy'],
+                    paidToolsMpp: ['get_mpp_signals', 'get_mpp_market'],
                 }, null, 2),
             }],
         };
+    },
+);
+
+// ─── PAID TOOLS (MPP) ─────────────────────────────────────────
+//
+// MPP Charge mode: no external facilitator.
+// The client signs a Soroban SAC transfer and sends it inline.
+// Server verifies the on-chain transfer and returns 200.
+//
+// Advantage over x402: no Coinbase facilitator dependency.
+// Both x402 and MPP tools are available — client chooses.
+//
+
+server.tool(
+    'get_mpp_signals',
+    'PAID ($0.01 USDC via MPP Charge) — Premium arbitrage signals settled via direct Soroban SAC transfer. No external facilitator. Same signal data as get_premium_signals. Requires funded Stellar wallet.',
+    {
+        count: z.number().optional().describe('Number of signals to fetch (default: 20, max: 100)'),
+    },
+    async (args) => {
+        const count = args.count || 20;
+        try {
+            const res = await mppFetch(`${API_URL}/api/v1/mpp/signals?count=${count}`);
+            if (!res.ok) {
+                return { content: [{ type: 'text', text: `Error ${res.status}: ${await res.text()}` }], isError: true };
+            }
+            const data = await res.json();
+            return { content: [{ type: 'text', text: JSON.stringify(data, null, 2) }] };
+        } catch (err: any) {
+            return { content: [{ type: 'text', text: `MPP payment failed: ${err.message}` }], isError: true };
+        }
+    },
+);
+
+server.tool(
+    'get_mpp_market',
+    'PAID ($0.01 USDC via MPP Charge) — Enriched market state settled via direct Soroban SAC transfer. No external facilitator. Includes arbitrage windows, yield ranking, and fee alerts. Requires funded Stellar wallet.',
+    {},
+    async () => {
+        try {
+            const res = await mppFetch(`${API_URL}/api/v1/mpp/market`);
+            if (!res.ok) {
+                return { content: [{ type: 'text', text: `Error ${res.status}: ${await res.text()}` }], isError: true };
+            }
+            const data = await res.json();
+            return { content: [{ type: 'text', text: JSON.stringify(data, null, 2) }] };
+        } catch (err: any) {
+            return { content: [{ type: 'text', text: `MPP payment failed: ${err.message}` }], isError: true };
+        }
     },
 );
 
@@ -259,9 +336,10 @@ server.tool(
 async function main(): Promise<void> {
     const transport = new StdioServerTransport();
     await server.connect(transport);
-    console.error('[Nirium MCP] v0.3.0 running on stdio');
+    console.error('[Nirium MCP] v0.4.0 running on stdio');
     console.error(`[Nirium MCP] Agent API: ${API_URL}`);
     console.error(`[Nirium MCP] x402 enabled: ${!!STELLAR_KEY}`);
+    console.error(`[Nirium MCP] MPP Charge enabled: ${!!STELLAR_KEY}`);
 }
 
 main().catch((err) => {
