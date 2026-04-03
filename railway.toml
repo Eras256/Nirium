@@ -10,7 +10,7 @@ buildCommand = "pnpm install --filter @nirium/agent... && cd packages/agent && p
 watchPatterns = ["/packages/agent/**", "package.json", "pnpm-lock.yaml", "railway.toml"]
 
 [deploy]
-startCommand = "cd packages/agent && node dist/src/scripts/master.js"
+startCommand = "cd packages/agent && node --dns-result-order=ipv4first dist/src/scripts/master.js"
 healthcheckPath = "/health"
 healthcheckTimeout = 300
 restartPolicy = "on-failure"

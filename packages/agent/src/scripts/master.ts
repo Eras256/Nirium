@@ -24,7 +24,9 @@ function spawnWorker(label: string, entryFile: string, color: string, extraEnv: 
     function start(): void {
         log(label, color, `Starting ${entryFile}`);
         const child = fork(entryFile, [], {
-            execArgv: entryFile.endsWith('.js') ? [] : ['--import', 'tsx/esm'],
+            execArgv: entryFile.endsWith('.js')
+                ? ['--dns-result-order=ipv4first']
+                : ['--import', 'tsx/esm', '--dns-result-order=ipv4first'],
             env: { ...process.env, ...extraEnv },
             stdio: ['ignore', 'inherit', 'inherit', 'ipc'],
         });
