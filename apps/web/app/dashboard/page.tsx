@@ -15,6 +15,7 @@ import { toast } from "sonner";
 import { useRouter, useSearchParams } from "next/navigation";
 import { ExternalLink, Shield, X, AlertTriangle, Trash2, Info, ChevronRight, RefreshCw, Zap, Plus, Code, Cpu, Brain, Filter, Download, Activity, StopCircle, Database, Globe } from "lucide-react";
 import OpsConsole from "@/components/layout/OpsConsole";
+import ProtocolRevenue from "@/components/dashboard/ProtocolRevenue";
 import { writeLog } from "@/lib/logger";
 import { stellarClient } from "@/lib/stellarClient";
 import { useVault, useEloReputation } from "@/hooks/useNiriumContracts";
@@ -2498,6 +2499,9 @@ function DashboardContent() {
                             walletAddress={account?.address}
                         />
                     </div>
+
+                    {/* x402 Protocol Revenue */}
+                    <ProtocolRevenue />
                 </div>
             </div>
 

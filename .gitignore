@@ -50,6 +50,7 @@ Cargo.lock
 *.md
 !README.md
 !NIRIUM_TECHNICAL_PAPER.md
+!DEMO_SCRIPT.md
 !claude.md
 
 # Ignoring plans generated if any

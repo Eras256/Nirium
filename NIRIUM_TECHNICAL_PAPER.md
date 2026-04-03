@@ -230,13 +230,101 @@ During the final development phases, critical architectural adjustments were mad
 
 ---
 
-## 11. Conclusion
+## 11. Agentic Payments: x402 + MCP Integration
+
+### 11.1 x402 — Pay-Per-Request Intelligence Monetization
+
+Nirium v0.2 integrates the **x402 HTTP payment protocol** (Coinbase / x402 Foundation), enabling any AI agent to pay for premium Nirium intelligence on a per-request basis using USDC on Stellar — with no account, no API key, and no registration.
+
+**Protocol flow:**
+```
+External Agent → GET /api/v1/premium/signals
+    ← HTTP 402 + payment requirements (0.01 USDC, stellar:testnet)
+External Agent → signs Soroban auth entry (SEP-41 compatible)
+    → GET /api/v1/premium/signals + X-PAYMENT header
+    ← HTTP 200 + premium signal data + X-PAYMENT-RESPONSE
+```
+
+**Facilitator:** `https://www.x402.org/facilitator` (Coinbase-operated, testnet fees sponsored)
+
+**Protected Premium Endpoints:**
+
+| Endpoint | Price | Content |
+|---|---|---|
+| `GET /api/v1/premium/signals` | $0.01 USDC | Arbitrage signals with execution paths, confidence, profit estimates |
+| `GET /api/v1/premium/market` | $0.01 USDC | Enriched market state: yield ranking, arbitrage windows, fee alerts |
+| `POST /api/v1/premium/execute` | $0.05 USDC | Strategy execution via Soroban, no Nirium account required |
+
+Payment receipts are logged to Supabase (`agent_logs.level = 'payment'`) and displayed in the Protocol Revenue dashboard panel in real time.
+
+### 11.2 MCP Server — Universal AI Agent Integration
+
+The `@nirium/mcp` package implements a **Model Context Protocol server** (Anthropic open standard, adopted by Claude, ChatGPT, Cursor, VS Code Copilot, and others). It exposes Nirium's capabilities as MCP tools, enabling any compatible AI agent to control Nirium without direct HTTP integration.
+
+**Tool tiers:**
+
+| Tool | Tier | Description |
+|---|---|---|
+| `get_market_state` | Free | Real-time SDEX/Blend/Soroswap market data |
+| `get_loop_status` | Free | Autonomous agent loop state |
+| `start_loop / stop_loop` | Free | Loop lifecycle control |
+| `execute_demo` | Free | Soroban simulation dry-run |
+| `get_system_health` | Free | Horizon/RPC/IPFS connectivity |
+| `get_premium_signals` | **$0.01 USDC** | Premium arbitrage signals via x402 |
+| `get_premium_market` | **$0.01 USDC** | Enriched market intelligence via x402 |
+| `execute_paid_strategy` | **$0.05 USDC** | On-chain strategy execution via x402 |
+
+Claude Desktop configuration:
+```json
+{
+  "mcpServers": {
+    "nirium": {
+      "command": "node",
+      "args": ["/path/to/nirium/packages/mcp/dist/index.js"],
+      "env": {
+        "STELLAR_SECRET_KEY": "S...",
+        "AGENT_API_URL": "https://api.nirium.xyz"
+      }
+    }
+  }
+}
+```
+
+### 11.3 Architectural Significance
+
+The x402 + MCP stack transforms Nirium from a **closed institutional platform** into an **open protocol for the agentic economy**:
+
+- **Any AI agent** (Claude, GPT, Codex, custom) can purchase Nirium intelligence
+- **Zero onboarding friction** — pay with a funded Stellar wallet, no accounts
+- **Automated revenue** — USDC settles on-chain, logged, visible in real time
+- **Interoperable** — MCP standard ensures compatibility with the entire AI ecosystem
+
+This positions Nirium at the intersection of two emerging infrastructure layers: Stellar's agentic payment network and the MCP tool ecosystem.
+
+---
+
+## 12. Cloud Infrastructure: Railway Deployment
+
+The Nirium agent suite (API server, Indexer, Swarm) is designed for single-command cloud deployment on **Railway** via a master process (`scripts/master.ts`) that:
+
+1. Launches the Express API server (port 3001, x402 middleware active)
+2. Starts the on-chain Indexer with auto-restart on failure
+3. Starts the Swarm with configurable LLM provider
+4. Exposes `/health` endpoint for Railway health checks
+
+Required Railway environment variables: `SUPABASE_URL`, `SUPABASE_ANON_KEY`, `STELLAR_SECRET_KEY`, `X402_PAY_TO_ADDRESS`, `STELLAR_NETWORK`, `ACTIVE_LLM_PROVIDER`, `JWT_SECRET`, `ADMIN_API_KEY`.
+
+---
+
+## 13. Conclusion
 
 Nirium represents a significant leap in DeFi autonomy. By treating AI as a first-class citizen with cryptographic rights and on-chain accountability, we are building the first protocol capable of true **Intelligent Capital Management** spanning both cryptocurrency and real-world assets. The integration of CETES (Mexican Treasury Bonds) demonstrates Nirium's ability to bridge traditional finance with decentralized autonomous systems, opening new frontiers for AI-managed portfolios that include government securities alongside digital assets.
 
-The protocol's current deployment on Stellar Testnet — with 30 autonomous agents, 4 smart contracts, 3 supported asset types, and a comprehensive test suite — validates the architectural foundations for mainnet readiness.
+With the addition of x402 agentic payments and MCP integration, Nirium becomes a **composable protocol** — any AI agent in the world can purchase Nirium's intelligence and execution capabilities with a single USDC micropayment on Stellar, with no registration, no API key, and no friction.
+
+The protocol's current deployment on Stellar Testnet — with 30 autonomous agents, 4 smart contracts, 3 supported asset types, x402 premium endpoints, and an MCP server — validates the architectural foundations for mainnet readiness.
 
 ---
 **Authors**: Vaiosx, M0nsxx.  
-**Version**: 1.1 (March 24, 2026).  
+**Version**: 1.2 (April 2, 2026).  
 **Contact**: [Institutional@Nirium.Matrix](mailto:institutional@nirium.matrix)
