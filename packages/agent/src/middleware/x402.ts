@@ -77,17 +77,37 @@ const PREMIUM_ROUTES = {
 };
 
 // ─── Export middleware ─────────────────────────────────────────
+// If X402_PAY_TO_ADDRESS is not configured, the payment middleware
+// cannot initialize (payTo is required). We fall back to a pass-through
+// so premium routes remain accessible and log a startup warning.
 
-export const x402Middleware = paymentMiddlewareFromConfig(
-    PREMIUM_ROUTES,
-    facilitatorClient,
-    schemes,
-    {
-        appName: 'Nirium Protocol',
-        appLogo: 'https://nirium.xyz/favicon.ico',
-        testnet: NETWORK === 'stellar:testnet',
-    },
-);
+import type { Request, Response, NextFunction } from 'express';
+
+let _x402Middleware: ReturnType<typeof paymentMiddlewareFromConfig> | ((req: Request, res: Response, next: NextFunction) => void);
+
+if (!PAY_TO) {
+    console.warn('[x402] ⚠️  X402_PAY_TO_ADDRESS not set — premium routes open (no payment required). Set this env var to enable monetization.');
+    _x402Middleware = (_req: Request, _res: Response, next: NextFunction) => next();
+} else {
+    try {
+        _x402Middleware = paymentMiddlewareFromConfig(
+            PREMIUM_ROUTES,
+            facilitatorClient,
+            schemes,
+            {
+                appName: 'Nirium Protocol',
+                appLogo: 'https://nirium.xyz/favicon.ico',
+                testnet: NETWORK === 'stellar:testnet',
+            },
+        );
+        console.log(`[x402] ✅ Payment middleware active | payTo: ${PAY_TO.slice(0, 8)}… | network: ${NETWORK}`);
+    } catch (err) {
+        console.error('[x402] ❌ Failed to initialize payment middleware:', err);
+        _x402Middleware = (_req: Request, _res: Response, next: NextFunction) => next();
+    }
+}
+
+export const x402Middleware = _x402Middleware;
 
 // ─── Payment receipt logger ────────────────────────────────────
 //
