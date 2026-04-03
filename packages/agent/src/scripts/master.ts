@@ -90,7 +90,7 @@ healthServer.listen(PORT, '0.0.0.0', () => {
 // ─── Boot Sequence ─────────────────────────────────────────────
 const IS_PROD = process.env.NODE_ENV === 'production' || __dirname.includes('/dist/');
 const AGENT_FILE   = IS_PROD ? resolve(__dirname, '../index.js') : AGENT_ENTRY;
-const INDEXER_FILE = IS_PROD ? resolve(__dirname, './nirium_indexer.ts') : INDEXER_ENTRY;
+const INDEXER_FILE = IS_PROD ? resolve(__dirname, './nirium_indexer.js') : INDEXER_ENTRY;
 const SWARM_FILE   = IS_PROD ? resolve(__dirname, './nirium_full_swarm.js') : SWARM_ENTRY;
 
 setTimeout(() => spawnWorker('AGENT', AGENT_FILE, COLOR.teal, 8000, { PORT: '3002', AGENT_PORT: '3002' }), 2000);
