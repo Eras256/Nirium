@@ -25,7 +25,7 @@ buildCommand = "cd packages/agent && pnpm build"
 
 [deploy]
 # Start command — orchestrates all services via master process
-startCommand = "cd packages/agent && node dist/scripts/master.js"
+startCommand = "cd packages/agent && node dist/src/scripts/master.js"
 healthcheckPath = "/health"
 healthcheckTimeout = 300
 restartPolicyType = "on_failure"
