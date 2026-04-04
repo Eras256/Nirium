@@ -20,6 +20,23 @@ import { supabase } from '../providers/database.js';
 
 const router: IRouter = Router();
 
+// ─── Helper ───────────────────────────────────────────────────
+// x402 v2 uses PAYMENT-SIGNATURE header; v1 used X-PAYMENT.
+// Extract the payer address from whichever header is present.
+function extractPayerAndLog(req: Request, route: string, amount: string): void {
+    const raw = (req.headers['payment-signature'] || req.headers['x-payment']) as string | undefined;
+    if (!raw) return;
+    try {
+        const decoded = JSON.parse(Buffer.from(raw, 'base64').toString());
+        // v2: decoded.payload.from  |  v1: decoded.payload.from (same field)
+        const fromAddress = decoded?.payload?.from || decoded?.accepted?.payTo || 'unknown';
+        logPaymentReceived(fromAddress, route, amount).catch(() => {});
+    } catch {
+        // Non-blocking — log with unknown address anyway
+        logPaymentReceived('unknown', route, amount).catch(() => {});
+    }
+}
+
 // ─── Enriched Signal Feed ─────────────────────────────────────
 //
 // Returns premium arbitrage signals with full execution parameters.
@@ -30,17 +47,7 @@ router.get('/signals', async (req: Request, res: Response) => {
     const count = Math.min(parseInt(req.query.count as string) || 20, 100);
     const signals = getRecentSignals(count);
 
-    // Extract payer from x402 payment header for logging
-    const paymentHeader = req.headers['x-payment'] as string | undefined;
-    if (paymentHeader) {
-        try {
-            const payload = JSON.parse(Buffer.from(paymentHeader, 'base64').toString());
-            const fromAddress = payload?.payload?.from || 'unknown';
-            await logPaymentReceived(fromAddress, 'GET /api/v1/premium/signals', '0.01');
-        } catch {
-            // Non-blocking
-        }
-    }
+    extractPayerAndLog(req, 'GET /api/v1/premium/signals', '0.01');
 
     supabase.from('agent_logs').insert([{ agent_id: 'X402_GATEWAY', message: `[x402] Premium signal feed accessed | count=${count}`, level: 'info', created_at: new Date().toISOString() }]).then(() => {});
 
@@ -70,7 +77,8 @@ router.get('/signals', async (req: Request, res: Response) => {
 // Full market intelligence: DEX depth, yield rates, fee pressure,
 // arbitrage windows. Enriched vs the free /api/market endpoint.
 //
-router.get('/market', async (_req: Request, res: Response) => {
+router.get('/market', async (req: Request, res: Response) => {
+    extractPayerAndLog(req, 'GET /api/v1/premium/market', '0.01');
     try {
         const market = getCurrentMarketState() || await fetchMarketState();
 
@@ -107,17 +115,7 @@ router.post('/execute', async (req: Request, res: Response) => {
         return res.status(400).json({ error: 'strategy and asset are required' });
     }
 
-    // Log payment (async, non-blocking)
-    const paymentHeader = req.headers['x-payment'] as string | undefined;
-    if (paymentHeader) {
-        try {
-            const payload = JSON.parse(Buffer.from(paymentHeader, 'base64').toString());
-            const fromAddress = payload?.payload?.from || 'unknown';
-            await logPaymentReceived(fromAddress, 'POST /api/v1/premium/execute', '0.05');
-        } catch {
-            // Non-blocking
-        }
-    }
+    extractPayerAndLog(req, 'POST /api/v1/premium/execute', '0.05');
 
     try {
         const result = await routeExecution(strategy, asset, params || {}, () => {});
