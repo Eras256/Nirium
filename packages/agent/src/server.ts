@@ -75,6 +75,7 @@ import * as skillManager from './services/skillManager.js';
 import { uploadToIpfs, PINATA_GATEWAY } from './services/ipfsService.js';
 import { routeExecution } from './execution/router.js';
 import { fetchMarketState, checkHorizonHealth, checkSorobanHealth, NETWORK } from './providers/stellarProvider.js';
+import { supabase } from './providers/database.js';
 import { getLLMProvider, getAvailableProviders, resetProvider } from './providers/llm/index.js';
 
 const PORT = parseInt(process.env.AGENT_PORT || '3001');
@@ -155,6 +156,29 @@ app.use('/api/v1/mpp', mppRoutes);
 // ═══════════════════════════════════════════════════════════════
 // PUBLIC ENDPOINTS (No Auth)
 // ═══════════════════════════════════════════════════════════════
+
+// ─── x402 Revenue (public, cached 15s) ───────────────────────
+let _revenueCache: { data: unknown; ts: number } | null = null;
+
+app.get('/api/revenue', async (_req: Request, res: Response) => {
+    res.setHeader('Access-Control-Allow-Origin', '*');
+    if (_revenueCache && Date.now() - _revenueCache.ts < 15_000) {
+        return res.json(_revenueCache.data);
+    }
+    try {
+        const { data, error } = await supabase
+            .from('agent_logs')
+            .select('id, message, created_at')
+            .eq('level', 'payment')
+            .order('created_at', { ascending: false })
+            .limit(50);
+        if (error) throw error;
+        _revenueCache = { data, ts: Date.now() };
+        res.json(data);
+    } catch {
+        res.status(500).json([]);
+    }
+});
 
 app.get('/health', (_req: Request, res: Response) => {
     res.json({
@@ -376,7 +400,7 @@ app.post('/api/execute-demo', standardLimiter, async (req: Request, res: Respons
             { amount: 1000, demo: true },
             broadcastLog
         );
-        
+
         // Response Filtering (Audit Fix #3) - Prevent XDR/Soroban metadata leakage 
         res.json({
             success: result.success || true,
@@ -525,9 +549,9 @@ app.get('/api/tickers', standardLimiter, async (_req: Request, res: Response) =>
             change24h: a.change24h || null,
             network: NETWORK,
         })) || [
-            { symbol: 'XLM', price: null, volume24h: null, change24h: null, network: NETWORK },
-            { symbol: 'USDC', price: null, volume24h: null, change24h: null, network: NETWORK },
-        ];
+                { symbol: 'XLM', price: null, volume24h: null, change24h: null, network: NETWORK },
+                { symbol: 'USDC', price: null, volume24h: null, change24h: null, network: NETWORK },
+            ];
         res.json({ tickers, timestamp: new Date().toISOString(), network: NETWORK });
     } catch (error) {
         res.status(500).json({ error: String(error) });

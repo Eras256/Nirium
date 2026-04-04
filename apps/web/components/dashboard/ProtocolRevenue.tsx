@@ -26,8 +26,7 @@ interface RevenueStats {
     lastPayment: string | null;
 }
 
-const SUPABASE_URL  = process.env.NEXT_PUBLIC_SUPABASE_URL  || '';
-const SUPABASE_KEY  = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || '';
+const API_URL = process.env.NEXT_PUBLIC_API_URL || 'https://api.nirium.xyz';
 
 function parsePaymentMessage(msg: string): Pick<PaymentEvent, 'from' | 'route' | 'amount'> {
     const from   = msg.match(/from=([^\s|]+)/)?.[1];
@@ -42,12 +41,8 @@ export default function ProtocolRevenue() {
     const [loading, setLoading] = useState(true);
 
     const fetchRevenue = useCallback(async () => {
-        if (!SUPABASE_URL || !SUPABASE_KEY) return;
         try {
-            const res = await fetch(
-                `${SUPABASE_URL}/rest/v1/agent_logs?level=eq.payment&order=created_at.desc&limit=50`,
-                { headers: { apikey: SUPABASE_KEY, Authorization: `Bearer ${SUPABASE_KEY}` } }
-            );
+            const res = await fetch(`${API_URL}/api/revenue`);
             if (!res.ok) return;
             const rows: Array<{ id: string; message: string; created_at: string }> = await res.json();
 
