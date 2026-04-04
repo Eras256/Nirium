@@ -15,6 +15,7 @@
         "start:pool": "tsx scripts/initialize_pool.ts",
         "start:protocol": "tsx scripts/initialize_protocol.ts",
         "generate-swarm": "tsx scripts/generate_swarm.ts",
+        "x402:buy": "tsx src/scripts/x402_buyer_agent.ts",
         "lint": "eslint src/",
         "test": "jest --passWithNoTests"
     },
