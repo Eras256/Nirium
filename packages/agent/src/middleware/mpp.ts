@@ -25,6 +25,7 @@ import type { Request, Response, NextFunction } from 'express';
 import { stellar } from '@stellar/mpp/charge/server';
 import { Mppx as MppxServer } from 'mppx/server';
 import { USDC_SAC_TESTNET, USDC_SAC_MAINNET } from '@stellar/mpp';
+import { Keypair } from '@stellar/stellar-sdk';
 import { supabase } from '../providers/database.js';
 
 // ─── Configuration ────────────────────────────────────────────
@@ -34,8 +35,27 @@ const NETWORK = (process.env.STELLAR_NETWORK === 'mainnet'
     : 'stellar:testnet') as 'stellar:testnet' | 'stellar:pubnet';
 
 const USDC_SAC = NETWORK === 'stellar:pubnet' ? USDC_SAC_MAINNET : USDC_SAC_TESTNET;
-const RECIPIENT = process.env.STELLAR_RECIPIENT || process.env.X402_PAY_TO_ADDRESS || '';
 const MPP_SECRET = process.env.MPP_SECRET_KEY || '';
+
+// Guard: if STELLAR_RECIPIENT is a secret key (starts with 'S'), derive the public key.
+// This handles misconfigured Railway env vars where the secret was set instead of public key.
+function resolveRecipient(): string {
+    const raw = process.env.STELLAR_RECIPIENT || process.env.X402_PAY_TO_ADDRESS || '';
+    if (!raw) return '';
+    if (raw.startsWith('S')) {
+        try {
+            const pub = Keypair.fromSecret(raw).publicKey();
+            console.warn(`[MPP] STELLAR_RECIPIENT is a secret key — derived public key: ${pub.slice(0, 8)}...`);
+            return pub;
+        } catch {
+            console.error('[MPP] STELLAR_RECIPIENT looks like a secret key but failed to parse — disabling MPP');
+            return '';
+        }
+    }
+    return raw;
+}
+
+const RECIPIENT = resolveRecipient();
 
 // ─── Charge Mode Mppx Instance ────────────────────────────────
 //
