@@ -40,8 +40,12 @@ const MPP_SECRET = process.env.MPP_SECRET_KEY || '';
 // Guard: if STELLAR_RECIPIENT is a secret key (starts with 'S'), derive the public key.
 // This handles misconfigured Railway env vars where the secret was set instead of public key.
 function resolveRecipient(): string {
-    const raw = process.env.STELLAR_RECIPIENT || process.env.X402_PAY_TO_ADDRESS || '';
+    let raw = process.env.STELLAR_RECIPIENT || process.env.X402_PAY_TO_ADDRESS || '';
     if (!raw) return '';
+    
+    // Clean up quotes and whitespace (fixes common Railway/Docker config issues)
+    raw = raw.trim().replace(/['"]/g, '');
+
     if (raw.startsWith('S')) {
         try {
             const pub = Keypair.fromSecret(raw).publicKey();
@@ -134,11 +138,12 @@ export function mppChargeMiddleware(amountUsdc: string, description: string) {
 
 // ─── Payment Logger ───────────────────────────────────────────
 
-async function logMppPayment(req: Request, intent: 'charge' | 'channel'): Promise<void> {
+async function logMppPayment(req: Request, intent: 'charge' | 'channel', amount?: string): Promise<void> {
     try {
+        const amountStr = amount ?? MPP_PRICES[req.path.replace('/', '') as keyof typeof MPP_PRICES] ?? '0.01';
         await supabase.from('agent_logs').insert([{
             agent_id: 'MPP_GATEWAY',
-            message: `MPP ${intent} payment received | route=${req.path} | ip=${req.ip}`,
+            message: `MPP ${intent} payment received | from=${RECIPIENT.slice(0, 8)} | route=${req.path} | amount=${amountStr}`,
             level: 'payment',
             created_at: new Date().toISOString(),
         }]);
