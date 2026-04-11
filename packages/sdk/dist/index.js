@@ -71,7 +71,7 @@ export class Agent {
     async ping() {
         try {
             const data = await this.request('GET', '/health');
-            return data.status === 'operational';
+            return data.status === 'operational' || data.status === 'online';
         }
         catch {
             return false;

@@ -133,6 +133,23 @@ Nirium/
 
 ---
 
+## 💰 Agentic Payments Infrastructure (x402 & MPP)
+
+Nirium is at the forefront of the **Agents on Stellar** revolution, providing a production-grade implementation of the ecosystem's latest payment protocols:
+
+- **x402 (HTTP-Stellar Micropayments)**: Our premium APIs (`/api/v1/premium/*`) are protected by the **x402 protocol**. This allows any external AI agent (Claude, GPT, etc.) to pay for enriched market signals and strategy execution in real-time using USDC/Stellar, without needing a pre-existing subscription or API key.
+- **MPP (Machine Payments Protocol)**: We implement **MPP Charge** (on-chain SAC transfers) and **MPP Channel** (high-frequency off-chain commitments) for native machine-to-machine settlements. This enables our autonomous agents to pay for external services or receive payments with sub-second finality and near-zero fees.
+
+## 🔌 Stellar Development Skill Integration
+
+As of April 2026, Nirium is an official contributor to the [**Stellar Development Skill**](https://github.com/stellar/stellar-dev-skill), the definitive AI knowledge base for Stellar. Our production-hardened patterns are now part of the ecosystem's reference documentation, including:
+
+- **x402 Production Patterns**: Multi-route pricing factories, graceful degradation logic for non-configured environments, and non-blocking payment receipt logging.
+- **MPP Advanced Architectures**: Dual-mode (Charge + Channel) server integration, automated recipient key auto-resolution for containerized deployments, and intent negotiation discovery endpoints.
+- **Developer Experience**: Expansion of the core Stellar AI prompt library to support end-to-end agentic payment workflows.
+
+---
+
 ## 🌐 Institutional API Infrastructure (`api.nirium.xyz`)
 
 > [!NOTE]

@@ -23,6 +23,7 @@
 
 import type { Request, Response, NextFunction } from 'express';
 import { stellar } from '@stellar/mpp/charge/server';
+import { stellar as stellarChannel, Store } from '@stellar/mpp/channel/server';
 import { Mppx as MppxServer } from 'mppx/server';
 import { USDC_SAC_TESTNET, USDC_SAC_MAINNET } from '@stellar/mpp';
 import { Keypair } from '@stellar/stellar-sdk';
@@ -86,6 +87,55 @@ if (RECIPIENT && MPP_SECRET) {
     console.warn('[MPP] MPP_SECRET_KEY or STELLAR_RECIPIENT not set — MPP charge middleware disabled');
 }
 
+// ─── Channel Mode Mppx Instance ──────────────────────────────
+//
+// Used for /api/v1/mpp/channel/* — high-frequency off-chain payment channel.
+// Client deploys a one-way-channel Soroban contract, deposits USDC once,
+// then signs cumulative off-chain commitments per request.
+// Only two on-chain txs: deposit + close.
+//
+// Requires:
+//   MPP_CHANNEL_CONTRACT    — deployed one-way-channel contract address
+//   MPP_COMMITMENT_KEY      — 64-char hex ed25519 seed for commitment verification
+//   STELLAR_RECIPIENT       — recipient public key (reused from charge mode)
+//
+
+const CHANNEL_CONTRACT = process.env.MPP_CHANNEL_CONTRACT || '';
+const COMMITMENT_KEY_HEX = process.env.MPP_COMMITMENT_KEY || '';
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+let channelMppx: any = null;
+
+if (CHANNEL_CONTRACT && COMMITMENT_KEY_HEX && RECIPIENT && MPP_SECRET) {
+    try {
+        channelMppx = MppxServer.create({
+            secretKey: MPP_SECRET,
+            methods: [
+                stellarChannel.channel({
+                    channel: CHANNEL_CONTRACT,
+                    commitmentKey: COMMITMENT_KEY_HEX,
+                    network: NETWORK,
+                    store: Store.memory(),
+                    feePayer: {
+                        envelopeSigner: Keypair.fromSecret(
+                            (process.env.STELLAR_RECIPIENT || '').startsWith('S')
+                                ? process.env.STELLAR_RECIPIENT!.trim().replace(/['"]/g, '')
+                                : ''
+                        ),
+                    },
+                }),
+            ],
+        });
+        console.log(`[MPP] Channel mode initialized | contract=${CHANNEL_CONTRACT.substring(0, 8)}... | network=${NETWORK}`);
+    } catch (err) {
+        console.warn(`[MPP] Channel mode init failed — charge-only mode active: ${err}`);
+    }
+} else {
+    if (RECIPIENT && MPP_SECRET) {
+        console.log('[MPP] Channel mode not configured (MPP_CHANNEL_CONTRACT / MPP_COMMITMENT_KEY missing) — charge-only mode');
+    }
+}
+
 // ─── Express Adapter for MPP ──────────────────────────────────
 //
 // Converts Express req/res to Web API Request/Response and back.
@@ -136,6 +186,38 @@ export function mppChargeMiddleware(amountUsdc: string, description: string) {
     };
 }
 
+// ─── Channel Middleware Factory ──────────────────────────────
+//
+// For channel mode, the client sends cumulative off-chain vouchers.
+// Each commitment amount must be the RUNNING TOTAL of all payments,
+// not just the price of the current request.
+//
+
+export function mppChannelMiddleware(amountUsdc: string, description: string) {
+    return async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+        if (!channelMppx) {
+            res.setHeader('X-MPP-Warning', 'MPP Channel not configured on this server');
+            return next();
+        }
+
+        try {
+            const handler = (channelMppx as any).channel({
+                amount: amountUsdc,
+                description,
+            });
+            await runMppHandler(handler, req, res, next);
+        } catch (error) {
+            console.error('[MPP] Channel middleware error:', error);
+            res.status(500).json({ error: 'MPP channel payment processing error', details: String(error) });
+        }
+    };
+}
+
+// ─── Channel Status ─────────────────────────────────────────
+
+export const isChannelEnabled = (): boolean => !!channelMppx;
+export const getChannelContract = (): string => CHANNEL_CONTRACT;
+
 // ─── Payment Logger ───────────────────────────────────────────
 
 async function logMppPayment(req: Request, intent: 'charge' | 'channel', amount?: string): Promise<void> {
@@ -143,7 +225,7 @@ async function logMppPayment(req: Request, intent: 'charge' | 'channel', amount?
         const amountStr = amount ?? MPP_PRICES[req.path.replace('/', '') as keyof typeof MPP_PRICES] ?? '0.01';
         await supabase.from('agent_logs').insert([{
             agent_id: 'MPP_GATEWAY',
-            message: `MPP ${intent} payment received | from=${RECIPIENT.slice(0, 8)} | route=${req.path} | amount=${amountStr}`,
+            message: `MPP ${intent} payment received | to=${RECIPIENT.slice(0, 8)} | route=${req.path} | amount=${amountStr}`,
             level: 'payment',
             created_at: new Date().toISOString(),
         }]);

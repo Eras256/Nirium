@@ -5,7 +5,8 @@ import Navbar from "@/components/layout/Navbar";
 import {
     Download, Star, Search, Filter, TrendingUp, Sparkles,
     CheckCircle, Package, ExternalLink, ChevronRight, Zap,
-    Code2, Bell, BarChart3, Database, Link2, Settings, Play, UserPlus
+    Code2, Bell, BarChart3, Database, Link2, Settings, Play, UserPlus,
+    X, Info, AlertTriangle, Shield, ArrowRight, Activity, Terminal, DollarSign
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import Link from "next/link";
@@ -15,6 +16,7 @@ import { writeLog } from "@/lib/logger";
 import { useFreighter } from "@/hooks/useFreighter";
 import InstallSkillModal from "@/components/marketplace/InstallSkillModal";
 import { useMarketplace } from "@/hooks/useNiriumContracts";
+import { useX402 } from "@/hooks/useX402";
 
 
 // Types
@@ -32,6 +34,8 @@ interface MarketplaceSkill {
     reviewCount: number;
     isVerified: boolean;
     isFeatured: boolean;
+    isPremium?: boolean;
+    price?: string;
     actions?: { name: string; description: string }[];
 }
 
@@ -74,6 +78,8 @@ export default function MarketplacePage() {
     const [selectedSkillToInstall, setSelectedSkillToInstall] = useState<MarketplaceSkill | null>(null);
     const [selectedSkillToExecute, setSelectedSkillToExecute] = useState<MarketplaceSkill | null>(null);
     const marketplace = useMarketplace();
+    const { fetchPaid } = useX402();
+    const { address } = useFreighter();
     const [onChainStrategyCount, setOnChainStrategyCount] = useState<number | null>(null);
 
     // Fetch on-chain marketplace stats
@@ -110,7 +116,9 @@ export default function MarketplacePage() {
                         downloads: 12453,
                         elo: 1200, reviewCount: 0,
                         isVerified: true,
-                        isFeatured: true
+                        isFeatured: true,
+                        isPremium: true,
+                        price: "0.01 USDC"
                     },
                     {
                         id: 'price-oracle',
@@ -496,14 +504,11 @@ export default function MarketplacePage() {
         const toastId = toast.loading(`Installing ${skill.name} to unit ${agentId.slice(0, 10)}...`);
 
         try {
-            // El backend está proxyado en Next.js (rewrites) o accesible directamente
-            // Asumimos que /api está configurado correctamente
-            const response = await fetch(`/api/marketplace/install/${skill.id}`, {
+            const response = await fetchPaid(`/api/marketplace/install/${skill.id}`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                     'x-stellar-account': userWallet || '',
-                    // 'Authorization': 'Bearer ...' // In a real app
                 },
                 body: JSON.stringify({ targetAgent: agentId }) // Send agent ID
             });
@@ -517,17 +522,22 @@ export default function MarketplacePage() {
             if (data.success) {
                 toast.dismiss(toastId);
 
-                // Update local persistence (per-agent)
+                // Update local persistence (per-agent AND global)
                 const agentLocalKey = `nirium-skills-${agentId}`;
-                const existingLocal = JSON.parse(localStorage.getItem(agentLocalKey) || '{}');
-                const newInstalled = { ...existingLocal, [skill.id]: true, [skill.slug]: true };
-                localStorage.setItem(agentLocalKey, JSON.stringify(newInstalled));
+                const globalLocalKey = 'nirium-skills';
+                
+                const existingAgentLocal = JSON.parse(localStorage.getItem(agentLocalKey) || '{}');
+                const existingGlobalLocal = JSON.parse(localStorage.getItem(globalLocalKey) || '{}');
+                
+                const newAgentInstalled = { ...existingAgentLocal, [skill.id]: true, [skill.slug]: true };
+                const newGlobalInstalled = { ...existingGlobalLocal, [skill.id]: true, [skill.slug]: true };
+                
+                localStorage.setItem(agentLocalKey, JSON.stringify(newAgentInstalled));
+                localStorage.setItem(globalLocalKey, JSON.stringify(newGlobalInstalled));
+                
                 setInstalledSkills(prev => ({ ...prev, [skill.id]: true, [skill.slug]: true }));
 
-                // Log the install event to Supabase (shows in Ops Console)
-                await writeLog(`SKILL INSTALLED: ${skill.name} → agent ${agentId}`, 'success', userWallet || agentId);
-
-                // Skill-specific bootup logs (sequential, simulates skill activating)
+                // Skill-specific bootup logs
                 const SKILL_BOOT_LOGS: Record<string, Array<{ msg: string; level: 'info' | 'success' | 'warn' }>> = {
                     'flash-loan-executor': [{ msg: 'SKILL: Flash Loan Executor binding to Soroban atomic module...', level: 'info' }, { msg: 'SKILL: Atomic flash loan ready. Reviewing arbitrage routes.', level: 'success' }],
                     'price-oracle': [{ msg: 'SKILL: Multi-Source Oracle aggregating CoinGecko + DeFiLlama + Pyth...', level: 'info' }, { msg: 'SKILL: Price feeds live — 200+ assets tracked.', level: 'success' }],
@@ -539,17 +549,17 @@ export default function MarketplacePage() {
                     'portfolio-tracker': [{ msg: 'SKILL: Portfolio Tracker indexing wallet positions...', level: 'info' }, { msg: 'SKILL: 12 open positions tracked. P&L dashboard ready.', level: 'success' }],
                     'pyth-oracle': [{ msg: 'SKILL: Pyth Network Oracle subscribing to price feeds...', level: 'info' }, { msg: 'SKILL: 230 Pyth price feeds active. Staleness guard enabled.', level: 'success' }],
                     'twitter-sentiment': [{ msg: 'SKILL: X/Twitter Sentiment scanning #Stellar ecosystem keywords...', level: 'info' }, { msg: 'SKILL: Bullish sentiment index: 72%. Signal feed active.', level: 'success' }],
-                    'phoenix-lp-manager': [{ msg: 'SKILL: Phoenix LP Manager reading AMM position ranges...', level: 'info' }, { msg: 'SKILL: 2 positions in range. Auto-rebalance armed.', level: 'success' }],
+                    'soroswap-lp-manager': [{ msg: 'SKILL: Phoenix LP Manager reading AMM position ranges...', level: 'info' }, { msg: 'SKILL: 2 positions in range. Auto-rebalance armed.', level: 'success' }],
                     'gas-optimizer': [{ msg: 'SKILL: Fee Optimizer analyzing transaction multi-op opportunities...', level: 'info' }, { msg: 'SKILL: Multi-op mode enabled. Estimated 45% fee savings.', level: 'success' }],
                     'blend-lending-bot': [{ msg: 'SKILL: Blend Lending Bot reading health factor across positions...', level: 'info' }, { msg: 'SKILL: Health factor 1.82 — safe. Auto-rebalance threshold set.', level: 'success' }],
-                    'deepbook-market-maker': [{ msg: 'SKILL: DeepBook Market Maker placing two-sided limit orders...', level: 'info' }, { msg: 'SKILL: 4 limit orders placed. Maker rebate capture active.', level: 'success' }],
+                    'sdex-market-maker': [{ msg: 'SKILL: DeepBook Market Maker placing two-sided limit orders...', level: 'info' }, { msg: 'SKILL: 4 limit orders placed. Maker rebate capture active.', level: 'success' }],
                     'stop-loss-guardian': [{ msg: 'SKILL: Stop-Loss Guardian monitoring 3 open positions...', level: 'info' }, { msg: 'SKILL: Stop orders armed at -8% threshold. Protection active.', level: 'warn' }],
                     'eliza-trading-brain': [{ msg: 'SKILL: ElizaOS Trading Brain loading LLM context model...', level: 'info' }, { msg: 'SKILL: AI decision layer active. Pre-execution analysis enabled.', level: 'success' }],
-                    'neural-storage-logger': [{ msg: 'SKILL: Neural Logger connecting to decentralized storage...', level: 'info' }, { msg: 'SKILL: Storage endpoint active. Logs will be archived on-chain.', level: 'success' }],
+                    'ipfs-blackbox-logger': [{ msg: 'SKILL: Neural Logger connecting to decentralized storage...', level: 'info' }, { msg: 'SKILL: Storage endpoint active. Logs will be archived on-chain.', level: 'success' }],
                     'cross-dex-aggregator': [{ msg: 'SKILL: Cross-DEX Aggregator indexing Phoenix, Soroswap, SDEX...', level: 'info' }, { msg: 'SKILL: 3 DEXes indexed. Best-route execution enabled.', level: 'success' }],
                     'pnl-reporter': [{ msg: 'SKILL: P&L Reporter calculating realized/unrealized positions...', level: 'info' }, { msg: 'SKILL: Daily P&L report scheduled. Delivery target: Telegram.', level: 'success' }],
                     'webhook-trigger': [{ msg: 'SKILL: Webhook Trigger generating secure endpoint key...', level: 'info' }, { msg: 'SKILL: Webhook live at /api/hook/{agentId}. Ready for TradingView.', level: 'success' }],
-                    'neural-blackbox': [{ msg: 'SKILL: Neural Archive establishing uplink to IPFS network...', level: 'info' }, { msg: 'SKILL: Blob storage active. Forensic logging armed. Tamper-proof seal enabled.', level: 'success' }],
+                    'neural-archive-logger': [{ msg: 'SKILL: Neural Archive establishing uplink to IPFS network...', level: 'info' }, { msg: 'SKILL: Blob storage active. Forensic logging armed. Tamper-proof seal enabled.', level: 'success' }],
                     'usdc-vault-manager': [{ msg: 'SKILL: USDC Vault Manager scanning for existing USDC vaults...', level: 'info' }, { msg: 'SKILL: Phoenix & Blend USDC pools indexed. Auto-rotation active.', level: 'success' }],
                 };
 
@@ -562,8 +572,28 @@ export default function MarketplacePage() {
                     });
                 }
 
+                if (data.txHash) {
+                    writeLog(`x402 VERIFIED: ${skill.name} payment confirmed. Tx: ${data.txHash.substring(0, 12)}...`, 'success', address || '');
+                }
+                
+                writeLog(`PLUGIN INSTALLED: ${skill.name} integrated into agent unit ${agentId.slice(0, 8)}.`, 'info', address || '');
+
                 toast.success(`${skill.name} installed successfully!`, {
-                    description: "The skill is now available in your agent and ready to use. Check the Dashboard for logs.",
+                    description: (
+                        <div className="flex flex-col gap-2 mt-1">
+                            <p>The skill is now available in your agent and ready to use.</p>
+                            {data.txHash && (
+                                <a 
+                                    href={`https://stellar.expert/explorer/testnet/tx/${data.txHash}`}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="text-stellar-teal hover:underline flex items-center gap-1 text-xs font-mono"
+                                >
+                                    <ExternalLink size={10} /> View Transaction on StellarExpert
+                                </a>
+                            )}
+                        </div>
+                    ),
                     action: {
                         label: "View Dashboard",
                         onClick: () => window.location.href = "/dashboard"
@@ -767,10 +797,14 @@ export default function MarketplacePage() {
                                                     e.stopPropagation();
                                                     setSelectedSkillToInstall(skill);
                                                 }}
-                                                className="flex items-center gap-2 px-3 py-1.5 bg-slate-700/50 hover:bg-stellar-yellow hover:text-black text-white rounded-lg text-sm font-bold transition-colors border border-slate-600/50 hover:border-stellar-yellow z-10 relative"
+                                                className={`flex items-center gap-2 px-3 py-1.5 rounded-lg text-sm font-bold transition-colors border z-10 relative ${
+                                                    skill.isPremium 
+                                                    ? 'bg-stellar-teal/20 hover:bg-stellar-teal text-white border-stellar-teal/50 hover:text-black shadow-lg shadow-stellar-teal/5' 
+                                                    : 'bg-slate-700/50 hover:bg-stellar-yellow hover:text-black text-white border-slate-600/50 hover:border-stellar-yellow'
+                                                }`}
                                             >
                                                 <Zap className="w-3.5 h-3.5" />
-                                                Install
+                                                {skill.isPremium ? `Pay ${skill.price}` : 'Install'}
                                             </button>
                                         )}
                                     </div>
@@ -913,6 +947,19 @@ export default function MarketplacePage() {
                                                     {skill.elo} ELO ({skill.reviewCount})
                                                 </span>
                                             </div>
+
+                                            {skill.isPremium && (
+                                                <div className="absolute top-2 left-2 bg-stellar-teal text-black text-[10px] font-black px-1.5 py-0.5 rounded-full flex items-center gap-1 z-20 shadow-lg shadow-stellar-teal/20">
+                                                    <DollarSign size={10} />
+                                                    PREMIUM
+                                                </div>
+                                            )}
+                                            {skill.isFeatured && (
+                                                <div className="absolute top-2 right-2 bg-stellar-yellow/90 backdrop-blur-md text-black text-[10px] font-bold px-2 py-0.5 rounded-md flex items-center gap-1 z-10">
+                                                    <Sparkles size={10} />
+                                                    Featured
+                                                </div>
+                                            )}
 
                                             {installedSkills[skill.id] || installedSkills[skill.slug] ? (
                                                 <div className="flex gap-2">

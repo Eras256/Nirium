@@ -16,6 +16,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { ExternalLink, Shield, X, AlertTriangle, Trash2, Info, ChevronRight, RefreshCw, Zap, Plus, Code, Cpu, Brain, Filter, Download, Activity, StopCircle, Database, Globe } from "lucide-react";
 import OpsConsole from "@/components/layout/OpsConsole";
 import ProtocolRevenue from "@/components/dashboard/ProtocolRevenue";
+import PaymentStreams from "@/components/dashboard/PaymentStreams";
 import { writeLog } from "@/lib/logger";
 import { stellarClient } from "@/lib/stellarClient";
 import { useVault, useEloReputation } from "@/hooks/useNiriumContracts";
@@ -2500,8 +2501,9 @@ function DashboardContent() {
                         />
                     </div>
 
-                    {/* x402 Protocol Revenue */}
+                    {/* x402 Protocol Revenue & M2M Streams */}
                     <ProtocolRevenue />
+                    <PaymentStreams />
                 </div>
             </div>
 

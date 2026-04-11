@@ -1,6 +1,6 @@
 {
     "name": "nirium",
-    "version": "0.2.1",
+    "version": "0.2.2",
     "description": "Official TypeScript SDK for the Nirium autonomous DeFi agent on Stellar",
     "main": "dist/index.js",
     "types": "dist/index.d.ts",

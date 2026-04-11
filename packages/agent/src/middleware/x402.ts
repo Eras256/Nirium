@@ -46,8 +46,11 @@ const schemes: SchemeRegistration[] = [
 //   premium market   → $0.01 per call  (enriched market state)
 //   premium execute  → $0.05 per call  (strategy execution)
 //
+// NOTE: paths are sub-paths relative to the /api/v1/premium mount point,
+// because x402Middleware is mounted via app.use('/api/v1/premium', ...).
+// Express strips the prefix, so req.path inside the middleware is /signals, /market, etc.
 const PREMIUM_ROUTES = {
-    'GET /api/v1/premium/signals': {
+    'GET /signals': {
         accepts: {
             scheme: 'exact' as const,
             price: '$0.01',
@@ -56,7 +59,7 @@ const PREMIUM_ROUTES = {
             description: 'Nirium premium arbitrage signals (x402)',
         },
     },
-    'GET /api/v1/premium/market': {
+    'GET /market': {
         accepts: {
             scheme: 'exact' as const,
             price: '$0.01',
@@ -65,7 +68,7 @@ const PREMIUM_ROUTES = {
             description: 'Nirium enriched market state (x402)',
         },
     },
-    'POST /api/v1/premium/execute': {
+    'POST /execute': {
         accepts: {
             scheme: 'exact' as const,
             price: '$0.05',

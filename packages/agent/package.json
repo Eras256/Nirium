@@ -16,6 +16,7 @@
         "start:protocol": "tsx scripts/initialize_protocol.ts",
         "generate-swarm": "tsx scripts/generate_swarm.ts",
         "x402:buy": "tsx src/scripts/x402_buyer_agent.ts",
+        "mpp:buy": "tsx src/scripts/mpp_buyer_agent.ts",
         "lint": "eslint src/",
         "test": "jest --passWithNoTests"
     },

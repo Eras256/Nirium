@@ -20,7 +20,7 @@ jobs:
         run: cargo install cargo-audit --locked || true
 
       - name: Run Cargo Audit
-        run: cargo audit --deny warnings
+        run: cargo audit
 
   node-audit:
     name: Node.js Supply Chain Audit

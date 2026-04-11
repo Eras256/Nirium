@@ -1,19 +1,25 @@
 {
-    "name": "nirium-root",
-    "private": true,
-    "scripts": {
-        "dev": "pnpm --parallel --filter nirium-web --filter @nirium/agent run dev",
-        "build": "pnpm --filter nirium-web run build",
-        "start": "pnpm --filter nirium-web start"
-    },
-    "engines": {
-        "node": "20.x"
-    },
-    "packageManager": "pnpm@9.12.2",
-    "devDependencies": {
-        "@types/node": "^20.11.0",
-        "@types/react": "^19.0.0",
-        "@types/react-dom": "^19.0.0",
-        "typescript": "^5.7.0"
+  "name": "nirium-root",
+  "private": true,
+  "scripts": {
+    "dev": "pnpm --parallel --filter nirium-web --filter @nirium/agent run dev",
+    "build": "pnpm --filter nirium-web run build",
+    "start": "pnpm --filter nirium-web start"
+  },
+  "engines": {
+    "node": "20.x"
+  },
+  "packageManager": "pnpm@9.12.2",
+  "devDependencies": {
+    "@types/node": "^20.11.0",
+    "@types/react": "^19.0.0",
+    "@types/react-dom": "^19.0.0",
+    "typescript": "^5.7.0"
+  },
+  "pnpm": {
+    "overrides": {
+      "handlebars": ">=4.7.9",
+      "defu": ">=6.1.5"
     }
+  }
 }

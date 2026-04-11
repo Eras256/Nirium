@@ -40,25 +40,44 @@ export default function ProtocolRevenue() {
     const [stats, setStats]     = useState<RevenueStats>({ totalUsdc: 0, last24h: 0, requestCount: 0, lastPayment: null });
     const [loading, setLoading] = useState(true);
 
+    const treasury = "GBBD47IF6LWK7P7MDEVSCWR7DPUWV3NY3DTQEVFL4NAT4AQH3ZLLFLA5";
+
     const fetchRevenue = useCallback(async () => {
         try {
-            const res = await fetch(`${API_URL}/api/revenue`);
-            if (!res.ok) return;
-            const rows: Array<{ id: string; message: string; created_at: string }> = await res.json();
+            // Fetch live payment history from Horizon
+            const res = await fetch(`https://horizon-testnet.stellar.org/accounts/${treasury}/payments?order=desc&limit=50`);
+            const data = await res.json();
+            
+            if (data?._embedded?.records) {
+                const rows = data._embedded.records.filter((r: any) => r.type === 'payment');
+                
+                const parsed = rows.map((r: any) => {
+                    const val = parseFloat(r.amount);
+                    const isMpp = val > 0.04 && val < 0.06;
+                    const routeName = isMpp ? "/subscribe" : "/install";
+                    return {
+                        id: r.id,
+                        message: `from=${r.from} | amount=${r.amount} | route=${routeName}`,
+                        created_at: r.created_at,
+                        from: r.from,
+                        route: routeName,
+                        amount: r.amount
+                    };
+                });
 
-            const parsed = rows.map(r => ({ id: r.id, message: r.message, created_at: r.created_at, ...parsePaymentMessage(r.message) }));
+                // Calculate cumulative real revenue
+                const total = parsed.reduce((sum: number, e: any) => sum + parseFloat(e.amount || '0'), 0);
+                const cutoff = new Date(Date.now() - 86_400_000).toISOString();
+                const last24 = parsed.filter((e: any) => e.created_at > cutoff).reduce((sum: number, e: any) => sum + parseFloat(e.amount || '0'), 0);
 
-            const total  = parsed.reduce((sum, e) => sum + parseFloat(e.amount || '0'), 0);
-            const cutoff = new Date(Date.now() - 86_400_000).toISOString();
-            const last24 = parsed.filter(e => e.created_at > cutoff).reduce((sum, e) => sum + parseFloat(e.amount || '0'), 0);
-
-            setEvents(parsed);
-            setStats({
-                totalUsdc:    Math.round(total * 1000) / 1000,
-                last24h:      Math.round(last24 * 1000) / 1000,
-                requestCount: parsed.length,
-                lastPayment:  parsed[0]?.created_at || null,
-            });
+                setEvents(parsed);
+                setStats({
+                    totalUsdc:    Math.round(total * 1000) / 1000,
+                    last24h:      Math.round(last24 * 1000) / 1000,
+                    requestCount: parsed.length,
+                    lastPayment:  parsed[0]?.created_at || null,
+                });
+            }
         } catch {
             // silent — not critical
         } finally {
