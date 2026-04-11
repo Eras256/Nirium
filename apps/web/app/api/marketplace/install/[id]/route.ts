@@ -11,6 +11,7 @@ import {
 } from "@stellar/stellar-sdk";
 
 const horizonServer = new Horizon.Server("https://horizon-testnet.stellar.org");
+const USDC_ASSET = new Asset('USDC', 'GBBD47IF6LWK7P7MDEVSCWR7DPUWV3NY3DTQEVFL4NAT4AQH3ZLLFLA5');
 
 // x402 Pattern: Using standard Transactions for maximum wallet compatibility (Freighter/LOBSTR)
 const PREMIUM_SKILLS = ['flash-loan-executor', 'whale-tracker', 'arbitrage-bot'];
@@ -52,8 +53,8 @@ export async function POST(
             })
             .addOperation(Operation.payment({
                 destination,
-                asset: Asset.native(), // Switch to XLM for Demo stability (User always has XLM)
-                amount: "0.001"
+                asset: USDC_ASSET, 
+                amount: "0.01"
             }))
             .setTimeout(60 * 5) // 5 minutes window
             .build();
@@ -63,8 +64,8 @@ export async function POST(
             return NextResponse.json({
                 error: "Payment Required",
                 paymentInstructions: {
-                    amount: "0.001",
-                    assetSymbol: "XLM",
+                    amount: "0.01",
+                    assetSymbol: "USDC",
                     transactionXdr: xdr,
                     authEntry: xdr,
                     recipient: destination

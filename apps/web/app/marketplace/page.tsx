@@ -118,7 +118,7 @@ export default function MarketplacePage() {
                         isVerified: true,
                         isFeatured: true,
                         isPremium: true,
-                        price: "0.001 XLM"
+                        price: "0.01 USDC"
                     },
                     {
                         id: 'price-oracle',
@@ -134,7 +134,7 @@ export default function MarketplacePage() {
                         isVerified: true,
                         isFeatured: true,
                         isPremium: true,
-                        price: "0.05 XLM/mo"
+                        price: "1.00 USDC/mo"
                     },
                     {
                         id: 'telegram-alerts-pro',
@@ -150,7 +150,7 @@ export default function MarketplacePage() {
                         isVerified: true,
                         isFeatured: true,
                         isPremium: true,
-                        price: "0.05 XLM/mo"
+                        price: "1.00 USDC/mo"
                     },
                     {
                         id: 'whale-tracker',
@@ -166,7 +166,7 @@ export default function MarketplacePage() {
                         isVerified: true,
                         isFeatured: false,
                         isPremium: true,
-                        price: "0.001 XLM"
+                        price: "0.01 USDC"
                     },
                     {
                         id: 'lst-arbitrage',

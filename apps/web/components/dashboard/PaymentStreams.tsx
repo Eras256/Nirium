@@ -28,15 +28,19 @@ export default function PaymentStreams() {
                     const realStreams: PaymentStream[] = data._embedded.records
                         .filter((tx: any) => tx.type === 'payment')
                         .map((tx: any) => {
-                            // MORE ROBUST LOGIC: Check range to avoid precision issues
+                            // Labeling logic:
                             const val = parseFloat(tx.amount);
-                            const isMpp = val > 0.04 && val < 0.06; 
+                            const isUsdc = tx.asset_type === 'credit_alphanum4' && tx.asset_code === 'USDC';
+                            
+                            // 1.0 USDC is the new MPP subscription standard
+                            // 0.01 USDC is the x402 micro-billing standard
+                            const isMpp = (val > 0.9 && val < 1.1) || (val > 0.04 && val < 0.06); 
                             
                             return {
                                 id: tx.transaction_hash,
                                 from: `${tx.from.substring(0, 6)}...${tx.from.slice(-4)}`,
-                                amount: val.toFixed(3),
-                                asset: tx.asset_type === 'native' ? 'XLM' : 'USDC',
+                                amount: val.toFixed(isUsdc ? 2 : 3),
+                                asset: isUsdc ? 'USDC' : 'XLM',
                                 timestamp: new Date(tx.created_at),
                                 type: isMpp ? 'mpp' : 'x402'
                             };

@@ -20,6 +20,7 @@ import {
 const SECRET_KEY = process.env.AGENT_SECRET; // Optional: Provide your own
 const TREASURY = "GBBD47IF6LWK7P7MDEVSCWR7DPUWV3NY3DTQEVFL4NAT4AQH3ZLLFLA5";
 const SERVER = new Horizon.Server("https://horizon-testnet.stellar.org");
+const USDC_ASSET = new Asset('USDC', 'GBBD47IF6LWK7P7MDEVSCWR7DPUWV3NY3DTQEVFL4NAT4AQH3ZLLFLA5');
 
 async function runMppCycle(agentKeys: Keypair) {
     try {
@@ -35,8 +36,8 @@ async function runMppCycle(agentKeys: Keypair) {
         })
         .addOperation(Operation.payment({
             destination: TREASURY,
-            asset: Asset.native(),
-            amount: "0.05" // MPP payments can be larger (e.g., monthly subs)
+            asset: USDC_ASSET,
+            amount: "1.00" // Standardized MPP USDC subscription
         }))
         .addMemo(Memo.text("MPP_SUBSCRIBE_99"))
         .setTimeout(30)
@@ -65,7 +66,29 @@ async function startAgent() {
         console.log(`🔑 Public: ${agentKeys.publicKey()}`);
         console.log("💧 Funding...");
         await fetch(`https://friendbot.stellar.org/?addr=${agentKeys.publicKey()}`);
+        console.log("💧 Funding with XLM...");
         await new Promise(r => setTimeout(r, 2000));
+
+        // 🪙 Onboarding: USDC Trustline + Swap
+        console.log("🪙 Preparing MPP subscription wallet (USDC)...");
+        const account = await SERVER.loadAccount(agentKeys.publicKey());
+        const setupTx = new TransactionBuilder(account, {
+            fee: "1000",
+            networkPassphrase: Networks.TESTNET
+        })
+        .addOperation(Operation.changeTrust({ asset: USDC_ASSET }))
+        .addOperation(Operation.pathPaymentStrictReceive({
+            sendAsset: Asset.native(),
+            sendMax: "20",
+            destAsset: USDC_ASSET,
+            destAmount: "10.0", // Get enough for 10 cycles
+            destination: agentKeys.publicKey()
+        }))
+        .setTimeout(30)
+        .build();
+        setupTx.sign(agentKeys);
+        await SERVER.submitTransaction(setupTx);
+        console.log("✅ MPP Wallet Ready.");
     }
 
     console.log("🚀 MPP AGENT ACTIVE.");
