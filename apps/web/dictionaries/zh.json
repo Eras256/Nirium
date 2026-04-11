@@ -228,6 +228,15 @@
                 "title": "随同 App",
                 "desc": "移动神经链接"
             }
+        },
+        "settlement_layer": {
+            "title": "结算层",
+            "span": "为代理设计",
+            "subtitle": "Nirium 为 Stellar 上的可编程、非交互式价值转移提供终极基础设施。",
+            "x402_title": "x402：量子微计费",
+            "x402_desc": "每次 API 调用都是一次交易。自动化按推理付费，即时结算，零摩擦。",
+            "mpp_title": "MPP：机构流",
+            "mpp_desc": "高吞吐量订阅流和具有绝对可追溯性的程序化资本分配。"
         }
     },
     "common": {
