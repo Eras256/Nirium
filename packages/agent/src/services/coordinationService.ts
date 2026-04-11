@@ -11,7 +11,7 @@
 
 import { createEd25519Signer, getNetworkPassphrase } from "@x402/stellar";
 import { ExactStellarScheme } from "@x402/stellar/exact/client";
-import { x402HTTPClient } from "@x402/fetch";
+import { x402Client, wrapFetchWithPayment } from "@x402/fetch";
 
 const NETWORK = (process.env.STELLAR_NETWORK === "mainnet" ? "stellar:pubnet" : "stellar:testnet") as `${string}:${string}`;
 
@@ -22,21 +22,22 @@ export async function auditWithExternalAgent(strategyId: string, context: any): 
     const agentSecret = process.env.STELLAR_SECRET_KEY;
     if (!agentSecret) {
         console.log("[Coordination] No agent secret — skipping external audit");
-        return true; 
+        return true;
     }
 
     try {
         console.log(`[Coordination] Requesting security audit for ${strategyId}...`);
-        
+
         // Setup x402 client for the agent
-        const signer = createEd25519Signer(agentSecret, getNetworkPassphrase(NETWORK));
-        const client = x402HTTPClient({ signer, schemes: [ExactStellarScheme] });
+        const signer = createEd25519Signer(agentSecret, NETWORK);
+        const client = new x402Client();
+        client.register(NETWORK, new ExactStellarScheme(signer));
+        const fetchWithPay = wrapFetchWithPayment(fetch, client);
 
         // Target: A mock external auditor (could be another Nirium instance or a partner API)
-        // For the hackathon demo, we point to a known x402-enabled endpoint
         const AUDITOR_URL = process.env.EXTERNAL_AUDITOR_URL || "https://api.nirium.xyz/api/v1/premium/audit";
 
-        const response = await client.fetch(AUDITOR_URL, {
+        const response = await fetchWithPay(AUDITOR_URL, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ strategyId, context })

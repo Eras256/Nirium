@@ -21,5 +21,10 @@
       "handlebars": ">=4.7.9",
       "defu": ">=6.1.5"
     }
+  },
+  "dependencies": {
+    "@radix-ui/react-slot": "^1.2.4",
+    "@x402/fetch": "^2.9.0",
+    "class-variance-authority": "^0.7.1"
   }
 }

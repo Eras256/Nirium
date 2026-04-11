@@ -18,6 +18,7 @@ import dynamic from 'next/dynamic';
 const NeuralCanvas = dynamic(() => import('@/components/3d/NeuralCanvas').then((mod) => mod.NeuralCanvas), { ssr: false });
 import Navbar from "@/components/layout/Navbar";
 import { SectionBrandLogo } from "@/components/ui/SectionBrandLogo";
+import { Button } from "@/components/ui/Button";
 import { useLanguage } from "@/context/LanguageContext";
 import { supabase } from "@/lib/supabase";
 
@@ -72,7 +73,7 @@ export default function Home() {
                 const res = await fetch('/api/logs');
                 if (!res.ok) return;
                 const data: any[] = await res.json();
-                
+
                 if (data && data.length > 0) {
                     setAgentLog(data.slice(0, 8).map((l: any) => `[${l.agent_id}] ${l.message}`).reverse());
                 }
@@ -144,7 +145,7 @@ export default function Home() {
                         </div>
 
                         <p className="text-gray-400 text-lg md:text-xl max-w-xl leading-relaxed">
-                            {t.home.hero_subtitle} <br/>
+                            {t.home.hero_subtitle} <br />
                             <span className="text-stellar-teal/80 font-mono text-sm mt-2 block italic border-l border-stellar-teal/30 pl-4">
                                 Optimized for <span className="text-white">x402 Micro-Billing</span> & <span className="text-white">MPP Institutional Settlements</span>.
                             </span>
@@ -194,7 +195,7 @@ export default function Home() {
                                     const parts = log.split('|');
                                     const mainMsg = parts[0];
                                     const hashPart = parts[1];
-                                    
+
                                     return (
                                         <div key={i} className="flex gap-2 text-[10px]">
                                             <span className="text-white/20 select-none">{i.toString().padStart(2, '0')}</span>
@@ -223,15 +224,15 @@ export default function Home() {
             <section className="py-20 border-y border-white/5 bg-black/50">
                 <div className="container mx-auto px-4">
                     <div className="flex flex-col items-center gap-6 mb-12">
-                        <motion.div 
+                        <motion.div
                             initial={{ opacity: 0, scale: 0.8 }}
                             whileInView={{ opacity: 1, scale: 1 }}
                             transition={{ duration: 1 }}
                             className="relative"
                         >
-                            <img 
-                                src="/brand/NiLo.png" 
-                                alt="Nirium Logo" 
+                            <img
+                                src="/brand/NiLo.png"
+                                alt="Nirium Logo"
                                 className="w-48 sm:w-64 h-auto object-contain drop-shadow-[0_0_40px_rgba(45,235,232,0.4)]"
                             />
                         </motion.div>
@@ -350,7 +351,88 @@ export default function Home() {
                 </div>
             </section>
 
-            {/* ── UNIVERSAL TOOLKIT SECTION ─────────────────────────────── */}
+            {/* ── SETTLEMENT LAYER SECTION (x402 & MPP) ──────────────────── */}
+            <section className="py-24 bg-gradient-to-b from-black to-stellar-teal/5 border-y border-white/5 relative overflow-hidden">
+                <div className="absolute top-0 right-0 w-1/2 h-full bg-[radial-gradient(circle_at_100%_0%,rgba(45,235,232,0.05),transparent_70%)]" />
+                
+                <div className="container mx-auto px-4 relative z-10">
+                    <motion.div {...fadeUp()} className="text-center mb-20 space-y-4">
+                        <h2 className="text-4xl md:text-6xl font-black tracking-tighter uppercase italic leading-none">
+                            {t.home.settlement_layer.title} <span className="text-stellar-teal">{t.home.settlement_layer.span}</span>
+                        </h2>
+                        <p className="text-gray-400 max-w-2xl mx-auto text-lg">
+                            {t.home.settlement_layer.subtitle}
+                        </p>
+                    </motion.div>
+
+                    <div className="grid md:grid-cols-2 gap-8 max-w-6xl mx-auto">
+                        {/* x402 Card */}
+                        <motion.div {...fadeUp(0.1)} className="group relative p-8 rounded-3xl bg-black/60 border border-white/10 hover:border-stellar-teal/40 transition-all duration-500 shadow-2xl">
+                            <div className="absolute top-4 right-8 text-[40px] opacity-10 font-black italic tracking-tighter text-stellar-teal group-hover:opacity-20 transition-opacity">x402</div>
+                            <div className="space-y-6">
+                                <div className="w-16 h-16 rounded-2xl bg-stellar-teal/10 flex items-center justify-center border border-stellar-teal/30 group-hover:scale-110 transition-transform">
+                                    <Zap className="w-8 h-8 text-stellar-teal" />
+                                </div>
+                                <div>
+                                    <h3 className="text-2xl font-black tracking-tight mb-3 uppercase italic text-white flex items-center gap-2">
+                                        {t.home.settlement_layer.x402_title}
+                                    </h3>
+                                    <p className="text-gray-400 leading-relaxed text-sm md:text-base">
+                                        {t.home.settlement_layer.x402_desc}
+                                    </p>
+                                </div>
+                                <div className="flex items-center gap-4 py-4 border-t border-white/5">
+                                    <div className="text-[10px] font-mono text-stellar-teal uppercase tracking-[0.2em] font-bold">Protocol Status: LIVE</div>
+                                    <div className="h-1 flex-1 bg-white/5 rounded-full overflow-hidden">
+                                        <motion.div 
+                                            initial={{ width: 0 }}
+                                            whileInView={{ width: "100%" }}
+                                            transition={{ duration: 1.5, ease: "easeOut" }}
+                                            className="h-full bg-stellar-teal"
+                                        />
+                                    </div>
+                                </div>
+                            </div>
+                        </motion.div>
+
+                        {/* MPP Card */}
+                        <motion.div {...fadeUp(0.2)} className="group relative p-8 rounded-3xl bg-black/60 border border-white/10 hover:border-stellar-yellow/40 transition-all duration-500 shadow-2xl">
+                            <div className="absolute top-4 right-8 text-[40px] opacity-10 font-black italic tracking-tighter text-stellar-yellow group-hover:opacity-20 transition-opacity">MPP</div>
+                            <div className="space-y-6">
+                                <div className="w-16 h-16 rounded-2xl bg-stellar-yellow/10 flex items-center justify-center border border-stellar-yellow/30 group-hover:scale-110 transition-transform">
+                                    <Layers className="w-8 h-8 text-stellar-yellow" />
+                                </div>
+                                <div>
+                                    <h3 className="text-2xl font-black tracking-tight mb-3 uppercase italic text-white">
+                                        {t.home.settlement_layer.mpp_title}
+                                    </h3>
+                                    <p className="text-gray-400 leading-relaxed text-sm md:text-base">
+                                        {t.home.settlement_layer.mpp_desc}
+                                    </p>
+                                </div>
+                                <div className="flex items-center gap-4 py-4 border-t border-white/5">
+                                    <div className="text-[10px] font-mono text-stellar-yellow uppercase tracking-[0.2em] font-bold">Standard: SEP-XXXX</div>
+                                    <div className="h-1 flex-1 bg-white/5 rounded-full overflow-hidden">
+                                        <motion.div 
+                                            initial={{ width: 0 }}
+                                            whileInView={{ width: "100%" }}
+                                            transition={{ duration: 1.5, ease: "easeOut", delay: 0.2 }}
+                                            className="h-full bg-stellar-yellow"
+                                        />
+                                    </div>
+                                </div>
+                            </div>
+                        </motion.div>
+                    </div>
+
+                    <div className="mt-16 flex justify-center">
+                        <Link href="/docs/settlement" className="group inline-flex items-center gap-3 px-6 py-3 bg-white/5 border border-white/10 rounded-full font-bold hover:bg-white/10 transition-all">
+                            <span>Explore Infrastructure</span>
+                            <ChevronRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                        </Link>
+                    </div>
+                </div>
+            </section>
             <section className="py-24 bg-white/[0.01] border-y border-white/5">
                 <div className="container mx-auto px-4">
                     <motion.div {...fadeUp()} className="text-center mb-16 space-y-4">
@@ -516,15 +598,15 @@ export default function Home() {
                 <div className="container mx-auto px-4 relative z-10">
                     <motion.div {...fadeUp()} className="text-center mb-4">
                         <div className="flex flex-col items-center gap-8 mb-6">
-                            <motion.div 
+                            <motion.div
                                 initial={{ opacity: 0, scale: 0.8 }}
                                 whileInView={{ opacity: 1, scale: 1 }}
                                 transition={{ duration: 1 }}
                                 className="relative"
                             >
-                                <img 
-                                    src="/brand/NiLo.png" 
-                                    alt="Nirium Logo" 
+                                <img
+                                    src="/brand/NiLo.png"
+                                    alt="Nirium Logo"
                                     className="w-48 sm:w-64 h-auto object-contain drop-shadow-[0_0_40px_rgba(45,235,232,0.4)]"
                                 />
                             </motion.div>

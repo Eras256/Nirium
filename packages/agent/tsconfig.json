@@ -6,6 +6,10 @@
         "target": "ES2022",
         "module": "ESNext",
         "moduleResolution": "bundler",
+        "baseUrl": ".",
+        "paths": {
+            "@x402/*": ["node_modules/@x402/*"]
+        },
         "declaration": true,
         "strict": true,
         "esModuleInterop": true,
