@@ -119,12 +119,18 @@ export default function Home() {
                         transition={{ duration: 0.8 }}
                         className="space-y-8"
                     >
-                        <div className="inline-flex items-center gap-2 px-3 py-1 bg-white/5 border border-white/10 rounded-full text-xs font-mono text-stellar-teal mb-4">
-                            <span className="relative flex h-2 w-2">
-                                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-stellar-teal opacity-75"></span>
-                                <span className="relative inline-flex rounded-full h-2 w-2 bg-stellar-teal"></span>
-                            </span>
-                            v0.3.0 // {t.footer.testnet_live}
+                        <div className="flex flex-wrap gap-3 mb-4">
+                            <div className="inline-flex items-center gap-2 px-3 py-1 bg-white/5 border border-white/10 rounded-full text-[10px] font-mono text-stellar-teal">
+                                <span className="relative flex h-2 w-2">
+                                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-stellar-teal opacity-75"></span>
+                                    <span className="relative inline-flex rounded-full h-2 w-2 bg-stellar-teal"></span>
+                                </span>
+                                v0.3.0 // {t.footer.testnet_live}
+                            </div>
+                            <div className="inline-flex items-center gap-2 px-3 py-1 bg-stellar-yellow/10 border border-stellar-yellow/30 rounded-full text-[10px] font-mono text-stellar-yellow uppercase tracking-widest font-bold">
+                                <Zap size={10} className="fill-stellar-yellow" />
+                                x402 + MPP Enabled
+                            </div>
                         </div>
 
                         <div className="flex flex-col xl:flex-row items-center xl:items-start gap-10">
@@ -138,7 +144,10 @@ export default function Home() {
                         </div>
 
                         <p className="text-gray-400 text-lg md:text-xl max-w-xl leading-relaxed">
-                            {t.home.hero_subtitle}
+                            {t.home.hero_subtitle} <br/>
+                            <span className="text-stellar-teal/80 font-mono text-sm mt-2 block italic border-l border-stellar-teal/30 pl-4">
+                                Optimized for <span className="text-white">x402 Micro-Billing</span> & <span className="text-white">MPP Institutional Settlements</span>.
+                            </span>
                         </p>
 
                         {/* Live swarm counter pill */}
