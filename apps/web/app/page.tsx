@@ -157,20 +157,16 @@ export default function Home() {
                             <StatPill label={t.home.stat_throughput} value="~112 tx/min" color="purple" />
                         </div>
 
-                        <div className="flex flex-col sm:flex-row gap-4 pt-4 w-full">
-                            <button
-                                onClick={handleLaunch}
-                                className="w-full sm:w-auto group relative px-6 sm:px-8 py-4 bg-stellar-yellow text-black font-black rounded-lg transition-all hover:shadow-[0_0_30px_rgba(255,200,0,0.5)] active:scale-95 flex justify-center"
-                            >
-                                <span className="flex items-center gap-2">
-                                    {t.home.launch_dashboard} <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
-                                </span>
-                            </button>
-                            <Link
-                                href="/docs"
-                                className="w-full sm:w-auto px-6 sm:px-8 py-4 bg-white/5 border border-white/10 text-white font-bold rounded-lg hover:bg-white/10 transition-all text-center flex justify-center items-center"
-                            >
-                                {t.home.read_protocol}
+                        <div className="flex flex-wrap gap-4 pt-4">
+                            <Link href="/dashboard">
+                                <Button size="hero" className="bg-stellar-yellow text-black hover:bg-stellar-yellow/90 font-black italic tracking-tight rounded-full px-8">
+                                    {t.home.launch_dashboard} <ArrowRight className="ml-2 w-5 h-5" />
+                                </Button>
+                            </Link>
+                            <Link href="/docs">
+                                <Button size="hero" variant="outline" className="border-white/10 hover:border-white/20 text-white font-bold rounded-full px-8">
+                                    {t.home.read_protocol}
+                                </Button>
                             </Link>
                         </div>
                     </motion.div>
