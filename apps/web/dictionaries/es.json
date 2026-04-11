@@ -228,6 +228,15 @@
                 "title": "Companion App",
                 "desc": "Vínculo neural móvil"
             }
+        },
+        "settlement_layer": {
+            "title": "LA CAPA DE LIQUIDACIÓN",
+            "span": "PARA AGENTES",
+            "subtitle": "Nirium proporciona la infraestructura definitiva para transferencias de valor programables y no interactivas en Stellar.",
+            "x402_title": "x402: Micro-Facturación Quantum",
+            "x402_desc": "Cada llamada a la API es una transacción. Pago por inferencia automatizado con liquidación instantánea y cero fricciones.",
+            "mpp_title": "MPP: Flujos Institucionales",
+            "mpp_desc": "Flujos de suscripción de alto rendimiento y asignación de capital programática con trazabilidad absoluta."
         }
     },
     "common": {

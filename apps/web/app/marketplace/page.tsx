@@ -109,62 +109,64 @@ export default function MarketplacePage() {
                         name: 'Flash Loan Executor',
                         slug: 'flash-loan-executor',
                         version: '0.1.0',
-                        description: 'Execute atomic flash loans using Soroban single-invocation primitives.',
+                        description: 'Execute atomic flash loans using Soroban single-invocation primitives. Billed via x402.',
                         author: 'Nirium Team',
                         category: 'trading',
-                        tags: ['flash-loan', 'stellar', 'atomic'],
+                        tags: ['flash-loan', 'stellar', 'x402'],
                         downloads: 12453,
                         elo: 1200, reviewCount: 0,
                         isVerified: true,
                         isFeatured: true,
                         isPremium: true,
-                        price: "0.01 USDC"
+                        price: "0.001 XLM"
                     },
                     {
                         id: 'price-oracle',
                         name: 'Multi-Source Price Oracle',
                         slug: 'price-oracle',
                         version: '1.5.0',
-                        description: 'Aggregate prices from CoinGecko, DeFiLlama, Pyth.',
+                        description: 'Aggregate prices from CoinGecko, DeFiLlama, Pyth. Real-time MPP subscription.',
                         author: 'DeFi Labs',
                         category: 'data',
-                        tags: ['oracle', 'price', 'data'],
+                        tags: ['oracle', 'price', 'MPP'],
                         downloads: 8932,
                         elo: 1200, reviewCount: 0,
                         isVerified: true,
-                        isFeatured: true
+                        isFeatured: true,
+                        isPremium: true,
+                        price: "0.05 XLM/mo"
                     },
                     {
                         id: 'telegram-alerts-pro',
                         name: 'Telegram Alerts Pro',
                         slug: 'telegram-alerts-pro',
                         version: '3.0.0',
-                        description: 'Advanced Telegram notifications with rich formatting.',
+                        description: 'Advanced Telegram notifications with rich formatting. MPP enabled.',
                         author: 'NotifyBot',
                         category: 'notification',
-                        tags: ['telegram', 'alerts', 'bot'],
+                        tags: ['telegram', 'alerts', 'MPP'],
                         downloads: 15678,
                         elo: 1200, reviewCount: 0,
                         isVerified: true,
-                        isFeatured: true
+                        isFeatured: true,
+                        isPremium: true,
+                        price: "0.05 XLM/mo"
                     },
                     {
                         id: 'whale-tracker',
                         name: 'Whale Tracker',
                         slug: 'whale-tracker',
                         version: '1.2.0',
-                        description: 'Track large wallet movements on Stellar.',
+                        description: 'Track large wallet movements on Stellar. x402 pay-per-scan.',
                         author: 'OnChainInsights',
                         category: 'analysis',
-                        tags: ['whale', 'tracking', 'analysis'],
+                        tags: ['whale', 'tracking', 'x402'],
                         downloads: 6234,
                         elo: 1200, reviewCount: 0,
-
                         isVerified: true,
                         isFeatured: false,
-                        actions: [
-                            { name: 'scanWhales', description: 'Trigger manual whale scan' }
-                        ]
+                        isPremium: true,
+                        price: "0.001 XLM"
                     },
                     {
                         id: 'lst-arbitrage',
@@ -911,6 +913,20 @@ export default function MarketplacePage() {
                                                         <CheckCircle className="w-4 h-4 text-green-400" aria-label="Verified" />
                                                     </span>
                                                 )}
+                                                <div className="flex flex-wrap gap-2 mt-2">
+                                                    {skill.tags.map(tag => (
+                                                        <span 
+                                                            key={tag} 
+                                                            className={`px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider ${
+                                                                tag === 'x402' ? 'bg-stellar-teal/15 text-stellar-teal border border-stellar-teal/30' : 
+                                                                tag === 'MPP' ? 'bg-stellar-yellow/15 text-stellar-yellow border border-stellar-yellow/30' : 
+                                                                'bg-white/5 text-slate-400 border border-white/10'
+                                                            }`}
+                                                        >
+                                                            {tag}
+                                                        </span>
+                                                    ))}
+                                                </div>
                                                 <span className="text-xs text-slate-500">v{skill.version}</span>
                                             </div>
                                         </div>

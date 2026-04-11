@@ -228,6 +228,15 @@
                 "title": "Companion App",
                 "desc": "Mobile neural link"
             }
+        },
+        "settlement_layer": {
+            "title": "THE SETTLEMENT LAYER",
+            "span": "FOR AGENTS",
+            "subtitle": "Nirium provides the ultimate infrastructure for programmable, non-interactive value transfers on Stellar.",
+            "x402_title": "x402: Quantum Micro-Billing",
+            "x402_desc": "Every API call is a transaction. Automated pay-per-inference with instant settlement and zero friction.",
+            "mpp_title": "MPP: Institutional Flows",
+            "mpp_desc": "High-throughput subscription streams and programmatic capital allocation with absolute traceability."
         }
     },
     "common": {
