@@ -74,12 +74,15 @@ export default function PaymentStreams() {
             <div className="space-y-4">
                 <AnimatePresence initial={false}>
                     {streams.map((stream) => (
-                        <motion.div
+                        <motion.a
                             key={stream.id}
                             initial={{ opacity: 0, x: -20 }}
                             animate={{ opacity: 1, x: 0 }}
                             exit={{ opacity: 0, x: 20 }}
-                            className="flex items-center justify-between p-3 bg-white/5 rounded-xl border border-white/5 hover:border-stellar-teal/30 transition-all"
+                            href={`https://stellar.expert/explorer/testnet/tx/${stream.id}`}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="flex items-center justify-between p-3 bg-white/5 rounded-xl border border-white/5 hover:border-stellar-teal/30 hover:bg-white/10 transition-all cursor-pointer group"
                         >
                             <div className="flex items-center gap-3">
                                 <div className={`w-8 h-8 rounded-full flex items-center justify-center ${
@@ -88,7 +91,7 @@ export default function PaymentStreams() {
                                     <DollarSign size={14} />
                                 </div>
                                 <div className="flex flex-col">
-                                    <span className="text-xs font-mono text-gray-400">{stream.from}</span>
+                                    <span className="text-xs font-mono text-gray-400 group-hover:text-white transition-colors">{stream.from}</span>
                                     <span className="text-[10px] text-gray-600 uppercase tracking-tighter">
                                         via {stream.type.toUpperCase()} Protocol
                                     </span>
@@ -96,9 +99,9 @@ export default function PaymentStreams() {
                             </div>
                             <div className="flex flex-col items-end">
                                 <span className="text-sm font-black text-stellar-teal">+{stream.amount} {stream.asset}</span>
-                                <ArrowUpRight size={10} className="text-stellar-teal" />
+                                <ArrowUpRight size={10} className="text-stellar-teal group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform" />
                             </div>
-                        </motion.div>
+                        </motion.a>
                     ))}
                 </AnimatePresence>
 

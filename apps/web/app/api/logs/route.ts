@@ -22,6 +22,7 @@ export async function GET() {
         );
 
         if (!res.ok) {
+            console.warn('[API /logs] Supabase Error:', res.status, await res.text());
             return NextResponse.json([], { status: res.status });
         }
 

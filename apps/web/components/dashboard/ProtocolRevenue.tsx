@@ -12,6 +12,7 @@ import { Zap, TrendingUp, DollarSign, RefreshCw } from "lucide-react";
 
 interface PaymentEvent {
     id: string;
+    txHash?: string;
     message: string;
     created_at: string;
     from?: string;
@@ -57,6 +58,7 @@ export default function ProtocolRevenue() {
                     const routeName = isMpp ? "/subscribe" : "/install";
                     return {
                         id: r.id,
+                        txHash: r.transaction_hash || r.transaction_id || r.id,
                         message: `from=${r.from} | amount=${r.amount} | route=${routeName}`,
                         created_at: r.created_at,
                         from: r.from,
@@ -160,18 +162,24 @@ export default function ProtocolRevenue() {
                     </div>
                 )}
                 {events.slice(0, 10).map(e => (
-                    <div key={e.id} className="flex items-center justify-between text-[10px] font-mono py-1 border-b border-white/5">
+                    <a 
+                        key={e.id} 
+                        href={`https://stellar.expert/explorer/testnet/tx/${e.txHash}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="flex items-center justify-between text-[10px] font-mono py-1 border-b border-white/5 hover:bg-white/5 hover:text-green-400 transition-all cursor-pointer group px-1 rounded"
+                    >
                         <div className="flex items-center gap-2 min-w-0">
                             <span className="text-green-400 shrink-0">+${e.amount || '?'}</span>
-                            <span className="text-white/40 truncate">{e.route?.replace('/api/v1/premium/', '') || 'unknown'}</span>
+                            <span className="text-white/40 group-hover:text-green-200 truncate">{e.route?.replace('/api/v1/premium/', '') || 'unknown'}</span>
                             {e.from && e.from !== 'unknown' && (
-                                <span className="text-white/20 truncate">
+                                <span className="text-white/20 truncate group-hover:text-green-900">
                                     {e.from.substring(0, 6)}…{e.from.slice(-4)}
                                 </span>
                             )}
                         </div>
-                        <span className="text-white/30 shrink-0 ml-2">{timeAgo(e.created_at)}</span>
-                    </div>
+                        <span className="text-white/30 shrink-0 ml-2 group-hover:text-green-400">{timeAgo(e.created_at)}</span>
+                    </a>
                 ))}
             </div>
 

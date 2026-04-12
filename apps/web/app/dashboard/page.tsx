@@ -17,6 +17,7 @@ import { ExternalLink, Shield, X, AlertTriangle, Trash2, Info, ChevronRight, Ref
 import OpsConsole from "@/components/layout/OpsConsole";
 import ProtocolRevenue from "@/components/dashboard/ProtocolRevenue";
 import PaymentStreams from "@/components/dashboard/PaymentStreams";
+import NeuralFeed from "@/components/dashboard/NeuralFeed";
 import { writeLog } from "@/lib/logger";
 import { stellarClient } from "@/lib/stellarClient";
 import { useVault, useEloReputation } from "@/hooks/useNiriumContracts";
@@ -2364,6 +2365,18 @@ function DashboardContent() {
                             </div>
                         )}
                     </div>
+                    {/* Neural Feed // Uplink */}
+                    <div className="rounded-2xl h-[300px] flex flex-col relative mt-6">
+                        <OpsConsole
+                            isExpanded={expandConsole}
+                            onToggleExpand={() => setExpandConsole(!expandConsole)}
+                            walletAddress={account?.address}
+                        />
+                    </div>
+                    {/* x402 Protocol Revenue & M2M Streams */}
+                    <div className="mt-6">
+                        <ProtocolRevenue />
+                    </div>
                 </motion.div>
 
                 {/* Right Column: Stats & Agent Controls */}
@@ -2492,17 +2505,10 @@ function DashboardContent() {
                         </div>
                     </motion.div>
 
-                    {/* Agent Logs > Replacement OpsConsole */}
-                    <div className="rounded-2xl h-[300px] flex flex-col relative">
-                        <OpsConsole
-                            isExpanded={expandConsole}
-                            onToggleExpand={() => setExpandConsole(!expandConsole)}
-                            walletAddress={account?.address}
-                        />
-                    </div>
+                    {/* Neural Network Thought Process */}
+                    <NeuralFeed />
 
                     {/* x402 Protocol Revenue & M2M Streams */}
-                    <ProtocolRevenue />
                     <PaymentStreams />
                 </div>
             </div>
