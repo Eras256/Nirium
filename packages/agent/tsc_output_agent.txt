@@ -1,1 +1,0 @@
-src/services/coordinationService.ts(33,24): error TS2348: Value of type 'typeof x402HTTPClient' is not callable. Did you mean to include 'new'?

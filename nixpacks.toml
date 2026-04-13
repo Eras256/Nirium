@@ -1,9 +1,0 @@
-# Nixpacks build plan — overrides auto-detection
-# Installs ONLY the agent package (avoids apps/web native deps like usb/libudev)
-# See: https://nixpacks.com/docs/configuration/file
-
-[phases.install]
-cmds = ["pnpm install --filter @nirium/agent"]
-
-[phases.build]
-cmds = ["cd packages/agent && pnpm build"]
