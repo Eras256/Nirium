@@ -4,7 +4,7 @@
 ---
 
 ## 1. Abstract
-Nirium is a decentralized infrastructure protocol designed for the orchestration of **Sovereign AI Agents** on the Stellar network. By combining **Soroban Smart Contracts** with a high-fidelity **Neural Matrix (LLM)** layer, Nirium enables a new class of financial actors: autonomous, self-custodial AI entities that can navigate complex DeFi environments spanning both cryptocurrency and **Real-World Assets (RWAs)**. The protocol introduces four key innovations: **Multi-Asset Vault System** (XLM, USDC, CETES), **Single-Invocation Atomic Flash Loans**, an **On-Chain ELO Meritocracy**, and a **BlackBox Audit Immutable Archive**. As of March 2026, the protocol operates **30 autonomous agents** on Stellar Testnet with **4 deployed smart contracts** and **3 Stellar Asset Contracts** supporting triple-asset vault operations verified on-chain.
+Nirium is a decentralized infrastructure protocol designed for the orchestration of **Institutional Financial Operations** on the Stellar network. By combining **Soroban Smart Contracts** with a high-fidelity **Neural Matrix (LLM)** layer, Nirium enables a new class of financial actors: autonomous agents that automate **FX rebalancing and treasury management** for fintechs and cross-border companies. The protocol replaces slow, manual trading desks with 24/7 autonomous execution, providing sub-second settlement and full auditability. As of April 2026, the protocol supports multi-asset operations (USDC, XLM, CETES) and integrates **x402 micropayments** for intelligence acquisition and **MPP session-based budges** for secure capital delegation.
 
 ---
 
@@ -179,13 +179,11 @@ The CETES integration enables:
 - **Cross-Border DeFi**: International users gain access to Mexican government bonds without traditional banking barriers
 - **Dashboard Integration**: CETES balance display, trustline management, and "Buy via SPEI" flow built into the operator dashboard
 
-### 6.4 Swarm Operations with CETES
-The autonomous swarm executes three CETES-specific operations:
-1. **Vault Creation** (5% probability): Creates CETES-denominated vaults
-2. **Deposits** (10% probability): 100-1000 CETES deposits
-3. **Withdrawals** (5% probability): 50-500 CETES withdrawals
-
-This extends the total operation distribution from 17 to 20 weighted operations, with an estimated 90 CETES vaults and 8,640 total vault operations per hour.
+### 6.4 Institutional FX Automation with CETES
+The NIRIUM autonomous swarm provides a "Machine-as-a-Service" layer for fintechs operating in the USD/MXN corridor. By integrating CETES via Etherfuse and USDC on Stellar, agents can:
+1. **Dynamic Yield Optimization**: Automatically move capital between USDC (US Yield) and CETES (Mexican Treasury Yield) based on real-time spread analysis.
+2. **24/7 Liquidity Rebalancing**: Rebalance treasury pools during non-banking hours to ensure constant liquidity for remittance flows.
+3. **Audit-Ready FX Execution**: Every cross-currency swap is logged to IPFS via the BlackBox Archive, ensuring institutional compliance without manual reporting.
 
 ---
 

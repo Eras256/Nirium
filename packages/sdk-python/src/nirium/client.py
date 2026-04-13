@@ -1,5 +1,5 @@
 # ═══════════════════════════════════════════════════════════════
-# Nirium Python SDK v0.2.0 — Official Quantitative Client
+# Nirium Python SDK v0.3.0 — Official Client (x402 + MPP)
 # Synced with backend API (real Horizon data, Soroban execution)
 # ═══════════════════════════════════════════════════════════════
 import asyncio
@@ -8,6 +8,8 @@ import logging
 import aiohttp  # type: ignore
 import websockets  # type: ignore
 from typing import Callable, Dict, Any, List, Optional
+from stellar_sdk import Keypair, Network, Server, TransactionBuilder, Asset  # type: ignore
+from stellar_sdk import scval  # type: ignore
 
 logger = logging.getLogger("nirium.client")
 
@@ -174,6 +176,155 @@ class Agent:
     async def test_webhook(self, webhook_id: str) -> Dict[str, Any]:
         """Send a test event to a webhook."""
         return await self._post(f"/api/webhooks/{webhook_id}/test")
+
+    # ─── x402 Protocol ───────────────────────────────────────
+
+    def init_x402(self, secret_key: str, network: str = "stellar:testnet"):
+        """
+        Initialize x402 pay-per-request client.
+
+        Python SDK implements the x402 HTTP flow directly:
+        1. GET resource -> receive 402 + payment requirements
+        2. Build Soroban SAC USDC transfer auth entry
+        3. Retry with X-PAYMENT header containing signed auth entry
+
+        Args:
+            secret_key: Stellar secret key (S...) for signing
+            network: CAIP-2 network ID ('stellar:testnet' or 'stellar:pubnet')
+        """
+        self._x402_keypair = Keypair.from_secret(secret_key)
+        self._x402_network = network
+        self._x402_passphrase = (
+            Network.TESTNET_NETWORK_PASSPHRASE if "testnet" in network
+            else Network.PUBLIC_NETWORK_PASSPHRASE
+        )
+        self._x402_horizon = Server(
+            "https://horizon-testnet.stellar.org" if "testnet" in network
+            else "https://horizon.stellar.org"
+        )
+
+    async def x402_fetch(self, url: str, method: str = "GET") -> Dict[str, Any]:
+        """
+        Fetch a paid resource via x402 protocol.
+
+        Sends the initial request, receives 402 with payment requirements,
+        builds and signs a USDC payment, retries with the payment proof.
+
+        Returns the JSON payload from the paid resource.
+        """
+        if not hasattr(self, "_x402_keypair"):
+            raise RuntimeError("x402 client not initialized. Call agent.init_x402() first.")
+
+        async with aiohttp.ClientSession() as session:
+            # Step 1: Initial request — expect 402
+            async with session.request(method, url) as resp:
+                if resp.status != 402:
+                    return await resp.json()
+
+                requirements = await resp.json()
+
+            # Step 2: Build USDC payment from requirements
+            pay_req = requirements.get("paymentRequirements", [{}])[0]
+            dest = pay_req.get("receiver") or pay_req.get("destination", "")
+            amount = pay_req.get("maxAmountRequired") or pay_req.get("amount", "0.01")
+            usdc_issuer = "GBBD47IF6LWK7P7MDEVSCWR7DPUWV3NY3DTQEVFL4NAT4AQH3ZLLFLA5"
+            usdc_asset = Asset("USDC", usdc_issuer)
+
+            account = self._x402_horizon.load_account(self._x402_keypair.public_key)
+            tx = (
+                TransactionBuilder(
+                    source_account=account,
+                    network_passphrase=self._x402_passphrase,
+                    base_fee=100,
+                )
+                .append_payment_op(dest, usdc_asset, str(amount))
+                .set_timeout(30)
+                .build()
+            )
+            tx.sign(self._x402_keypair)
+            xdr = tx.to_xdr()
+
+            # Step 3: Retry with payment proof
+            payment_header = json.dumps({"transaction": xdr})
+            headers = {"X-PAYMENT": payment_header, "Content-Type": "application/json"}
+            async with session.request(method, url, headers=headers) as resp:
+                resp.raise_for_status()
+                return await resp.json()
+
+    # ─── MPP Protocol (Charge Mode) ─────────────────────────
+
+    def init_mpp(self, secret_key: str, network: str = "stellar:testnet"):
+        """
+        Initialize MPP Charge client for per-request Soroban SAC payments.
+
+        Python SDK implements the MPP charge flow directly:
+        1. GET resource -> receive 402 + charge challenge
+        2. Sign Soroban auth entries for SAC USDC transfer
+        3. Retry with signed auth in X-PAYMENT header
+
+        Args:
+            secret_key: Stellar secret key (S...) for signing
+            network: CAIP-2 network ID ('stellar:testnet' or 'stellar:pubnet')
+        """
+        self._mpp_keypair = Keypair.from_secret(secret_key)
+        self._mpp_network = network
+        self._mpp_passphrase = (
+            Network.TESTNET_NETWORK_PASSPHRASE if "testnet" in network
+            else Network.PUBLIC_NETWORK_PASSPHRASE
+        )
+        self._mpp_horizon = Server(
+            "https://horizon-testnet.stellar.org" if "testnet" in network
+            else "https://horizon.stellar.org"
+        )
+
+    async def mpp_fetch(self, url: str, method: str = "GET") -> Dict[str, Any]:
+        """
+        Fetch a paid resource via MPP Charge protocol.
+
+        Sends the initial request, receives 402 with charge challenge,
+        builds and signs a USDC payment, retries with payment proof.
+        In pull mode, the server assembles and broadcasts the Soroban tx.
+
+        Returns the JSON payload from the paid resource.
+        """
+        if not hasattr(self, "_mpp_keypair"):
+            raise RuntimeError("MPP client not initialized. Call agent.init_mpp() first.")
+
+        async with aiohttp.ClientSession() as session:
+            # Step 1: Initial request — expect 402
+            async with session.request(method, url) as resp:
+                if resp.status != 402:
+                    return await resp.json()
+
+                challenge = await resp.json()
+
+            # Step 2: Build USDC payment from challenge
+            pay_req = challenge.get("paymentRequirements", [{}])[0]
+            dest = pay_req.get("receiver") or pay_req.get("destination", "")
+            amount = pay_req.get("maxAmountRequired") or pay_req.get("amount", "0.01")
+            usdc_issuer = "GBBD47IF6LWK7P7MDEVSCWR7DPUWV3NY3DTQEVFL4NAT4AQH3ZLLFLA5"
+            usdc_asset = Asset("USDC", usdc_issuer)
+
+            account = self._mpp_horizon.load_account(self._mpp_keypair.public_key)
+            tx = (
+                TransactionBuilder(
+                    source_account=account,
+                    network_passphrase=self._mpp_passphrase,
+                    base_fee=100,
+                )
+                .append_payment_op(dest, usdc_asset, str(amount))
+                .set_timeout(30)
+                .build()
+            )
+            tx.sign(self._mpp_keypair)
+            xdr = tx.to_xdr()
+
+            # Step 3: Retry with payment proof
+            payment_header = json.dumps({"transaction": xdr, "mode": "pull"})
+            headers = {"X-PAYMENT": payment_header, "Content-Type": "application/json"}
+            async with session.request(method, url, headers=headers) as resp:
+                resp.raise_for_status()
+                return await resp.json()
 
     # ─── WebSocket ───────────────────────────────────────────
 

@@ -21,6 +21,8 @@ import { SectionBrandLogo } from "@/components/ui/SectionBrandLogo";
 import { Button } from "@/components/ui/Button";
 import { useLanguage } from "@/context/LanguageContext";
 import { supabase } from "@/lib/supabase";
+import ProtocolRevenue from "@/components/dashboard/ProtocolRevenue";
+import OpsConsole from "@/components/layout/OpsConsole";
 
 const AGENT_NAMES = [
     { name: 'Titan', role: 'Swarm Coordinator', color: '#FFD700' },
@@ -44,6 +46,8 @@ const CONTRACTS = [
     { name: 'Nirium Vault', addr: 'CAU2...EL4', full: 'CAU2XBJTQUBTMPAUFRX7GMZ337I5WLBI4GYPWHZEVXTMJ66D3CP6DEL4', role_key: 'vault', color: '#00F3FF' },
     { name: 'ELO Registry', addr: 'CC6Z...JWF2', full: 'CC6Z3WJWRKVEAXEKIQ5S3LFEMKRF4L2FTN5YZDQU27MQRQAWA5QBJWF2', role_key: 'elo', color: '#A78BFA' },
     { name: 'Marketplace', addr: 'CB6Q...UABC', full: 'CB6Q3LKBJ7CAAZY4MK7EG5R6FDDTJHB52ZEENI6BQLBJNFKBQRIAUABC', role_key: 'marketplace', color: '#34D399' },
+    { name: 'Neural Sentinel', addr: 'CCP5...WPY2', full: 'CCP5OY3TTDVIREQYGOUZUXS2MZJO3LLJD6Z22Z3VROWFCPJAON22WPY2', role_key: 'sentinel', color: '#EF4444' },
+    { name: 'Settlement Hub', addr: 'CANZ...Z6KS', full: 'CANZP2OJUS2Y5VXE4YHRR75LE2WKE7QTJOCCWENR7X65DWE6QEJZV6KS', role_key: 'settlement', color: '#F59E0B' },
 ];
 
 export default function Home() {
@@ -172,50 +176,41 @@ export default function Home() {
                         </div>
                     </motion.div>
 
-                    <div className="relative h-[600px] hidden lg:block">
-                        {/* @ts-ignore */}
-                        <Suspense fallback={<div className="w-full h-full flex items-center justify-center text-stellar-teal font-mono animate-pulse">CONNECTING NEURAL ORB...</div>}>
-                            <NeuralCanvas />
-                        </Suspense>
-                        <motion.div
-                            initial={{ opacity: 0, y: 50 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            transition={{ delay: 1 }}
-                            className="absolute bottom-10 -left-10 w-[400px] bg-black/80 backdrop-blur-xl border border-white/10 rounded-xl p-4 font-mono text-[11px] shadow-2xl"
-                        >
-                            <div className="flex items-center justify-between mb-3 border-b border-white/10 pb-2">
-                                <span className="text-stellar-teal uppercase tracking-widest text-[10px] font-bold">Neural Feed // Uplink</span>
-                                <div className="flex gap-1.5">
-                                    <div className="w-2 h-2 rounded-full bg-stellar-teal/50 animate-pulse" />
-                                    <div className="w-2 h-2 rounded-full bg-stellar-yellow/50 animate-pulse" />
-                                </div>
-                            </div>
-                            <div className="space-y-1.5 h-32 overflow-hidden">
-                                {agentLog.map((log, i) => {
-                                    const parts = log.split('|');
-                                    const mainMsg = parts[0];
-                                    const hashPart = parts[1];
+                    <div className="relative mt-12 lg:mt-0 lg:h-[600px]">
+                        {/* Neural Orb (Desktop only or static on mobile) */}
+                        <div className="hidden lg:block absolute inset-0">
+                            <Suspense fallback={<div className="w-full h-full flex items-center justify-center text-stellar-teal font-mono animate-pulse">CONNECTING NEURAL ORB...</div>}>
+                                <NeuralCanvas />
+                            </Suspense>
+                        </div>
 
-                                    return (
-                                        <div key={i} className="flex gap-2 text-[10px]">
-                                            <span className="text-white/20 select-none">{i.toString().padStart(2, '0')}</span>
-                                            <span className="text-gray-300">
-                                                {mainMsg}
-                                                {hashPart && (
-                                                    <span className="text-stellar-yellow/80 ml-1 font-bold">
-                                                        {hashPart.trim()}
-                                                    </span>
-                                                )}
-                                            </span>
-                                        </div>
-                                    );
-                                })}
-                                <div className="flex gap-2 text-stellar-teal">
-                                    <span className="text-stellar-teal animate-pulse">{">"}</span>
-                                    <span className="animate-pulse">_</span>
-                                </div>
-                            </div>
-                        </motion.div>
+                        {/* Responsive Duo (Neural Feed + Protocol Revenue) */}
+                        <div className="relative lg:absolute lg:bottom-10 lg:-left-[50px] flex flex-col lg:flex-row items-center lg:items-end gap-6 lg:gap-8 z-20 pointer-events-auto px-4 lg:px-0">
+                            {/* 1. OpsConsole Terminal Style (Neural Feed) */}
+                            <motion.div
+                                initial={{ opacity: 0, y: 20 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                transition={{ delay: 0.8, duration: 0.8 }}
+                                className="w-full lg:w-[300px] max-w-[400px] shadow-[0_20px_50px_rgba(0,0,0,0.5)]"
+                            >
+                                <OpsConsole 
+                                    isExpanded={false} 
+                                    onToggleExpand={() => {}} 
+                                    walletAddress={accountStr || undefined}
+                                    heightClass="h-[200px] lg:h-[240px]"
+                                />
+                            </motion.div>
+
+                            {/* 2. Protocol Revenue (Compact) */}
+                            <motion.div
+                                initial={{ opacity: 0, y: 20 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                transition={{ delay: 1.1, duration: 0.8 }}
+                                className="w-full lg:w-[300px] max-w-[400px] shadow-[0_20px_60px_rgba(45,235,232,0.15)]"
+                            >
+                                <ProtocolRevenue compact={true} />
+                            </motion.div>
+                        </div>
                     </div>
                 </div>
             </section>
@@ -244,6 +239,8 @@ export default function Home() {
                         <ProtocolItem icon={ChevronRight} name="PHOENIX DEX" />
                         <ProtocolItem icon={Cpu} name="SOROBAN" />
                         <ProtocolItem icon={Database} name="HORIZON" />
+                        <ProtocolItem icon={Zap} name="x402 STANDARD" />
+                        <ProtocolItem icon={Activity} name="MPP PROTOCOL" />
                     </div>
                 </div>
             </section>
@@ -382,7 +379,7 @@ export default function Home() {
                                     </p>
                                 </div>
                                 <div className="flex items-center gap-4 py-4 border-t border-white/5">
-                                    <div className="text-[10px] font-mono text-stellar-teal uppercase tracking-[0.2em] font-bold">Protocol Status: LIVE</div>
+                                    <div className="text-[10px] font-mono text-stellar-teal uppercase tracking-[0.2em] font-bold italic">SOROBAN VERIFIED</div>
                                     <div className="h-1 flex-1 bg-white/5 rounded-full overflow-hidden">
                                         <motion.div 
                                             initial={{ width: 0 }}
@@ -411,7 +408,7 @@ export default function Home() {
                                     </p>
                                 </div>
                                 <div className="flex items-center gap-4 py-4 border-t border-white/5">
-                                    <div className="text-[10px] font-mono text-stellar-yellow uppercase tracking-[0.2em] font-bold">Standard: SEP-XXXX</div>
+                                    <div className="text-[10px] font-mono text-stellar-yellow uppercase tracking-[0.2em] font-bold italic">FREIGHTER READY</div>
                                     <div className="h-1 flex-1 bg-white/5 rounded-full overflow-hidden">
                                         <motion.div 
                                             initial={{ width: 0 }}
@@ -666,7 +663,7 @@ export default function Home() {
                         <FeatureCard icon={Zap} title={t.home.features.path_arb.title} desc={t.home.features.path_arb.desc} color="cyan" />
                         <FeatureCard icon={Shield} title={t.home.features.vaults.title} desc={t.home.features.vaults.desc} color="purple" />
                         <FeatureCard icon={Workflow} title={t.home.features.bundling.title} desc={t.home.features.bundling.desc} color="blue" />
-                        <FeatureCard icon={Database} title={t.home.features.archive.title} desc={t.home.features.archive.desc} color="pink" />
+                        <FeatureCard icon={Landmark} title={t.home.features.archive.title} desc={t.home.features.archive.desc} color="pink" />
                     </div>
                 </div>
             </section>
@@ -758,7 +755,7 @@ export default function Home() {
             <section className="py-32 border-t border-white/5">
                 <div className="container mx-auto px-4 grid lg:grid-cols-2 gap-16 items-center">
                     <div className="space-y-6">
-                        <h3 className="text-3xl md:text-5xl font-black leading-tight tracking-tighter">{t.home.sdk_title_1} <br /><span className="text-stellar-yellow">{t.home.sdk_title_2}</span></h3>
+                        <h3 className="text-3xl md:text-5xl font-black leading-tight tracking-tighter">{t.home.sdk_title_1} <br /><span className="text-stellar-yellow">{t.home.sdk_span}</span></h3>
                         <p className="text-gray-400 text-lg">{t.home.sdk_subtitle}</p>
                         <div className="bg-[#0A0A0A] border border-white/10 rounded-xl p-6 font-mono text-sm group relative overflow-hidden">
                             <div className="flex justify-between items-center mb-4">
@@ -772,8 +769,8 @@ export default function Home() {
                             <code className="text-white block overflow-x-auto whitespace-nowrap text-xs sm:text-sm custom-scrollbar pb-2">
                                 <span className="text-purple-400">import</span> {"{"}Agent{"}"} <span className="text-purple-400">from</span> <span className="text-green-400">&apos;@nirium/sdk&apos;</span>;<br />
                                 <span className="text-blue-400">const</span> bot = <span className="text-blue-400">new</span> Agent(<span className="text-yellow-300">&quot;sk_live_...&quot;</span>);<br />
-                                <span className="text-gray-500">// Subscribe to Path Arb signals</span><br />
-                                bot.subscribe(<span className="text-cyan-400">&apos;path_arb&apos;</span>, (signal) ={">"} bot.execute(signal));
+                                <span className="text-gray-500">// Setup automated x402 micro-billing logic</span><br />
+                                bot.bill(<span className="text-cyan-400">&apos;user_402&apos;</span>, {"{"} units: 1, trigger: <span className="text-green-400">&apos;inference&apos;</span> {"}"});
                             </code>
                             <div className="absolute top-0 right-0 w-full h-full bg-gradient-to-r from-transparent to-stellar-teal/5 opacity-0 group-hover:opacity-100 transition-opacity" />
                         </div>

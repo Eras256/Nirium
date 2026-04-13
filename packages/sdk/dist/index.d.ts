@@ -5,6 +5,20 @@ export interface AgentConfig {
     /** JWT token for WebSocket auth (obtained from /api/auth/token) */
     token?: string;
 }
+export interface X402Config {
+    /** Stellar secret key (S...) for auth-entry signing */
+    secretKey: string;
+    /** CAIP-2 network ID (e.g. 'stellar:testnet' or 'stellar:pubnet') */
+    network?: string;
+}
+export interface MppConfig {
+    /** Stellar secret key (S...) for Soroban auth-entry signing */
+    secretKey: string;
+    /** CAIP-2 network ID */
+    network?: string;
+    /** 'pull' = server assembles+broadcasts, 'push' = client broadcasts */
+    mode?: 'pull' | 'push';
+}
 export interface Signal {
     id: string;
     signal_type: string;
@@ -153,6 +167,8 @@ export declare class Agent {
     private signalCallbacks;
     private logCallbacks;
     private token;
+    private x402Client;
+    private mppClient;
     constructor(config: AgentConfig);
     private request;
     /** Health check — returns true if agent is reachable. */
@@ -230,6 +246,43 @@ export declare class Agent {
     onLog(callback: (log: Record<string, unknown>) => void): void;
     private connectWebSocket;
     private attemptReconnect;
+    /**
+     * Initialize the x402 client for pay-per-request micropayments.
+     * Uses canonical @x402/fetch with ExactStellarScheme + OZ Channels facilitator.
+     * Agent signs Soroban auth entries only — facilitator sponsors all network fees.
+     *
+     * @example
+     * ```typescript
+     * agent.initX402({ secretKey: 'S...', network: 'stellar:testnet' });
+     * const data = await agent.x402Fetch('http://localhost:3402/skills/whale-tracker');
+     * ```
+     */
+    initX402(config: X402Config): void;
+    /**
+     * Fetch a paid resource via x402 protocol.
+     * The client automatically handles 402 negotiation, auth-entry signing, and payment.
+     * Returns the Response object — call .json() or .text() for the payload.
+     */
+    x402Fetch(url: string, init?: RequestInit): Promise<Response>;
+    /**
+     * Initialize the MPP Charge client for per-request Soroban SAC payments.
+     * Uses canonical @stellar/mpp charge mode with mppx.
+     * In pull mode, the server assembles and broadcasts the transaction.
+     *
+     * @example
+     * ```typescript
+     * agent.initMpp({ secretKey: 'S...', network: 'stellar:testnet', mode: 'pull' });
+     * const data = await agent.mppFetch('http://localhost:3403/signals/trading');
+     * ```
+     */
+    initMpp(config: MppConfig): void;
+    /**
+     * Fetch a paid resource via MPP Charge protocol.
+     * The client automatically handles 402 challenge, auth-entry signing,
+     * and Soroban SAC USDC settlement.
+     * Returns the Response object.
+     */
+    mppFetch(url: string, init?: RequestInit): Promise<Response>;
     /** Close the WebSocket connection. */
     disconnect(): void;
 }

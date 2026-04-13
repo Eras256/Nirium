@@ -121,6 +121,15 @@ function StrategyBuilderInner() {
                 { type: 'action', label: 'PHOENIX_SWAP', icon: 'Repeat', desc: 'Liquidity pool swap on Phoenix' },
                 { type: 'action', label: 'SDEX_LIMIT', icon: 'ArrowRight', desc: 'SDEX Orderbook placement' },
             ]
+        },
+        {
+            category: t.builder.categories.settlements,
+            color: 'from-green-400 to-emerald-600',
+            items: [
+                { type: 'action', label: 'X402_BILL', icon: 'Coins', desc: 'Execute micro-payment trigger' },
+                { type: 'action', label: 'MPP_INIT_SESSION', icon: 'History', desc: 'Start session-based settlement' },
+                { type: 'action', label: 'SETTLE_INTENT', icon: 'Landmark', desc: 'Finalize on-chain intent' },
+            ]
         }
     ];
 
@@ -508,9 +517,11 @@ function StrategyBuilderInner() {
                 <div className="flex-1 overflow-y-auto custom-scrollbar p-6 space-y-8">
                     {filteredTemplates.map((category, idx) => (
                         <div key={idx} className="space-y-3">
-                            <div className="flex items-center justify-between">
-                                <h3 className="text-[10px] font-black text-gray-500 uppercase tracking-[0.2em]">{category.category}</h3>
-                                <div className={`h-px flex-1 ml-4 bg-gradient-to-r from-white/5 to-transparent`}></div>
+                            <div className="flex items-center justify-between group-hover:opacity-100 transition-opacity">
+                                <h3 className={`text-[10px] font-black uppercase tracking-[0.2em] bg-gradient-to-r ${category.color} bg-clip-text text-transparent`}>
+                                    {category.category}
+                                </h3>
+                                <div className={`h-px flex-1 ml-4 bg-gradient-to-r ${category.color} to-transparent opacity-20`}></div>
                             </div>
                             <div className="grid grid-cols-1 gap-2">
                                 {category.items.map((item, i) => (

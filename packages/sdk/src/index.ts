@@ -1,8 +1,15 @@
 // ═══════════════════════════════════════════════════════════════
-// @nirium/sdk v0.2.0 — Official TypeScript SDK (Synced with Backend)
+// nirium v0.3.0 — Official TypeScript SDK (x402 + MPP)
 // ═══════════════════════════════════════════════════════════════
 
 import WebSocket from 'ws';
+// @ts-ignore — ESM subpath imports
+import { x402Client as X402ClientClass, wrapFetchWithPayment } from '@x402/fetch';
+// @ts-ignore
+import { createEd25519Signer } from '@x402/stellar';
+// @ts-ignore
+import { ExactStellarScheme } from '@x402/stellar/exact/client';
+import * as MppxModule from 'mppx';
 
 export interface AgentConfig {
     apiKey: string;
@@ -10,6 +17,22 @@ export interface AgentConfig {
     wsUrl?: string;
     /** JWT token for WebSocket auth (obtained from /api/auth/token) */
     token?: string;
+}
+
+export interface X402Config {
+    /** Stellar secret key (S...) for auth-entry signing */
+    secretKey: string;
+    /** CAIP-2 network ID (e.g. 'stellar:testnet' or 'stellar:pubnet') */
+    network?: string;
+}
+
+export interface MppConfig {
+    /** Stellar secret key (S...) for Soroban auth-entry signing */
+    secretKey: string;
+    /** CAIP-2 network ID */
+    network?: string;
+    /** 'pull' = server assembles+broadcasts, 'push' = client broadcasts */
+    mode?: 'pull' | 'push';
 }
 
 export interface Signal {
@@ -148,6 +171,9 @@ export class Agent {
     private logCallbacks: Array<(log: Record<string, unknown>) => void> = [];
 
     private token: string | null = null;
+
+    private x402Client: { fetch: typeof fetch } | null = null;
+    private mppClient: { fetch: typeof fetch } | null = null;
 
     constructor(config: AgentConfig) {
         this.apiKey = config.apiKey;
@@ -386,6 +412,86 @@ export class Agent {
             this.connectWebSocket(subscriptionId);
         }, delay);
     }
+
+    // ─── x402 Protocol ────────────────────────────────────────
+
+    /**
+     * Initialize the x402 client for pay-per-request micropayments.
+     * Uses canonical @x402/fetch with ExactStellarScheme + OZ Channels facilitator.
+     * Agent signs Soroban auth entries only — facilitator sponsors all network fees.
+     *
+     * @example
+     * ```typescript
+     * agent.initX402({ secretKey: 'S...', network: 'stellar:testnet' });
+     * const data = await agent.x402Fetch('http://localhost:3402/skills/whale-tracker');
+     * ```
+     */
+    initX402(config: X402Config): void {
+        const network = config.network || 'stellar:testnet';
+        const signer = (createEd25519Signer as any)(config.secretKey, network);
+        const rpcUrl = network.includes('testnet')
+            ? 'https://soroban-testnet.stellar.org'
+            : 'https://soroban.stellar.org';
+        const client = new (X402ClientClass as any)().register(
+            'stellar:*',
+            new (ExactStellarScheme as any)(signer, { url: rpcUrl })
+        );
+        this.x402Client = { fetch: wrapFetchWithPayment(fetch, client) } as any;
+    }
+
+    /**
+     * Fetch a paid resource via x402 protocol.
+     * The client automatically handles 402 negotiation, auth-entry signing, and payment.
+     * Returns the Response object — call .json() or .text() for the payload.
+     */
+    async x402Fetch(url: string, init?: RequestInit): Promise<Response> {
+        if (!this.x402Client) {
+            throw new Error('x402 client not initialized. Call agent.initX402() first.');
+        }
+        return this.x402Client.fetch(url, init);
+    }
+
+    // ─── MPP Protocol (Charge Mode) ────────────────────────────
+
+    /**
+     * Initialize the MPP Charge client for per-request Soroban SAC payments.
+     * Uses canonical @stellar/mpp charge mode with mppx.
+     * In pull mode, the server assembles and broadcasts the transaction.
+     *
+     * @example
+     * ```typescript
+     * agent.initMpp({ secretKey: 'S...', network: 'stellar:testnet', mode: 'pull' });
+     * const data = await agent.mppFetch('http://localhost:3403/signals/trading');
+     * ```
+     */
+    initMpp(config: MppConfig): void {
+        const Mppx = (MppxModule as any).default || MppxModule;
+        const mppx = Mppx.create({
+            stellar: {
+                charge: {
+                    secretKey: config.secretKey,
+                    network: config.network || 'stellar:testnet',
+                    mode: config.mode || 'pull',
+                },
+            },
+        });
+        this.mppClient = mppx;
+    }
+
+    /**
+     * Fetch a paid resource via MPP Charge protocol.
+     * The client automatically handles 402 challenge, auth-entry signing,
+     * and Soroban SAC USDC settlement.
+     * Returns the Response object.
+     */
+    async mppFetch(url: string, init?: RequestInit): Promise<Response> {
+        if (!this.mppClient) {
+            throw new Error('MPP client not initialized. Call agent.initMpp() first.');
+        }
+        return this.mppClient.fetch(url, init);
+    }
+
+    // ─── Connection ─────────────────────────────────────────
 
     /** Close the WebSocket connection. */
     disconnect(): void {

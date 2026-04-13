@@ -11,8 +11,11 @@
  *
  * Contracts:
  *  - NiriumVault:     CAU2XBJTQUBTMPAUFRX7GMZ337I5WLBI4GYPWHZEVXTMJ66D3CP6DEL4
- *  - ELO Reputation:  CC6Z3WJWRKVEAXEKIQ5S3LFEMKRF4L2FTN5YZDQU27MQRQAWA5QBJWF2
+ *  - ELO Registry:    CC6Z3WJWRKVEAXEKIQ5S3LFEMKRF4L2FTN5YZDQU27MQRQAWA5QBJWF2
  *  - Marketplace:     CB6Q3LKBJ7CAAZY4MK7EG5R6FDDTJHB52ZEENI6BQLBJNFKBQRIAUABC
+ *  - Neural Sentinel: CCP5OY3TTDVIREQYGOUZUXS2MZJO3LLJD6Z22Z3VROWFCPJAON22WPY2
+ *  - Settlement Hub:  CANZP2OJUS2Y5VXE4YHRR75LE2WKE7QTJOCCWENR7X65DWE6QEJZV6KS
+ *  - Skill Vault:     CB4JM3PP7GWKJUAYIZ7ZULWFTFJ57FTTUFZTFIDF4JCAPF664OJCXIEI
  */
 
 import {
@@ -38,6 +41,9 @@ export const CONTRACT_IDS = {
     VAULT: process.env.NEXT_PUBLIC_CONTRACT_VAULT || 'CAU2XBJTQUBTMPAUFRX7GMZ337I5WLBI4GYPWHZEVXTMJ66D3CP6DEL4',
     ELO: process.env.NEXT_PUBLIC_CONTRACT_ELO || 'CC6Z3WJWRKVEAXEKIQ5S3LFEMKRF4L2FTN5YZDQU27MQRQAWA5QBJWF2',
     MARKETPLACE: process.env.NEXT_PUBLIC_CONTRACT_MARKETPLACE || 'CB6Q3LKBJ7CAAZY4MK7EG5R6FDDTJHB52ZEENI6BQLBJNFKBQRIAUABC',
+    SENTINEL: process.env.NEXT_PUBLIC_CONTRACT_SENTINEL || 'CCP5OY3TTDVIREQYGOUZUXS2MZJO3LLJD6Z22Z3VROWFCPJAON22WPY2',
+    HUB: process.env.NEXT_PUBLIC_CONTRACT_HUB || 'CANZP2OJUS2Y5VXE4YHRR75LE2WKE7QTJOCCWENR7X65DWE6QEJZV6KS',
+    SKILL_VAULT: process.env.NEXT_PUBLIC_CONTRACT_SKILL_VAULT || 'CB4JM3PP7GWKJUAYIZ7ZULWFTFJ57FTTUFZTFIDF4JCAPF664OJCXIEI',
 } as const;
 
 // Soroban Native Token Address (XLM) on Stellar Testnet
@@ -526,4 +532,113 @@ export async function hasCETESTrustline(walletAddress: string): Promise<boolean>
     } catch {
         return false;
     }
+}
+
+// ═══════════════════════════════════════════════════════
+// NEURAL SENTINEL — Performance Scoring
+// ═══════════════════════════════════════════════════════
+
+/**
+ * Get current ELO score for an agent
+ */
+export async function sentinelGetScore(agentAddress: string): Promise<number> {
+    const result = await simulateContractRead({
+        contractId: CONTRACT_IDS.SENTINEL,
+        method: 'get_score',
+        args: [Address.fromString(agentAddress).toScVal()],
+    });
+    return Number(result ?? 1000);
+}
+
+/**
+ * Get full performance record for an agent
+ */
+export async function sentinelGetRecord(agentAddress: string): Promise<any> {
+    const result = await simulateContractRead({
+        contractId: CONTRACT_IDS.SENTINEL,
+        method: 'get_record',
+        args: [Address.fromString(agentAddress).toScVal()],
+    });
+    return result;
+}
+
+// ═══════════════════════════════════════════════════════
+// SETTLEMENT HUB — x402 & MPP
+// ═══════════════════════════════════════════════════════
+
+/**
+ * Open a high-frequency settlement session (MPP)
+ */
+export async function hubOpenSession(callerAddress: string, agentAddress: string, budget: bigint, duration: bigint) {
+    return invokeContract({
+        contractId: CONTRACT_IDS.HUB,
+        method: 'open_session',
+        args: [
+            Address.fromString(callerAddress).toScVal(),
+            Address.fromString(agentAddress).toScVal(),
+            nativeToScVal(budget, { type: 'i128' }),
+            nativeToScVal(duration, { type: 'u64' }),
+        ],
+        callerAddress,
+    });
+}
+
+/**
+ * Execute an x402 settlement intent (Agent-signed)
+ */
+export async function hubSettleIntent(callerAddress: string, userAddress: string, amount: bigint, memo: string) {
+    return invokeContract({
+        contractId: CONTRACT_IDS.HUB,
+        method: 'settle_intent',
+        args: [
+            Address.fromString(userAddress).toScVal(),
+            nativeToScVal(amount, { type: 'i128' }),
+            nativeToScVal(memo, { type: 'string' }),
+        ],
+        callerAddress,
+    });
+}
+
+/**
+ * Close a session and refund unspent budget
+ */
+export async function hubCloseSession(callerAddress: string) {
+    return invokeContract({
+        contractId: CONTRACT_IDS.HUB,
+        method: 'close_session',
+        args: [Address.fromString(callerAddress).toScVal()],
+        callerAddress,
+    });
+}
+
+// ═══════════════════════════════════════════════════════
+// SKILL VAULT — x402 Payment Gate
+// ═══════════════════════════════════════════════════════
+
+/**
+ * Unlock a skill by paying USDC atomically on-chain (x402 entry point).
+ * The contract verifies agent auth, deducts the fee, and emits an access key.
+ */
+export async function skillVaultUnlock(callerAddress: string, skillId: string) {
+    return invokeContract({
+        contractId: CONTRACT_IDS.SKILL_VAULT,
+        method: 'unlock_skill',
+        args: [
+            Address.fromString(callerAddress).toScVal(),
+            nativeToScVal(skillId, { type: 'string' }),
+        ],
+        callerAddress,
+    });
+}
+
+/**
+ * Get the USDC price for a skill (read-only)
+ */
+export async function skillVaultGetPrice(skillId: string): Promise<number> {
+    const result = await simulateContractRead({
+        contractId: CONTRACT_IDS.SKILL_VAULT,
+        method: 'get_price',
+        args: [nativeToScVal(skillId, { type: 'string' })],
+    });
+    return Number(result ?? 0);
 }

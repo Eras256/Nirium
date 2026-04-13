@@ -1,7 +1,14 @@
 // ═══════════════════════════════════════════════════════════════
-// @nirium/sdk v0.2.0 — Official TypeScript SDK (Synced with Backend)
+// nirium v0.3.0 — Official TypeScript SDK (x402 + MPP)
 // ═══════════════════════════════════════════════════════════════
 import WebSocket from 'ws';
+// @ts-ignore — ESM subpath imports
+import { x402Client as X402ClientClass, wrapFetchWithPayment } from '@x402/fetch';
+// @ts-ignore
+import { createEd25519Signer } from '@x402/stellar';
+// @ts-ignore
+import { ExactStellarScheme } from '@x402/stellar/exact/client';
+import * as MppxModule from 'mppx';
 /**
  * NiriumClient — Full API + WebSocket wrapper for the Nirium Agent.
  *
@@ -42,6 +49,8 @@ export class Agent {
     signalCallbacks = [];
     logCallbacks = [];
     token = null;
+    x402Client = null;
+    mppClient = null;
     constructor(config) {
         this.apiKey = config.apiKey;
         this.baseUrl = (config.baseUrl || 'http://localhost:3001').replace(/\/$/, '');
@@ -221,6 +230,76 @@ export class Agent {
             this.connectWebSocket(subscriptionId);
         }, delay);
     }
+    // ─── x402 Protocol ────────────────────────────────────────
+    /**
+     * Initialize the x402 client for pay-per-request micropayments.
+     * Uses canonical @x402/fetch with ExactStellarScheme + OZ Channels facilitator.
+     * Agent signs Soroban auth entries only — facilitator sponsors all network fees.
+     *
+     * @example
+     * ```typescript
+     * agent.initX402({ secretKey: 'S...', network: 'stellar:testnet' });
+     * const data = await agent.x402Fetch('http://localhost:3402/skills/whale-tracker');
+     * ```
+     */
+    initX402(config) {
+        const network = config.network || 'stellar:testnet';
+        const signer = createEd25519Signer(config.secretKey, network);
+        const rpcUrl = network.includes('testnet')
+            ? 'https://soroban-testnet.stellar.org'
+            : 'https://soroban.stellar.org';
+        const client = new X402ClientClass().register('stellar:*', new ExactStellarScheme(signer, { url: rpcUrl }));
+        this.x402Client = { fetch: wrapFetchWithPayment(fetch, client) };
+    }
+    /**
+     * Fetch a paid resource via x402 protocol.
+     * The client automatically handles 402 negotiation, auth-entry signing, and payment.
+     * Returns the Response object — call .json() or .text() for the payload.
+     */
+    async x402Fetch(url, init) {
+        if (!this.x402Client) {
+            throw new Error('x402 client not initialized. Call agent.initX402() first.');
+        }
+        return this.x402Client.fetch(url, init);
+    }
+    // ─── MPP Protocol (Charge Mode) ────────────────────────────
+    /**
+     * Initialize the MPP Charge client for per-request Soroban SAC payments.
+     * Uses canonical @stellar/mpp charge mode with mppx.
+     * In pull mode, the server assembles and broadcasts the transaction.
+     *
+     * @example
+     * ```typescript
+     * agent.initMpp({ secretKey: 'S...', network: 'stellar:testnet', mode: 'pull' });
+     * const data = await agent.mppFetch('http://localhost:3403/signals/trading');
+     * ```
+     */
+    initMpp(config) {
+        const Mppx = MppxModule.default || MppxModule;
+        const mppx = Mppx.create({
+            stellar: {
+                charge: {
+                    secretKey: config.secretKey,
+                    network: config.network || 'stellar:testnet',
+                    mode: config.mode || 'pull',
+                },
+            },
+        });
+        this.mppClient = mppx;
+    }
+    /**
+     * Fetch a paid resource via MPP Charge protocol.
+     * The client automatically handles 402 challenge, auth-entry signing,
+     * and Soroban SAC USDC settlement.
+     * Returns the Response object.
+     */
+    async mppFetch(url, init) {
+        if (!this.mppClient) {
+            throw new Error('MPP client not initialized. Call agent.initMpp() first.');
+        }
+        return this.mppClient.fetch(url, init);
+    }
+    // ─── Connection ─────────────────────────────────────────
     /** Close the WebSocket connection. */
     disconnect() {
         this.maxReconnectAttempts = 0; // Prevent reconnection

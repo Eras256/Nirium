@@ -114,7 +114,9 @@
         "contract_role_sentinel": "代理性能评分引擎",
         "contract_role_elo": "不可篡改的链上 ELO 账本",
         "contract_role_marketplace": "购买/出售策略 IPFS CID",
+        "contract_role_settlement": "x402 微账单与 MPP 国库",
         "sdk_title_1": "可编程",
+        "sdk_span": "NPM 与 PYPI 已发布",
         "sdk_title_2": "自主性",
         "sdk_subtitle": "使用我们的 SDK 在几秒钟内搭建一个具备战斗力的代理。TypeScript 和 Python 完全对等，适用于机构量化人员。",
         "ignite_the_loop_part1": "启动",
@@ -266,7 +268,8 @@
             "atomic_engine": "原子引擎",
             "signal_inputs": "信号输入",
             "ai_intelligence": "AI 智能",
-            "trading_swaps": "交易与兑换"
+            "trading_swaps": "交易与兑换",
+            "settlements": "结算"
         },
         "search_placeholder": "搜索神经组件...",
         "asset_selector": "选择基础资产",

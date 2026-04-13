@@ -4,16 +4,17 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "nirium"
-version = "0.2.1"
-description = "Official Python SDK for the Nirium autonomous DeFi agent on Stellar"
+version = "0.4.0"
+description = "Official Python SDK for Nirium autonomous agents on Stellar (x402 + MPP)"
 readme = "README.md"
 requires-python = ">=3.10"
 license = {text = "MIT"}
 authors = [{name = "Nirium Protocol"}]
-keywords = ["nirium", "stellar", "defi", "sdk", "soroban", "agent"]
+keywords = ["nirium", "stellar", "defi", "sdk", "soroban", "agent", "x402", "mpp", "agentic-payments", "usdc"]
 dependencies = [
     "aiohttp>=3.9.0",
     "websockets>=13.0",
+    "stellar-sdk>=11.0.0",
 ]
 
 [project.urls]

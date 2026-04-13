@@ -1,7 +1,7 @@
 {
     "name": "nirium",
-    "version": "0.2.2",
-    "description": "Official TypeScript SDK for the Nirium autonomous DeFi agent on Stellar",
+    "version": "0.4.0",
+    "description": "Official TypeScript SDK for the Nirium autonomous agent economy on Stellar (x402 + MPP)",
     "main": "dist/index.js",
     "types": "dist/index.d.ts",
     "files": [
@@ -15,7 +15,12 @@
         "test": "jest --passWithNoTests"
     },
     "dependencies": {
-        "ws": "^8.18.0"
+        "ws": "^8.18.0",
+        "@x402/fetch": "^2.9.0",
+        "@x402/stellar": "^2.9.0",
+        "@stellar/mpp": "^0.4.0",
+        "mppx": "^0.5.5",
+        "@stellar/stellar-sdk": "^14.5.0"
     },
     "devDependencies": {
         "@types/ws": "^8.5.13",
@@ -27,7 +32,11 @@
         "defi",
         "sdk",
         "soroban",
-        "agent"
+        "agent",
+        "x402",
+        "mpp",
+        "agentic-payments",
+        "usdc"
     ],
     "license": "MIT"
 }

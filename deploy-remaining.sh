@@ -21,6 +21,9 @@ cargo build --target wasm32-unknown-unknown --release --manifest-path packages/c
 log "Building Marketplace contract..."
 cargo build --target wasm32-unknown-unknown --release --manifest-path packages/contracts/marketplace/Cargo.toml 2>&1 | tail -3
 
+log "Building Skill Vault contract..."
+cargo build --target wasm32-unknown-unknown --release --manifest-path packages/contracts/skill-vault/Cargo.toml 2>&1 | tail -3
+
 # ─── Deploy ELO ───
 log "Deploying ELO Reputation contract..."
 ELO_ID=$(stellar contract deploy \
@@ -57,8 +60,29 @@ stellar contract invoke \
     -- initialize \
     --admin "$PUBLIC" \
     --treasury "$PUBLIC" \
-    --usdc_token "GBBD47IF6LWK7P7MDEVSCWR7DPUWV3NY3DTQEVFL4NAT4AQH3ZLLFLA5" 2>&1 | tail -2
+    --usdc_token "CBIELTK6YBZJU5UP2WWQEUCYKLPU6AUNZ2BQ4WWFEIE3USCIHMXQDAMA" 2>&1 | tail -2
 ok "Marketplace initialized"
+
+# ─── Deploy Skill Vault ───
+log "Deploying Skill Vault contract..."
+VAULT_ID=$(stellar contract deploy \
+    --wasm target/wasm32-unknown-unknown/release/nirium_skill_vault.wasm \
+    --source "$SECRET" \
+    --rpc-url "$RPC" \
+    --network-passphrase "$PASSPHRASE" 2>&1 | grep -oP 'C[A-Z2-7]{55}' | tail -1)
+ok "Skill Vault deployed: $VAULT_ID"
+
+log "Initializing Skill Vault..."
+stellar contract invoke \
+    --id "$VAULT_ID" \
+    --source "$SECRET" \
+    --rpc-url "$RPC" \
+    --network-passphrase "$PASSPHRASE" \
+    -- initialize \
+    --admin "$PUBLIC" \
+    --treasury "$PUBLIC" \
+    --usdc_token "CBIELTK6YBZJU5UP2WWQEUCYKLPU6AUNZ2BQ4WWFEIE3USCIHMXQDAMA" 2>&1 | tail -2
+ok "Skill Vault initialized"
 
 # ─── Summary ───
 echo ""
@@ -68,9 +92,11 @@ echo -e "${GREEN}═════════════════════
 echo ""
 echo "  ELO Contract:         $ELO_ID"
 echo "  Marketplace Contract: $MKT_ID"
+echo "  Skill Vault Contract: $VAULT_ID"
 echo "  Admin:                ${PUBLIC:0:10}...${PUBLIC: -6}"
 echo ""
 echo "Update your .env.local:"
 echo "  NEXT_PUBLIC_CONTRACT_ELO=\"$ELO_ID\""
 echo "  NEXT_PUBLIC_CONTRACT_MARKETPLACE=\"$MKT_ID\""
+echo "  NEXT_PUBLIC_CONTRACT_SKILL_VAULT=\"$VAULT_ID\""
 echo ""

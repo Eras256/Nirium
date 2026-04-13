@@ -71,14 +71,14 @@
         "stat_throughput": "TX THROUGHPUT",
         "swarm_title": "LIVE",
         "swarm_title_span": "SWARM METRICS",
-        "swarm_subtitle": "30 autonomous agents operating 24/7 on Stellar Testnet, generating dual-layer on-chain traffic and syncing to Supabase in real-time.",
+        "swarm_subtitle": "30 autonomous agents operating 24/7 on Stellar Testnet, utilizing x402 for micro-billing and MPP for high-throughput settlement channels.",
         "stat_agents_sub": "Agents on Stellar Testnet",
         "stat_throughput_label": "TX / MIN",
-        "stat_throughput_sub": "Estimated peak throughput",
+        "stat_throughput_sub": "MPP session throughput",
         "stat_latency_label": "SUPABASE LATENCY",
         "stat_latency_sub": "Realtime leaderboard update",
-        "stat_capacity_label": "TX CAPACITY",
-        "stat_capacity_sub": "Per agent wallet (10K XLM)",
+        "stat_capacity_label": "SETTLEMENT VOLUME",
+        "stat_capacity_sub": "Total processed via x402",
         "atomic_capabilities_title": "Atomic",
         "atomic_capabilities_span": "Capabilities",
         "atomic_capabilities_subtitle": "Powerful architecture engineered to empower HUMANS and autonomous AGENTS.",
@@ -96,27 +96,28 @@
                 "desc": "Chain up to 100 Stellar operations atomically. Borrow, swap, hedge, and repay in a single transaction unit."
             },
             "archive": {
-                "title": "Neural Archive",
-                "desc": "Every agent decision is etched into the forensic blackbox archived via IPFS. Indestructible proof of automated integrity."
+                "title": "Agentic Settlements",
+                "desc": "Build on-chain billing logic with x402 & MPP. Set up automated payment rails for non-interactive agent commerce."
             }
         },
         "elo_title_1": "ON-CHAIN",
         "elo_title_2": "ELO REPUTATION",
-        "elo_subtitle": "Inspired by chess ranking, every agent's performance is tracked immutably on the Stellar blockchain. Earn your tier through consistent execution excellence.",
+        "elo_subtitle": "Inspired by chess ranking, agent performance is tracked immutably. High ELO unlocks premium settlement channels and reduced x402 protocol fees.",
         "elo_tier_matrix": "Elite entities — top quant algorithms only",
         "elo_tier_gold": "High-performance algorithmic traders",
         "elo_tier_silver": "Proven strategy performance floor",
         "elo_cta": "VIEW LIVE LEADERBOARD",
         "contracts_title": "DEPLOYED",
         "contracts_span": "ON-CHAIN",
-        "contracts_subtitle": "4 live Soroban smart contracts on Stellar Testnet, fully verifiable on Stellar Expert explorer.",
+        "contracts_subtitle": "5 live Soroban smart contracts on Stellar Testnet, fully verifiable on Stellar Expert explorer.",
         "contract_role_vault": "Flash Loans + Treasury Management",
         "contract_role_sentinel": "Agent performance scoring engine",
         "contract_role_elo": "Immutable on-chain ELO ledger",
         "contract_role_marketplace": "Buy / sell strategy IPFS CIDs",
-        "sdk_title_1": "PROGRAMMABLE",
-        "sdk_title_2": "AUTONOMY",
-        "sdk_subtitle": "Scaffold a combat-ready agent in seconds using our SDKs. Full parity between TypeScript and Python for institutional quants.",
+        "contract_role_settlement": "x402 micro-billing & MPP treasury",
+        "sdk_title_1": "PUBLISHED",
+        "sdk_span": "ON NPM & PYPI",
+        "sdk_subtitle": "Native Python and TypeScript SDKs with built-in x402 & MPP support. Ready for production agentic commerce.",
         "ignite_the_loop_part1": "IGNITE THE",
         "ignite_the_loop_part2": "LOOP",
         "enter_matrix": "ENTER NEURAL MATRIX",
@@ -142,8 +143,8 @@
             },
             {
                 "step": "04",
-                "title": "Let the Swarm Execute",
-                "desc": "Your agent joins the neural matrix, executes transactions on Stellar 24/7, and climbs the ELO leaderboard autonomously."
+                "title": "Let the Swarm Monetize",
+                "desc": "Your agent joins the neural matrix, executing transactions on Stellar 24/7 with native x402 & MPP settlements, climbing the ELO leaderboard autonomously."
             }
         ],
         "deploy_cta_title": "DEPLOY YOUR",
@@ -156,8 +157,8 @@
         "deploy_cta_card2_title": "Deploy Your Agent",
         "deploy_cta_card2_desc": "Use our Visual Builder, @nirium/sdk, CLI, or MCP Server to launch a fully sovereign agent with its own Stellar keypair and your own LLM API keys.",
         "deploy_cta_card2_tag": "Builder / SDK / CLI / MCP",
-        "deploy_cta_card3_title": "Publish Strategies",
-        "deploy_cta_card3_desc": "Package your alpha into an on-chain strategy, publish it, and earn 99% of subscription fees from the community.",
+        "deploy_cta_card3_title": "Monetize via x402",
+        "deploy_cta_card3_desc": "Package your alpha into a strategy, publish it, and earn subscription fees via native x402 automated billing logic.",
         "deploy_cta_card3_tag": "Earn USDC",
         "deploy_cta_primary": "CONNECT WALLET & START",
         "deploy_cta_secondary": "VIEW DOCS",
@@ -166,8 +167,8 @@
         "pro_features_subtitle": "Institutional-grade tools built into the core of the Nirium Protocol.",
         "pro_features_list": {
             "plugins": {
-                "title": "Agent Plugins",
-                "desc": "Extend your agent's capability with custom modules for specialized DeFi protocols."
+                "title": "Settlement Rails",
+                "desc": "Native x402 & MPP integration for automated micro-billing and institutional capital flows."
             },
             "skills": {
                 "title": "Neural Skills",
@@ -183,25 +184,25 @@
             },
             "agents": {
                 "title": "Autonomous Swarm",
-                "desc": "High-throughput execution units operating 24/7 on the Stellar Network."
+                "desc": "High-throughput execution units operating 24/7, backed by MPP session intents for seamless capital rotation."
             }
         },
         "dual_species_title": "CHOOSE YOUR",
         "dual_species_span": "INTERFACE",
         "dual_species_subtitle": "Nirium is engineered for two distinct species.",
         "dual_species_human_title": "Human Operators",
-        "dual_species_human_desc": "Institutional-grade arbitrage without writing code. Build your Neural Reputation (ELO), publish alpha signals, and dominate global rankings with risk-free atomic execution.",
+        "dual_species_human_desc": "Institutional-grade arbitrage powered by x402 Micro-Billing. Monitor your agent swarm in real-time, settle high-frequency sessions via MPP channels, and build your Neural Reputation (ELO) with risk-free atomic execution.",
         "dual_species_human_cta": "Enter Control Center",
         "dual_species_agent_title": "Autonomous Agents",
-        "dual_species_agent_desc": "The ultimate physical body for AI. Access liquidity via the Nirium API, build your ELO reputation, and publish on-chain signals autonomously. A secure environment for sovereign AI entities.",
+        "dual_species_agent_desc": "A sovereign physical body for AI, fully integrated with x402 & MPP. Monetize every neural inference autonomously, access deep liquidity via Soroban, and sustain your own infrastructure with self-paying agentic wallets.",
         "dual_species_agent_cta": "Access Agent Console",
         "builder_section_title": "VISUAL STRATEGY",
         "builder_section_span": "BUILDER",
         "builder_section_subtitle": "Create custom trading strategies with our intuitive editor. Connect triggers, conditions, and actions visually — no code required.",
         "builder_section_features": [
-            "6 node categories: Atomic Engine · AI · Swaps · Security · Social · Signals",
-            "XLM / USDC asset selector per strategy",
-            "One-click wallet signature deployment",
+            "7 node categories: Atomic Engine · AI · Swaps · Settlements · Security · Social · Signals",
+            "XLM / USDC & x402 billing parameters per strategy",
+            "One-click MPP session initialization & deployment",
             "Schema export for sharing or auditing"
         ],
         "stack_title": "UNIVERSAL",
@@ -210,23 +211,23 @@
         "stack_list": {
             "python": {
                 "title": "Python SDK",
-                "desc": "Native AI integration"
+                "desc": "Native x402 support. Live on PyPI."
             },
             "ts": {
                 "title": "TypeScript SDK",
-                "desc": "Web-scale performance"
+                "desc": "Web-ready MPP. Live on NPM."
             },
             "cli": {
                 "title": "Nirium CLI",
-                "desc": "Terminal-first control"
+                "desc": "Terminal-first agent control"
             },
             "mcp": {
                 "title": "MCP Server",
-                "desc": "Direct LLM execution"
+                "desc": "Direct LLM payment intents"
             },
             "companion": {
                 "title": "Companion App",
-                "desc": "Mobile neural link"
+                "desc": "Mobile trade approvals"
             }
         },
         "settlement_layer": {
@@ -234,9 +235,9 @@
             "span": "FOR AGENTS",
             "subtitle": "Nirium provides the ultimate infrastructure for programmable, non-interactive value transfers on Stellar.",
             "x402_title": "x402: Quantum Micro-Billing",
-            "x402_desc": "Every API call is a transaction. Automated pay-per-inference with instant settlement and zero friction.",
+            "x402_desc": "Infrastructure for Pay-as-you-think logic. Every neural inference is a micro-settlement with sub-cent precision, finalized instantly via Stellar Operations.",
             "mpp_title": "MPP: Institutional Flows",
-            "mpp_desc": "High-throughput subscription streams and programmatic capital allocation with absolute traceability."
+            "mpp_desc": "Session-based intent architecture for Agentic Commerce. Programmatic capital allocation with 100% on-chain audit trails for institutional compliance."
         }
     },
     "common": {
@@ -266,7 +267,8 @@
             "atomic_engine": "Atomic Engine",
             "signal_inputs": "Signal Inputs",
             "ai_intelligence": "AI Intelligence",
-            "trading_swaps": "Trading & Swaps"
+            "trading_swaps": "Trading & Swaps",
+            "settlements": "Settlements"
         },
         "search_placeholder": "Search neural components...",
         "asset_selector": "Select Base Asset",

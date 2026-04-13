@@ -1,17 +1,19 @@
 Metadata-Version: 2.4
 Name: nirium
-Version: 0.2.1
-Summary: Official Python SDK for the Nirium autonomous DeFi agent on Stellar
+Version: 0.4.0
+Summary: Official Python SDK for Nirium autonomous agents on Stellar (x402 + MPP)
 Author: Nirium Protocol
 License: MIT
 Project-URL: Homepage, https://nirium.dev
 Project-URL: Repository, https://github.com/nirium/nirium
 Project-URL: Documentation, https://nirium.dev/docs
-Keywords: nirium,stellar,defi,sdk,soroban,agent
-Requires-Python: >=3.10
+Keywords: nirium,stellar,defi,sdk,soroban,agent,x402,mpp,agentic-payments,usdc
+Requires-Python: >=3.9
 Description-Content-Type: text/markdown
 Requires-Dist: aiohttp>=3.9.0
 Requires-Dist: websockets>=13.0
+Requires-Dist: stellar-sdk>=11.0.0
+Dynamic: requires-python
 
 # nirium
 

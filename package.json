@@ -4,7 +4,8 @@
   "scripts": {
     "dev": "pnpm --parallel --filter nirium-web --filter @nirium/agent run dev",
     "build": "pnpm --filter nirium-web run build",
-    "start": "pnpm --filter nirium-web start"
+    "start": "pnpm --filter nirium-web start",
+    "postinstall": "node scripts/postinstall.js"
   },
   "engines": {
     "node": "20.x"
@@ -24,7 +25,14 @@
   },
   "dependencies": {
     "@radix-ui/react-slot": "^1.2.4",
+    "@stellar/mpp": "^0.4.0",
+    "@x402/core": "^2.9.0",
+    "@x402/express": "^2.9.0",
     "@x402/fetch": "^2.9.0",
-    "class-variance-authority": "^0.7.1"
+    "@x402/stellar": "^2.9.0",
+    "class-variance-authority": "^0.7.1",
+    "dotenv": "^16.4.5",
+    "express": "^5.1.0",
+    "mppx": "^0.5.5"
   }
 }

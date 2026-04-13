@@ -8,6 +8,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { useFreighter } from "@/hooks/useFreighter";
 import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabase";
+import { eloGetScore, sentinelGetScore } from "@/lib/sorobanContracts";
 
 interface SwarmAgent {
     id: string;
@@ -46,9 +47,10 @@ interface LeaderboardEntry {
 
 function agentToEntry(agent: SwarmAgent, rank: number): LeaderboardEntry {
     let tier: LeaderboardEntry['tier'] = 'bronze';
-    if (agent.total_txs > 200) tier = 'matrix';
-    else if (agent.total_txs > 100) tier = 'gold';
-    else if (agent.total_txs > 50) tier = 'silver';
+    const elo = agent.elo_onchain || 1200;
+    if (elo >= 2000) tier = 'matrix';
+    else if (elo >= 1500) tier = 'gold';
+    else if (elo >= 1000) tier = 'silver';
 
     return {
         rank,
@@ -86,6 +88,32 @@ export default function LeaderboardPage() {
     const [isLive, setIsLive] = useState(false);
     const [lastUpdate, setLastUpdate] = useState<Date | null>(null);
 
+    // ── Enrich leaderboard entries with on-chain ELO scores ────
+    const enrichWithOnChainScores = async (entries: LeaderboardEntry[]): Promise<LeaderboardEntry[]> => {
+        const enriched = await Promise.all(
+            entries.map(async (entry) => {
+                if (!entry.address || entry.address === 'G' + '0'.repeat(55)) return entry;
+                try {
+                    const [eloScore, sentinelScore] = await Promise.all([
+                        eloGetScore(entry.address).catch(() => 0),
+                        sentinelGetScore(entry.address).catch(() => 1000),
+                    ]);
+                    const onchainElo = eloScore > 0 ? eloScore : entry.eloOnchain;
+                    let tier: LeaderboardEntry['tier'] = 'bronze';
+                    if (onchainElo >= 2000) tier = 'matrix';
+                    else if (onchainElo >= 1500) tier = 'gold';
+                    else if (onchainElo >= 1000) tier = 'silver';
+                    return { ...entry, eloOnchain: onchainElo, tier };
+                } catch {
+                    return entry;
+                }
+            })
+        );
+        // Re-sort by on-chain ELO, then by totalTxs
+        enriched.sort((a, b) => b.eloOnchain - a.eloOnchain || b.totalTxs - a.totalTxs);
+        return enriched.map((e, i) => ({ ...e, rank: i + 1 }));
+    };
+
     // ── Initial fetch & Polling ────────────────────────────────
     useEffect(() => {
         let isMounted = true;
@@ -98,11 +126,16 @@ export default function LeaderboardPage() {
                     return;
                 }
                 const data = await res.json();
-                
+
                 if (data && data.length > 0 && isMounted) {
-                    setLeaderboard(data.map((a: any, i: number) => agentToEntry(a as SwarmAgent, i + 1)));
-                    setIsLive(true);
-                    setLastUpdate(new Date());
+                    const entries = data.map((a: any, i: number) => agentToEntry(a as SwarmAgent, i + 1));
+                    // Enrich with real on-chain ELO from Soroban contracts
+                    const enriched = await enrichWithOnChainScores(entries);
+                    if (isMounted) {
+                        setLeaderboard(enriched);
+                        setIsLive(true);
+                        setLastUpdate(new Date());
+                    }
                 } else if (isMounted) {
                     setLeaderboard(prev => prev.length === 0 ? PLACEHOLDER_AGENTS : prev);
                 }
@@ -114,7 +147,7 @@ export default function LeaderboardPage() {
         };
 
         fetchAgents();
-        const pollInterval = setInterval(fetchAgents, 2000);
+        const pollInterval = setInterval(fetchAgents, 10000);
         return () => {
             isMounted = false;
             clearInterval(pollInterval);
@@ -277,8 +310,8 @@ export default function LeaderboardPage() {
                                                     </td>
                                                     <td className="p-5 text-center">
                                                         <div className="flex flex-col items-center justify-center gap-1">
-                                                            <span className="text-yellow-400 font-mono text-[10px] bg-yellow-500/10 px-2 py-0.5 rounded-full" title="On-Chain ELO">
-                                                                <Trophy size={8} className="inline mr-1" />{agent.eloOnchain || 1200}
+                                                            <span className="text-yellow-400 font-mono text-[10px] bg-yellow-500/10 px-2 py-0.5 rounded-full" title="On-Chain ELO (Soroban Contract)">
+                                                                <Trophy size={8} className="inline mr-1" />{agent.eloOnchain || 1200} <span className="text-yellow-600 text-[7px]">ELO</span>
                                                             </span>
                                                             <div className="flex gap-2 text-[9px] text-slate-400 font-mono mt-1">
                                                                 <span title="Pools Created" className="border-b border-dashed border-slate-600 pb-0.5">P: {agent.poolsCreated || 0}</span>
