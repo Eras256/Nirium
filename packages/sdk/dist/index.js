@@ -1,5 +1,5 @@
 // ═══════════════════════════════════════════════════════════════
-// nirium v0.3.0 — Official TypeScript SDK (x402 + MPP)
+// nirium v0.4.0 — Official TypeScript SDK (x402 + MPP)
 // ═══════════════════════════════════════════════════════════════
 import WebSocket from 'ws';
 // @ts-ignore — ESM subpath imports
@@ -59,10 +59,14 @@ export class Agent {
     }
     // ─── HTTP Methods ────────────────────────────────────────
     async request(method, path, body) {
+        return this.requestWithHeaders(method, path, body, {});
+    }
+    async requestWithHeaders(method, path, body, extraHeaders) {
         const url = `${this.baseUrl}${path}`;
         const headers = {
             'Content-Type': 'application/json',
             'x-api-key': this.apiKey,
+            ...extraHeaders,
         };
         const options = { method, headers };
         if (body) {
@@ -96,22 +100,37 @@ export class Agent {
     }
     // ─── Execution ───────────────────────────────────────────
     /**
-     * Execute a strategy (routed to actual Soroban contract).
+     * Execute a strategy via a real Soroban contract transaction on Stellar.
      * Strategy names: flash-loan-arb, path-arbitrage, cross-dex, blend-yield, soroswap-swap
+     *
+     * @param stellarAccount - Your Stellar wallet address (required for legal consent verification)
      */
-    async execute(strategy, asset, params) {
-        return this.request('POST', '/api/execute', { strategy, asset, params });
+    async execute(strategy, asset, params, stellarAccount) {
+        const extraHeaders = {};
+        if (stellarAccount) {
+            extraHeaders['x-stellar-account'] = stellarAccount;
+        }
+        return this.requestWithHeaders('POST', '/api/execute', { strategy, asset, ...params }, extraHeaders);
     }
     /**
      * Demo execution (Soroban dry-run simulation, no TX submitted).
+     * Returns a professional market assessment message.
      */
     async executeDemo(strategy, asset) {
         return this.request('POST', '/api/execute-demo', { strategy, asset });
     }
     // ─── Market Data ─────────────────────────────────────────
+    /** Get asset price tickers (XLM, USDC) from Stellar Horizon. */
+    async getTickers() {
+        return this.request('GET', '/api/tickers');
+    }
     /** Get current market state (real data from Horizon). */
     async getMarket() {
         return this.request('GET', '/api/market');
+    }
+    /** Get global protocol statistics. */
+    async getStats() {
+        return this.request('GET', '/api/stats/global');
     }
     /** Get autonomous loop status. */
     async getLoopStatus() {

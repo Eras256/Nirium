@@ -1,258 +1,195 @@
+# Nirium Protocol — Institutional Infrastructure on Stellar
 
-# NIRIUM: Institutional Infrastructure for Automated Treasury and FX on Stellar
+![Network](https://img.shields.io/badge/Network-Stellar%20Testnet-orange?style=for-the-badge)
+![Status](https://img.shields.io/badge/Status-Testnet%20Active-yellow?style=for-the-badge)
+![API](https://img.shields.io/badge/API-v2.5%20%7C%2044%20Endpoints-blue?style=for-the-badge)
+![Security](https://img.shields.io/badge/JARGUS%20Audit-78%2F78%20PASS-brightgreen?style=for-the-badge)
+![SCF](https://img.shields.io/badge/SCF-Round%2043%20Applicant-purple?style=for-the-badge)
 
-**Nirium** is a decentralized orchestration layer that enables fintechs and financial institutions to automate treasury operations and cross-border FX using autonomous agentic execution on Stellar. Agents manage liquidity, settle intents via **MPP** sessions, and pay for premium financial intelligence via **x402** micropayments—all with 24/7 reliability on Stellar Testnet.
+> **DISCLAIMER:** Nirium is experimental software deployed exclusively on Stellar Testnet. All operations use test tokens with no monetary value. Not financial advice. Not an investment product. Smart contracts have not been formally audited by a third party. Use at your own risk.
 
-Built for the **Agents on Stellar Hackathon (April 2026)**.
+---
+
+**Nirium** is institutional DeFi infrastructure powered by autonomous agents on Stellar. It enables fintechs and financial institutions to automate treasury operations, cross-border FX, and yield management — replacing slow manual trading desks with 24/7 autonomous execution, full on-chain auditability, and sub-second settlement.
+
+Agents are the execution engine. B2B and A2A institutional automation is the market.
 
 ## What It Does
 
-Nirium solves the **manual treasury bottleneck**: Fintechs moving capital across borders (e.g., USD/MXN) face high FX costs, slow settlement, and error-prone manual trading desks. Nirium replaces these workflows with autonomous agents that have their own Stellar wallets, funded via sponsorship (zero XLM needed), and capable of 24/7 execution using two complementary protocols:
+Nirium solves the **manual treasury bottleneck**: fintechs moving capital across borders face high FX costs, slow settlement, and error-prone processes. Nirium replaces these workflows with:
 
-- **FX Automation (MPP)**: A treasury manager delegates a USDC budget to an agent via a Soroban escrow session. The agent autonomously executes FX rebalancing and liquidity intents within that budget, eliminating manual oversight.
-- **Pay-Per-Request Intelligence (x402)**: Agents acquire premium financial telemetry (e.g., real-time yield rankings or arbitrage signals) on a micropayment basis. This "Just-in-Time" billing allows institutions to pay only for the intelligence they use.
+- **Autonomous Agents** — AI-driven execution units with their own Stellar wallets, operating 24/7 against live SDEX/Soroswap/Blend liquidity
+- **x402 Micropayments** — agents pay for premium intelligence per-request in USDC, no account needed
+- **MPP Session Budgets** — institutions delegate a USDC budget to an agent via Soroban escrow; agent executes within limits, unspent funds refundable
+- **Institutional API** — 44 endpoints with multi-tier auth (sandbox, API key, JWT), webhooks, signal subscriptions, and skill marketplace
+- **Audit Trail Engine** — every agent decision is HMAC-signed, IPFS-indexed, and translated to boardroom-readable summaries
+- **Multi-LLM** — provider-agnostic (OpenAI, Anthropic, Gemini, Grok, Ollama, and more) with hot-swap via API
 
 ## Architecture
 
 ```
-Human Operator (Freighter Wallet)
+Fintech / Institution (B2B / A2A)
         |
         v
-  [Next.js Dashboard]  <-->  [Soroban Contracts on Stellar Testnet]
-        |                         |-- Nirium Vault (Treasury & Flash Loans)
-        |                         |-- ELO Registry (Reputation)
-        |                         |-- Marketplace (Strategy CIDs)
-        |                         |-- Neural Sentinel (Performance Scoring)
-        |                         |-- Settlement Hub (x402 & MPP Sessions)
-        |                         |-- Skill Vault (x402 Payment Gate)
-        v
-  [Autonomous Agent Bots]
-        |-- Neural Reasoner (DeepSeek-R1 via Ollama)
-        |-- MPP Subscription Agent
-        |-- x402 Fleet Agent
+  [Next.js Dashboard — nirium.xyz]
         |
         v
-  [MCP Server] --> Claude Desktop / Cursor / AI IDEs
+  [Agent API — api.nirium.xyz — 44 endpoints]
+        |-- Auth (JWT / API Key / Sandbox)
+        |-- legalShield middleware
+        |-- x402 + MPP payment middleware
+        |-- Rate limiting (institutional: 300rpm)
+        |
+        v
+  [Autonomous Execution Layer]
+        |-- Neural Reasoner (LLM-driven decisions)
+        |-- Swarm (30 agents, racing mode, 3–12s intervals)
+        |-- Strategy Router (flash-loan, path-arb, cross-dex, blend-yield, soroswap)
+        |
+        v
+  [Soroban Smart Contracts — Stellar Testnet]
+        |-- NiriumVault (treasury, flash loans, delegation)
+        |-- ELO Reputation (on-chain scoring)
+        |-- Strategy Marketplace (CID registry)
+        |-- Skill Vault (x402 payment gate)
+        |-- Settlement Hub (MPP escrow sessions)
+        |-- Neural Sentinel (agent performance)
+        |
+        v
+  [Supabase] ← agent_logs, auth_keys, webhooks, swarm_agents
+  [IPFS / Pinata] ← audit trail, BlackBox Archive
 ```
 
 ## Key Features
 
-### 1. Neural Reasoner (Local LLM)
-Agents use **DeepSeek-R1** locally via Ollama to make economic decisions:
-- "Should I pay 0.01 USDC for this flash-loan-executor skill?"
-- "Is my budget sufficient for another MPP cycle?"
-- All reasoning is logged to the Neural Feed for operator observability.
+### Institutional API (44 endpoints)
+Multi-tier authentication with sandbox accounts, API key tiers (free/institutional), and JWT for WebSocket. Full RBAC, sliding-window rate limiting, AML checks, and domain lock.
 
-### 2. Dual Protocol Settlement (x402 + MPP)
-- **x402**: HTTP 402 response with payment instructions. Agent pays USDC, API verifies payment on Horizon, delivers premium data.
-- **MPP**: Opens a Soroban escrow session with a USDC budget. Agent settles intents atomically within the budget. Unspent funds are refundable.
+| Access | Endpoints |
+|---|---|
+| Public (no key) | health, loop/status, execute-demo, signals/recent, skills |
+| Protected (API key) | execute, market, tickers, stats, loop control, webhooks, subscriptions, skills/install |
+| WebSocket (JWT) | /ws/signals — real-time signal stream |
+| Admin only | system/health, config/llm |
 
-### 3. Skill Vault (On-Chain Payment Gate)
-A Soroban contract that acts as a payment gateway for agent skills. `unlock_skill()` atomically verifies agent identity, deducts USDC, and emits an access key — all in a single invocation.
+### Autonomous Execution
+Five strategy types executed on-chain via Soroban:
+- `flash-loan-arb` — single-invocation flash loan, mathematically solvency-guaranteed
+- `path-arb` — multi-hop path payment arbitrage on SDEX
+- `cross-dex-arb` — cross-venue arbitrage (SDEX × Soroswap)
+- `blend-yield` — Blend Protocol yield capture
+- `soroswap-swap` — direct Soroswap execution
 
-### 4. Zero-Friction Agent Onboarding
-Using Stellar's **Sponsorship Protocol** (`beginSponsoringFutureReserves`), Nirium creates funded agent accounts with 0 XLM. The treasury covers reserves, and agents operate solely in USDC from second one.
+### x402 + MCP
+Any AI agent (Claude, GPT, custom) can pay for premium Nirium intelligence per-request with USDC on Stellar — zero account setup. MCP server exposes Nirium as tools for Claude Desktop, Cursor, and compatible AI IDEs.
 
-### 5. Neural Sentinel (Performance Scoring)
-On-chain agent reputation: +10 for success, -25 for failure. Only the trusted oracle (Settlement Hub) can report performance, ensuring trustless scoring.
+### Audit Trail Engine
+Every agent action: HMAC-SHA256 signed → logged to Supabase → IPFS CID via Pinata → LLM-translated to human-readable summary. Exportable as encrypted JSON. Compliance-ready without blockchain expertise.
 
-### 6. MCP Server
-Exposes Nirium as tools for Claude Desktop, Cursor, and other AI environments. Operators can query agent ELO scores, fetch premium strategies, and trigger skill acquisitions via natural language.
+### Published SDKs
+
+| SDK | Package | Version |
+|---|---|---|
+| TypeScript | [nirium (npm)](https://www.npmjs.com/package/nirium) | 0.5.0 |
+| Python | [nirium (PyPI)](https://pypi.org/project/nirium/) | 0.5.0 |
+
+```typescript
+import { Agent } from 'nirium';
+const agent = new Agent({ apiKey: 'sk_inst_...', baseUrl: 'https://api.nirium.xyz' });
+
+const market = await agent.getMarket();
+const result = await agent.execute('path-arb', 'XLM-USDC', { amount: 5000 }, 'G...');
+agent.subscribe(signal => console.log(signal));
+```
+
+```python
+from nirium import Agent
+agent = Agent(api_url="https://api.nirium.xyz", api_key="sk_inst_...")
+
+market = await agent.get_market()
+result = await agent.execute("path-arb", "XLM-USDC", {"amount": 5000}, stellar_account="G...")
+```
 
 ## Deployed Contracts (Stellar Testnet)
 
-All contracts are live and verifiable on [Stellar Expert](https://stellar.expert/explorer/testnet).
+| Contract | Contract ID |
+|---|---|
+| **NiriumVault** (primary, Vault 2000 active) | `CDHDX63NUYSFCIPJTTS46N5PYLTI7J5WIAIOP7TZSPBNUTLI32AY7GA2` |
+| ELO Reputation | `CC6Z3WJWRKVEAXEKIQ5S3LFEMKRF4L2FTN5YZDQU27MQRQAWA5QBJWF2` |
+| Strategy Marketplace | `CB6Q3LKBJ7CAAZY4MK7EG5R6FDDTJHB52ZEENI6BQLBJNFKBQRIAUABC` |
+| Neural Sentinel | `CCP5OY3TTDVIREQYGOUZUXS2MZJO3LLJD6Z22Z3VROWFCPJAON22WPY2` |
+| Settlement Hub | `CANZP2OJUS2Y5VXE4YHRR75LE2WKE7QTJOCCWENR7X65DWE6QEJZV6KS` |
+| Skill Vault | `CB4JM3PP7GWKJUAYIZ7ZULWFTFJ57FTTUFZTFIDF4JCAPF664OJCXIEI` |
 
-| Contract | Role | Contract ID |
-| :--- | :--- | :--- |
-| **Nirium Vault** | Treasury & Flash Loans | `CAU2XBJTQUBTMPAUFRX7GMZ337I5WLBI4GYPWHZEVXTMJ66D3CP6DEL4` |
-| **ELO Registry** | On-chain Reputation (ELO scoring) | `CC6Z3WJWRKVEAXEKIQ5S3LFEMKRF4L2FTN5YZDQU27MQRQAWA5QBJWF2` |
-| **Marketplace** | Strategy CID Registry | `CB6Q3LKBJ7CAAZY4MK7EG5R6FDDTJHB52ZEENI6BQLBJNFKBQRIAUABC` |
-| **Neural Sentinel** | Agent Performance Scoring | `CCP5OY3TTDVIREQYGOUZUXS2MZJO3LLJD6Z22Z3VROWFCPJAON22WPY2` |
-| **Settlement Hub** | x402 & MPP Session Escrow | `CANZP2OJUS2Y5VXE4YHRR75LE2WKE7QTJOCCWENR7X65DWE6QEJZV6KS` |
-| **Skill Vault** | x402 Payment Gate | `CB4JM3PP7GWKJUAYIZ7ZULWFTFJ57FTTUFZTFIDF4JCAPF664OJCXIEI` |
-| **USDC (Testnet)** | Settlement Asset | `CBIELTK6YBZJU5UP2WWQEUCYKLPU6AUNZ2BQ4WWFEIE3USCIHMXQDAMA` |
+All verifiable on [Stellar Expert (Testnet)](https://stellar.expert/explorer/testnet).
 
 ## Getting Started
 
 ### Prerequisites
-- Node.js 18+
-- pnpm
-- [Ollama](https://ollama.com) with `deepseek-r1` model (for agent reasoning)
-- [Freighter wallet](https://freighter.app) (for dashboard interactions)
+- Node.js 20+, pnpm 9+
+- Freighter wallet (testnet mode) for dashboard interactions
 
-### 1. Install and run the dashboard
+### Run locally
 ```bash
 pnpm install
-pnpm dev
+pnpm dev          # starts web (3000) + agent API (3001) in parallel
 ```
-Open [http://localhost:3000](http://localhost:3000) and connect Freighter (Testnet mode).
 
-### 2. Start the x402 server (canonical, with OZ Channels facilitator)
+### Deploy
 ```bash
-npx -y tsx scripts/x402_server.ts
+pnpm deploy       # → vercel --prod (web frontend)
+# Agent API deploys to Railway via git push to main (Railway CI)
 ```
-This runs the x402 paid API server on port 3402. Uses `@x402/express` middleware with the OpenZeppelin Channels facilitator for payment verification and settlement. Agents sign Soroban auth entries (not full tx envelopes), and the facilitator sponsors all network fees.
 
-### 3. Start the MPP Charge server (canonical, with @stellar/mpp)
+### SDK Quick Start
 ```bash
-npx -y tsx scripts/mpp_server.ts
-```
-This runs the MPP paid API server on port 3403. Uses `mppx` middleware with `@stellar/mpp` Charge mode. Each request triggers a Soroban SAC USDC transfer settled on-chain. Server optionally sponsors fees.
-
-### 4. Launch the Neural Reasoner Agent (x402 buyer)
-Ensure Ollama is running with DeepSeek-R1:
-```bash
-ollama pull deepseek-r1
-npx -y tsx scripts/neural_reasoner_bot.ts
-```
-The agent creates a Stellar wallet, acquires USDC, then uses `@x402/fetch` with `ExactStellarScheme` to autonomously buy skills. DeepSeek-R1 decides which skill to acquire each cycle. Watch the Neural Feed in the dashboard for live reasoning logs.
-
-### 5. Launch the MPP Agent (MPP Charge buyer)
-Requires a funded sponsor account in `.env.local`:
-```bash
-npx -y tsx scripts/mpp_agent_bot.ts
-```
-Uses `mppx.fetch()` with `@stellar/mpp/charge/client` in pull mode. The agent signs auth entries, the server assembles and broadcasts. Demonstrates Stellar's Sponsorship Protocol for zero-XLM agent onboarding.
-
-### 6. Connect as MCP Tool (Claude Desktop / Cursor)
-Add to your MCP configuration:
-```json
-{
-  "nirium-mcp": {
-    "command": "npx",
-    "args": ["-y", "tsx", "/absolute/path/to/scripts/mcp_server.ts"]
-  }
-}
+npm install nirium       # TypeScript
+pip install nirium       # Python
 ```
 
-## Tech Stack
-
-| Layer | Technology |
-| :--- | :--- |
-| Network | Stellar Testnet (USDC via Soroban SAC) |
-| Smart Contracts | Soroban (Rust) — 6 deployed contracts |
-| x402 | `@x402/express` + `@x402/fetch` + `@x402/stellar` (ExactStellarScheme, OZ Channels facilitator) |
-| MPP | `@stellar/mpp` Charge mode + `mppx` middleware (Soroban SAC per-request settlement) |
-| Intelligence | Ollama (DeepSeek-R1 local) |
-| Frontend | Next.js 15, Three.js (Neural Orb), Framer Motion |
-| Wallet | Freighter (Soroban auth-entry signing) |
-| Database | Supabase (agent logs, Neural Feed) |
-| MCP | Model Context Protocol server for AI IDEs |
+See [SDKs.md](SDKs.md) for full SDK documentation and [IsacapKey.md](IsacapKey.md) for complete API reference.
 
 ## Project Structure
 
 ```
 nirium-core-private/
-├── apps/web/                  # Next.js 15 dashboard
-│   ├── app/                   # Pages (home, dashboard, marketplace, agents, etc.)
-│   ├── components/            # UI components (NeuralCanvas, ProtocolRevenue, etc.)
-│   └── lib/sorobanContracts.ts  # Typed wrappers for all 6 Soroban contracts
-├── packages/contracts/        # Soroban smart contracts (Rust)
-│   ├── src/                   # Nirium Vault (treasury, flash loans)
-│   ├── elo/                   # ELO reputation system
-│   ├── marketplace/           # Strategy registry
-│   ├── sentinel/              # Agent performance scoring
-│   ├── hub/                   # Settlement Hub (x402 & MPP escrow)
-│   └── skill-vault/           # x402 payment gate
-├── scripts/                   # Servers, agent bots, and MCP
-│   ├── x402_server.ts         # x402 paid API (@x402/express + OZ Channels facilitator)
-│   ├── mpp_server.ts          # MPP Charge paid API (@stellar/mpp + mppx)
-│   ├── neural_reasoner_bot.ts # x402 buyer agent (DeepSeek-R1 + @x402/fetch)
-│   ├── mpp_agent_bot.ts       # MPP Charge buyer agent (mppx.fetch + sponsorship)
-│   ├── x402_agent_bot.ts      # x402 fleet testing agent
-│   └── mcp_server.ts          # MCP server for AI IDEs
-└── deploy_agentic_layer.sh    # Contract deployment script
+├── apps/web/               → Next.js 15 dashboard (nirium.xyz)
+├── packages/agent/         → Express API server (api.nirium.xyz)
+├── packages/sdk/           → TypeScript SDK v0.5.0
+├── packages/sdk-python/    → Python SDK v0.5.0
+├── packages/contracts/     → Soroban smart contracts (Rust)
+├── packages/cli/           → CLI tool
+├── packages/mcp/           → MCP server (Claude Desktop / Cursor)
+└── scripts/                → x402/MPP bots, postinstall, deploy
 ```
 
-## How the x402 Flow Works (Canonical)
+## Security
 
-Uses `@x402/express` server middleware + `@x402/fetch` client with OZ Channels facilitator.
+- **JARGUS Audit v2.0**: 78/78 vectors PASS, 0 critical, 0 high (April 2026)
+- Formal third-party audit planned (Soroban layer: SCF Audit Bank eligible, 95% subsidy)
+- See [SECURITY.md](SECURITY.md) for vulnerability disclosure policy
 
-```
-1. Agent GET /skills/whale-tracker
-   └── @x402/express middleware returns 402 + payment requirements
+## Roadmap
 
-2. @x402/fetch client automatically:
-   └── Builds Soroban SAC USDC transfer
-   └── Signs AUTH ENTRIES only (not full tx envelope)
-   └── Retries with X-PAYMENT header
+| Phase | Status |
+|---|---|
+| Core infrastructure + x402/MPP on Testnet | ✅ Complete |
+| Institutional API (44 endpoints) + SDKs v0.5.0 | ✅ Complete |
+| JARGUS Security Audit v2.0 (78/78 PASS) | ✅ Complete |
+| SCF Round 43 Build Award application | ⏳ April 26, 2026 deadline |
+| Formal third-party security audit | Planned (Mes 3, Isacap JV) |
+| Mainnet deployment | Post-audit |
 
-3. Server middleware forwards to OZ Channels facilitator:
-   ���── /verify — validates auth entry
-   └── /settle — submits tx to Stellar (~5s)
-   └── Facilitator pays all network fees (agent needs zero XLM)
+## Contact
 
-4. Agent receives 200 + premium data (live whale movements from Horizon)
-```
+- **Website**: [nirium.xyz](https://nirium.xyz)
+- **API**: [api.nirium.xyz](https://api.nirium.xyz)
+- **X/Twitter**: [@NiriumXYZ](https://x.com/Niriumstellar)
+- **Security**: security@nirium.xyz
 
-The Skill Vault contract provides an alternative on-chain path where payment verification and skill access are atomic within a single Soroban invocation.
+## Legal
 
-## How the MPP Charge Flow Works (Canonical)
-
-Uses `mppx` server middleware + `@stellar/mpp/charge/client` with pull mode.
-
-```
-1. Agent GET /signals/trading
-   └── mppx middleware returns 402 + payment challenge
-
-2. mppx.fetch() client automatically:
-   └── Signs Soroban SAC auth entries
-   └── mode: "pull" — server assembles + broadcasts the transaction
-   └── Soroban SAC USDC transfer settled on-chain
-
-3. Agent receives 200 + paid data (trading signals, whale alerts)
-```
-
-The Settlement Hub contract provides a complementary session-based path: a human locks a USDC budget in Soroban escrow via `open_session()`, the agent settles intents within the budget via `settle_intent()`, and unspent funds are refunded on `close_session()`.
-
-## Verified Testnet Transactions
-
-Every agent payment is a real, verifiable Stellar Testnet transaction. Here are live transaction hashes from our e2e test runs:
-
-### x402 Payments (Agent pays for skills via Soroban auth-entry signing + OZ facilitator)
-
-| Skill | USDC | Transaction Hash |
-| :--- | :--- | :--- |
-| Whale Tracker | $0.05 | [`473a679e...`](https://stellar.expert/explorer/testnet/tx/473a679e3e098e945de5f924236f5f90d6992e1eb568a313e0de98a652eda32e) |
-| Arbitrage Bot | $0.02 | [`7dff5b29...`](https://stellar.expert/explorer/testnet/tx/7dff5b29f269f780ffeb3069810c6f95be2cdc054c4981983a723ff9bff54420) |
-
-### MPP Charge Payments (Soroban SAC USDC transfers, server-sponsored fees)
-
-| Service | USDC | Transaction Hash |
-| :--- | :--- | :--- |
-| Trading Signals | $0.01 | [`cdefaf72...`](https://stellar.expert/explorer/testnet/tx/cdefaf72a115b703c2ef5de1cfe36632b3c3012c586da059b2000517742fee49) |
-| Whale Alerts | $0.02 | [`7f2ff3e5...`](https://stellar.expert/explorer/testnet/tx/7f2ff3e50531c7322ddb92a5023a00b28d01263e580ff8d4fe0e141bf1302d5e) |
-| Sentiment Analysis | $0.01 | [`6c17e598...`](https://stellar.expert/explorer/testnet/tx/6c17e5981d4d5053bc3137d747bb6291c1ebc9fce427efa71e818c6cb93d6261) |
-
-### Other On-Chain Evidence
-
-| Action | Transaction Hash |
-| :--- | :--- |
-| Treasury XLM → USDC swap | [`d1b1cf2b...`](https://stellar.expert/explorer/testnet/tx/d1b1cf2b1d5adf1cee4ef183139d613636373efd2fc46c5eb0f7e80d712c6cf9) |
-| Agent USDC setup (x402) | [`0761acd9...`](https://stellar.expert/explorer/testnet/tx/0761acd95c355b3e0ed9733251d678398c9ebb8e6fc558c6c9c244e324f4b826) |
-| Agent USDC setup (MPP) | [`d124ae63...`](https://stellar.expert/explorer/testnet/tx/d124ae6372bc1a9653f6f9454db6ba82489bc072ccca127e496107ea9bdd4431) |
-
-All transactions are verifiable on [Stellar Expert](https://stellar.expert/explorer/testnet).
-
-## SDKs
-
-| SDK | Package | Version |
-| :--- | :--- | :--- |
-| TypeScript | [`nirium`](https://www.npmjs.com/package/nirium) | 0.3.0 |
-| Python | [`nirium`](https://pypi.org/project/nirium/) | 0.3.0 |
-
-Both SDKs include x402 and MPP client wrappers for building agents that pay for services autonomously.
-
-## Why Nirium for Institutions
-
-1. **Automated Financial Outcomes**: Reduces FX slippage and treasury overhead by replacing manual desks with 24/7 autonomous agents.
-2. **Real-World Asset Integration**: Native support for **CETES** (Mexican Treasury Bonds) via Etherfuse for institutional liquidity management.
-3. **Dual Protocol Settlement**: x402 for on-demand intelligence; MPP for secure, session-based budget delegation.
-4. **Auditability & Observability**: Full IPFS-stored audit trails and the Neural Feed show the "why" behind every execution for compliance teams.
-5. **Zero-Friction Liquidity**: Agents are born with sponsored accounts—no XLM reserves needed to start moving USDC or CETES.
-6. **Local-First Sovereign AI**: DeepSeek-R1 via Ollama ensures that financial reasoning stays private and within the institution's control.
-7. **Published SDKs**: npm + PyPI packages with x402/MPP client wrappers for any developer to build agents.
+[Terms of Service](https://nirium.xyz/terms) · [Risk Disclosure](https://nirium.xyz/risk-disclosure) · [Privacy Policy](https://nirium.xyz/privacy) · [Disclaimers](https://nirium.xyz/disclaimers)
 
 ---
-**Built for the Agents on Stellar Hackathon 2026.**
+*Nirium Protocol — experimental software. Not financial advice. Testnet only.*

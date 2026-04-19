@@ -1,43 +1,53 @@
-# 🧠 Nirium Web — Neural Matrix Dashboard
+# nirium-web
 
-This is the frontend for the **Nirium Protocol**, built with **Next.js 15 (App Router)**. It provides a real-time institutional-grade interface for managing autonomous AI agents on the Stellar network.
+Next.js 15 dashboard for the Nirium Protocol — [nirium.xyz](https://nirium.xyz)
 
-## ⚡ Features
-- **Neural Particle Field**: GPGPU-powered real-time visualization of the agent swarm.
-- **Glassmorphic UI**: High-fidelity design system using physics-based rendering.
-- **Real-Time Leaderboard**: WebSocket-driven ELO rankings via Supabase.
-- **Visual Strategy Builder**: Node-based editor for designing complex DeFi logic.
-- **On-Chain Analytics**: Deep integration with Horizon and Soroban RPC for performance tracking.
+## Stack
 
-## 🚀 Getting Started
+- Next.js 15.1.7 / React 19
+- TypeScript 5 / Tailwind CSS
+- Zustand 5 (state) / React Query 5 (server state)
+- Stellar SDK 14.5 + Freighter wallet
+- Supabase JS 2 (Realtime)
+- Three.js / Framer Motion / Recharts
 
-1. **Install Dependencies**:
+## Local Development
+
 ```bash
+# from repo root
 pnpm install
-```
-
-2. **Configure Environment**:
-Create a `.env.local` file with:
-- `NEXT_PUBLIC_SUPABASE_URL`
-- `NEXT_PUBLIC_SUPABASE_ANON_KEY`
-- `NEXT_PUBLIC_STELLAR_NETWORK` (testnet/mainnet)
-
-3. **Run Development Server**:
-```bash
 pnpm dev
 ```
 
-4. **Build for Production**:
-```bash
-pnpm build
-pnpm start
+Opens at [http://localhost:3000](http://localhost:3000). Requires Freighter browser extension in Testnet mode.
+
+## Environment Variables
+
+Copy `.env.example` to `.env.local`:
+
+```
+NEXT_PUBLIC_SUPABASE_URL=https://your-project.supabase.co
+NEXT_PUBLIC_SUPABASE_ANON_KEY=...
+NEXT_PUBLIC_CONTRACT_VAULT=CDHDX63NUYSFCIPJTTS46N5PYLTI7J5WIAIOP7TZSPBNUTLI32AY7GA2
+NEXT_PUBLIC_HORIZON_URL=https://horizon-testnet.stellar.org
 ```
 
-## 🏗️ Architecture
-- **`/app`**: Next.js App Router routes and layouts.
-- **`/components`**: Reusable React components (Atomic UI).
-- **`/lib`**: Utility functions and Stellar SDK wrappers.
-- **`/hooks`**: Custom React hooks for data fetching and WebSocket sync.
+The agent API URL defaults to `https://api.nirium.xyz`. For local dev set `NEXT_PUBLIC_AGENT_API_URL=http://localhost:3001`.
 
----
-**Part of the Nirium Protocol Swarm.**
+## Pages
+
+| Route | Description |
+|---|---|
+| `/` | Landing page |
+| `/dashboard` | Main operator dashboard |
+| `/marketplace` | Skills marketplace |
+| `/agents` | Swarm agent list |
+| `/analytics` | Analytics |
+| `/treasury` | Treasury / revenue |
+| `/sandbox` | Sandbox account request |
+| `/docs` | Documentation |
+| `/leaderboard` | Agent leaderboard |
+
+## Deploy
+
+Deployed via `pnpm deploy` from the repo root (Vercel CLI). Git auto-deploy is disabled.

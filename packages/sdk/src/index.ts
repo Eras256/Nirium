@@ -1,5 +1,5 @@
 // ═══════════════════════════════════════════════════════════════
-// nirium v0.3.0 — Official TypeScript SDK (x402 + MPP)
+// nirium v0.4.0 — Official TypeScript SDK (x402 + MPP)
 // ═══════════════════════════════════════════════════════════════
 
 import WebSocket from 'ws';
@@ -60,6 +60,28 @@ export interface ExecutionResult {
     timestamp: string;
     network: string;
     details?: Record<string, unknown>;
+}
+
+export interface Ticker {
+    symbol: string;
+    price: number | null;
+    volume24h: number | null;
+    change24h: number | null;
+    network: string;
+}
+
+export interface TickersResponse {
+    tickers: Ticker[];
+    timestamp: string;
+    network: string;
+}
+
+export interface GlobalStats {
+    totalExecutions: number;
+    totalProfit: number;
+    activeAgents: number;
+    network: string;
+    timestamp: string;
 }
 
 export interface PathPaymentRoute {
@@ -189,10 +211,20 @@ export class Agent {
         path: string,
         body?: Record<string, unknown>
     ): Promise<T> {
+        return this.requestWithHeaders(method, path, body, {});
+    }
+
+    private async requestWithHeaders<T>(
+        method: string,
+        path: string,
+        body?: Record<string, unknown>,
+        extraHeaders?: Record<string, string>
+    ): Promise<T> {
         const url = `${this.baseUrl}${path}`;
         const headers: Record<string, string> = {
             'Content-Type': 'application/json',
             'x-api-key': this.apiKey,
+            ...extraHeaders,
         };
 
         const options: RequestInit = { method, headers };
@@ -235,29 +267,52 @@ export class Agent {
     // ─── Execution ───────────────────────────────────────────
 
     /**
-     * Execute a strategy (routed to actual Soroban contract).
+     * Execute a strategy via a real Soroban contract transaction on Stellar.
      * Strategy names: flash-loan-arb, path-arbitrage, cross-dex, blend-yield, soroswap-swap
+     *
+     * @param stellarAccount - Your Stellar wallet address (required for legal consent verification)
      */
     async execute(
         strategy: string,
         asset: string,
-        params?: Record<string, unknown>
+        params?: Record<string, unknown>,
+        stellarAccount?: string
     ): Promise<ExecutionResult> {
-        return this.request('POST', '/api/execute', { strategy, asset, params });
+        const extraHeaders: Record<string, string> = {};
+        if (stellarAccount) {
+            extraHeaders['x-stellar-account'] = stellarAccount;
+        }
+        return this.requestWithHeaders('POST', '/api/execute', { strategy, asset, ...params }, extraHeaders);
     }
 
     /**
      * Demo execution (Soroban dry-run simulation, no TX submitted).
+     * Returns a professional market assessment message.
      */
-    async executeDemo(strategy: string, asset: string): Promise<ExecutionResult> {
+    async executeDemo(strategy: string, asset: string): Promise<{
+        success: boolean;
+        simulated_profit: number;
+        gas_consumed: number;
+        message: string;
+    }> {
         return this.request('POST', '/api/execute-demo', { strategy, asset });
     }
 
     // ─── Market Data ─────────────────────────────────────────
 
+    /** Get asset price tickers (XLM, USDC) from Stellar Horizon. */
+    async getTickers(): Promise<TickersResponse> {
+        return this.request('GET', '/api/tickers');
+    }
+
     /** Get current market state (real data from Horizon). */
     async getMarket(): Promise<MarketState> {
         return this.request('GET', '/api/market');
+    }
+
+    /** Get global protocol statistics. */
+    async getStats(): Promise<GlobalStats> {
+        return this.request('GET', '/api/stats/global');
     }
 
     /** Get autonomous loop status. */

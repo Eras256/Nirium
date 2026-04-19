@@ -44,6 +44,25 @@ export interface ExecutionResult {
     network: string;
     details?: Record<string, unknown>;
 }
+export interface Ticker {
+    symbol: string;
+    price: number | null;
+    volume24h: number | null;
+    change24h: number | null;
+    network: string;
+}
+export interface TickersResponse {
+    tickers: Ticker[];
+    timestamp: string;
+    network: string;
+}
+export interface GlobalStats {
+    totalExecutions: number;
+    totalProfit: number;
+    activeAgents: number;
+    network: string;
+    timestamp: string;
+}
 export interface PathPaymentRoute {
     source: string;
     destination: string;
@@ -171,6 +190,7 @@ export declare class Agent {
     private mppClient;
     constructor(config: AgentConfig);
     private request;
+    private requestWithHeaders;
     /** Health check — returns true if agent is reachable. */
     ping(): Promise<boolean>;
     /** Detailed health information. */
@@ -178,16 +198,28 @@ export declare class Agent {
     /** Detailed system health (Horizon, Soroban, WebSocket, IPFS, LLM). */
     systemHealth(): Promise<SystemHealth>;
     /**
-     * Execute a strategy (routed to actual Soroban contract).
+     * Execute a strategy via a real Soroban contract transaction on Stellar.
      * Strategy names: flash-loan-arb, path-arbitrage, cross-dex, blend-yield, soroswap-swap
+     *
+     * @param stellarAccount - Your Stellar wallet address (required for legal consent verification)
      */
-    execute(strategy: string, asset: string, params?: Record<string, unknown>): Promise<ExecutionResult>;
+    execute(strategy: string, asset: string, params?: Record<string, unknown>, stellarAccount?: string): Promise<ExecutionResult>;
     /**
      * Demo execution (Soroban dry-run simulation, no TX submitted).
+     * Returns a professional market assessment message.
      */
-    executeDemo(strategy: string, asset: string): Promise<ExecutionResult>;
+    executeDemo(strategy: string, asset: string): Promise<{
+        success: boolean;
+        simulated_profit: number;
+        gas_consumed: number;
+        message: string;
+    }>;
+    /** Get asset price tickers (XLM, USDC) from Stellar Horizon. */
+    getTickers(): Promise<TickersResponse>;
     /** Get current market state (real data from Horizon). */
     getMarket(): Promise<MarketState>;
+    /** Get global protocol statistics. */
+    getStats(): Promise<GlobalStats>;
     /** Get autonomous loop status. */
     getLoopStatus(): Promise<LoopStatus>;
     /** Start the autonomous scanning loop. */

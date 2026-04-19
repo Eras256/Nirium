@@ -1,7 +1,7 @@
 openapi: 3.1.0
 info:
   title: Nirium Protocol API
-  version: 1.0.0
+  version: 2.5.0
   description: |
     **Nirium Protocol** - Autonomous AI Agent Matrix on Stellar/Soroban
 
@@ -61,7 +61,7 @@ info:
     - **Discord:** https://discord.gg/nirium
   contact:
     name: Nirium Protocol Support
-    email: support@nirium.xyz
+    email: xvaiosx7@gmail.com
     url: https://nirium.xyz
   license:
     name: MIT
@@ -106,7 +106,7 @@ paths:
     get:
       tags: [Public]
       summary: Health check
-      description: Simple health endpoint to verify API availability
+      description: Simple health endpoint to verify API availability. No authentication required.
       operationId: getHealth
       responses:
         '200':
@@ -118,21 +118,14 @@ paths:
                 properties:
                   status:
                     type: string
-                    example: operational
-                  version:
+                    enum: [online, degraded, offline]
+                    example: online
+                  service:
                     type: string
-                    example: 0.1.0
-                  uptime:
-                    type: number
-                    description: Uptime in seconds
-                    example: 3600
-                  network:
+                    example: nirium-matrix-v2.5
+                  matrix:
                     type: string
-                    enum: [testnet, mainnet]
-                    example: testnet
-                  timestamp:
-                    type: string
-                    format: date-time
+                    example: stable
 
   /api/info:
     get:
@@ -304,6 +297,38 @@ paths:
                     type: array
                     items:
                       $ref: '#/components/schemas/QuickstartStep'
+
+  /api/tickers:
+    get:
+      tags: [Market Data]
+      summary: Asset price tickers
+      description: |
+        Real-time asset price tickers derived from Stellar Horizon order books.
+        Returns XLM and USDC prices. No deep authentication required — standard API key sufficient.
+      operationId: getTickers
+      security:
+        - bearerAuth: []
+        - apiKeyAuth: []
+      responses:
+        '200':
+          description: Current asset tickers
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  tickers:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Ticker'
+                  timestamp:
+                    type: string
+                    format: date-time
+                  network:
+                    type: string
+                    enum: [testnet, mainnet]
+        '401':
+          $ref: '#/components/responses/Unauthorized'
 
   # ========================================
   # SANDBOX ENDPOINTS
@@ -593,14 +618,35 @@ paths:
   /api/execute:
     post:
       tags: [Execution]
-      summary: Execute strategy (production)
+      summary: Execute strategy (live Soroban transaction)
       description: |
-        Execute a trading strategy with real funds on Stellar network.
-        Requires authentication and sufficient quotas.
+        Execute a trading strategy via a real Soroban smart contract invocation on Stellar.
+        Builds an XDR transaction envelope, simulates it, signs it, submits to the network,
+        and polls for on-chain confirmation. Returns the transaction hash and profit.
+
+        **Required headers:**
+        - `x-api-key` — your institutional API key
+        - `x-stellar-account` — your Stellar wallet address (used for legal consent verification)
+
+        **Available strategies:**
+        - `flash-loan-arb` → `flash_loan_execute`
+        - `path-arbitrage` → `execute_path_arbitrage`
+        - `cross-dex` → `execute_cross_dex`
+        - `blend-yield` → `execute_blend_yield`
+        - `soroswap-swap` → `execute_soroswap_swap`
       operationId: postExecute
       security:
         - bearerAuth: []
         - apiKeyAuth: []
+      parameters:
+        - name: x-stellar-account
+          in: header
+          required: true
+          schema:
+            type: string
+            pattern: '^G[A-Z0-9]{55}$'
+          description: Stellar wallet address for legal consent verification
+          example: GCVVQUDCIHIMZLIZCWPMCORWOX32OX5NVU2EMT7S2DRV2VOVPLEMINR3
       requestBody:
         required: true
         content:
@@ -609,7 +655,7 @@ paths:
               $ref: '#/components/schemas/ExecuteRequest'
       responses:
         '200':
-          description: Execution result
+          description: Strategy executed and confirmed on-chain
           content:
             application/json:
               schema:
@@ -618,17 +664,36 @@ paths:
           $ref: '#/components/responses/BadRequest'
         '401':
           $ref: '#/components/responses/Unauthorized'
+        '403':
+          description: Legal consent missing or wallet not enrolled
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: "Forbidden: Legal Consent Required (Missing x-stellar-account header)"
+                  code:
+                    type: string
+                    example: LEGAL_CONSENT_REQUIRED
+                  hint:
+                    type: string
         '429':
           $ref: '#/components/responses/RateLimitExceeded'
 
   /api/execute-demo:
     post:
       tags: [Execution]
-      summary: Execute strategy (demo/simulation)
+      summary: Execute strategy (Soroban dry-run simulation)
       description: |
-        Execute a trading strategy in simulation mode.
-        No real funds are used. Great for testing and development.
+        Execute a trading strategy in simulation mode using Soroban's simulateTransaction.
+        No transaction is submitted to the network. Safe to call repeatedly.
+        Returns a professional market assessment message regardless of simulation outcome.
       operationId: postExecuteDemo
+      security:
+        - bearerAuth: []
+        - apiKeyAuth: []
       requestBody:
         required: true
         content:
@@ -639,17 +704,35 @@ paths:
               properties:
                 strategy:
                   type: string
-                  example: scan
+                  enum: [flash-loan-arb, path-arbitrage, cross-dex, blend-yield, soroswap-swap]
+                  example: path-arbitrage
                 asset:
                   type: string
                   example: XLM
       responses:
         '200':
-          description: Demo execution result
+          description: Simulation result with market assessment
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ExecuteResponse'
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  simulated_profit:
+                    type: number
+                    description: Simulated profit in stroops (0 means no arbitrage window)
+                    example: 10
+                  gas_consumed:
+                    type: number
+                    description: Estimated gas in stroops
+                    example: 19417
+                  message:
+                    type: string
+                    enum:
+                      - "Arbitrage window detected — executing strategy"
+                      - "No arbitrage window detected — market conditions stable"
         '400':
           $ref: '#/components/responses/BadRequest'
 
@@ -1300,38 +1383,92 @@ components:
         reasoning:
           type: string
 
+    Ticker:
+      type: object
+      properties:
+        symbol:
+          type: string
+          example: XLM
+        price:
+          type: number
+          nullable: true
+          description: Price in USD (XLM) or XLM per unit (USDC)
+          example: 0.112
+        volume24h:
+          type: number
+          nullable: true
+          description: 24h volume proxy (SDEX spread for XLM)
+        change24h:
+          type: number
+          nullable: true
+          description: 24h price change percentage (not yet implemented)
+        network:
+          type: string
+          enum: [testnet, mainnet]
+
     ExecuteRequest:
       type: object
-      required: [strategy, asset]
+      required: [strategy]
       properties:
         strategy:
           type: string
-          example: buy
+          enum: [flash-loan-arb, path-arbitrage, cross-dex, blend-yield, soroswap-swap]
+          description: Strategy maps to a specific NiriumVault contract function
+          example: path-arbitrage
         asset:
           type: string
+          description: Base asset symbol
           example: XLM
-        params:
-          type: object
-          properties:
-            amount:
-              type: number
-            maxPrice:
-              type: number
+        amount:
+          type: number
+          description: Amount in stroops (1 XLM = 10,000,000 stroops). Default 1000.
+          example: 1000
 
     ExecuteResponse:
       type: object
       properties:
         success:
           type: boolean
+          example: true
         txHash:
           type: string
-          description: Stellar transaction hash
-        strategy:
+          description: 64-character hex Stellar transaction hash (verifiable on Stellar Expert)
+          example: de3ffdc726c58b52aee36dd7e9afd3ee1bdad2595c5b7c01f789b8ea2a541347
+        profit:
+          type: number
+          description: Actual profit returned by the contract in stroops
+          example: 10
+        gasUsed:
+          type: number
+          description: Soroban resource fee in stroops
+          example: 19417
+        timestamp:
           type: string
-        asset:
+          format: date-time
+        network:
           type: string
-        result:
+          enum: [testnet, mainnet]
+        details:
           type: object
+          properties:
+            strategy:
+              type: string
+            asset:
+              type: string
+            method:
+              type: string
+              description: Actual Soroban contract function called
+              example: execute_path_arbitrage
+            executionTime:
+              type: number
+              description: Total execution time in milliseconds
+            contractId:
+              type: string
+              description: NiriumVault contract address
+              example: CAU2XBJTQUBTMPAUFRX7GMZ337I5WLBI4GYPWHZEVXTMJ66D3CP6DEL4
+        error:
+          type: string
+          description: Present only when success is false
 
     LoopStatus:
       type: object

@@ -42,7 +42,7 @@ agent.subscribe((signal) => {
 |---|---|
 | Health | `ping()`, `health()`, `systemHealth()` |
 | Execution | `execute()`, `executeDemo()` |
-| Market | `getMarket()`, `getLoopStatus()`, `startLoop()`, `stopLoop()`, `triggerScan()` |
+| Market | `getTickers()`, `getMarket()`, `getStats()`, `getLoopStatus()`, `startLoop()`, `stopLoop()`, `triggerScan()` |
 | Signals | `createSubscription()`, `getRecentSignals()` |
 | Skills | `getSkills()`, `installSkill()`, `uninstallSkill()` |
 | Webhooks | `registerWebhook()`, `getWebhooks()`, `deleteWebhook()`, `testWebhook()` |
