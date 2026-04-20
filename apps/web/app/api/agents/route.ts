@@ -24,7 +24,14 @@ export async function GET() {
             return NextResponse.json([], { status: 200 });
         }
 
-        const data = await res.json();
+        const raw = await res.json();
+        // Filter out protocol/simulator addresses that are not swarm agents
+        const NON_AGENT_ADDRESSES = new Set([
+            'GC4Q5TWWXI7IHN6DYCBEKCOWJWCKY4JE2NLKLU5SE3YL44IUUFPKUOPC', // Soroban simulator key / x402 payTo
+        ]);
+        const data = Array.isArray(raw)
+            ? raw.filter((a: any) => !NON_AGENT_ADDRESSES.has(a.wallet_address))
+            : raw;
         return NextResponse.json(data);
     } catch (e) {
         console.error('[API /agents] Error:', e);

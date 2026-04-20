@@ -52,7 +52,7 @@ The LLM layer advises. The contract decides. A compromised LLM cannot drain fund
 
 ### 3.1 NiriumVault — Primary Execution Contract
 
-**Contract ID:** `CDHDX63NUYSFCIPJTTS46N5PYLTI7J5WIAIOP7TZSPBNUTLI32AY7GA2`
+**Contract ID:** `CAU2XBJTQUBTMPAUFRX7GMZ337I5WLBI4GYPWHZEVXTMJ66D3CP6DEL4`
 **Active Vault:** ID 2000 (production, agent delegated)
 
 Core functions:
@@ -72,11 +72,11 @@ Core functions:
 
 | Contract | ID | Purpose |
 |---|---|---|
-| ELO Reputation | `CC6Z3WJWRKVEAXEKIQ5S3LFEMKRF4L2FTN5YZDQU27MQRQAWA5QBJWF2` | On-chain agent performance scoring (ELO 1200 base, K=32) |
-| Strategy Marketplace | `CB6Q3LKBJ7CAAZY4MK7EG5R6FDDTJHB52ZEENI6BQLBJNFKBQRIAUABC` | Strategy CID registry, ELO-weighted subscriptions |
+| ELO Reputation | `CDSDNMJQYPNGJM2GALM7Z2GFTXTUNX7GITUFFIE6JD4AGEMSWM5FYK7Z` | On-chain agent performance scoring (ELO 1200 base, K=32) |
+| Strategy Marketplace | `CBOJ5M4AM3C4YCZJC5KDE4NRHYQEZZFKIOIMW53DPIUWLNA6GAYK74H5` | Strategy CID registry, ELO-weighted subscriptions |
 | Neural Sentinel | `CCP5OY3TTDVIREQYGOUZUXS2MZJO3LLJD6Z22Z3VROWFCPJAON22WPY2` | Agent performance reporting, score storage |
 | Settlement Hub | `CANZP2OJUS2Y5VXE4YHRR75LE2WKE7QTJOCCWENR7X65DWE6QEJZV6KS` | MPP session escrow (open/settle/close) |
-| Skill Vault | `CB4JM3PP7GWKJUAYIZ7ZULWFTFJ57FTTUFZTFIDF4JCAPF664OJCXIEI` | x402 payment gate, atomic skill unlock |
+| Skill Vault | `CC5HUV5RA2LHFD7IXFSROB7OO4BXCWHH42Y2KY6SWRKS3DELZ2GSJ2UW` | x402 payment gate, atomic skill unlock |
 
 ---
 
@@ -128,7 +128,7 @@ The Nirium API (`api.nirium.xyz`) exposes 44 endpoints across 11 categories, dep
 
 **Admin:** `/api/system/health`, `/api/config/llm`
 
-**x402 Premium:** `/api/v1/premium/signals` ($0.01 USDC), `/api/v1/premium/market` ($0.01 USDC)
+**x402 Premium:** `/api/v1/premium/signals` ($0.02 USDC), `/api/v1/premium/market` ($0.05 USDC)
 
 ### 4.3 WebSocket Real-Time Signals
 JWT-authenticated WebSocket stream. Events: `signal` (arbitrage/yield signal), `log` (agent execution log), `connected`. Reconnects automatically. Used for real-time dashboard feeds and signal-triggered strategy execution.
@@ -143,7 +143,7 @@ JWT-authenticated WebSocket stream. Events: `signal` (arbitrage/yield signal), `
 
 ```
 Agent → GET /api/v1/premium/signals
-     ← 402 + payment requirements (0.01 USDC, stellar:testnet)
+     ← 402 + payment requirements (0.02 USDC, stellar:testnet)
 Agent → signs Soroban SAC auth entry (SEP-41)
      → GET + X-PAYMENT header
      ← 200 + premium signal data
@@ -167,7 +167,7 @@ The `@nirium/mcp` package implements a Model Context Protocol server exposing Ni
 
 Free tools: `get_market_state`, `get_loop_status`, `start_loop`, `stop_loop`, `execute_demo`, `get_system_health`
 
-Paid tools (x402): `get_premium_signals` ($0.01), `get_premium_market` ($0.01), `execute_paid_strategy` ($0.05)
+Paid tools (x402): `get_premium_signals` ($0.02), `get_premium_market` ($0.05), `execute_paid_strategy` ($0.25)
 
 ---
 
@@ -339,7 +339,7 @@ Key tables: `agent_logs`, `auth_keys`, `nirium_swarm_agents`, `sandbox_accounts`
 **Protocol fees (software licensing, not financial intermediation):**
 - Variable license: 0.5% volume (Remzy/anchor client) — 0.6–0.8% (external clients)
 - Agent deployment: 12.5 XLM one-time
-- x402 API calls: $0.01–$0.05 USDC per request
+- x402 API calls: $0.02–$0.25 USDC per request
 - Total corridor cost for clients: 1.3% (Remzy) — 1.4–1.6% (external)
 
 **Legal classification (software-only):**

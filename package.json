@@ -20,7 +20,8 @@
   "pnpm": {
     "overrides": {
       "handlebars": ">=4.7.9",
-      "defu": ">=6.1.5"
+      "defu": ">=6.1.5",
+      "axios": "^1.15.0"
     }
   },
   "dependencies": {

@@ -86,6 +86,13 @@ Any AI agent (Claude, GPT, custom) can pay for premium Nirium intelligence per-r
 ### Audit Trail Engine
 Every agent action: HMAC-SHA256 signed → logged to Supabase → IPFS CID via Pinata → LLM-translated to human-readable summary. Exportable as encrypted JSON. Compliance-ready without blockchain expertise.
 
+### Institutional Monetization Model
+Nirium uses a tiered high-frequency micropayment model via x402 and MPP protocols:
+- **Premium Signals:** 0.02 USDC per request
+- **Enriched Market Data:** 0.05 USDC per request
+- **Soroban Execution:** 0.25 USDC per transaction
+- **Institutional Custom:** Bulk API tiers (300+ RPM) with dedicated throughput
+
 ### Published SDKs
 
 | SDK | Package | Version |
@@ -114,12 +121,12 @@ result = await agent.execute("path-arb", "XLM-USDC", {"amount": 5000}, stellar_a
 
 | Contract | Contract ID |
 |---|---|
-| **NiriumVault** (primary, Vault 2000 active) | `CDHDX63NUYSFCIPJTTS46N5PYLTI7J5WIAIOP7TZSPBNUTLI32AY7GA2` |
-| ELO Reputation | `CC6Z3WJWRKVEAXEKIQ5S3LFEMKRF4L2FTN5YZDQU27MQRQAWA5QBJWF2` |
-| Strategy Marketplace | `CB6Q3LKBJ7CAAZY4MK7EG5R6FDDTJHB52ZEENI6BQLBJNFKBQRIAUABC` |
+| **NiriumVault** (primary, Vault 2000 active) | `CAU2XBJTQUBTMPAUFRX7GMZ337I5WLBI4GYPWHZEVXTMJ66D3CP6DEL4` |
+| ELO Reputation | `CDSDNMJQYPNGJM2GALM7Z2GFTXTUNX7GITUFFIE6JD4AGEMSWM5FYK7Z` |
+| Strategy Marketplace | `CBOJ5M4AM3C4YCZJC5KDE4NRHYQEZZFKIOIMW53DPIUWLNA6GAYK74H5` |
 | Neural Sentinel | `CCP5OY3TTDVIREQYGOUZUXS2MZJO3LLJD6Z22Z3VROWFCPJAON22WPY2` |
 | Settlement Hub | `CANZP2OJUS2Y5VXE4YHRR75LE2WKE7QTJOCCWENR7X65DWE6QEJZV6KS` |
-| Skill Vault | `CB4JM3PP7GWKJUAYIZ7ZULWFTFJ57FTTUFZTFIDF4JCAPF664OJCXIEI` |
+| Skill Vault | `CC5HUV5RA2LHFD7IXFSROB7OO4BXCWHH42Y2KY6SWRKS3DELZ2GSJ2UW` |
 
 All verifiable on [Stellar Expert (Testnet)](https://stellar.expert/explorer/testnet).
 
@@ -185,7 +192,7 @@ nirium-core-private/
 - **Website**: [nirium.xyz](https://nirium.xyz)
 - **API**: [api.nirium.xyz](https://api.nirium.xyz)
 - **X/Twitter**: [@NiriumXYZ](https://x.com/Niriumstellar)
-- **Security**: security@nirium.xyz
+- **Security**: xvaiosx7@gmail.com
 
 ## Legal
 

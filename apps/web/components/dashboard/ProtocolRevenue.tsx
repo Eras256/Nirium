@@ -23,55 +23,89 @@ interface RevenueStats {
 
 export default function ProtocolRevenue({ compact = false }: { compact?: boolean }) {
     const [events, setEvents]   = useState<PaymentEvent[]>([]);
-    const [stats, setStats]     = useState<RevenueStats>({ 
-        totalUsdc: 142.50,
-        last24h: 12.10, 
-        requestCount: 42, 
+    const [stats, setStats]     = useState<RevenueStats>({
+        totalUsdc: 0,
+        last24h: 0,
+        requestCount: 0,
         lastPayment: null,
-        eloHealth: 1450 
+        eloHealth: 1450
     });
     const [loading, setLoading] = useState(true);
 
-    const treasury = "GBBD47IF6LWK7P7MDEVSCWR7DPUWV3NY3DTQEVFL4NAT4AQH3ZLLFLA5"; 
+    const treasury = "GC4Q5TWWXI7IHN6DYCBEKCOWJWCKY4JE2NLKLU5SE3YL44IUUFPKUOPC"; 
 
     const fetchRevenue = useCallback(async () => {
         try {
-            const res = await fetch(`https://horizon-testnet.stellar.org/accounts/${treasury}/payments?order=desc&limit=50`);
-            const data = await res.json();
-            
-            if (data?._embedded?.records) {
-                const rows = data._embedded.records.filter((r: any) => r.type === 'payment' || r.type === 'path_payment_strict_receive');
-                
-                const parsed = rows.map((r: any) => {
-                    const val = parseFloat(r.amount);
-                    let routeName = "/settle";
-                    if (val === 0.10) routeName = "/strategies/premium";
-                    if (val > 0.5) routeName = "/mpp/subscribe";
+            // Fetch up to 200 ops (4 pages) for full historical revenue
+            const USDC_ISSUER = 'GBBD47IF6LWK7P7MDEVSCWR7DPUWV3NY3DTQEVFL4NAT4AQH3ZLLFLA5';
+            // Buyer cycles: x402_signal → x402_market → mpp_signal → mpp_market (all $0.01)
+            const CYCLE_ROUTES = ['/x402/signal', '/x402/market', '/mpp/signal', '/mpp/market'];
 
-                    return {
-                        id: r.id,
-                        txHash: r.transaction_hash || r.transaction_id || r.id,
-                        message: `from=${r.from} | amount=${r.amount} | route=${routeName}`,
-                        created_at: r.created_at,
-                        from: r.from,
-                        route: routeName,
-                        amount: r.amount
-                    };
-                });
-
-                const total = parsed.reduce((sum: number, e: any) => sum + parseFloat(e.amount || '0'), 0);
-                const cutoff = new Date(Date.now() - 86_400_000).toISOString();
-                const last24 = parsed.filter((e: any) => e.created_at > cutoff).reduce((sum: number, e: any) => sum + parseFloat(e.amount || '0'), 0);
-
-                setEvents(parsed);
-                setStats(prev => ({
-                    ...prev,
-                    totalUsdc:    Math.round((142.50 + total) * 100) / 100,
-                    last24h:      Math.round(last24 * 100) / 100,
-                    requestCount: 42 + parsed.length,
-                    lastPayment:  parsed[0]?.created_at || null,
-                }));
+            let allRecords: any[] = [];
+            let url = `https://horizon-testnet.stellar.org/accounts/${treasury}/operations?order=desc&limit=50`;
+            for (let page = 0; page < 4; page++) {
+                const res = await fetch(`${url}&_t=${Date.now()}`);
+                const json = await res.json();
+                const records: any[] = json?._embedded?.records ?? [];
+                allRecords = allRecords.concat(records);
+                const nextUrl = json?._links?.next?.href;
+                if (!nextUrl || records.length < 50) break;
+                url = nextUrl.replace(/_t=\d+/, '');
             }
+
+            const parsed = allRecords.reduce((acc: PaymentEvent[], r: any) => {
+                let amount: string | null = null;
+                let from = r.from || 'Contract';
+
+                if (r.type === 'invoke_host_function') {
+                    const change = r.asset_balance_changes?.find(
+                        (c: any) => c.to === treasury &&
+                            c.asset_code === 'USDC' && c.asset_issuer === USDC_ISSUER
+                    );
+                    if (change) { amount = change.amount; from = change.from || from; }
+                } else if (
+                    (r.type === 'payment' || r.type === 'path_payment_strict_receive') &&
+                    r.to === treasury && r.asset_code === 'USDC' && r.asset_issuer === USDC_ISSUER
+                ) {
+                    amount = r.amount; from = r.from || from;
+                }
+
+                if (!amount) return acc;
+
+                const val = parseFloat(amount);
+                let routeName: string;
+                if (val <= 0.01)       routeName = CYCLE_ROUTES[acc.length % CYCLE_ROUTES.length];
+                else if (val <= 0.02)  routeName = '/x402/arbitrage';
+                else if (val <= 0.05)  routeName = '/x402/premium';
+                else if (val <= 0.10)  routeName = '/mpp/market';
+                else                   routeName = '/mpp/subscribe';
+
+                acc.push({
+                    id: r.id,
+                    txHash: r.transaction_hash || r.transaction_id || r.id,
+                    message: `from=${from} | amount=${amount} USDC | route=${routeName}`,
+                    created_at: r.created_at,
+                    from,
+                    route: routeName,
+                    amount,
+                });
+                return acc;
+            }, []);
+
+            const total  = parsed.reduce((s: number, e: any) => s + parseFloat(e.amount || '0'), 0);
+            const cutoff = new Date(Date.now() - 86_400_000).toISOString();
+            const last24 = parsed
+                .filter((e: any) => e.created_at > cutoff)
+                .reduce((s: number, e: any) => s + parseFloat(e.amount || '0'), 0);
+
+            setEvents(parsed);
+            setStats(prev => ({
+                ...prev,
+                totalUsdc:    Math.round(total * 100) / 100,
+                last24h:      Math.round(last24 * 100) / 100,
+                requestCount: parsed.length,
+                lastPayment:  parsed[0]?.created_at || null,
+            }));
         } catch {
             // silent
         } finally {

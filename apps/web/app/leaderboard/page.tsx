@@ -45,12 +45,16 @@ interface LeaderboardEntry {
     avatar: string;
 }
 
-function agentToEntry(agent: SwarmAgent, rank: number): LeaderboardEntry {
+function agentToEntry(agent: SwarmAgent, rank: number, xlmUsd: number, xlmMxn: number): LeaderboardEntry {
     let tier: LeaderboardEntry['tier'] = 'bronze';
     const elo = agent.elo_onchain || 1200;
     if (elo >= 2000) tier = 'matrix';
     else if (elo >= 1500) tier = 'gold';
     else if (elo >= 1000) tier = 'silver';
+
+    // CETES ≈ 1 MXN (Etherfuse Stablebond, 1:1 with Mexican peso)
+    const volumeUSDC = (agent.total_volume * xlmUsd).toFixed(4);
+    const volumeCETES = (agent.total_volume * xlmMxn).toFixed(4);
 
     return {
         rank,
@@ -60,8 +64,8 @@ function agentToEntry(agent: SwarmAgent, rank: number): LeaderboardEntry {
         sorobanTxs: agent.soroban_txs,
         sdexTxs: agent.sdex_txs,
         volume: agent.total_volume.toFixed(4),
-        volumeUSDC: (agent.total_volume * 0.134).toFixed(4),
-        volumeCETES: (agent.total_volume * 2.25).toFixed(4),
+        volumeUSDC,
+        volumeCETES,
         lastTxHash: agent.last_tx_hash,
         lastActivity: agent.last_activity,
         eloOnchain: agent.elo_onchain,
@@ -87,6 +91,9 @@ export default function LeaderboardPage() {
     const [isLoading, setIsLoading] = useState(true);
     const [isLive, setIsLive] = useState(false);
     const [lastUpdate, setLastUpdate] = useState<Date | null>(null);
+    // Live XLM prices: USD for USDC column, MXN for CETES column (1 CETES ≈ 1 MXN)
+    const [xlmUsd, setXlmUsd] = useState(0.12);
+    const [xlmMxn, setXlmMxn] = useState(2.0);
 
     // ── Enrich leaderboard entries with on-chain ELO scores ────
     const enrichWithOnChainScores = async (entries: LeaderboardEntry[]): Promise<LeaderboardEntry[]> => {
@@ -114,6 +121,26 @@ export default function LeaderboardPage() {
         return enriched.map((e, i) => ({ ...e, rank: i + 1 }));
     };
 
+    // ── CoinGecko XLM price feed (refreshes every 60s) ────────
+    useEffect(() => {
+        const fetchPrices = async () => {
+            try {
+                const res = await fetch(
+                    'https://api.coingecko.com/api/v3/simple/price?ids=stellar&vs_currencies=usd,mxn',
+                    { cache: 'no-store' }
+                );
+                if (res.ok) {
+                    const json = await res.json();
+                    if (json?.stellar?.usd) setXlmUsd(json.stellar.usd);
+                    if (json?.stellar?.mxn) setXlmMxn(json.stellar.mxn);
+                }
+            } catch { /* keep defaults */ }
+        };
+        fetchPrices();
+        const priceInterval = setInterval(fetchPrices, 60000);
+        return () => clearInterval(priceInterval);
+    }, []);
+
     // ── Initial fetch & Polling ────────────────────────────────
     useEffect(() => {
         let isMounted = true;
@@ -128,7 +155,7 @@ export default function LeaderboardPage() {
                 const data = await res.json();
 
                 if (data && data.length > 0 && isMounted) {
-                    const entries = data.map((a: any, i: number) => agentToEntry(a as SwarmAgent, i + 1));
+                    const entries = data.map((a: any, i: number) => agentToEntry(a as SwarmAgent, i + 1, xlmUsd, xlmMxn));
                     // Enrich with real on-chain ELO from Soroban contracts
                     const enriched = await enrichWithOnChainScores(entries);
                     if (isMounted) {
@@ -153,6 +180,15 @@ export default function LeaderboardPage() {
             clearInterval(pollInterval);
         };
     }, []);
+
+    // ── Recompute USDC/CETES volumes when prices refresh ──────
+    useEffect(() => {
+        setLeaderboard(prev => prev.map(entry => ({
+            ...entry,
+            volumeUSDC: (parseFloat(entry.volume) * xlmUsd).toFixed(4),
+            volumeCETES: (parseFloat(entry.volume) * xlmMxn).toFixed(4),
+        })));
+    }, [xlmUsd, xlmMxn]);
 
     const top3 = leaderboard.slice(0, 3);
     const rest = leaderboard.slice(3);
@@ -206,6 +242,9 @@ export default function LeaderboardPage() {
                                     Updated {lastUpdate.toLocaleTimeString()}
                                 </span>
                             )}
+                            <span className="text-[10px] text-gray-700 font-mono">
+                                XLM ${xlmUsd.toFixed(4)} · {xlmMxn.toFixed(2)} MXN
+                            </span>
                         </div>
                     </div>
 
@@ -213,7 +252,7 @@ export default function LeaderboardPage() {
                     <div className="hidden lg:flex flex-col items-end text-right">
                         <div className="text-[10px] font-black text-gray-500 uppercase tracking-[0.4em] mb-2">NETWORK STATUS</div>
                         <div className="px-4 py-2 bg-green-500/10 border border-green-500/20 text-green-400 text-xs font-mono rounded-lg animate-pulse">
-                            UPLINK_STABLE_v0.7
+                            UPLINK_STABLE_v0.5
                         </div>
                     </div>
                 </div>
