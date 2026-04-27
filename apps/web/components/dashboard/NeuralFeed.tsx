@@ -13,7 +13,10 @@ interface Thought {
     timestamp: string;
 }
 
+import { useLanguage } from "@/context/LanguageContext";
+
 export default function NeuralFeed() {
+    const { t } = useLanguage();
     const [thoughts, setThoughts] = useState<Thought[]>([]);
 
     useEffect(() => {
@@ -34,7 +37,7 @@ export default function NeuralFeed() {
         <div className="bg-[#050505] border border-stellar-teal/30 rounded-2xl p-6 font-mono overflow-hidden h-[400px] flex flex-col">
             <div className="flex items-center gap-2 mb-4 border-b border-stellar-teal/20 pb-3">
                 <Brain className="w-5 h-5 text-stellar-teal animate-pulse" />
-                <h2 className="text-xs font-bold uppercase tracking-[0.3em] text-stellar-teal">Neural Reasoning Feed</h2>
+                <h2 className="text-xs font-bold uppercase tracking-[0.3em] text-stellar-teal">{t.dashboard.neural_feed.title}</h2>
                 <div className="ml-auto flex items-center gap-1">
                     <div className="w-1.5 h-1.5 rounded-full bg-green-500 animate-ping" />
                     <span className="text-[10px] text-green-500/70">DEEPSEEK_R1_ACTIVE</span>
@@ -64,7 +67,7 @@ export default function NeuralFeed() {
                 {thoughts.length === 0 && (
                     <div className="h-full flex flex-col items-center justify-center opacity-20">
                         <Terminal className="w-8 h-8 mb-2" />
-                        <p className="text-[10px]">AWAITING NEURAL SIGNALS...</p>
+                        <p className="text-[10px]">{t.dashboard.neural_feed.waiting}</p>
                     </div>
                 )}
             </div>

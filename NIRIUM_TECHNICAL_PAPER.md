@@ -1,7 +1,7 @@
-# Nirium Protocol: Technical Whitepaper v2.0
+# Nirium Protocol: Technical Whitepaper v2.1
 > Institutional DeFi Infrastructure Powered by Autonomous Agents on Stellar/Soroban
 
-**Version:** 2.0 — April 2026
+**Version:** 2.1 — April 2026 (Updated April 22)
 **Author:** Nirium Protocol Team — Nirium Protocol
 **Network:** Stellar Testnet (Mainnet post-audit)
 **Contact:** xvaiosx7@gmail.com
@@ -52,7 +52,7 @@ The LLM layer advises. The contract decides. A compromised LLM cannot drain fund
 
 ### 3.1 NiriumVault — Primary Execution Contract
 
-**Contract ID:** `CAU2XBJTQUBTMPAUFRX7GMZ337I5WLBI4GYPWHZEVXTMJ66D3CP6DEL4`
+**Contract ID:** `CDHDX63NUYSFCIPJTTS46N5PYLTI7J5WIAIOP7TZSPBNUTLI32AY7GA2`
 **Active Vault:** ID 2000 (production, agent delegated)
 
 Core functions:
@@ -72,11 +72,11 @@ Core functions:
 
 | Contract | ID | Purpose |
 |---|---|---|
-| ELO Reputation | `CDSDNMJQYPNGJM2GALM7Z2GFTXTUNX7GITUFFIE6JD4AGEMSWM5FYK7Z` | On-chain agent performance scoring (ELO 1200 base, K=32) |
-| Strategy Marketplace | `CBOJ5M4AM3C4YCZJC5KDE4NRHYQEZZFKIOIMW53DPIUWLNA6GAYK74H5` | Strategy CID registry, ELO-weighted subscriptions |
+| ELO Reputation | `CC6Z3WJWRKVEAXEKIQ5S3LFEMKRF4L2FTN5YZDQU27MQRQAWA5QBJWF2` | On-chain agent performance scoring (ELO 1200 base, K=32) |
+| Strategy Marketplace | `CB6Q3LKBJ7CAAZY4MK7EG5R6FDDTJHB52ZEENI6BQLBJNFKBQRIAUABC` | Strategy CID registry, ELO-weighted subscriptions |
 | Neural Sentinel | `CCP5OY3TTDVIREQYGOUZUXS2MZJO3LLJD6Z22Z3VROWFCPJAON22WPY2` | Agent performance reporting, score storage |
 | Settlement Hub | `CANZP2OJUS2Y5VXE4YHRR75LE2WKE7QTJOCCWENR7X65DWE6QEJZV6KS` | MPP session escrow (open/settle/close) |
-| Skill Vault | `CC5HUV5RA2LHFD7IXFSROB7OO4BXCWHH42Y2KY6SWRKS3DELZ2GSJ2UW` | x402 payment gate, atomic skill unlock |
+| Skill Vault | `CB4JM3PP7GWKJUAYIZ7ZULWFTFJ57FTTUFZTFIDF4JCAPF664OJCXIEI` | x402 payment gate, atomic skill unlock |
 
 ---
 
@@ -232,7 +232,7 @@ Use case: AI agent dynamically moves capital between USDC (US yield) and CETES (
 
 Nirium's path arbitrage engine operates on Stellar SDEX — the deepest on-chain order book for XLM/USDC. Total corridor cost: 0.8% (0.3% AMM hop × 2 + 0.2% slippage). Gas: ~$0.000001 per operation.
 
-For institutional clients: fee structure is 0.5% B2B (Remzy rate) to 0.8% (external clients), invoiced monthly as software license — not financial intermediation.
+For institutional clients: fee structure is 0.5% B2B (Regulated Operator rate) to 0.8% (external clients), invoiced monthly as software license — not financial intermediation.
 
 ---
 
@@ -268,9 +268,11 @@ Internal security framework (Kali Linux). Result: **78/78 PASS, 0 critical, 0 hi
 - `timingSafeEqual` for all key comparisons
 
 ### 9.4 Formal Audit Plan
-Formal third-party audit planned for Month 3 of Isacap JV:
+Formal third-party audit planned for Month 3 of Institutional Partner JV (contracts signed April 20, 2026):
 - Soroban layer ($25K–$30K): SCF Audit Bank eligible (95% subsidy)
-- Server/API pen test ($10K–$15K): funded by Isacap
+- Server/API pen test ($10K–$15K): funded by Institutional Partner
+- SCF Round 43 Build Award application: deadline April 26, 2026 (up to $150K milestone-based)
+- Etherfuse partnership grant: ~$150K potential, technical call pending
 
 ### 9.5 Pending Pre-Mainnet (non-blocking for Testnet)
 SEP-10, SEP-24, SEP-31, SEP-12/Travel Rule, Bug Bounty, Proof of Reserves, Sanctions Screening (Chainalysis/Elliptic).
@@ -337,17 +339,17 @@ Key tables: `agent_logs`, `auth_keys`, `nirium_swarm_agents`, `sandbox_accounts`
 ## 12. Economic Model
 
 **Protocol fees (software licensing, not financial intermediation):**
-- Variable license: 0.5% volume (Remzy/anchor client) — 0.6–0.8% (external clients)
+- Variable license: 0.5% volume (Regulated Operator/anchor client) — 0.6–0.8% (external clients)
 - Agent deployment: 12.5 XLM one-time
-- x402 API calls: $0.02–$0.25 USDC per request
-- Total corridor cost for clients: 1.3% (Remzy) — 1.4–1.6% (external)
+- x402 API calls: $0.01–$0.05 USDC per request
+- Total corridor cost for clients: 1.3% (Regulated Operator) — 1.4–1.6% (external)
 
 **Legal classification (software-only):**
-All revenue streams classified as software licensing under LRITF Art. 22, LMV Arts. 225–226, Banxico Circular 4/2019. Holding never touches transactional flow. Isacap/Remzy is the sole regulated operator.
+All revenue streams classified as software licensing under LRITF Art. 22, LMV Arts. 225–226, Banxico Circular 4/2019. Holding never touches transactional flow. Partner/Regulated Operator is the sole regulated operator.
 
 **3-Year Projections:**
-- Scenario A (Pedro ecosystem only): ~$993K USD cumulative
-- Scenario B (Pedro + external, 18% CNBV market): ~$1.45M USD cumulative
+- Scenario A (Lead Investor ecosystem only): ~$993K USD cumulative
+- Scenario B (Lead Investor + external, 18% CNBV market): ~$1.45M USD cumulative
 - Break-even: Month 6–7 post Go-Live
 
 ---
@@ -356,8 +358,8 @@ All revenue streams classified as software licensing under LRITF Art. 22, LMV Ar
 
 Nirium is the infrastructure layer where institutional DeFi and the agentic economy converge on Stellar. Institutions get automated treasury operations with full auditability and compliance-ready output. AI agents get a protocol they can pay into and execute against without human intermediation.
 
-The protocol's deployment on Stellar Testnet — 44 API endpoints, 30 autonomous agents, 6 Soroban contracts, x402/MPP payment protocols, multi-LLM support, published SDKs, and JARGUS-verified security — establishes the architectural foundation for mainnet readiness pending formal third-party audit.
+The protocol's deployment on Stellar Testnet — 44 API endpoints, 30 autonomous agents, 6 Soroban contracts, x402/MPP payment protocols, multi-LLM support, MCP server (12 tools, 13/13 PASS), published SDKs (npm + PyPI), JARGUS-verified security (78/78 PASS), and a signed institutional partnership with a CNBV-regulated operator — establishes the architectural foundation for mainnet readiness pending formal third-party audit.
 
 ---
 
-*Nirium Protocol — experimental software. Not financial advice. Not an investment product. Testnet operations only.*
+*Nirium Protocol — experimental software. Not financial advice. Not an investment product. Testnet operations only. Updated April 22, 2026.*

@@ -296,6 +296,22 @@ export async function vaultWithdraw(callerAddress: string, vaultId: number, amou
 }
 
 /**
+ * Delegate execution access to an agent on a vault (must be called before revoke_agent)
+ */
+export async function vaultDelegateAgent(callerAddress: string, vaultId: number, agentAddress: string, maxAmount: bigint = BigInt(1_000_000_000)) {
+    return invokeContract({
+        contractId: CONTRACT_IDS.VAULT,
+        method: 'delegate_agent',
+        args: [
+            nativeToScVal(vaultId, { type: 'u64' }),
+            Address.fromString(agentAddress).toScVal(),
+            nativeToScVal(maxAmount, { type: 'i128' }),
+        ],
+        callerAddress,
+    });
+}
+
+/**
  * Revoke an agent's access to a vault (Used as on-chain termination log)
  */
 export async function vaultRevokeAgent(callerAddress: string, vaultId: number, agentAddress: string, silent = false) {

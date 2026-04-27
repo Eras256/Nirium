@@ -24,7 +24,7 @@ import { useVault, useEloReputation } from "@/hooks/useNiriumContracts";
 import { getWebSocketUrl } from "@/lib/constants";
 import { simulateSorobanTx } from "@/lib/stellarSim";
 import { handleWalletError } from "@/components/wallet/WalletErrorHandler";
-import { NATIVE_ASSET_ID, USDC_ASSET_ID, CETES_ASSET_ID, vaultDeposit, vaultWithdraw, vaultCreate, vaultClose, vaultRevokeAgent, vaultGetVaultCount, CETES_ASSET, getCETESBalance, hasCETESTrustline } from "@/lib/sorobanContracts";
+import { NATIVE_ASSET_ID, USDC_ASSET_ID, CETES_ASSET_ID, vaultDeposit, vaultWithdraw, vaultCreate, vaultClose, vaultRevokeAgent, vaultDelegateAgent, vaultGetVaultCount, CETES_ASSET, getCETESBalance, hasCETESTrustline } from "@/lib/sorobanContracts";
 import { generateOnboardingUrl, getOrCreateCustomerIds } from "@/lib/etherfuseApi";
 import MarketTicker from "@/components/dashboard/MarketTicker";
 import NeuralOrb from "@/components/dashboard/NeuralOrb";
@@ -136,6 +136,7 @@ function DashboardContent() {
     const [onChainVaultCount, setOnChainVaultCount] = useState<number | null>(null);
     const [onChainTotalFees, setOnChainTotalFees] = useState<number | null>(null);
     const [onChainElo, setOnChainElo] = useState<number | null>(null);
+    const [globalActiveAgents, setGlobalActiveAgents] = useState<number | null>(null);
     const vault = useVault();
     const elo = useEloReputation();
 
@@ -148,7 +149,7 @@ function DashboardContent() {
                     vault.getTotalFees(),
                 ]);
                 setOnChainVaultCount(count);
-                setOnChainTotalFees(fees);
+                setOnChainTotalFees(fees / 10_000_000); // convert stroops → XLM
                 if (accountStr) {
                     const score = await elo.getScore(accountStr);
                     setOnChainElo(score);
@@ -159,6 +160,24 @@ function DashboardContent() {
         };
         fetchOnChainData();
     }, [accountStr]);
+
+    // Fetch global active agents count from Supabase
+    useEffect(() => {
+        const fetchGlobalAgents = async () => {
+            try {
+                const { supabase } = await import('@/lib/supabase');
+                const { count } = await supabase
+                    .from('nirium_protocol_records')
+                    .select('*', { count: 'exact', head: true })
+                    .eq('record_type', 'STRATEGY')
+                    .eq('status', 'RUNNING');
+                setGlobalActiveAgents(count ?? 0);
+            } catch {
+                setGlobalActiveAgents(null);
+            }
+        };
+        fetchGlobalAgents();
+    }, []);
     const [vaultBalance, setVaultBalance] = useState<number>(0);
     const [vaultId, setVaultId] = useState<number | null>(null);
     const [ownerCapId, setOwnerCapId] = useState<string | null>(null);
@@ -508,8 +527,11 @@ function DashboardContent() {
                         });
                         const finalDeduped = Array.from(finalMap.values());
 
-                        // Filter out DRAFT strategies - only show RUNNING in Active Fleet
-                        const activeOnly = finalDeduped.filter(s => s.status !== 'DRAFT');
+                        // Filter out DRAFT strategies - show any RUNNING/active status
+                        const activeOnly = finalDeduped.filter(s => {
+                            const st = (s.status || '').toUpperCase();
+                            return st !== 'DRAFT' && st !== '';
+                        });
 
                         // Also clean up LocalStorage to prevent future issues
                         if (finalDeduped.length < merged.length) {
@@ -600,25 +622,42 @@ function DashboardContent() {
             const nativeBalance = await stellarClient.getBalance({ owner: account.address, coinType: 'XLM' }).then(b => Number(BigInt(b.totalBalance)) / 10_000_000);
 
             if (nativeBalance < REQUIRED_BALANCE) {
-                toast.error(`Insufficient Balance: You need at least ${REQUIRED_BALANCE} XLM for license fee + gas`, {
+                toast.error(t.dashboard.toasts.insufficient_balance.replace('{amount}', REQUIRED_BALANCE.toString()), {
                     description: `Detected: ${nativeBalance.toFixed(4)} XLM.`
                 });
                 return;
             }
 
             // REAL INSTITUTIONAL SOROBAN CALL
-            toast.loading("Invoking NiriumVault.create_vault...", { id: toastId });
+            toast.loading(t.dashboard.toasts.deploying_vault, { id: toastId });
             const result = await vault.createVault(account.address, NATIVE_ASSET_ID, currentStrategy.name);
 
             if (!result.success || !result.txHash) {
                 toast.dismiss(toastId);
-                toast.error("Deployment Failed", {
-                    description: result.error || "Check Freighter for details."
+                toast.error(t.dashboard.toasts.deployment_failed, {
+                    description: result.error || t.dashboard.toasts.check_freighter
                 });
                 return;
             }
 
             const txHash = result.txHash;
+
+            // Extract vault ID and store so stop flow can call close_vault
+            const newVaultData = result.result as any;
+            const newVaultId = newVaultData
+                ? Number(newVaultData.vault_id ?? newVaultData.vaultId ?? newVaultData[0] ?? NaN)
+                : NaN;
+            if (!isNaN(newVaultId)) {
+                const storageData = {
+                    vaultId: newVaultId,
+                    ownerCapId: `cap_${newVaultId}_${Date.now()}`,
+                    createdAt: Date.now(),
+                    txHash,
+                };
+                localStorage.setItem(`nirium-vault-v2-XLM-${account.address}`, JSON.stringify(storageData));
+                setVaultId(newVaultId);
+            }
+
             toast.dismiss(toastId);
             toast.success(`${currentStrategy.emoji} ${currentStrategy.name} Active!`, {
                 description: "Institutional Soroban Vault created.",
@@ -628,7 +667,7 @@ function DashboardContent() {
                 }
             });
 
-            // Save to Supabase & State
+            // Save to Supabase & State (vault_id in config so stop works after page reload)
             const { StrategyService } = await import("@/lib/strategyService");
             StrategyService.deployStrategy(account.address, {
                 strategy_id: strategyId,
@@ -637,7 +676,7 @@ function DashboardContent() {
                 status: "RUNNING",
                 yield: "~14.2%",
                 tx_digest: txHash,
-                config: {}
+                config: !isNaN(newVaultId) ? { vault_id: newVaultId } : {}
             }).then((newStrategy: any) => {
                 const strategyToAdd = {
                     id: newStrategy?.id || strategyId,
@@ -735,41 +774,68 @@ function DashboardContent() {
         const toastId = toast.loading("Sending Termination Signal...");
 
         try {
-            const { TransactionBuilder, Networks, Operation, Asset } = await import("@stellar/stellar-sdk");
-            // Assuming this is where it's defined
+            // Resolve vaultId: state → localStorage → Supabase config
+            let resolvedVaultId = vaultId;
+            if (resolvedVaultId === null && account?.address) {
+                for (const asset of ['USDC', 'XLM', 'CETES']) {
+                    try {
+                        const saved = localStorage.getItem(`nirium-vault-v2-${asset}-${account.address}`);
+                        if (saved) {
+                            const parsed = JSON.parse(saved);
+                            if (parsed?.vaultId != null && !isNaN(Number(parsed.vaultId))) {
+                                resolvedVaultId = Number(parsed.vaultId);
+                                break;
+                            }
+                        }
+                    } catch { /* skip */ }
+                }
+            }
+            // Last resort: read vault_id from the strategy's config in Supabase/localStorage
+            if (resolvedVaultId === null) {
+                const found = activeStrategies.find(s => s.id === dbId || s.strategy_id === dbId);
+                const configVaultId = found?.config?.vault_id;
+                if (configVaultId != null && !isNaN(Number(configVaultId))) {
+                    resolvedVaultId = Number(configVaultId);
+                }
+            }
 
-            const tx = new TransactionBuilder({
-                accountId: () => account.address,
-                sequenceNumber: () => "0",
-                incrementSequenceNumber: () => { }
-            } as any, { fee: "100" })
-                .setNetworkPassphrase(Networks.TESTNET)
-                .setTimeout(300);
-
-            // Stellar Termination: Simulated by sending a small XLM amount to oneself
-            tx.addOperation(Operation.payment({
-                destination: account.address,
-                asset: Asset.native(),
-                amount: "0.0001"
-            }));
-
-            const builtTx = tx.build();
-            const result = await signAndSubmitTransaction({ transaction: builtTx });
+            // Close vault on-chain — proper Soroban invocation, 1 Freighter signature
+            const localVaultId = resolvedVaultId;
+            const closeResult = localVaultId !== null
+                ? await vaultClose(account.address, localVaultId)
+                : null;
 
             toast.dismiss(toastId);
-            toast.success("Agent Stop Signal Confirmed", {
-                description: "Termination confirmation broadcast to Stellar network.",
-                action: {
-                    label: "View Tx",
-                    onClick: () => window.open(`https://stellar.expert/explorer/testnet/tx/${result.hash}`, "_blank")
-                }
-            });
-
-            writeLog(
-                `AGENT TERMINATED: Deployment removed from the fleet | tx: ${result.hash.slice(0, 12)}...`,
-                'warn',
-                account?.address
-            );
+            if (closeResult?.success && closeResult?.txHash) {
+                toast.success("Vault Closed", {
+                    description: `Vault #${localVaultId} terminated on Stellar Testnet.`,
+                    action: {
+                        label: "View Tx",
+                        onClick: () => window.open(`https://stellar.expert/explorer/testnet/tx/${closeResult.txHash}`, "_blank")
+                    }
+                });
+                writeLog(`VAULT CLOSED: #${localVaultId} | tx: ${closeResult.txHash.slice(0, 12)}...`, 'warn', account?.address);
+            } else {
+                // Fallback: signed memo tx so Freighter still prompts
+                const { Operation, Asset, Memo } = await import("@stellar/stellar-sdk");
+                const stratName = activeStrategies.find(s => s.id === dbId)?.name || dbId;
+                const tx = await buildStellarTransaction(account.address);
+                tx.addOperation(Operation.payment({
+                    destination: account.address,
+                    asset: Asset.native(),
+                    amount: "0.0001"
+                })).addMemo(Memo.text(`NIRIUM:STOP:${stratName.slice(0, 16)}`));
+                const builtTx = tx.build();
+                const result = await signAndSubmitTransaction({ transaction: builtTx });
+                toast.success("Agent Terminated", {
+                    description: "Termination logged on Stellar Testnet.",
+                    action: {
+                        label: "View Tx",
+                        onClick: () => window.open(`https://stellar.expert/explorer/testnet/tx/${result.hash}`, "_blank")
+                    }
+                });
+                writeLog(`AGENT TERMINATED: ${stratName} | tx: ${result.hash.slice(0, 12)}...`, 'warn', account?.address);
+            }
 
             // Step 2: Clean up locally
             setActiveStrategies(prev => prev.filter(s => s.id !== dbId));
@@ -949,6 +1015,20 @@ function DashboardContent() {
             }
         };
     }, []); // Runs once per mount
+    
+    // 🧪 Production Diagnostics: Test Supabase link on first load
+    useEffect(() => {
+        const testConn = async () => {
+            const hasTested = sessionStorage.getItem('nirium_diag_v1');
+            if (!hasTested) {
+                console.log('🧪 [Diag] Testing Supabase connectivity...');
+                const { writeLog } = await import('@/lib/logger');
+                await writeLog('SYSTEM_DIAGNOSTIC: Dashboard session initialized. Bridge status: OK.', 'system', 'DASHBOARD_UI');
+                sessionStorage.setItem('nirium_diag_v1', 'true');
+            }
+        };
+        testConn();
+    }, []);
 
 
 
@@ -1082,10 +1162,10 @@ function DashboardContent() {
                 // Immediately update wallet balance (subtract deposited amount)
                 setWalletBalance(prev => Math.max(0, prev - parseFloat(amount)));
 
-                toast.success("Deposit Successful", {
-                    description: `${amount} ${baseAsset} deposited to Vault on-chain.`,
+                toast.success(t.dashboard.toasts.deposit_success, {
+                    description: t.dashboard.toasts.deposit_desc.replace('{amount}', amount).replace('{asset}', baseAsset),
                     action: result.txHash ? {
-                        label: "View Tx",
+                        label: t.dashboard.toasts.view_tx,
                         onClick: () => window.open(`https://stellar.expert/explorer/testnet/tx/${result.txHash}`, "_blank")
                     } : undefined
                 });
@@ -1664,14 +1744,14 @@ function DashboardContent() {
     // --- ACCESS GUARD (Removed for guest viewing) ---
 
     return (
-        <div className="min-h-screen bg-nirium-obsidian pt-56 pb-12 px-4 md:px-8 relative overflow-hidden">
+        <div className="min-h-screen bg-nirium-obsidian pt-32 sm:pt-40 md:pt-48 lg:pt-56 pb-12 px-4 md:px-8 relative overflow-hidden">
             <Navbar />
-            <div className="flex items-center gap-6 mb-10 px-2 lg:px-0">
-                <SectionBrandLogo size="w-32 sm:w-40" className="!justify-start mb-0" />
-                <div className="hidden sm:block">
-                    <h1 className="text-3xl font-black text-white tracking-tight uppercase italic" style={{ fontFamily: 'Orbitron, sans-serif' }}>ORBITAL_DASHBOARD</h1>
+            <div className="flex flex-col sm:flex-row sm:items-center gap-4 sm:gap-6 mb-10 px-2 lg:px-0">
+                <SectionBrandLogo size="w-24 sm:w-32 md:w-40" className="!justify-start mb-0" />
+                <div className="flex flex-col">
+                    <h1 className="text-xl sm:text-2xl md:text-3xl font-black text-white tracking-tight uppercase italic" style={{ fontFamily: 'Orbitron, sans-serif' }}>{t.dashboard.title}</h1>
                     <div className="flex items-center gap-3">
-                        <p className="text-[10px] font-mono text-gray-500 tracking-[0.3em]">NEURAL_COMMAND_v0.7</p>
+                        <div className="px-1.5 py-0.5 bg-amber-500/10 border border-amber-500/20 rounded text-[8px] font-black text-amber-500 uppercase tracking-widest">{t.dashboard.version_live}</div>
                         <div className="flex gap-1">
                             <div className="w-1.5 h-1.5 rounded-full bg-stellar-teal animate-pulse" />
                             <div className="w-1.5 h-1.5 rounded-full bg-stellar-yellow animate-pulse delay-75" />
@@ -1701,11 +1781,11 @@ function DashboardContent() {
                                 <div className="absolute inset-0 bg-stellar-teal/20 rounded-full animate-ping group-hover:animate-none opacity-20"></div>
                                 <span className="text-2xl relative z-10">{currentStrategy.emoji}</span>
                             </div>
-                            <h2 className="text-xl font-bold text-white mb-1.5 leading-tight">Deploy {currentStrategy.name}?</h2>
+                            <h2 className="text-xl font-bold text-white mb-1.5 leading-tight">{t.dashboard.modals.deploy_title.replace('{name}', currentStrategy.name)}</h2>
                             <div className="bg-stellar-teal/5 border border-stellar-teal/20 p-3 rounded-lg mb-4">
                                 <div className="flex justify-between items-center text-[9px] text-gray-400 uppercase tracking-widest mb-0.5 font-mono">
-                                    <span>PROTOCOL FEE</span>
-                                    <span>AUTHORIZED</span>
+                                    <span>{t.dashboard.modals.fee_label}</span>
+                                    <span>{t.dashboard.modals.fee_approved}</span>
                                 </div>
                                 <p className="text-stellar-teal font-mono text-base font-bold flex justify-between items-baseline">
                                     <span>0.10</span>
@@ -1713,20 +1793,20 @@ function DashboardContent() {
                                 </p>
                             </div>
                             <p className="text-gray-400 mb-6 text-xs leading-relaxed max-w-[280px] mx-auto">
-                                Initializing autonomous logic gates. Deployment includes secure vault synchronization.
+                                {t.dashboard.modals.deploy_desc}
                             </p>
                             <div className="flex gap-3">
                                 <button
                                     onClick={() => setShowAutoStartModal(false)}
                                     className="flex-1 px-3 py-2.5 rounded-lg bg-white/5 border border-white/10 text-gray-400 hover:text-white hover:bg-white/10 transition-colors font-mono font-bold text-[10px]"
                                 >
-                                    CANCEL
+                                    {t.dashboard.modals.cancel}
                                 </button>
                                 <button
                                     onClick={confirmAutoStart}
                                     className="flex-1 px-3 py-2.5 rounded-lg bg-stellar-teal/20 border border-stellar-teal/50 text-stellar-teal hover:bg-stellar-teal hover:text-black transition-all font-mono font-bold text-[10px] shadow-[0_0_20px_rgba(0,243,255,0.2)] flex items-center justify-center gap-1.5 group"
                                 >
-                                    CONFIRM
+                                    {t.dashboard.modals.confirm}
                                     <ChevronRight size={12} className="group-hover:translate-x-1 transition-transform" />
                                 </button>
                             </div>
@@ -1974,7 +2054,7 @@ function DashboardContent() {
                                     onClick={() => setSelectedStrategy(null)}
                                     className="flex-1 px-4 py-3 rounded-xl font-bold text-xs bg-white/5 hover:bg-white/10 text-gray-300 transition-colors border border-white/5"
                                 >
-                                    CLOSE VIEW
+                                    CLOSE
                                 </button>
                                 <button
                                     onClick={() => {
@@ -1984,7 +2064,7 @@ function DashboardContent() {
                                     className="flex-1 px-4 py-3 rounded-xl font-bold text-xs bg-red-500/10 hover:bg-red-500/20 text-red-500 border border-red-500/20 transition-colors flex items-center justify-center gap-2 group"
                                 >
                                     <Trash2 size={14} className="group-hover:scale-110 transition-transform" />
-                                    TERMINATE AGENT
+                                    STOP HELPER
                                 </button>
                             </div>
                         </motion.div>
@@ -2032,7 +2112,7 @@ function DashboardContent() {
                                         onClick={() => setConfirmConfig(prev => ({ ...prev, isOpen: false }))}
                                         className="flex-1 px-4 py-2.5 rounded-lg bg-white/5 border border-white/10 text-gray-400 hover:text-white hover:bg-white/10 transition-all font-bold text-[10px]"
                                     >
-                                        DISMISS
+                                        {t.dashboard.toasts.dismiss}
                                     </button>
                                     <button
                                         onClick={confirmConfig.onConfirm}
@@ -2052,12 +2132,12 @@ function DashboardContent() {
             </AnimatePresence>
 
             {/* On-Chain Soroban Verifiable Stats */}
-            <div className="w-full max-w-[1600px] mx-auto grid grid-cols-2 md:grid-cols-4 gap-4 mb-4 relative z-10">
+            <div className="w-full max-w-[1600px] mx-auto grid grid-cols-1 xs:grid-cols-2 md:grid-cols-4 gap-4 mb-4 relative z-10">
                 <div className="glass-panel p-4 rounded-xl border border-stellar-teal/20 bg-stellar-teal/5 relative overflow-hidden group">
                     <div className="absolute top-0 right-0 w-24 h-24 bg-stellar-teal/10 rounded-full blur-2xl -translate-y-1/2 translate-x-1/2" />
                     <h3 className="text-xs text-stellar-teal uppercase tracking-wider mb-1 font-bold flex items-center gap-1.5 relative z-10">
                         <Shield size={12} />
-                        Your On-Chain ELO
+                        {t.dashboard.stats.reputation}
                     </h3>
                     <div className="text-xl font-mono text-stellar-teal font-black flex items-baseline gap-2 relative z-10">
                         {onChainElo !== null ? onChainElo : '...'}
@@ -2065,13 +2145,13 @@ function DashboardContent() {
                     </div>
                     <div className="text-[10px] text-gray-500 mt-1 font-mono flex items-center gap-1.5 relative z-10">
                         <div className="w-1.5 h-1.5 rounded-full bg-stellar-teal animate-pulse" />
-                        Soroban Verified
+                        {t.dashboard.stats.trust_verified}
                     </div>
                 </div>
                 <div className="glass-panel p-4 rounded-xl border border-white/5">
                     <h3 className="text-xs text-gray-400 uppercase tracking-wider mb-1 flex items-center gap-1.5">
                         <Activity size={12} />
-                        Global Vaults
+                        {t.dashboard.stats.wallets}
                     </h3>
                     <div className="text-xl font-mono text-white font-bold flex items-baseline gap-2">
                         {onChainVaultCount !== null ? onChainVaultCount : '--'}
@@ -2081,10 +2161,10 @@ function DashboardContent() {
                 <div className="glass-panel p-4 rounded-xl border border-white/5">
                     <h3 className="text-xs text-gray-400 uppercase tracking-wider mb-1 flex items-center gap-1.5">
                         <Globe size={12} />
-                        Global Active Agents
+                        {t.dashboard.stats.helpers}
                     </h3>
                     <div className="text-xl font-mono text-white font-bold flex items-baseline gap-2">
-                        30
+                        {globalActiveAgents !== null ? globalActiveAgents : '--'}
                         <span className="text-[10px] text-gray-600">NODES</span>
                     </div>
                 </div>
@@ -2092,19 +2172,20 @@ function DashboardContent() {
                     <div className="absolute top-0 right-0 w-24 h-24 bg-stellar-yellow/10 rounded-full blur-2xl -translate-y-1/2 translate-x-1/2" />
                     <h3 className="text-xs text-stellar-yellow uppercase tracking-wider mb-1 font-bold flex items-center gap-1.5 relative z-10">
                         <Database size={12} />
-                        Protocol Treasury
+                        {t.dashboard.stats.treasury}
+                        <span className="text-[8px] font-mono text-stellar-yellow/50 border border-stellar-yellow/20 px-1 py-0.5 rounded">TESTNET</span>
                     </h3>
                     <div className="text-xl font-mono text-stellar-yellow font-black flex items-baseline gap-2 relative z-10">
-                        {onChainTotalFees !== null ? onChainTotalFees.toFixed(1) : '0.0'}
+                        {onChainTotalFees !== null ? onChainTotalFees.toFixed(4) : '0.0000'}
                         <span className="text-[10px] text-stellar-yellow/60">XLM</span>
                     </div>
                 </div>
             </div>
 
             {/* Real-Time Analytics Bar */}
-            <div className="w-full max-w-[1600px] mx-auto grid grid-cols-2 md:grid-cols-5 gap-4 mb-8 relative z-10">
+            <div className="w-full max-w-[1600px] mx-auto grid grid-cols-1 xs:grid-cols-2 md:grid-cols-5 gap-4 mb-8 relative z-10">
                 <div className="glass-panel p-4 rounded-xl border border-white/5">
-                    <h3 className="text-xs text-gray-400 uppercase tracking-wider mb-1">Secure Vault TVL</h3>
+                    <h3 className="text-xs text-gray-400 uppercase tracking-wider mb-1">{t.dashboard.stats.secured_capital}</h3>
                     <div className="text-xl font-mono text-white font-bold">
                         {vaultBalance.toLocaleString(undefined, { maximumFractionDigits: 2 })} <span className="text-xs text-gray-500">{baseAsset}</span>
                     </div>
@@ -2135,7 +2216,7 @@ function DashboardContent() {
                 </div>
                 <div className="glass-panel p-4 rounded-xl border border-white/5">
                     <h3 className="text-xs text-gray-400 uppercase tracking-wider mb-1">
-                        Market Alpha ({baseAsset} APY)
+                        {t.dashboard.stats.efficiency} ({baseAsset})
                     </h3>
                     <div className="text-xl font-mono text-stellar-teal font-bold flex items-center gap-2">
                         {baseAsset === 'USDC'
@@ -2148,13 +2229,13 @@ function DashboardContent() {
                     </div>
                 </div>
                 <div className="glass-panel p-4 rounded-xl border border-white/5">
-                    <h3 className="text-xs text-gray-400 uppercase tracking-wider mb-1">Projected Yield (24H)</h3>
+                    <h3 className="text-xs text-gray-400 uppercase tracking-wider mb-1">{t.dashboard.stats.projected_accrual}</h3>
                     <div className="text-xl font-mono text-white font-bold">
                         +{(vaultBalance * ((blendData?.supplyApy || 0) / 100 / 365)).toFixed(4)} <span className="text-xs text-gray-500">{baseAsset}</span>
                     </div>
                 </div>
                 <div className="glass-panel p-4 rounded-xl border border-white/5">
-                    <h3 className="text-xs text-gray-400 uppercase tracking-wider mb-1">Active Neural Nets</h3>
+                    <h3 className="text-xs text-gray-400 uppercase tracking-wider mb-1">{t.dashboard.stats.helpers}</h3>
                     <div className="text-xl font-mono text-purple-400 font-bold">
                         {activeStrategies.length} <span className="text-xs text-gray-500">AGENTS</span>
                     </div>
@@ -2182,44 +2263,44 @@ function DashboardContent() {
                                 <div className="space-y-1">
                                     <div className="flex items-center gap-3">
                                         <h3 className="text-xl font-bold text-white flex items-center gap-2">
-                                            Main Trading Vault
-                                            {vaultId && <span className="text-[10px] bg-stellar-teal/10 text-stellar-teal px-2 py-0.5 rounded-full border border-stellar-teal/20">ACTIVE</span>}
+                                            {t.dashboard.vault_control.title}
+                                            {vaultId && <span className="text-[10px] bg-stellar-teal/10 text-stellar-teal px-2 py-0.5 rounded-full border border-stellar-teal/20">{t.dashboard.stats.status_active}</span>}
                                         </h3>
-                                        <div className="flex items-center bg-black/40 border border-white/10 rounded-lg p-1">
+                                        <div className="flex flex-wrap items-center bg-black/40 border border-white/10 rounded-lg p-1 gap-1">
                                             <button
                                                 onClick={() => setBaseAsset('USDC')}
-                                                className={`px-3 py-1 rounded-md text-xs font-bold transition-colors ${baseAsset === 'USDC' ? 'bg-stellar-yellow text-white shadow-lg' : 'text-gray-500 hover:text-white'}`}
+                                                className={`flex-1 sm:flex-none px-2 sm:px-3 py-1 rounded-md text-[10px] sm:text-xs font-bold transition-colors ${baseAsset === 'USDC' ? 'bg-stellar-yellow text-white shadow-lg' : 'text-gray-500 hover:text-white'}`}
                                             >
                                                 USDC
                                             </button>
                                             <button
                                                 onClick={() => setBaseAsset('XLM')}
-                                                className={`px-3 py-1 rounded-md text-xs font-bold transition-colors ${baseAsset === 'XLM' ? 'bg-[#4ca2ff] text-white shadow-lg' : 'text-gray-500 hover:text-white'}`}
+                                                className={`flex-1 sm:flex-none px-2 sm:px-3 py-1 rounded-md text-[10px] sm:text-xs font-bold transition-colors ${baseAsset === 'XLM' ? 'bg-[#4ca2ff] text-white shadow-lg' : 'text-gray-500 hover:text-white'}`}
                                             >
                                                 XLM
                                             </button>
                                             <button
                                                 onClick={() => setBaseAsset('CETES')}
-                                                className={`px-3 py-1 rounded-md text-xs font-bold transition-colors ${baseAsset === 'CETES' ? 'bg-green-600 text-white shadow-lg' : 'text-gray-500 hover:text-white'}`}
+                                                className={`flex-1 sm:flex-none px-2 sm:px-3 py-1 rounded-md text-[10px] sm:text-xs font-bold transition-colors ${baseAsset === 'CETES' ? 'bg-green-600 text-white shadow-lg' : 'text-gray-500 hover:text-white'}`}
                                                 title="Mexican Treasury Bonds (Etherfuse)"
                                             >
                                                 🇲🇽 CETES
                                             </button>
                                         </div>
                                     </div>
-                                    <p className="text-xs text-gray-500 font-mono mt-1">
+                                    <p className="text-[10px] sm:text-xs text-gray-500 font-mono mt-1">
                                         {vaultId ? `ID: ${vaultId}` : 'Vault ID: Not Created'} • {vaultBalance.toFixed(2)} {baseAsset} Locked
                                     </p>
-                                    <div className="flex items-center gap-2 pt-1">
+                                    <div className="flex flex-wrap items-center gap-2 pt-1">
                                         {vaultId ? (
                                             <span className="text-[10px] font-bold text-green-400 flex items-center gap-1.5 bg-green-500/5 px-2 py-1 rounded-lg border border-green-500/10">
                                                 <RefreshCw size={10} className="animate-spin-slow" />
-                                                AGENT ACCESS: GRANTED 🔓
+                                                {t.dashboard.vault_control.unlocked} 🔓
                                             </span>
                                         ) : (
                                             <span className="text-[10px] font-bold text-orange-400 flex items-center gap-1.5 bg-orange-500/5 px-2 py-1 rounded-lg border border-orange-500/10">
                                                 <Shield size={10} />
-                                                AGENT ACCESS: REVOKED 🔒
+                                                {t.dashboard.vault_control.locked} 🔒
                                             </span>
                                         )}
                                         {vaultId && (
@@ -2235,27 +2316,27 @@ function DashboardContent() {
                                 </div>
                             </div>
 
-                            <div className="flex items-center gap-3">
+                            <div className="flex flex-col sm:flex-row items-center gap-3 w-full sm:w-auto">
                                 {!vaultId ? (
                                     <button
                                         onClick={handleCreateVault}
-                                        className="bg-stellar-yellow text-black font-bold text-xs px-6 py-3 rounded-xl hover:bg-stellar-yellow/80 transition-all shadow-[0_0_20px_rgba(255,200,0,0.3)] animate-pulse"
+                                        className="w-full sm:w-auto bg-stellar-yellow text-black font-bold text-xs px-6 py-3 rounded-xl hover:bg-stellar-yellow/80 transition-all shadow-[0_0_20px_rgba(255,200,0,0.3)] animate-pulse"
                                     >
-                                        + INITIALIZE VAULT
+                                        {t.dashboard.vault_control.create_vault}
                                     </button>
                                 ) : (
-                                    <div className="flex gap-2">
+                                    <div className="flex flex-row sm:flex-row gap-2 w-full sm:w-auto">
                                         <button
                                             onClick={handleDeposit}
-                                            className="px-5 py-2.5 rounded-xl border border-white/10 bg-white/5 hover:bg-white/10 text-white text-xs font-bold transition-all hover:scale-105 active:scale-95 shadow-lg"
+                                            className="flex-1 sm:px-5 py-2.5 rounded-xl border border-white/10 bg-white/5 hover:bg-white/10 text-white text-xs font-bold transition-all hover:scale-105 active:scale-95 shadow-lg"
                                         >
-                                            Deposit
+                                            {t.dashboard.vault_control.deposit}
                                         </button>
                                         <button
                                             onClick={handleWithdraw}
-                                            className="px-5 py-2.5 rounded-xl border border-white/10 bg-white/5 hover:bg-white/10 text-gray-400 hover:text-white text-xs font-bold transition-all hover:scale-105 active:scale-95"
+                                            className="flex-1 sm:px-5 py-2.5 rounded-xl border border-white/10 bg-white/5 hover:bg-white/10 text-gray-400 hover:text-white text-xs font-bold transition-all hover:scale-105 active:scale-95"
                                         >
-                                            Withdraw
+                                            {t.dashboard.vault_control.withdraw}
                                         </button>
                                     </div>
                                 )}
@@ -2271,11 +2352,11 @@ function DashboardContent() {
                         <div className="flex justify-between items-center mb-6">
                             <h2 className="text-sm text-gray-400 uppercase tracking-widest flex items-center gap-2">
                                 <RefreshCw size={14} className={activeStrategies.length > 0 ? "animate-spin-slow text-stellar-teal" : "text-gray-600"} />
-                                Fleet Status Monitor ({activeStrategies.length}/10)
+                                {t.dashboard.stats.helpers} ({activeStrategies.length}/10)
                             </h2>
                             {activeStrategies.length === 0 && (
                                 <button onClick={handleDeploy} className="text-[10px] bg-stellar-yellow/10 text-stellar-yellow px-3 py-1.5 rounded-lg border border-stellar-yellow/20 hover:bg-stellar-yellow/20 transition-colors">
-                                    DEPLOY DEFAULT LOOP
+                                    {t.common.strategies}
                                 </button>
                             )}
                         </div>
@@ -2301,13 +2382,13 @@ function DashboardContent() {
                                                         <h3 className="font-bold text-sm leading-tight text-white">{strat.name}</h3>
                                                         <span className="text-[10px] text-green-400 font-mono flex items-center gap-1">
                                                             <span className="w-1.5 h-1.5 bg-green-400 rounded-full animate-pulse"></span>
-                                                            ACTIVE
+                                                            {t.dashboard.stats.status_active}
                                                         </span>
                                                     </div>
                                                 </div>
                                                 <div className="text-right">
                                                     <div className="text-stellar-teal font-mono font-bold animate-pulse-slow">{dynamicYield}</div>
-                                                    <div className="text-[9px] text-gray-500">REAL APY</div>
+                                                    <div className="text-[9px] text-gray-500">{t.dashboard.stats.efficiency}</div>
                                                 </div>
                                             </div>
 
@@ -2338,7 +2419,7 @@ function DashboardContent() {
                                                         <ExternalLink size={10} />
                                                     </a>
                                                 ) : (
-                                                    <span className="text-[10px] font-mono text-gray-500">Pending Execution...</span>
+                                                    <span className="text-[10px] font-mono text-gray-500">Starting up...</span>
                                                 )}
 
                                                 <button
@@ -2359,14 +2440,14 @@ function DashboardContent() {
                                     💤
                                 </div>
                                 <div className="space-y-1">
-                                    <p className="text-gray-400 font-medium">No agents currently deployed.</p>
-                                    <p className="text-xs text-gray-600 max-w-xs mx-auto">Initialize your Secure Vault and select a strategy to begin automated trading.</p>
+                                    <p className="text-gray-400 font-medium">No helpers running yet.</p>
+                                    <p className="text-xs text-gray-600 max-w-xs mx-auto">Create your wallet and pick a helper to start earning automatically.</p>
                                 </div>
                             </div>
                         )}
                     </div>
                     {/* Neural Feed // Uplink */}
-                    <div className="rounded-2xl h-[300px] flex flex-col relative mt-6">
+                    <div className="relative rounded-2xl h-[400px] flex flex-col mt-6 overflow-hidden">
                         <OpsConsole
                             isExpanded={expandConsole}
                             onToggleExpand={() => setExpandConsole(!expandConsole)}
@@ -2374,7 +2455,7 @@ function DashboardContent() {
                         />
                     </div>
                     {/* x402 Protocol Revenue & M2M Streams */}
-                    <div className="mt-6">
+                    <div className="relative rounded-2xl h-[400px] flex flex-col mt-6 overflow-hidden">
                         <ProtocolRevenue />
                     </div>
                 </motion.div>
@@ -2394,7 +2475,7 @@ function DashboardContent() {
                         </div>
 
                         <h3 className="text-sm text-gray-400 uppercase tracking-widest mb-4 flex items-center justify-between">
-                            Active Fleet
+                            Your Helpers
                             <span className="text-stellar-teal font-mono text-xs">{activeStrategies.length} ACTIVE</span>
                         </h3>
 
@@ -2403,9 +2484,9 @@ function DashboardContent() {
                                 <div className="w-12 h-12 rounded-full bg-white/5 flex items-center justify-center text-gray-600">
                                     <span className="text-2xl">💤</span>
                                 </div>
-                                <p className="text-sm text-gray-400">No agents running.</p>
+                                <p className="text-sm text-gray-400">No helpers running.</p>
                                 <button onClick={handleDeploy} className="text-xs bg-stellar-yellow/10 text-stellar-yellow px-3 py-1.5 rounded-lg border border-stellar-yellow/20 hover:bg-stellar-yellow/20 transition-colors">
-                                    Deploy Loop (v2.0)
+                                    Start My First Helper
                                 </button>
                             </div>
                         ) : (
@@ -2422,17 +2503,17 @@ function DashboardContent() {
                                             </div>
                                             <div className="text-right">
                                                 <div className="text-xs text-stellar-teal font-mono font-bold">{strat.yield}</div>
-                                                <div className="text-[9px] text-gray-500">TARGET APY</div>
+                                                <div className="text-[9px] text-gray-500">TARGET YIELD</div>
                                             </div>
                                         </div>
-                                        <div className="flex gap-2 mt-2">
+                                        <div className="flex flex-wrap gap-2 mt-2">
                                             <button
                                                 onClick={(e) => { e.stopPropagation(); setSelectedStrategy(strat); }}
-                                                className="flex-1 py-1.5 rounded bg-white/5 border border-white/10 text-[9px] font-bold text-gray-400 hover:text-white transition-colors"
+                                                className="flex-1 min-w-[70px] py-1.5 rounded bg-white/5 border border-white/10 text-[9px] font-bold text-gray-400 hover:text-white transition-colors"
                                             >
                                                 DETAILS
                                             </button>
-                                            <div className="flex items-center gap-1.5 px-2 py-1 rounded bg-stellar-blue/5 border border-stellar-blue/20">
+                                            <div className="flex-1 min-w-[120px] flex items-center justify-center gap-1.5 px-2 py-1 rounded bg-stellar-blue/5 border border-stellar-blue/20">
                                                 <Shield size={10} className="text-stellar-blue" />
                                                 <span className="text-[8px] font-bold text-stellar-blue whitespace-nowrap uppercase tracking-tighter">
                                                     {t.common.atomic_execution} — AUDITED
@@ -2440,7 +2521,7 @@ function DashboardContent() {
                                             </div>
                                             <button
                                                 onClick={() => stopStrategy(strat.id)}
-                                                className="px-3 bg-red-500/10 hover:bg-red-500/20 text-[10px] py-1.5 rounded transition-colors text-red-400 border border-red-500/20"
+                                                className="flex-none px-3 bg-red-500/10 hover:bg-red-500/20 text-[10px] py-1.5 rounded transition-colors text-red-400 border border-red-500/20"
                                             >
                                                 STOP
                                             </button>
@@ -2455,13 +2536,13 @@ function DashboardContent() {
                             <Link href="/strategies" className="w-full">
                                 <button className="w-full bg-white/5 hover:bg-white/10 text-[11px] font-bold py-2 rounded-xl transition-all border border-white/10 text-gray-300 flex items-center justify-center gap-2">
                                     <Zap className="w-3 h-3 text-stellar-teal" />
-                                    DEPLOY MORE AGENTS
+                                    ADD MORE HELPERS
                                 </button>
                             </Link>
                             <Link href="/strategies/builder" className="w-full">
                                 <button className="w-full bg-stellar-yellow/10 hover:bg-stellar-yellow/20 text-[11px] font-bold py-2 rounded-xl transition-all border border-stellar-yellow/20 text-stellar-yellow flex items-center justify-center gap-2">
                                     <Plus className="w-3 h-3" />
-                                    CREATE YOUR AGENT
+                                    BUILD YOUR OWN
                                 </button>
                             </Link>
                         </div>
@@ -2474,7 +2555,7 @@ function DashboardContent() {
                         transition={{ delay: 0.15 }}
                         className="glass-panel p-4 rounded-xl border border-white/5"
                     >
-                        <h3 className="text-xs text-gray-400 uppercase tracking-widest mb-3">Liquidity Intelligence</h3>
+                        <h3 className="text-xs text-gray-400 uppercase tracking-widest mb-3">Market Rates Right Now</h3>
                         <div className="grid grid-cols-2 gap-3">
                             <div className="bg-white/5 p-2 rounded border border-white/5 hover:border-stellar-teal/30 transition-colors">
                                 <div className="text-[10px] text-stellar-teal font-bold mb-1 flex items-center gap-1">
@@ -2531,7 +2612,7 @@ export default function Dashboard() {
                 <div className="min-h-screen flex items-center justify-center">
                     <div className="flex flex-col items-center gap-4">
                         <div className="w-12 h-12 border-4 border-stellar-teal border-t-transparent rounded-full animate-spin"></div>
-                        <p className="text-stellar-teal font-mono animate-pulse">Initializing Dashboard...</p>
+                        <p className="text-stellar-teal font-mono animate-pulse">Loading your dashboard...</p>
                     </div>
                 </div>
             }>

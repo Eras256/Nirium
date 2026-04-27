@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { ExternalLink, Zap, Shield, Activity, Cpu, Database } from "lucide-react";
+import { ExternalLink, Zap, Shield, Activity, Cpu, Database, CheckCircle, Heart } from "lucide-react";
 import { useState, useEffect } from "react";
 import { useLanguage } from "../../context/LanguageContext";
 
@@ -20,12 +20,12 @@ export default function Footer() {
     const { t } = useLanguage();
 
     const PROTOCOL_LINKS = [
-        { label: t.footer.neural_matrix, href: "/dashboard" },
-        { label: t.footer.market_analytics, href: "/analytics" },
-        { label: t.footer.signal_pool, href: "/strategies" },
-        { label: t.footer.matrix_builder, href: "/strategies/builder" },
-        { label: t.nav.marketplace, href: "/marketplace" },
-        { label: t.footer.neural_plugins, href: "/plugins" },
+        { label: t.nav.dashboard, href: "/dashboard" },
+        { label: t.nav.strategies, href: "/marketplace" },
+        { label: t.nav.treasury, href: "/treasury" },
+        { label: t.nav.leaderboard, href: "/leaderboard" },
+        { label: t.nav.analytics, href: "/analytics" },
+        { label: t.nav.sandbox, href: "/sandbox" },
     ];
 
     const contractHref = "https://stellar.expert/explorer/testnet/contract/CAU2XBJTQUBTMPAUFRX7GMZ337I5WLBI4GYPWHZEVXTMJ66D3CP6DEL4";
@@ -52,6 +52,14 @@ export default function Footer() {
         { label: "XLM Native", color: "emerald" },
         { label: "USDC Anchor", color: "violet" },
     ];
+
+    const METRICS = [
+        { label: t.footer.testnet_nodes, value: "342", color: "text-stellar-teal" },
+        { label: t.footer.matrix_tier, value: "L-v1", color: "text-stellar-yellow" },
+        { label: t.footer.net_health, value: t.footer.optimal.toUpperCase(), color: "text-green-400" },
+        { label: t.footer.arb_vectors, value: t.footer.locked, color: "text-yellow-400" },
+    ];
+
     return (
         <footer className="w-full relative z-10 border-t border-white/5 bg-[#050505]">
             {/* Glow accent top */}
@@ -66,23 +74,33 @@ export default function Footer() {
                                 <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75" />
                                 <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-green-500" />
                             </span>
-                            UPLINK <span className="hidden xs:inline">ESTABLISHED</span>
+                            {t.footer.uplink_established}
                         </span>
-                        <span className="text-gray-600 hidden xs:inline">KERNEL v0.1.0</span>
+                        <span className="text-gray-600 hidden xs:inline">{t.footer.kernel_version}</span>
                         <span className="flex items-center gap-1.5 text-blue-400">
                             <Shield className="w-3 h-3" />
-                            <span className="hidden xs:inline">SOROBAN VERIFIED</span>
+                            <span className="hidden xs:inline">{t.footer.soroban_verified}</span>
                             <span className="xs:hidden">SOROBAN</span>
                         </span>
-                        <span className="hidden md:flex items-center gap-1.5 text-stellar-teal">
+                        <span className="hidden lg:flex items-center gap-1.5 text-stellar-teal">
+                            <CheckCircle className="w-3 h-3" />
+                            {t.footer.scf_verified}
+                        </span>
+                        <span className="hidden md:flex items-center gap-1.5 text-stellar-yellow">
                             <Activity className="w-3 h-3" />
-                            STELLAR TESTNET LIVE
+                            {t.footer.testnet_live}
                         </span>
                     </div>
-                    <div className="flex items-center gap-2 text-[9px] sm:text-[10px] font-mono text-gray-500">
-                        <Database className="w-3 h-3 text-stellar-yellow" />
-                        <span className="hidden xs:inline">Forged in the Stellar Neural Matrix</span>
-                        <span className="xs:hidden">Neural Matrix</span>
+                    <div className="flex items-center gap-4 text-[9px] sm:text-[10px] font-mono text-gray-500">
+                        <span className="hidden lg:flex items-center gap-1 text-pink-400">
+                            <Heart className="w-3 h-3" />
+                            {t.footer.instaward_supported}
+                        </span>
+                        <div className="flex items-center gap-2">
+                            <Database className="w-3 h-3 text-stellar-yellow" />
+                            <span className="hidden xs:inline">{t.footer.powered_by}</span>
+                            <span className="xs:hidden">{t.footer.stellar_native}</span>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -99,8 +117,7 @@ export default function Footer() {
                     </Link>
 
                     <p className="text-gray-400 text-sm leading-relaxed max-w-xs mx-auto xs:mx-0">
-                        Institutional-grade autonomous AI agents for the Stellar Network.
-                        Precision execution via Soroban smart contracts.
+                        {t.footer.brand_desc}
                     </p>
 
                     {/* Tech Badges */}
@@ -128,7 +145,7 @@ export default function Footer() {
                 {/* Protocol Links */}
                 <div className="space-y-4">
                     <h4 className="text-white font-black text-xs tracking-widest uppercase font-mono italic">
-                        <span className="text-stellar-teal mr-1">{'>'}</span> Protocol
+                        <span className="text-stellar-teal mr-1">{'>'}</span> {t.footer.protocol}
                     </h4>
                     <ul className="space-y-2.5 sm:space-y-3">
                         {PROTOCOL_LINKS.map((link) => (
@@ -148,7 +165,7 @@ export default function Footer() {
                 {/* Intelligence Links */}
                 <div className="space-y-4">
                     <h4 className="text-white font-black text-xs tracking-widest uppercase font-mono italic">
-                        <span className="text-stellar-yellow mr-1">{'>'}</span> Intel Hub
+                        <span className="text-stellar-yellow mr-1">{'>'}</span> {t.footer.intel_hub}
                     </h4>
                     <ul className="space-y-2.5 sm:space-y-3">
                         {INTEL_LINKS.map((link) => (
@@ -181,16 +198,11 @@ export default function Footer() {
                 {/* Stats / CTA Column */}
                 <div className="col-span-1 xs:col-span-2 md:col-span-1 space-y-4 pt-4 sm:pt-0">
                     <h4 className="text-white font-black text-xs tracking-widest uppercase font-mono italic">
-                        <span className="text-green-400 mr-1">{'>'}</span> Metrics
+                        <span className="text-green-400 mr-1">{'>'}</span> {t.footer.metrics}
                     </h4>
 
                     <div className="space-y-2 sm:space-y-3 bg-white/5 border border-white/10 rounded-xl p-4">
-                        {[
-                            { label: "Active Nodes", value: "342", color: "text-stellar-teal" },
-                            { label: "Matrix Tier", value: "L-v1", color: "text-stellar-yellow" },
-                            { label: "Net Health", value: "OPTIMAL", color: "text-green-400" },
-                            { label: "Arb Vectors", value: "Locked", color: "text-yellow-400" },
-                        ].map((stat) => (
+                        {METRICS.map((stat) => (
                             <div key={stat.label} className="flex items-center justify-between py-1 border-b border-white/5 last:border-0">
                                 <span className="text-[9px] sm:text-[10px] text-gray-500 font-mono uppercase">{stat.label}</span>
                                 <span className={`text-[9px] sm:text-[10px] font-mono font-bold ${stat.color}`}>{stat.value}</span>
@@ -204,8 +216,15 @@ export default function Footer() {
                         className="flex items-center justify-center gap-2 w-full py-3 sm:py-4 bg-stellar-teal text-black font-black italic rounded-lg text-xs transition-all hover:shadow-[0_0_30px_rgba(45,235,232,0.4)] hover:scale-[1.02] active:scale-95 group shadow-lg"
                     >
                         <Zap className="w-3.5 h-3.5" />
-                        IGNITE MATRIX
+                        {t.footer.ignite_matrix}
                     </Link>
+                </div>
+            </div>
+
+            {/* Compliance Disclaimer */}
+            <div className="border-t border-white/5 bg-black/60">
+                <div className="max-w-[1600px] w-full mx-auto px-4 sm:px-6 py-4 text-[10px] sm:text-[11px] text-gray-500 font-mono leading-relaxed text-center">
+                    {t.footer.compliance_disclaimer}
                 </div>
             </div>
 
@@ -213,15 +232,31 @@ export default function Footer() {
             <div className="border-t border-white/5 bg-black/80 backdrop-blur-md">
                 <div className="max-w-[1600px] w-full mx-auto px-4 sm:px-6 py-6 sm:py-8 flex flex-col md:flex-row justify-between items-center gap-6 text-[9px] sm:text-[10px] text-gray-600 font-mono uppercase tracking-widest text-center md:text-left">
                     <div className="flex flex-col xs:flex-row items-center gap-2 sm:gap-4">
-                        <span>© 2026 NIRIUM NEURAL SYSTEMS</span>
+                        <span>{t.footer.copyright}</span>
                         <span className="hidden xs:block text-gray-800">|</span>
-                        <span className="text-stellar-teal">ENCRYPTED PROTOCOL</span>
+                        <div className="flex items-center gap-2 px-2 py-0.5 bg-stellar-yellow/10 border border-stellar-yellow/30 rounded text-stellar-yellow animate-pulse">
+                            <Activity className="w-3 h-3" />
+                            <span className="font-black tracking-tighter">{t.footer.testnet_live}</span>
+                        </div>
+                        <span className="hidden xs:block text-gray-800">|</span>
+                        <span className="text-stellar-teal">{t.footer.institutional_protocol}</span>
                     </div>
                     <div className="flex flex-wrap justify-center items-center gap-4 sm:gap-6">
-                        <Link href="/risk-disclosure" className="hover:text-red-400 transition-colors">Risk Disclosure</Link>
-                        <Link href="/privacy" className="hover:text-white transition-colors">Privacy</Link>
-                        <Link href="/terms" className="hover:text-white transition-colors">Terms</Link>
-                        <span className="text-gray-400 hidden xs:inline">v0.1.0-STABLE</span>
+                        <Link href="/docs?tab=security" className="text-stellar-yellow hover:text-white transition-colors flex items-center gap-1.5">
+                            <Activity className="w-3 h-3" />
+                            {t.footer.coc_aligned}
+                        </Link>
+                        <Link href="/jargus-audit" className="text-stellar-teal hover:text-white transition-colors flex items-center gap-1.5">
+                            <Shield className="w-3 h-3" />
+                            {t.footer.jargus_link}
+                        </Link>
+                        <div className="flex flex-wrap justify-center items-center gap-3 sm:gap-4 border-l border-white/10 pl-4">
+                            <Link href="/risk-disclosure" className="hover:text-red-400 transition-colors">{t.footer.risk_disclosure}</Link>
+                            <Link href="/disclaimers" className="hover:text-red-400 transition-colors">{t.footer.disclaimers_label}</Link>
+                            <Link href="/privacy" className="hover:text-white transition-colors">{t.footer.privacy}</Link>
+                            <Link href="/terms" className="hover:text-white transition-colors">{t.footer.terms}</Link>
+                            <span className="text-gray-400 hidden xs:inline">v0.5.0-STABLE</span>
+                        </div>
                     </div>
                 </div>
             </div>

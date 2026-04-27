@@ -9,10 +9,13 @@ import { motion } from 'framer-motion';
 import { toast } from 'sonner';
 import { supabase } from "@/lib/supabase";
 
+import { useLanguage } from '@/context/LanguageContext';
+
 type NeuralArchiveStatus = 'connecting' | 'live' | 'error';
 type SystemStatus = 'OPERATIONAL' | 'DEGRADED' | 'OFFLINE';
 
 export default function AgentsPage() {
+    const { t } = useLanguage();
     const [activeTab, setActiveTab] = useState<'logs' | 'sdk'>('logs');
     const [syntax, setSyntax] = useState<'ts' | 'py'>('ts');
     const [sdkAsset, setSdkAsset] = useState<'XLM' | 'USDC'>('XLM');
@@ -61,8 +64,29 @@ export default function AgentsPage() {
         if (archiveStatus === 'live' && logs.length > 0) {
             // Simulate each new log being uploaded to IPFS/Archive
             setArchiveCount(prev => prev + 1);
+            
+            // Randomly update activity bars
+            setLogBarData(prev => {
+                const newData = [...prev];
+                const index = Math.floor(Math.random() * newData.length);
+                newData[index] = Math.floor(Math.random() * 60) + 30;
+                return newData;
+            });
         }
     }, [logs.length, archiveStatus]);
+
+    // Interval to keep activity looking alive even without new logs
+    useEffect(() => {
+        const interval = setInterval(() => {
+            setLogBarData(prev => {
+                const newData = [...prev];
+                // Shift left and add new random value
+                const [first, ...rest] = newData;
+                return [...rest, Math.floor(Math.random() * 70) + 20];
+            });
+        }, 3000);
+        return () => clearInterval(interval);
+    }, []);
 
     // Supabase Realtime for Live Logs
     useEffect(() => {
@@ -136,7 +160,11 @@ export default function AgentsPage() {
             ? 'bg-green-500/20 text-green-400'
             : 'bg-red-500/20 text-red-400';
 
-    const archiveBadgeText = archiveStatus === 'connecting' ? 'CONNECTING...' : archiveStatus === 'live' ? `LIVE · ${archiveCount} RECORDS` : 'ERROR';
+    const archiveBadgeText = archiveStatus === 'connecting' 
+        ? t.agents.status.connecting 
+        : archiveStatus === 'live' 
+            ? t.agents.status.live.replace('{n}', archiveCount.toString()) 
+            : t.agents.status.error;
 
     const USDC_TYPE = 'USDC';
     const XLM_TYPE = 'XLM';
@@ -150,10 +178,9 @@ export default function AgentsPage() {
             <div className="fixed inset-0 z-0">
                 <div className="absolute top-0 left-0 w-full h-[500px] bg-gradient-to-b from-stellar-yellow/10 to-transparent opacity-50" />
                 <div className="absolute bottom-0 right-0 w-[800px] h-[800px] bg-stellar-teal/5 rounded-full blur-[120px]" />
-                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full h-full bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-10" />
             </div>
 
-            <div className="relative z-10 container mx-auto px-4 pt-48 pb-20">
+            <div className="relative z-10 container mx-auto px-4 pt-32 sm:pt-40 md:pt-48 lg:pt-56 pb-20">
 
                 {/* Header Section */}
                 <div className="flex flex-col lg:flex-row items-center lg:items-center justify-between gap-12 mb-20 px-4">
@@ -164,7 +191,7 @@ export default function AgentsPage() {
                             className="inline-flex items-center gap-2 px-3 py-1 bg-white/5 border border-white/10 rounded-full text-xs font-mono text-stellar-teal mb-8 self-center lg:self-start"
                         >
                             <Radio className="w-3 h-3 animate-pulse" />
-                            SYSTEM ONLINE: v0.0.7 // ENCRYPTED
+                            {t.agents.status_online.replace('{v}', 'v0.5.0')}
                         </motion.div>
 
                         <div className="flex flex-col lg:flex-row items-center lg:items-center gap-6 mb-6">
@@ -172,21 +199,26 @@ export default function AgentsPage() {
                             <motion.h1
                                 initial={{ opacity: 0, scale: 0.9 }}
                                 animate={{ opacity: 1, scale: 1 }}
-                                className="text-4xl md:text-7xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-white via-gray-200 to-gray-500 tracking-tight leading-none"
+                                className="text-3xl sm:text-5xl md:text-7xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-white via-gray-200 to-gray-500 tracking-tight leading-none"
                             >
-                                OPERATIONS COMMAND
+                                {t.agents.title}
                             </motion.h1>
                         </div>
 
                         <p className="text-gray-400 max-w-2xl text-lg mt-4">
-                            All activity immortalized via <span className="text-pink-400 font-bold">Neural Archive</span> forensic logging.
+                            {t.agents.subtitle.split('{strong}').map((part, i, arr) => (
+                                <span key={i}>
+                                    {part}
+                                    {i < arr.length - 1 && <span className="text-pink-400 font-bold">{t.agents.permanent_record_strong}</span>}
+                                </span>
+                            ))}
                         </p>
                     </div>
 
                     {/* Uplink Status Card */}
                     <div className="hidden lg:block p-6 bg-white/5 border border-white/10 rounded-2xl backdrop-blur-md min-w-[300px]">
                         <div className="flex items-center justify-between mb-4">
-                            <span className="text-[10px] font-mono text-gray-500 uppercase tracking-widest">Horizon Uplink</span>
+                            <span className="text-[10px] font-mono text-gray-500 uppercase tracking-widest">{t.agents.stellar_connection}</span>
                             <div className="flex gap-2">
                                 <div className="w-2 h-2 rounded-full bg-stellar-teal animate-pulse" />
                                 <div className="w-2 h-2 rounded-full bg-stellar-yellow animate-pulse" />
@@ -194,11 +226,11 @@ export default function AgentsPage() {
                         </div>
                         <div className="space-y-4">
                             <div className="flex justify-between items-center text-[11px] font-mono border-b border-white/5 pb-2">
-                                <span className="text-gray-500">Latency:</span>
+                                <span className="text-gray-500">{t.agents.latency}:</span>
                                 <span className="text-stellar-teal font-bold">12ms</span>
                             </div>
                             <div className="flex justify-between items-center text-[11px] font-mono">
-                                <span className="text-gray-500">Node:</span>
+                                <span className="text-gray-500">{t.agents.node}:</span>
                                 <span className="text-white font-bold uppercase">HORIZON-PUB1</span>
                             </div>
                         </div>
@@ -215,29 +247,29 @@ export default function AgentsPage() {
                         transition={{ delay: 0.2 }}
                         className="space-y-6"
                     >
-                        <div className="bg-[#0A0A0A] border border-white/10 rounded-xl p-6 relative overflow-hidden group hover:border-stellar-teal/30 transition-colors">
+                        <div className="bg-[#0A0A0A] border border-white/10 rounded-2xl p-5 sm:p-6 relative overflow-hidden group hover:border-stellar-teal/30 transition-colors">
                             <div className="absolute inset-0 bg-gradient-to-br from-stellar-teal/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
                             <h3 className="text-sm font-mono text-gray-400 flex items-center gap-2 mb-4">
                                 <Activity className="w-4 h-4 text-stellar-teal" />
-                                ORBITAL UPLINK STATUS
+                                {t.agents.health.title}
                             </h3>
                             <div className="space-y-4">
                                 <div className="flex justify-between items-center">
-                                    <span className="text-sm">Uplink Gateway</span>
+                                    <span className="text-sm">{t.agents.health.connection}</span>
                                     <span className={`text-xs px-2 py-1 rounded ${statusColor(uplinkStatus)}`}>{uplinkStatus}</span>
                                 </div>
                                 <div className="flex justify-between items-center">
-                                    <span className="text-sm">Targeting Engine</span>
-                                    <span className="text-xs bg-green-500/20 text-green-400 px-2 py-1 rounded">OPERATIONAL</span>
+                                    <span className="text-sm">{t.agents.health.engine}</span>
+                                    <span className="text-xs bg-green-500/20 text-green-400 px-2 py-1 rounded">{t.agents.health.running}</span>
                                 </div>
                                 <div className="flex justify-between items-center">
-                                    <span className="text-sm">Secure Enclave</span>
-                                    <span className="text-xs bg-green-500/20 text-green-400 px-2 py-1 rounded">SHIELD ACTIVE</span>
+                                    <span className="text-sm">{t.agents.health.storage}</span>
+                                    <span className="text-xs bg-green-500/20 text-green-400 px-2 py-1 rounded">{t.agents.health.protected}</span>
                                 </div>
                                 <div className="flex justify-between items-center">
                                     <span className="text-sm flex items-center gap-1.5">
                                         <Database className="w-3 h-3 text-blue-400" />
-                                        Neural Archive Log
+                                        {t.agents.health.record}
                                     </span>
                                     <span className={`text-xs px-2 py-1 rounded flex items-center gap-1 ${archiveBadgeClass}`}>
                                         <ArchiveIcon />
@@ -245,56 +277,57 @@ export default function AgentsPage() {
                                     </span>
                                 </div>
                                 <div className="flex justify-between items-center pt-1 border-t border-white/5">
-                                    <span className="text-sm">RPC Latency</span>
+                                    <span className="text-sm">{t.agents.health.response_time}</span>
                                     <span className={`text-xs font-mono ${rpcLatency === null ? 'text-gray-600' : rpcLatency < 200 ? 'text-green-400' : rpcLatency < 500 ? 'text-yellow-400' : 'text-red-400'}`}>
-                                        {rpcLatency === null ? 'measuring...' : `${rpcLatency}ms`}
+                                        {rpcLatency === null ? t.agents.health.measuring : `${rpcLatency}ms`}
                                     </span>
                                 </div>
                             </div>
                         </div>
 
-                        <div className="bg-[#0A0A0A] border border-white/10 rounded-xl p-6">
+                        <div className="bg-[#0A0A0A] border border-white/10 rounded-2xl p-5 sm:p-6">
                             <h3 className="text-sm font-mono text-gray-400 flex items-center gap-2 mb-4">
                                 <Signal className="w-4 h-4 text-stellar-yellow" />
-                                DEPLOYED UNITS
+                                {t.agents.activity.title}
                             </h3>
                             <div className="h-32 flex items-end justify-between gap-1 px-2">
                                 {logBarData.map((h, i) => (
-                                    <div key={i} className="w-full bg-white/10 rounded-t-sm relative overflow-hidden group">
+                                    <div key={i} className="flex-1 h-full bg-white/5 rounded-t-sm relative overflow-hidden group min-w-[2px]">
                                         <motion.div
+                                            initial={{ height: 0 }}
                                             animate={{ height: `${h}%` }}
-                                            transition={{ duration: 0.6, ease: 'easeInOut' }}
-                                            className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-stellar-yellow to-stellar-teal w-full opacity-50 group-hover:opacity-80 transition-opacity"
+                                            transition={{ duration: 0.8, ease: 'easeOut' }}
+                                            className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-stellar-yellow to-stellar-teal w-full opacity-60 group-hover:opacity-100 transition-opacity"
                                         />
                                     </div>
                                 ))}
                             </div>
                             <div className="mt-2 text-xs text-center text-gray-500 font-mono">
-                                PACKET INTERCEPTION RATE (LIVE)
+                                {t.agents.activity.moves_per_minute}
                             </div>
                         </div>
 
                         {/* Neural Archive Panel */}
-                        <div className="bg-[#0A0A0A] border border-blue-500/20 rounded-xl p-6">
+                        <div className="bg-[#0A0A0A] border border-blue-500/20 rounded-2xl p-5 sm:p-6">
                             <h3 className="text-sm font-mono text-blue-400 flex items-center gap-2 mb-3">
                                 <Database className="w-4 h-4" />
-                                NEURAL ARCHIVE AUDIT
+                                {t.agents.record_panel.title}
                             </h3>
                             <p className="text-xs text-gray-500 mb-3 leading-relaxed">
-                                Every agent execution is immortalized on the Neural Archive, Nirium&apos;s decentralized forensic layer. Audit logs are cryptographically sealed and tamper-proof.
+                                {t.agents.record_panel.desc}
                             </p>
                             <div className="space-y-2">
                                 <div className="flex justify-between text-xs">
-                                    <span className="text-gray-500">Blobs committed</span>
+                                    <span className="text-gray-500">{t.agents.record_panel.saved}</span>
                                     <span className="font-mono text-blue-400">{archiveCount}</span>
                                 </div>
                                 <div className="flex justify-between text-xs">
-                                    <span className="text-gray-500">Storage network</span>
-                                    <span className="font-mono text-blue-400">Stellar Neural Archive</span>
+                                    <span className="text-gray-500">{t.agents.record_panel.lives}</span>
+                                    <span className="font-mono text-blue-400">Stellar</span>
                                 </div>
                                 <div className="flex justify-between text-xs">
-                                    <span className="text-gray-500">Retention</span>
-                                    <span className="font-mono text-green-400">∞ Permanent</span>
+                                    <span className="text-gray-500">{t.agents.record_panel.how_long}</span>
+                                    <span className="font-mono text-green-400">{t.agents.record_panel.forever}</span>
                                 </div>
                             </div>
                         </div>
@@ -313,13 +346,13 @@ export default function AgentsPage() {
                             <ApiKeyManager />
                         </div>
 
-                        <div className="mt-8 bg-gradient-to-r from-stellar-yellow/10 to-stellar-teal/10 border border-white/10 rounded-xl p-6 mb-6">
+                        <div className="mt-8 bg-gradient-to-r from-stellar-yellow/10 to-stellar-teal/10 border border-white/10 rounded-2xl p-5 sm:p-6 mb-6">
                             <div className="flex items-center gap-3 mb-2">
                                 <Terminal className="w-5 h-5 text-white" />
-                                <h3 className="font-bold text-white">Nirium CLI</h3>
-                                <span className="bg-stellar-teal/20 text-stellar-teal text-[10px] px-2 py-0.5 rounded font-mono">NEW</span>
+                                <h3 className="font-bold text-white">{t.agents.cli.title}</h3>
+                                <span className="bg-stellar-teal/20 text-stellar-teal text-[10px] px-2 py-0.5 rounded font-mono">{t.agents.cli.new}</span>
                             </div>
-                            <p className="text-xs text-gray-400 mb-3">Scaffold a combat-ready agent in seconds.</p>
+                            <p className="text-xs text-gray-400 mb-3">{t.agents.cli.subtitle}</p>
                             <div className="bg-black/50 border border-white/5 rounded px-3 py-2 flex justify-between items-center group cursor-pointer hover:border-white/20 transition-colors"
                                 onClick={() => { navigator.clipboard.writeText('npx nirium create-unit'); toast.success('Copied!'); }}>
                                 <code className="text-xs font-mono text-stellar-teal">npx nirium create-unit</code>
@@ -328,16 +361,16 @@ export default function AgentsPage() {
                         </div>
 
                         <div className="grid grid-cols-2 gap-4">
-                            <div className="p-4 bg-white/5 rounded-xl border border-white/10 text-center hover:bg-white/10 transition-colors cursor-pointer">
-                                <Code className="w-6 h-6 mx-auto mb-2 text-blue-400" />
-                                <div className="text-sm font-bold">Python SDK</div>
-                                <div className="text-xs text-green-400">v0.0.7 Ready</div>
-                            </div>
-                            <div className="p-4 bg-white/5 rounded-xl border border-white/10 text-center hover:bg-white/10 transition-colors cursor-pointer">
-                                <Zap className="w-6 h-6 mx-auto mb-2 text-yellow-400" />
-                                <div className="text-sm font-bold">Node.js SDK</div>
-                                <div className="text-xs text-green-400">v0.0.7 Ready</div>
-                            </div>
+                            <a href="https://pypi.org/project/nirium/" target="_blank" rel="noreferrer" className="p-4 bg-white/5 rounded-xl border border-white/10 text-center hover:bg-white/10 hover:border-blue-400/50 transition-colors cursor-pointer group">
+                                <Code className="w-6 h-6 mx-auto mb-2 text-blue-400 group-hover:scale-110 transition-transform" />
+                                <div className="text-sm font-bold">{t.agents.sdk.py}</div>
+                                <div className="text-xs text-green-400">{t.agents.sdk.ready.replace('{v}', 'v0.5.0')}</div>
+                            </a>
+                            <a href="https://www.npmjs.com/package/nirium" target="_blank" rel="noreferrer" className="p-4 bg-white/5 rounded-xl border border-white/10 text-center hover:bg-white/10 hover:border-yellow-400/50 transition-colors cursor-pointer group">
+                                <Zap className="w-6 h-6 mx-auto mb-2 text-yellow-400 group-hover:scale-110 transition-transform" />
+                                <div className="text-sm font-bold">{t.agents.sdk.js}</div>
+                                <div className="text-xs text-green-400">{t.agents.sdk.ready.replace('{v}', 'v0.5.0')}</div>
+                            </a>
                         </div>
                     </motion.div>
 
@@ -348,21 +381,21 @@ export default function AgentsPage() {
                         transition={{ delay: 0.3 }}
                         className="space-y-6"
                     >
-                        <div className="bg-[#0A0A0A] border border-white/10 rounded-xl p-6 group hover:border-stellar-teal/30 transition-colors min-h-[400px] flex flex-col">
+                        <div className="bg-[#0A0A0A] border border-white/10 rounded-2xl p-5 sm:p-6 group hover:border-stellar-teal/30 transition-colors min-h-[400px] flex flex-col">
                             <div className="flex justify-between items-center mb-4">
                                 <h3 className="text-sm font-mono text-gray-400 flex items-center gap-2">
                                     <Terminal className="w-4 h-4 text-stellar-teal" />
-                                    {activeTab === 'logs' ? 'LIVE NEURAL FEED' : 'DIRECT LINK PROTOCOL'}
+                                    {activeTab === 'logs' ? t.agents.tabs.activity_title : t.agents.tabs.starter_title}
                                 </h3>
                                 <div className="flex gap-2">
                                     <button
                                         onClick={() => setActiveTab('logs')}
                                         className={`px-2 py-0.5 rounded text-[10px] font-bold transition-colors ${activeTab === 'logs' ? 'bg-stellar-teal/20 text-stellar-teal' : 'bg-white/5 text-gray-500'}`}
-                                    >LOGS</button>
+                                    >{t.agents.tabs.logs}</button>
                                     <button
                                         onClick={() => setActiveTab('sdk')}
                                         className={`px-2 py-0.5 rounded text-[10px] font-bold transition-colors ${activeTab === 'sdk' ? 'bg-blue-500/20 text-blue-400' : 'bg-white/5 text-gray-500'}`}
-                                    >SDK</button>
+                                    >{t.agents.tabs.sdk}</button>
                                 </div>
                             </div>
 
@@ -373,7 +406,7 @@ export default function AgentsPage() {
                                 >
                                     <div className="space-y-1">
                                         {logs.length === 0 && (
-                                            <div className="text-gray-600 italic">Waiting for signal Uplink...</div>
+                                            <div className="text-gray-600 italic">{t.agents.tabs.waiting}</div>
                                         )}
                                         {logs.map((log, i) => {
                                             const parts = log.message.split('|');
@@ -398,7 +431,7 @@ export default function AgentsPage() {
                                                         </span>
                                                     )}
                                                     {archiveStatus === 'live' && (
-                                                        <span className="text-blue-500/40 text-[9px] flex items-center">⬆ archive</span>
+                                                        <span className="text-blue-500/40 text-[9px] flex items-center">⬆ {t.agents.tabs.archive}</span>
                                                     )}
                                                 </div>
                                             );
@@ -444,7 +477,7 @@ export default function AgentsPage() {
                                                 <div className="text-gray-500">{'// Subscribe to signals'}</div>
                                                 <div>bot.subscribe((<span className="text-orange-300">signal</span>) ={">"} {"{"}</div>
                                                 <div className="pl-4"><span className="text-blue-400">if</span> (signal.asset === <span className="text-yellow-300">&apos;{sdkAsset}&apos;</span>) {"{"}</div>
-                                                <div className="pl-8">bot.execute(<span className="text-green-400">&apos;flash-loan-arb&apos;</span>, signal);</div>
+                                                <div className="pl-8">bot.execute(<span className="text-green-400">&apos;liquidity-rebalance&apos;</span>, signal);</div>
                                                 <div className="pl-4">{"}"}</div>
                                                 <div>{"}"});</div>
                                             </div>
@@ -465,7 +498,7 @@ export default function AgentsPage() {
                                                 <div className="text-gray-500"># Exec strategy</div>
                                                 <div><span className="text-purple-400">async for</span> signal <span className="text-purple-400">in</span> bot.listen():</div>
                                                 <div className="pl-4"><span className="text-blue-400">if</span> signal[<span className="text-green-400">&apos;asset&apos;</span>] == <span className="text-yellow-300">&quot;{sdkAsset}&quot;</span>:</div>
-                                                <div className="pl-8">bot.execute(<span className="text-green-400">&quot;flash-loan-arb&quot;</span>, signal)</div>
+                                                <div className="pl-8">bot.execute(<span className="text-green-400">&quot;liquidity-rebalance&quot;</span>, signal)</div>
                                             </div>
                                         )}
                                     </div>
@@ -474,19 +507,18 @@ export default function AgentsPage() {
 
                             <p className="mt-4 text-xs text-gray-500">
                                 {activeTab === 'logs'
-                                    ? `Live feed via Supabase Realtime. ${archiveStatus === 'live' ? `All ${archiveCount} logs mirrored to Neural Archive.` : 'Archive sync connecting...'}`
-                                    : `Use the key above to authenticate. Showing ${sdkAsset} vault integration example.`}
+                                    ? t.agents.tabs.live_updates.replace('{n}', archiveCount.toString())
+                                    : t.agents.tabs.starter_desc.replace('{asset}', sdkAsset)}
                             </p>
                         </div>
 
-                        <div className="bg-gradient-to-br from-stellar-yellow/20 to-transparent border border-stellar-yellow/30 rounded-xl p-6">
+                        <div className="bg-gradient-to-br from-stellar-yellow/20 to-transparent border border-stellar-yellow/30 rounded-2xl p-5 sm:p-8">
                             <h3 className="text-sm font-bold text-white mb-2 flex items-center gap-2">
                                 <Shield className="w-4 h-4 text-stellar-yellow" />
-                                Institutional Security
+                                {t.agents.built_safe.title}
                             </h3>
                             <p className="text-xs text-gray-300 leading-relaxed opacity-80">
-                                All agent interactions are secured by Soroban Smart Contracts and signed nonces.
-                                Transactions are atomically executed in a single Multi-Op Transaction. Forensic logs are permanently stored on the Neural Archive for both XLM and USDC vaults.
+                                {t.agents.built_safe.desc}
                             </p>
                             <button
                                 onClick={() => {
@@ -522,20 +554,20 @@ export default function AgentsPage() {
                                     });
 
                                     toast.promise(downloadPromise, {
-                                        loading: 'Decrypting Black Box Neural Signatures...',
-                                        success: 'Secure Logs Downloaded (nirium-audit.json)',
-                                        error: 'Access Denied'
+                                        loading: t.agents.audit.preparing,
+                                        success: t.agents.audit.success,
+                                        error: t.agents.audit.error
                                     });
 
                                     setLogs(prev => [...prev, {
                                         level: 'system',
-                                        message: '⚠️ ENCRYPTED LOG DUMP REQUESTED BY OPERATOR',
+                                        message: t.agents.audit.requested,
                                         timestamp: new Date().toISOString()
                                     }]);
                                 }}
                                 className="mt-4 w-full py-2 bg-stellar-yellow/20 hover:bg-stellar-yellow/30 text-stellar-yellow border border-stellar-yellow/50 rounded-lg text-xs font-bold transition-all hover:shadow-[0_0_15px_rgba(168,85,247,0.3)] active:scale-95"
                             >
-                                ACCESS BLACK BOX DATA
+                                {t.agents.audit.button}
                             </button>
                         </div>
                     </motion.div>

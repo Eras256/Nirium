@@ -38,7 +38,10 @@ const Orb = ({ activity = 0.5 }: { activity?: number }) => {
     );
 };
 
+import { useLanguage } from '@/context/LanguageContext';
+
 const NeuralOrb = ({ activity = 0.5 }: { activity?: number }) => {
+    const { t } = useLanguage();
     const [latency, setLatency] = React.useState<number>(20.5);
 
     React.useEffect(() => {
@@ -65,9 +68,9 @@ const NeuralOrb = ({ activity = 0.5 }: { activity?: number }) => {
 
             {/* Overlay Neural Text */}
             <div className="absolute bottom-4 left-1/2 -translate-x-1/2 text-center pointer-events-none">
-                <div className="text-[10px] font-mono tracking-[0.3em] text-stellar-blue/60 uppercase">Neural Matrix Sync</div>
+                <div className="text-[10px] font-mono tracking-[0.3em] text-stellar-blue/60 uppercase">{t.common.sync}</div>
                 <div className="text-[8px] font-mono text-white/30 mt-1 uppercase">
-                    Latency: {latency.toFixed(1)}ms | Load: {(activity * 100).toFixed(0)}%
+                    {t.common.latency}: {latency.toFixed(1)}ms | {t.common.load}: {(activity * 100).toFixed(0)}%
                 </div>
             </div>
         </div>

@@ -57,7 +57,7 @@ npm install nirium
 import { Agent } from 'nirium';
 
 const agent = new Agent({
-  apiKey: 'sk_inst_isacap_pedro_nirium_2026',
+  apiKey: 'sk_inst_YOUR_API_KEY',
   baseUrl: 'https://api.nirium.xyz',
   // token: 'eyJhbG...'  // Optional JWT for WebSocket auth
 });
@@ -324,7 +324,7 @@ const { token } = await agent.request('POST', '/api/auth/token', {
 });
 
 const agentWithToken = new Agent({
-  apiKey: 'sk_inst_isacap_pedro_nirium_2026',
+  apiKey: 'sk_inst_YOUR_API_KEY',
   baseUrl: 'https://api.nirium.xyz',
   token,
 });
@@ -527,7 +527,7 @@ from nirium import Agent
 
 agent = Agent(
     api_url="https://api.nirium.xyz",
-    api_key="sk_inst_isacap_pedro_nirium_2026",
+    api_key="sk_inst_YOUR_API_KEY",
     # token="eyJhbG..."  # Optional JWT for WebSocket auth
 )
 ```
@@ -753,7 +753,7 @@ from nirium import Agent
 
 agent = Agent(
     api_url="https://api.nirium.xyz",
-    api_key="sk_inst_isacap_pedro_nirium_2026",
+    api_key="sk_inst_YOUR_API_KEY",
     token="eyJhbG...",  # JWT from /api/auth/token
 )
 
@@ -1232,7 +1232,7 @@ asyncio.run(agent.subscribe())
 | **Institutional** | **300** | **10,000** | **500** |
 | Enterprise | 1,000 | 100,000 | unlimited |
 
-**Isacap current tier:** Institutional (300 req/min · 10,000 req/day · 500 strategies/day)
+**Institutional Partner current tier:** Institutional (300 req/min · 10,000 req/day · 500 strategies/day)
 
 **Rate limit headers returned on 429:**
 ```
@@ -1255,7 +1255,7 @@ X-RateLimit-Reset: <unix_timestamp>
 | Contract | Address | Network |
 |---|---|---|
 | NiriumVault | `CAU2XBJTQUBTMPAUFRX7GMZ337I5WLBI4GYPWHZEVXTMJ66D3CP6DEL4` | Testnet |
-| Vault ID (Isacap) | `2000` | Testnet |
+| Vault ID (Institutional Partner) | `2000` | Testnet |
 
 Verify transactions: `https://stellar.expert/explorer/testnet/tx/<txHash>`
 
@@ -1267,7 +1267,7 @@ Verify transactions: `https://stellar.expert/explorer/testnet/tx/<txHash>`
 - **npm:** https://www.npmjs.com/package/nirium  
 - **PyPI:** https://pypi.org/project/nirium/  
 - **API reference:** [API_DOCUMENTATION_OPENAPI.yaml](API_DOCUMENTATION_OPENAPI.yaml)  
-- **Endpoint test guide:** [IsacapKey.md](IsacapKey.md)
+- **Endpoint test guide:** [InstitutionalPartnerKey.md](InstitutionalPartnerKey.md)
 
 ---
 

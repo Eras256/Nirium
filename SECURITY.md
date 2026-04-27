@@ -89,4 +89,4 @@ We appreciate the security research community's efforts. Reporters of valid secu
 
 ---
 
-*This security policy is effective as of April 17, 2026.*
+*This security policy is effective as of April 22, 2026.*

@@ -4,6 +4,8 @@ import { NextResponse } from 'next/server';
 const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL || '';
 const SUPABASE_KEY = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || '';
 
+export const dynamic = 'force-dynamic';
+
 export async function GET() {
     if (!SUPABASE_URL || !SUPABASE_KEY) return NextResponse.json([]);
 
@@ -11,13 +13,13 @@ export async function GET() {
         // We must encode % and the emoji correctly for the URL
         const filter = encodeURIComponent('%🧠%');
         const res = await fetch(
-            `${SUPABASE_URL}/rest/v1/logs?message=like.${filter}&select=*&order=timestamp.desc&limit=10`,
+            `${SUPABASE_URL}/rest/v1/agent_logs?message=like.${filter}&select=*&order=created_at.desc&limit=10`,
             {
                 headers: {
                     apikey: SUPABASE_KEY,
                     Authorization: `Bearer ${SUPABASE_KEY}`,
                 },
-                next: { revalidate: 0 },
+                cache: 'no-store',
             }
         );
         const data = await res.json();
@@ -28,7 +30,7 @@ export async function GET() {
             agent: d.agent_id,
             thought: d.message.replace('🧠 [THOUGHT] ', ''),
             protocol: 'neural',
-            timestamp: d.timestamp
+            timestamp: d.created_at || d.timestamp || new Date().toISOString()
         })));
     } catch (e) {
         return NextResponse.json([]);
@@ -42,7 +44,7 @@ export async function POST(req: Request) {
         const { agent, thought, protocol } = await req.json();
         console.log(`📡 [NeuralFeed] Attempting to save thought from ${agent}...`);
 
-        const res = await fetch(`${SUPABASE_URL}/rest/v1/logs`, {
+        const res = await fetch(`${SUPABASE_URL}/rest/v1/agent_logs`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',

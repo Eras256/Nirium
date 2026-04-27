@@ -34,9 +34,6 @@
             "path": "./packages/mcp"
         },
         {
-            "path": "./packages/desktop"
-        },
-        {
             "path": "./apps/web"
         }
     ]

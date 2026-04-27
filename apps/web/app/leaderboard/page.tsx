@@ -77,18 +77,19 @@ function agentToEntry(agent: SwarmAgent, rank: number, xlmUsd: number, xlmMxn: n
     };
 }
 
-const TIER_STYLES = {
-    matrix: { bg: 'bg-purple-500/20', border: 'border-purple-500/50', text: 'text-purple-400', label: 'MATRIX', icon: Sparkles },
-    gold: { bg: 'bg-yellow-500/20', border: 'border-yellow-500/50', text: 'text-yellow-400', label: 'GOLD', icon: Star },
-    silver: { bg: 'bg-slate-300/20', border: 'border-slate-300/50', text: 'text-slate-300', label: 'SILVER', icon: Shield },
-    bronze: { bg: 'bg-orange-500/20', border: 'border-orange-500/50', text: 'text-orange-400', label: 'ACTIVE', icon: Activity },
-};
 
 export default function LeaderboardPage() {
     const { t } = useLanguage();
     const { address } = useFreighter();
     const [leaderboard, setLeaderboard] = useState<LeaderboardEntry[]>([]);
     const [isLoading, setIsLoading] = useState(true);
+
+    const TIER_STYLES = {
+        matrix: { bg: 'bg-purple-500/20', border: 'border-purple-500/50', text: 'text-purple-400', label: t.leaderboard.tiers.matrix, icon: Sparkles },
+        gold: { bg: 'bg-yellow-500/20', border: 'border-yellow-500/50', text: 'text-yellow-400', label: t.leaderboard.tiers.gold, icon: Star },
+        silver: { bg: 'bg-slate-300/20', border: 'border-slate-300/50', text: 'text-slate-300', label: t.leaderboard.tiers.silver, icon: Shield },
+        bronze: { bg: 'bg-orange-500/20', border: 'border-orange-500/50', text: 'text-orange-400', label: t.leaderboard.tiers.active, icon: Activity },
+    };
     const [isLive, setIsLive] = useState(false);
     const [lastUpdate, setLastUpdate] = useState<Date | null>(null);
     // Live XLM prices: USD for USDC column, MXN for CETES column (1 CETES ≈ 1 MXN)
@@ -194,7 +195,7 @@ export default function LeaderboardPage() {
     const rest = leaderboard.slice(3);
 
     return (
-        <div className="min-h-screen pt-56 pb-24 px-4 md:px-8 relative overflow-hidden bg-[#030303]">
+        <div className="min-h-screen pt-32 sm:pt-40 md:pt-48 lg:pt-56 pb-24 px-4 md:px-8 relative overflow-hidden bg-[#030303]">
             <Navbar />
 
             {/* Background glow */}
@@ -210,7 +211,7 @@ export default function LeaderboardPage() {
                             animate={{ opacity: 1, scale: 1 }}
                             className="inline-flex items-center gap-2 px-4 py-1 rounded-full bg-purple-500/10 border border-purple-500/20 text-purple-400 text-xs font-mono uppercase tracking-widest mb-8 self-center lg:self-start"
                         >
-                            <Trophy size={14} /> Global Agent Reputation Layer
+                            <Trophy size={14} /> {t.leaderboard.header.badge}
                         </motion.div>
 
                         <div className="flex flex-col lg:flex-row items-center lg:items-center gap-6 mb-6">
@@ -218,15 +219,15 @@ export default function LeaderboardPage() {
                             <motion.h1
                                 initial={{ opacity: 0, y: -20 }}
                                 animate={{ opacity: 1, y: 0 }}
-                                className="text-4xl md:text-7xl font-black text-white tracking-tighter uppercase italic leading-none"
+                                className="text-3xl sm:text-5xl md:text-7xl font-black text-white tracking-tighter uppercase italic leading-none"
                                 style={{ fontFamily: 'Orbitron, sans-serif' }}
                             >
-                                {t.leaderboard.title}
+                                {t.leaderboard.header.title}
                             </motion.h1>
                         </div>
-
+ 
                         <p className="text-gray-500 font-mono text-sm max-w-xl uppercase tracking-tighter mb-4">
-                            {t.leaderboard.subtitle}
+                            {t.leaderboard.header.subtitle}
                         </p>
 
                         <div className="flex items-center gap-3">
@@ -235,11 +236,11 @@ export default function LeaderboardPage() {
                                 : 'bg-gray-500/10 border border-gray-500/30 text-gray-500'
                                 }`}>
                                 <Radio size={10} className={isLive ? 'animate-pulse' : ''} />
-                                {isLive ? 'LIVE — SYNCING FROM CHAIN' : 'DEMO MODE'}
+                                {isLive ? t.leaderboard.sync.live : t.leaderboard.sync.demo}
                             </div>
                             {lastUpdate && (
                                 <span className="text-[10px] text-gray-600 font-mono uppercase">
-                                    Updated {lastUpdate.toLocaleTimeString()}
+                                    {t.leaderboard.sync.updated} {lastUpdate.toLocaleTimeString()}
                                 </span>
                             )}
                             <span className="text-[10px] text-gray-700 font-mono">
@@ -250,9 +251,15 @@ export default function LeaderboardPage() {
 
                     {/* Quick Stats or Badge */}
                     <div className="hidden lg:flex flex-col items-end text-right">
-                        <div className="text-[10px] font-black text-gray-500 uppercase tracking-[0.4em] mb-2">NETWORK STATUS</div>
-                        <div className="px-4 py-2 bg-green-500/10 border border-green-500/20 text-green-400 text-xs font-mono rounded-lg animate-pulse">
-                            UPLINK_STABLE_v0.5
+                        <div className="text-[10px] font-black text-gray-500 uppercase tracking-[0.4em] mb-2">{t.leaderboard.header.network_status}</div>
+                        <div className="flex gap-2">
+                            <div className="px-4 py-2 bg-green-500/10 border border-green-500/20 text-green-400 text-xs font-mono rounded-lg animate-pulse">
+                                {t.leaderboard.sync.uplink}
+                            </div>
+                            <div className="px-4 py-2 bg-stellar-teal/10 border border-stellar-teal/20 text-stellar-teal text-[10px] font-black uppercase tracking-widest rounded-lg flex items-center gap-2" title="Compliant with Stellar Code of Conduct (April 2026)">
+                                <Shield size={12} />
+                                ETHICS VERIFIED
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -267,9 +274,9 @@ export default function LeaderboardPage() {
                 {/* PODIUM */}
                 {!isLoading && top3.length >= 3 && (
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-16 items-end">
-                        <PodiumCard agent={top3[1]} rank={2} />
-                        <PodiumCard agent={top3[0]} rank={1} />
-                        <PodiumCard agent={top3[2]} rank={3} />
+                        <PodiumCard agent={top3[1]} rank={2} tierStyles={TIER_STYLES} t={t} />
+                        <PodiumCard agent={top3[0]} rank={1} tierStyles={TIER_STYLES} t={t} />
+                        <PodiumCard agent={top3[2]} rank={3} tierStyles={TIER_STYLES} t={t} />
                     </div>
                 )}
 
@@ -285,14 +292,14 @@ export default function LeaderboardPage() {
                             <table className="w-full text-left">
                                 <thead className="bg-white/5 border-b border-white/5">
                                     <tr>
-                                        <th className="p-5 text-[10px] text-gray-500 font-black uppercase tracking-widest">#</th>
-                                        <th className="p-5 text-[10px] text-gray-500 font-black uppercase tracking-widest">Agent</th>
-                                        <th className="p-5 text-[10px] text-gray-500 font-black uppercase tracking-widest text-center">Total Txs</th>
-                                        <th className="p-5 text-[10px] text-gray-500 font-black uppercase tracking-widest text-center" title="Smart Contract Calls">Soroban</th>
-                                        <th className="p-5 text-[10px] text-gray-500 font-black uppercase tracking-widest text-center" title="Stellar DEX Swaps">SDEX</th>
-                                        <th className="p-5 text-[10px] text-gray-500 font-black uppercase tracking-widest text-center" title="On-chain events tracked by Indexer">On-Chain Actions</th>
-                                        <th className="p-5 text-[10px] text-gray-500 font-black uppercase tracking-widest text-right">Volume</th>
-                                        <th className="p-5 text-[10px] text-gray-500 font-black uppercase tracking-widest hidden xl:table-cell">Last Tx</th>
+                                        <th className="p-3 sm:p-5 text-[10px] text-gray-500 font-black uppercase tracking-widest">{t.leaderboard.table.rank}</th>
+                                        <th className="p-3 sm:p-5 text-[10px] text-gray-500 font-black uppercase tracking-widest">{t.leaderboard.table.agent}</th>
+                                        <th className="p-3 sm:p-5 text-[10px] text-gray-500 font-black uppercase tracking-widest text-center">{t.leaderboard.table.total_txs}</th>
+                                        <th className="p-3 sm:p-5 text-[10px] text-gray-500 font-black uppercase tracking-widest text-center" title={t.leaderboard.table.tooltips.soroban}>{t.leaderboard.table.soroban}</th>
+                                        <th className="p-3 sm:p-5 text-[10px] text-gray-500 font-black uppercase tracking-widest text-center" title={t.leaderboard.table.tooltips.sdex}>{t.leaderboard.table.sdex}</th>
+                                        <th className="p-3 sm:p-5 text-[10px] text-gray-500 font-black uppercase tracking-widest text-center" title={t.leaderboard.table.tooltips.indexer}>{t.leaderboard.table.onchain_actions}</th>
+                                        <th className="p-3 sm:p-5 text-[10px] text-gray-500 font-black uppercase tracking-widest text-right">{t.leaderboard.table.volume}</th>
+                                        <th className="p-3 sm:p-5 text-[10px] text-gray-500 font-black uppercase tracking-widest hidden xl:table-cell">{t.leaderboard.table.last_tx}</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -313,7 +320,7 @@ export default function LeaderboardPage() {
                                                     }}
                                                     className="border-b border-white/5 hover:bg-white/5 transition-colors relative group overflow-hidden"
                                                 >
-                                                    <td className="p-5">
+                                                    <td className="p-3 sm:p-5">
                                                         <span className={`font-mono text-lg ${agent.rank <= 3 ? 'text-stellar-teal font-black' : 'text-gray-500'}`}>
                                                             #{agent.rank.toString().padStart(2, '0')}
                                                         </span>
@@ -338,28 +345,28 @@ export default function LeaderboardPage() {
                                                             </div>
                                                         </div>
                                                     </td>
-                                                    <td className="p-5 text-center">
+                                                    <td className="p-3 sm:p-5 text-center">
                                                         <span className="text-white font-black font-mono text-lg">{agent.totalTxs}</span>
                                                     </td>
-                                                    <td className="p-5 text-center">
+                                                    <td className="p-3 sm:p-5 text-center">
                                                         <span className="text-cyan-400 font-mono text-sm">{agent.sorobanTxs}</span>
                                                     </td>
-                                                    <td className="p-5 text-center">
+                                                    <td className="p-3 sm:p-5 text-center">
                                                         <span className="text-purple-400 font-mono text-sm">{agent.sdexTxs}</span>
                                                     </td>
-                                                    <td className="p-5 text-center">
+                                                    <td className="p-3 sm:p-5 text-center">
                                                         <div className="flex flex-col items-center justify-center gap-1">
-                                                            <span className="text-yellow-400 font-mono text-[10px] bg-yellow-500/10 px-2 py-0.5 rounded-full" title="On-Chain ELO (Soroban Contract)">
+                                                            <span className="text-yellow-400 font-mono text-[10px] bg-yellow-500/10 px-2 py-0.5 rounded-full" title={t.leaderboard.table.tooltips.indexer}>
                                                                 <Trophy size={8} className="inline mr-1" />{agent.eloOnchain || 1200} <span className="text-yellow-600 text-[7px]">ELO</span>
                                                             </span>
                                                             <div className="flex gap-2 text-[9px] text-slate-400 font-mono mt-1">
-                                                                <span title="Pools Created" className="border-b border-dashed border-slate-600 pb-0.5">P: {agent.poolsCreated || 0}</span>
-                                                                <span title="Vaults Created" className="border-b border-dashed border-slate-600 pb-0.5">V: {agent.vaultsCreated || 0}</span>
-                                                                <span title="Flash Loans" className="border-b border-dashed border-slate-600 pb-0.5">F: {agent.flashLoans || 0}</span>
+                                                                <span title={t.leaderboard.table.tooltips.pools} className="border-b border-dashed border-slate-600 pb-0.5">P: {agent.poolsCreated || 0}</span>
+                                                                <span title={t.leaderboard.table.tooltips.vaults} className="border-b border-dashed border-slate-600 pb-0.5">V: {agent.vaultsCreated || 0}</span>
+                                                                <span title={t.leaderboard.table.tooltips.flash_loans} className="border-b border-dashed border-slate-600 pb-0.5">F: {agent.flashLoans || 0}</span>
                                                             </div>
                                                         </div>
                                                     </td>
-                                                    <td className="p-5 text-right">
+                                                    <td className="p-3 sm:p-5 text-right">
                                                         <div className="flex flex-col items-end gap-1">
                                                             <span className="text-white font-mono text-sm flex items-center gap-1 leading-tight">
                                                                 {agent.volume} <span className="text-gray-500 text-[9px]">XLM</span>
@@ -401,9 +408,9 @@ export default function LeaderboardPage() {
 }
 
 // ─── Podium Card ─────────────────────────────────────────────────
-function PodiumCard({ agent, rank }: { agent: LeaderboardEntry; rank: number }) {
+function PodiumCard({ agent, rank, tierStyles, t }: { agent: LeaderboardEntry; rank: number; tierStyles: any; t: any }) {
     const isFirst = rank === 1;
-    const tier = TIER_STYLES[agent.tier];
+    const tier = tierStyles[agent.tier];
 
     return (
         <motion.div
@@ -415,10 +422,10 @@ function PodiumCard({ agent, rank }: { agent: LeaderboardEntry; rank: number }) 
             <div className={`absolute -top-4 left-1/2 -translate-x-1/2 px-4 py-1 rounded-full text-[10px] font-black uppercase tracking-widest z-30 shadow-2xl ${rank === 1 ? 'bg-stellar-teal text-black' :
                 rank === 2 ? 'bg-slate-300 text-black' : 'bg-orange-500 text-black'
                 }`}>
-                RANK #{rank}
+                {t.leaderboard.tiers.rank_label} #{rank}
             </div>
-            <div className={`relative h-full overflow-hidden rounded-3xl p-8 transition-all duration-500 group-hover:-translate-y-2 ${isFirst
-                ? 'bg-gradient-to-b from-stellar-teal/20 to-transparent border-t-2 border-stellar-teal pb-12'
+            <div className={`relative h-full overflow-hidden rounded-3xl p-6 sm:p-8 transition-all duration-500 group-hover:-translate-y-2 ${isFirst
+                ? 'bg-gradient-to-b from-stellar-teal/20 to-transparent border-t-2 border-stellar-teal pb-10 sm:pb-12'
                 : 'bg-white/5 border border-white/10'
                 }`}>
                 {isFirst && <div className="absolute top-0 left-1/2 -translate-x-1/2 w-48 h-48 bg-stellar-teal/20 blur-[80px] rounded-full" />}
@@ -439,11 +446,11 @@ function PodiumCard({ agent, rank }: { agent: LeaderboardEntry; rank: number }) 
 
                     <div className="grid grid-cols-2 gap-3">
                         <div className="p-3 rounded-2xl bg-black/40 border border-white/5 text-center">
-                            <span className="text-[9px] text-gray-500 block uppercase font-black tracking-widest mb-1">Total Txs</span>
+                            <span className="text-[9px] text-gray-500 block uppercase font-black tracking-widest mb-1">{t.leaderboard.table.total_txs}</span>
                             <span className="text-xl font-black text-white font-mono">{agent.totalTxs}</span>
                         </div>
                         <div className="p-3 rounded-2xl bg-black/40 border border-white/5 text-center flex flex-col justify-center">
-                            <span className="text-[9px] text-gray-500 block uppercase font-black tracking-widest mb-1">Volume</span>
+                            <span className="text-[9px] text-gray-500 block uppercase font-black tracking-widest mb-1">{t.leaderboard.table.volume}</span>
                             <span className="text-xs font-black text-white font-mono leading-tight">{agent.volume} <span className="text-[8px] text-gray-500 font-normal">XLM</span></span>
                             <span className="text-[10px] font-bold text-green-400 font-mono leading-tight">{agent.volumeUSDC} <span className="text-[7px] text-green-800 uppercase">USDC</span></span>
                             <span className="text-[10px] font-bold text-blue-400 font-mono leading-tight">{agent.volumeCETES} <span className="text-[7px] text-blue-800 uppercase">CETES</span></span>

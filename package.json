@@ -3,9 +3,12 @@
   "private": true,
   "scripts": {
     "dev": "pnpm --parallel --filter nirium-web --filter @nirium/agent run dev",
-    "build": "pnpm --filter nirium-web run build",
+    "build": "pnpm --filter nirium-web --filter @nirium/agent run build",
     "start": "pnpm --filter nirium-web start",
-    "postinstall": "node scripts/postinstall.js"
+    "start:agent": "pnpm --filter @nirium/agent start",
+    "start:web": "pnpm --filter nirium-web start",
+    "ship": "vercel --prod",
+    "postinstall": "node -e \"try{require('./scripts/postinstall.js')}catch(e){console.log('[postinstall] skipped:',e.message)}\""
   },
   "engines": {
     "node": "20.x"

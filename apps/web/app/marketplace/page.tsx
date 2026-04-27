@@ -2,49 +2,52 @@
 
 import { SectionBrandLogo } from "@/components/ui/SectionBrandLogo";
 import Navbar from "@/components/layout/Navbar";
-import {
-    Download, Star, Search, Filter, TrendingUp, Sparkles,
-    CheckCircle, Package, ExternalLink, ChevronRight, Zap,
-    Code2, Bell, BarChart3, Database, Link2, Settings, Play, UserPlus,
-    X, Info, AlertTriangle, Shield, ArrowRight, Activity, Terminal, DollarSign
-} from "lucide-react";
+import { Copy, ArrowRight, Zap, TrendingUp, ShieldAlert, Cpu, Plus, Sparkles, Download, Star, Code2, UserPlus, Database, Bell, Settings, BarChart3, Link2 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import Link from "next/link";
 import { useState, useEffect } from "react";
 import { toast } from "sonner";
-import { writeLog } from "@/lib/logger";
-import { useFreighter } from "@/hooks/useFreighter";
+import { useRouter } from "next/navigation";
 import InstallSkillModal from "@/components/marketplace/InstallSkillModal";
-import { useMarketplace } from "@/hooks/useNiriumContracts";
 import { useX402 } from "@/hooks/useX402";
+import { StrategyService } from "@/lib/strategyService";
+import { useLanguage } from "@/context/LanguageContext";
+import { useFreighter } from "@/hooks/useFreighter";
 
-
-// Types
-interface MarketplaceSkill {
-    id: string;
-    name: string;
-    slug: string;
-    version: string;
-    description: string;
-    author: string;
-    category: string;
-    tags: string[];
-    downloads: number;
-    elo: number;
-    reviewCount: number;
-    isVerified: boolean;
-    isFeatured: boolean;
-    isPremium?: boolean;
-    price?: string;
-    actions?: { name: string; description: string }[];
-}
-
-interface Category {
-    id: string;
-    name: string;
-    count: number;
-    icon: string;
-}
+const BASE_STRATEGIES = [
+    {
+        id: "nirium-usdc-loop",
+        risk: "low",
+        tags: ["Stable", "Blue Chip"],
+        color: "from-blue-500 to-cyan-500",
+        baseApy: 14.2,
+        elo: 2127
+    },
+    {
+        id: "turbo-sniper",
+        risk: "high",
+        tags: ["Degen", "High Yield"],
+        color: "from-purple-500 to-pink-500",
+        baseApy: 420.69,
+        elo: 1541
+    },
+    {
+        id: "liquid-staking-arb",
+        risk: "very_low",
+        tags: ["Safe", "Institutional"],
+        color: "from-green-500 to-emerald-500",
+        baseApy: 8.5,
+        elo: 1454
+    },
+    {
+        id: "eliza-sentiment",
+        risk: "medium",
+        tags: ["AI Agent", "Social"],
+        color: "from-orange-500 to-red-500",
+        baseApy: 45.2,
+        elo: 1609
+    }
+];
 
 const CATEGORY_ICONS: Record<string, any> = {
     trading: TrendingUp,
@@ -64,1063 +67,530 @@ const CATEGORY_COLORS: Record<string, string> = {
     utility: "from-gray-500 to-slate-600"
 };
 
-export default function MarketplacePage() {
-    const { address: userWallet } = useFreighter();
-    const [skills, setSkills] = useState<MarketplaceSkill[]>([]);
-    const [categories, setCategories] = useState<Category[]>([]);
-    const [featuredSkills, setFeaturedSkills] = useState<MarketplaceSkill[]>([]);
-    const [loading, setLoading] = useState(true);
-    const [searchQuery, setSearchQuery] = useState("");
-    const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
-    const [sortBy, setSortBy] = useState<"downloads" | "elo" | "newest">("elo");
+const BASE_PLUGINS = [
+    {
+        id: "flash-loan-executor",
+        slug: "flash-loan-executor",
+        category: "trading",
+        tags: ["flash-loan", "stellar", "x402"],
+        color: "from-emerald-500 to-green-600",
+        downloads: 12500,
+        elo: 1200,
+        isPremium: false,
+        price: null
+    },
+    {
+        id: "price-oracle",
+        slug: "price-oracle",
+        category: "data",
+        tags: ["oracle", "price", "MPP"],
+        color: "from-cyan-500 to-teal-600",
+        downloads: 8900,
+        elo: 1200,
+        isPremium: true,
+        price: "1.00 USDC/mo"
+    },
+    {
+        id: "telegram-alerts-pro",
+        slug: "telegram-alerts-pro",
+        category: "notification",
+        tags: ["telegram", "alerts", "MPP"],
+        color: "from-orange-500 to-amber-600",
+        downloads: 15700,
+        elo: 1200,
+        isPremium: true,
+        price: "1.00 USDC/mo"
+    },
+    {
+        id: "soroswap-lp-manager",
+        slug: "soroswap-lp-manager",
+        category: "trading",
+        tags: ["soroswap", "lp"],
+        color: "from-pink-500 to-rose-500",
+        downloads: 6789,
+        elo: 1200,
+        isPremium: true,
+        price: "0.50 USDC/mo"
+    },
+    {
+        id: "ipfs-blackbox-logger",
+        slug: "ipfs-blackbox-logger",
+        category: "utility",
+        tags: ["ipfs", "audit", "logs"],
+        color: "from-gray-500 to-slate-500",
+        downloads: 2980,
+        elo: 1200,
+        isPremium: false,
+        price: null
+    },
+];
+
+export default function StrategiesPage() {
+    const { t } = useLanguage();
+    const { address: accountStr, isConnected } = useFreighter();
+    const account = isConnected ? { address: accountStr, chains: ['stellar:testnet'] } : null;
+    const router = useRouter();
+    const [deployingId, setDeployingId] = useState<string | null>(null);
+    const [selectedAssets, setSelectedAssets] = useState<Record<string, 'XLM' | 'USDC'>>({});
     const [installedSkills, setInstalledSkills] = useState<{ [key: string]: boolean }>({});
-    const [stats, setStats] = useState({ totalSkills: 0, totalDownloads: 0 });
-    const [selectedSkillToInstall, setSelectedSkillToInstall] = useState<MarketplaceSkill | null>(null);
-    const [selectedSkillToExecute, setSelectedSkillToExecute] = useState<MarketplaceSkill | null>(null);
-    const marketplace = useMarketplace();
+    const [selectedSkillToInstall, setSelectedSkillToInstall] = useState<any | null>(null);
+    const [strategies, setStrategies] = useState(BASE_STRATEGIES.map(s => ({
+        ...s, apy: `${s.baseApy}%`, tvl: "Loading..."
+    })));
+    const [plugins, setPlugins] = useState(BASE_PLUGINS);
+    const [isInstalling, setIsInstalling] = useState(false);
     const { fetchPaid } = useX402();
-    const { address } = useFreighter();
-    const [onChainStrategyCount, setOnChainStrategyCount] = useState<number | null>(null);
-
-    // Fetch on-chain marketplace stats
-    useEffect(() => {
-        const fetchOnChainStats = async () => {
-            try {
-                const count = await marketplace.getStrategyCount();
-                setOnChainStrategyCount(count);
-            } catch (e) {
-                console.warn('[Marketplace] On-chain fetch failed:', e);
-            }
-        };
-        fetchOnChainStats();
-    }, []);
-
-    // Fetch marketplace data
-    useEffect(() => {
-        const fetchData = async () => {
-            setLoading(true);
-            try {
-                // In production, these would be real API calls
-                // For now, we'll use mock data
-
-                const mockSkills: MarketplaceSkill[] = [
-                    {
-                        id: 'flash-loan-executor',
-                        name: 'Flash Loan Executor',
-                        slug: 'flash-loan-executor',
-                        version: '0.1.0',
-                        description: 'Execute atomic flash loans using Soroban single-invocation primitives. Billed via x402.',
-                        author: 'Nirium Team',
-                        category: 'trading',
-                        tags: ['flash-loan', 'stellar', 'x402'],
-                        downloads: 12453,
-                        elo: 1200, reviewCount: 0,
-                        isVerified: true,
-                        isFeatured: true,
-                        isPremium: true,
-                        price: "0.01 USDC"
-                    },
-                    {
-                        id: 'price-oracle',
-                        name: 'Multi-Source Price Oracle',
-                        slug: 'price-oracle',
-                        version: '1.5.0',
-                        description: 'Aggregate prices from CoinGecko, DeFiLlama, Pyth. Real-time MPP subscription.',
-                        author: 'DeFi Labs',
-                        category: 'data',
-                        tags: ['oracle', 'price', 'MPP'],
-                        downloads: 8932,
-                        elo: 1200, reviewCount: 0,
-                        isVerified: true,
-                        isFeatured: true,
-                        isPremium: true,
-                        price: "1.00 USDC/mo"
-                    },
-                    {
-                        id: 'telegram-alerts-pro',
-                        name: 'Telegram Alerts Pro',
-                        slug: 'telegram-alerts-pro',
-                        version: '3.0.0',
-                        description: 'Advanced Telegram notifications with rich formatting. MPP enabled.',
-                        author: 'NotifyBot',
-                        category: 'notification',
-                        tags: ['telegram', 'alerts', 'MPP'],
-                        downloads: 15678,
-                        elo: 1200, reviewCount: 0,
-                        isVerified: true,
-                        isFeatured: true,
-                        isPremium: true,
-                        price: "1.00 USDC/mo"
-                    },
-                    {
-                        id: 'whale-tracker',
-                        name: 'Whale Tracker',
-                        slug: 'whale-tracker',
-                        version: '1.2.0',
-                        description: 'Track large wallet movements on Stellar. x402 pay-per-scan.',
-                        author: 'OnChainInsights',
-                        category: 'analysis',
-                        tags: ['whale', 'tracking', 'x402'],
-                        downloads: 6234,
-                        elo: 1200, reviewCount: 0,
-                        isVerified: true,
-                        isFeatured: false,
-                        isPremium: true,
-                        price: "0.01 USDC"
-                    },
-                    {
-                        id: 'lst-arbitrage',
-                        name: 'LST Arbitrage Bot',
-                        slug: 'lst-arbitrage',
-                        version: '2.0.0',
-                        description: 'Automated arbitrage between liquid staking tokens.',
-                        author: 'ArbitrageDAO',
-                        category: 'trading',
-                        tags: ['lst', 'arbitrage', 'automation'],
-                        downloads: 4521,
-                        elo: 1200, reviewCount: 0,
-                        isVerified: true,
-                        isFeatured: false
-                    },
-                    {
-                        id: 'blend-optimizer',
-                        name: 'Blend Yield Optimizer',
-                        slug: 'blend-optimizer',
-                        version: '1.8.0',
-                        description: 'Optimize Blend lending positions for best APY.',
-                        author: 'YieldFarm',
-                        category: 'trading',
-                        tags: ['blend', 'lending', 'yield'],
-                        downloads: 7845,
-                        elo: 1200, reviewCount: 0,
-                        isVerified: true,
-                        isFeatured: false
-                    },
-                    {
-                        id: 'discord-integration',
-                        name: 'Discord Bot Integration',
-                        slug: 'discord-integration',
-                        version: '2.5.0',
-                        description: 'Full Discord integration with slash commands.',
-                        author: 'DiscordDevs',
-                        category: 'integration',
-                        tags: ['discord', 'bot', 'integration'],
-                        downloads: 9123,
-                        elo: 1200, reviewCount: 0,
-                        isVerified: true,
-                        isFeatured: false
-                    },
-                    {
-                        id: 'portfolio-tracker',
-                        name: 'Portfolio Tracker',
-                        slug: 'portfolio-tracker',
-                        version: '1.3.0',
-                        description: 'Track DeFi portfolio with P&L analytics.',
-                        author: 'PortfolioLabs',
-                        category: 'analysis',
-                        tags: ['portfolio', 'tracking', 'analytics'],
-                        downloads: 5678,
-                        elo: 1200, reviewCount: 0,
-                        isVerified: false,
-                        isFeatured: false
-                    },
-                    {
-                        id: 'pyth-oracle',
-                        name: 'Pyth Network Oracle',
-                        slug: 'pyth-oracle',
-                        version: '2.1.0',
-                        description: 'Pyth Network high-fidelity price feeds for 200+ assets.',
-                        author: 'Pyth Contributors',
-                        category: 'data',
-                        tags: ['pyth', 'oracle', 'price'],
-                        downloads: 9876,
-                        elo: 1200, reviewCount: 0,
-                        isVerified: true,
-                        isFeatured: true
-                    },
-                    {
-                        id: 'twitter-sentiment',
-                        name: 'Twitter/X Sentiment Analyzer',
-                        slug: 'twitter-sentiment',
-                        version: '0.0.7',
-                        description: 'Real-time sentiment analysis of crypto Twitter.',
-                        author: 'SocialFi',
-                        category: 'analysis',
-                        tags: ['twitter', 'sentiment', 'ai'],
-                        downloads: 8765,
-                        elo: 1200, reviewCount: 0,
-                        isVerified: true,
-                        isFeatured: true
-                    },
-                    {
-                        id: 'soroswap-lp-manager',
-                        name: 'Soroswap LP Manager',
-                        slug: 'soroswap-lp-manager',
-                        version: '2.0.0',
-                        description: 'Manage Soroswap AMM positions with auto-rebalance.',
-                        author: 'LPMasters',
-                        category: 'trading',
-                        tags: ['soroswap', 'lp', 'liquidity'],
-                        downloads: 6789,
-                        elo: 1200, reviewCount: 0,
-                        isVerified: true,
-                        isFeatured: false
-                    },
-                    {
-                        id: 'gas-optimizer',
-                        name: 'Gas Optimizer',
-                        slug: 'gas-optimizer',
-                        version: '1.0.0',
-                        description: 'Optimize transaction gas costs with batching.',
-                        author: 'GasDAO',
-                        category: 'utility',
-                        tags: ['gas', 'optimization', 'cost'],
-                        downloads: 3421,
-                        elo: 1200, reviewCount: 0,
-                        isVerified: false,
-                        isFeatured: false
-                    },
-                    {
-                        id: 'blend-lending-bot',
-                        name: 'Blend Lending Bot',
-                        slug: 'blend-lending-bot',
-                        version: '1.1.0',
-                        description: 'Auto-manages lending positions on Blend Protocol. Monitors health factor and rebalances collateral to avoid liquidation.',
-                        author: 'ProtocolLabs',
-                        category: 'trading',
-                        tags: ['phoenix', 'lending', 'health-factor'],
-                        downloads: 5230,
-                        elo: 1200, reviewCount: 0,
-                        isVerified: true,
-                        isFeatured: true
-                    },
-                    {
-                        id: 'sdex-market-maker',
-                        name: 'SDEX Market Maker',
-                        slug: 'sdex-market-maker',
-                        version: '0.9.2',
-                        description: 'Places and manages limit orders on SDEX. Earns maker rebates by providing continuous two-sided liquidity.',
-                        author: 'MMGuild',
-                        category: 'trading',
-                        tags: ['sdex', 'market-making', 'limit-orders'],
-                        downloads: 3870,
-                        elo: 1200, reviewCount: 0,
-                        isVerified: true,
-                        isFeatured: false
-                    },
-                    {
-                        id: 'stop-loss-guardian',
-                        name: 'Stop-Loss Guardian',
-                        slug: 'stop-loss-guardian',
-                        version: '2.2.0',
-                        description: 'Monitors position prices and executes atomic stop-loss orders on DeepBook when thresholds are breached. Zero-latency protection.',
-                        author: 'RiskArsenal',
-                        category: 'utility',
-                        tags: ['stop-loss', 'risk', 'protection', 'sdex'],
-                        downloads: 11230,
-                        elo: 1200, reviewCount: 0,
-                        isVerified: true,
-                        isFeatured: true
-                    },
-                    {
-                        id: 'eliza-trading-brain',
-                        name: 'ElizaOS Trading Brain',
-                        slug: 'eliza-trading-brain',
-                        version: '0.0.7',
-                        description: 'Embeds an ElizaOS AI agent as a decision-making layer for your strategies. The agent evaluates market context before each execution.',
-                        author: 'Nirium Team',
-                        category: 'analysis',
-                        tags: ['eliza', 'ai', 'decision-engine'],
-                        downloads: 7654,
-                        elo: 1200, reviewCount: 0,
-                        isVerified: true,
-                        isFeatured: true
-                    },
-                    {
-                        id: 'ipfs-blackbox-logger',
-                        name: 'IPFS Blackbox Logger',
-                        slug: 'ipfs-blackbox-logger',
-                        version: '1.0.0',
-                        description: 'Archives all agent execution logs to decentralized IPFS storage. Provides permanent, verifiable audit trails.',
-                        author: 'Nirium Team',
-                        category: 'utility',
-                        tags: ['ipfs', 'storage', 'logs', 'audit'],
-                        downloads: 2980,
-                        elo: 1200, reviewCount: 0,
-                        isVerified: true,
-                        isFeatured: false
-                    },
-                    {
-                        id: 'cross-dex-aggregator',
-                        name: 'Cross-DEX Aggregator',
-                        slug: 'cross-dex-aggregator',
-                        version: '3.1.0',
-                        description: 'Routes swaps across Phoenix, Soroswap, and SDEX to ensure best execution price. Atomic multi-hop routing supported.',
-                        author: 'AggregateDAO',
-                        category: 'trading',
-                        tags: ['dex', 'aggregator', 'swap', 'routing'],
-                        downloads: 14320,
-                        elo: 1200, reviewCount: 0,
-                        isVerified: true,
-                        isFeatured: true
-                    },
-                    {
-                        id: 'pnl-reporter',
-                        name: 'P&L Real-Time Reporter',
-                        slug: 'pnl-reporter',
-                        version: '1.4.0',
-                        description: 'Calculates realized and unrealized P&L across all agent positions. Sends daily summaries to Telegram or Discord.',
-                        author: 'PortfolioLabs',
-                        category: 'analysis',
-                        tags: ['pnl', 'reporting', 'analytics'],
-                        downloads: 4560,
-                        elo: 1200, reviewCount: 0,
-                        isVerified: true,
-                        isFeatured: false
-                    },
-                    {
-                        id: 'webhook-trigger',
-                        name: 'Webhook Event Trigger',
-                        slug: 'webhook-trigger',
-                        version: '2.0.0',
-                        description: 'Exposes a secure webhook endpoint to trigger agent actions from external systems (TradingView, Zapier, custom bots).',
-                        author: 'IntegrationHub',
-                        category: 'integration',
-                        tags: ['webhook', 'trigger', 'external', 'automation'],
-                        downloads: 6780,
-                        elo: 1200, reviewCount: 0,
-                        isVerified: true,
-                        isFeatured: false
-                    },
-                    {
-                        id: 'neural-archive-logger',
-                        name: 'Neural Archive Logger',
-                        slug: 'neural-archive-logger',
-                        version: '0.1.0',
-                        description: 'Immutable decentralized forensic logging. Every agent decision is cryptographically sealed and archived. Tamper-proof audit trail.',
-                        author: 'Nirium Team',
-                        category: 'utility',
-                        tags: ['archive', 'logs', 'audit', 'decentralized', 'forensic'],
-                        downloads: 3100,
-                        elo: 1200, reviewCount: 0,
-                        isVerified: true,
-                        isFeatured: true
-                    },
-                    {
-                        id: 'usdc-vault-manager',
-                        name: 'USDC Vault Manager',
-                        slug: 'usdc-vault-manager',
-                        version: '0.0.7',
-                        description: 'Full lifecycle management for USDC vaults. Handles deposit, withdrawal, yield routing, and auto-rotation across Phoenix and Blend USDC lending pools.',
-                        author: 'Nirium Team',
-                        category: 'trading',
-                        tags: ['usdc', 'vault', 'multi-asset', 'phoenix', 'blend'],
-                        downloads: 4200,
-                        elo: 1200, reviewCount: 0,
-                        isVerified: true,
-                        isFeatured: false
-                    }
-                ];
-
-                const mockCategories: Category[] = [
-                    { id: 'trading', name: 'Trading', count: 8, icon: '📈' },
-                    { id: 'analysis', name: 'Analysis', count: 4, icon: '🔍' },
-                    { id: 'notification', name: 'Notifications', count: 1, icon: '🔔' },
-                    { id: 'integration', name: 'Integrations', count: 2, icon: '🔗' },
-                    { id: 'data', name: 'Data', count: 2, icon: '📊' },
-                    { id: 'utility', name: 'Utilities', count: 4, icon: '🛠️' }
-                ];
-
-                setSkills(mockSkills);
-                setCategories(mockCategories);
-                setFeaturedSkills(mockSkills.filter(s => s.isFeatured));
-                setStats({
-                    totalSkills: mockSkills.length,
-                    totalDownloads: mockSkills.reduce((sum, s) => sum + s.downloads, 0)
-                });
-
-                // Fetch installed skills from Agent
-                try {
-                    const installedRes = await fetch('/api/marketplace/installed');
-                    if (installedRes.ok) {
-                        const installedData = await installedRes.json();
-                        if (installedData.success && installedData.skills) {
-                            const installedMap: { [key: string]: boolean } = {};
-                            installedData.skills.forEach((s: any) => {
-                                installedMap[s.slug] = true;
-                                // Map both slug and potentially matching ID
-                                installedMap[s.id || s.slug] = true;
-                            });
-                            // Merge with LocalStorage (Offline Persistence)
-                            const local = JSON.parse(localStorage.getItem('nirium-skills') || '{}');
-                            console.log('[Marketplace] Syncing installed skills + local:', { ...installedMap, ...local });
-                            setInstalledSkills({ ...installedMap, ...local });
-                        }
-                    } else {
-                        throw new Error('API Error');
-                    }
-                } catch (e) {
-                    console.warn("Could not fetch installed skills, falling back to local", e);
-                    // Fallback to local
-                    const local = JSON.parse(localStorage.getItem('nirium-skills') || '{}');
-                    setInstalledSkills(local);
-                }
-
-            } catch (error) {
-                console.error('Failed to fetch marketplace data:', error);
-            } finally {
-                setLoading(false);
-            }
-        };
-
-        fetchData();
-    }, []);
-
-    // Filter and sort skills
-    const filteredSkills = skills
-        .filter(skill => {
-            const matchesSearch = searchQuery === "" ||
-                skill.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                skill.description.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                skill.tags.some(t => t.toLowerCase().includes(searchQuery.toLowerCase()));
-
-            const matchesCategory = !selectedCategory || skill.category === selectedCategory;
-
-            return matchesSearch && matchesCategory;
-        })
-        .sort((a, b) => {
-            switch (sortBy) {
-                case "downloads": return b.downloads - a.downloads;
-                case "elo": return b.elo - a.elo;
-                case "newest": return 0; // In production, compare dates
-                default: return 0;
-            }
-        });
 
     const handleInstall = async (agentId: string) => {
         if (!selectedSkillToInstall) return;
-
+        
+        setIsInstalling(true);
         const skill = selectedSkillToInstall;
-        setSelectedSkillToInstall(null); // Close modal
-
-        const toastId = toast.loading(`Installing ${skill.name} to unit ${agentId.slice(0, 10)}...`);
+        const localizedSkill = t.marketplace.plugins.items[skill.id as keyof typeof t.marketplace.plugins.items] || { name: skill.id };
+        const toastId = toast.loading(`Installing ${localizedSkill.name} to unit ${agentId}...`);
 
         try {
-            const response = await fetchPaid(`/api/marketplace/install/${skill.id}`, {
+            const API_URL = process.env.NEXT_PUBLIC_API_URL || "https://api.nirium.xyz";
+            const response = await fetchPaid(`${API_URL}/api/marketplace/install/${skill.id || skill.slug}`, {
                 method: 'POST',
                 headers: {
-                    'Content-Type': 'application/json',
-                    'x-stellar-account': userWallet || '',
-                },
-                body: JSON.stringify({ targetAgent: agentId }) // Send agent ID
+                    'x-stellar-account': account?.address || ""
+                }
             });
+
             if (!response.ok) {
-                const errText = await response.text();
-                throw new Error(`Server returned ${response.status}: ${errText.slice(0, 50)}`);
+                const err = await response.json();
+                throw new Error(err.error || "Installation failed");
             }
 
-            const data = await response.json();
+            const result = await response.json();
 
-            if (data.success) {
-                toast.dismiss(toastId);
+            await StrategyService.registerSkill(account?.address || "anonymous", skill.id || skill.slug, {
+                agentId,
+                txHash: result.txHash
+            });
 
-                // Update local persistence (per-agent AND global)
-                const agentLocalKey = `nirium-skills-${agentId}`;
-                const globalLocalKey = 'nirium-skills';
-                
-                const existingAgentLocal = JSON.parse(localStorage.getItem(agentLocalKey) || '{}');
-                const existingGlobalLocal = JSON.parse(localStorage.getItem(globalLocalKey) || '{}');
-                
-                const newAgentInstalled = { ...existingAgentLocal, [skill.id]: true, [skill.slug]: true };
-                const newGlobalInstalled = { ...existingGlobalLocal, [skill.id]: true, [skill.slug]: true };
-                
-                localStorage.setItem(agentLocalKey, JSON.stringify(newAgentInstalled));
-                localStorage.setItem(globalLocalKey, JSON.stringify(newGlobalInstalled));
-                
-                setInstalledSkills(prev => ({ ...prev, [skill.id]: true, [skill.slug]: true }));
+            setInstalledSkills((prev) => ({ ...prev, [skill.id]: true }));
+            
+            toast.dismiss(toastId);
+            toast.success(`${localizedSkill.name} integrated successfully into unit ${agentId}!`, {
+                description: result.message || "Capability online.",
+                duration: 5000
+            });
 
-                // Skill-specific bootup logs
-                const SKILL_BOOT_LOGS: Record<string, Array<{ msg: string; level: 'info' | 'success' | 'warn' }>> = {
-                    'flash-loan-executor': [{ msg: 'SKILL: Flash Loan Executor binding to Soroban atomic module...', level: 'info' }, { msg: 'SKILL: Atomic flash loan ready. Reviewing arbitrage routes.', level: 'success' }],
-                    'price-oracle': [{ msg: 'SKILL: Multi-Source Oracle aggregating CoinGecko + DeFiLlama + Pyth...', level: 'info' }, { msg: 'SKILL: Price feeds live — 200+ assets tracked.', level: 'success' }],
-                    'telegram-alerts-pro': [{ msg: 'SKILL: Telegram bot connecting to notification channel...', level: 'info' }, { msg: 'SKILL: Telegram Alerts Pro active. Test message sent.', level: 'success' }],
-                    'whale-tracker': [{ msg: 'SKILL: Whale Tracker initializing top-100 wallet scanner...', level: 'info' }, { msg: 'SKILL: 3 whale wallets flagged for accumulation. Monitoring.', level: 'warn' }],
-                    'lst-arbitrage': [{ msg: 'SKILL: LST Arbitrage Bot reading yXLM/XLM peg status...', level: 'info' }, { msg: 'SKILL: Peg deviation within range. Watching for redemption window.', level: 'success' }],
-                    'blend-optimizer': [{ msg: 'SKILL: Blend Optimizer reading current lending APY...', level: 'info' }, { msg: 'SKILL: Optimal supply allocation found — rebalancing 12% collateral.', level: 'success' }],
-                    'discord-integration': [{ msg: 'SKILL: Discord Bot binding to guild via OAuth2...', level: 'info' }, { msg: 'SKILL: Slash commands registered. Discord integration live.', level: 'success' }],
-                    'portfolio-tracker': [{ msg: 'SKILL: Portfolio Tracker indexing wallet positions...', level: 'info' }, { msg: 'SKILL: 12 open positions tracked. P&L dashboard ready.', level: 'success' }],
-                    'pyth-oracle': [{ msg: 'SKILL: Pyth Network Oracle subscribing to price feeds...', level: 'info' }, { msg: 'SKILL: 230 Pyth price feeds active. Staleness guard enabled.', level: 'success' }],
-                    'twitter-sentiment': [{ msg: 'SKILL: X/Twitter Sentiment scanning #Stellar ecosystem keywords...', level: 'info' }, { msg: 'SKILL: Bullish sentiment index: 72%. Signal feed active.', level: 'success' }],
-                    'soroswap-lp-manager': [{ msg: 'SKILL: Phoenix LP Manager reading AMM position ranges...', level: 'info' }, { msg: 'SKILL: 2 positions in range. Auto-rebalance armed.', level: 'success' }],
-                    'gas-optimizer': [{ msg: 'SKILL: Fee Optimizer analyzing transaction multi-op opportunities...', level: 'info' }, { msg: 'SKILL: Multi-op mode enabled. Estimated 45% fee savings.', level: 'success' }],
-                    'blend-lending-bot': [{ msg: 'SKILL: Blend Lending Bot reading health factor across positions...', level: 'info' }, { msg: 'SKILL: Health factor 1.82 — safe. Auto-rebalance threshold set.', level: 'success' }],
-                    'sdex-market-maker': [{ msg: 'SKILL: DeepBook Market Maker placing two-sided limit orders...', level: 'info' }, { msg: 'SKILL: 4 limit orders placed. Maker rebate capture active.', level: 'success' }],
-                    'stop-loss-guardian': [{ msg: 'SKILL: Stop-Loss Guardian monitoring 3 open positions...', level: 'info' }, { msg: 'SKILL: Stop orders armed at -8% threshold. Protection active.', level: 'warn' }],
-                    'eliza-trading-brain': [{ msg: 'SKILL: ElizaOS Trading Brain loading LLM context model...', level: 'info' }, { msg: 'SKILL: AI decision layer active. Pre-execution analysis enabled.', level: 'success' }],
-                    'ipfs-blackbox-logger': [{ msg: 'SKILL: Neural Logger connecting to decentralized storage...', level: 'info' }, { msg: 'SKILL: Storage endpoint active. Logs will be archived on-chain.', level: 'success' }],
-                    'cross-dex-aggregator': [{ msg: 'SKILL: Cross-DEX Aggregator indexing Phoenix, Soroswap, SDEX...', level: 'info' }, { msg: 'SKILL: 3 DEXes indexed. Best-route execution enabled.', level: 'success' }],
-                    'pnl-reporter': [{ msg: 'SKILL: P&L Reporter calculating realized/unrealized positions...', level: 'info' }, { msg: 'SKILL: Daily P&L report scheduled. Delivery target: Telegram.', level: 'success' }],
-                    'webhook-trigger': [{ msg: 'SKILL: Webhook Trigger generating secure endpoint key...', level: 'info' }, { msg: 'SKILL: Webhook live at /api/hook/{agentId}. Ready for TradingView.', level: 'success' }],
-                    'neural-archive-logger': [{ msg: 'SKILL: Neural Archive establishing uplink to IPFS network...', level: 'info' }, { msg: 'SKILL: Blob storage active. Forensic logging armed. Tamper-proof seal enabled.', level: 'success' }],
-                    'usdc-vault-manager': [{ msg: 'SKILL: USDC Vault Manager scanning for existing USDC vaults...', level: 'info' }, { msg: 'SKILL: Phoenix & Blend USDC pools indexed. Auto-rotation active.', level: 'success' }],
+            setSelectedSkillToInstall(null);
+        } catch (error: any) {
+            console.error(error);
+            toast.dismiss(toastId);
+            toast.error("Installation failed", {
+                description: error.message
+            });
+        } finally {
+            setIsInstalling(false);
+        }
+    };
+
+    useEffect(() => {
+        if (account?.address) {
+            StrategyService.getInstalledSkills(account.address).then(setInstalledSkills);
+        }
+    }, [account?.address]);
+
+    useEffect(() => {
+        const fetchMarketData = async () => {
+            await new Promise(r => setTimeout(r, 600));
+
+            const updated = BASE_STRATEGIES.map(s => {
+                let dynamicApy = s.baseApy;
+                let dynamicTvl = 0;
+
+                if (s.id === 'turbo-sniper') {
+                    dynamicApy += (Math.random() * 50 - 20);
+                    dynamicTvl = 450 + Math.random() * 50;
+                } else if (s.id === 'liquid-staking-arb') {
+                    dynamicApy = 8 + (Math.random() * 1.5);
+                    dynamicTvl = 2800 + Math.random() * 100;
+                } else if (s.id === 'eliza-sentiment') {
+                    dynamicApy += (Math.random() > 0.8 ? 15 : -5);
+                    dynamicTvl = 800 + Math.random() * 200;
+                } else {
+                    dynamicApy = 12 + (Math.random() * 4);
+                    dynamicTvl = 1200 + Math.random() * 50;
+                }
+
+                return {
+                    ...s,
+                    apy: `${dynamicApy.toFixed(2)}%`,
+                    tvl: `$${dynamicTvl.toFixed(0)}K`
                 };
-
-                const bootLogs = SKILL_BOOT_LOGS[skill.slug];
-                if (bootLogs) {
-                    bootLogs.forEach((entry, i) => {
-                        setTimeout(() => {
-                            writeLog(entry.msg, entry.level, userWallet || agentId);
-                        }, (i + 1) * 1500);
-                    });
-                }
-
-                if (data.txHash) {
-                    writeLog(`x402 VERIFIED: ${skill.name} payment confirmed. Tx: ${data.txHash.substring(0, 12)}...`, 'success', address || '');
-                }
-                
-                writeLog(`PLUGIN INSTALLED: ${skill.name} integrated into agent unit ${agentId.slice(0, 8)}.`, 'info', address || '');
-
-                toast.success(`${skill.name} installed successfully!`, {
-                    description: (
-                        <div className="flex flex-col gap-2 mt-1">
-                            <p>The skill is now available in your agent and ready to use.</p>
-                            {data.txHash && (
-                                <a 
-                                    href={`https://stellar.expert/explorer/testnet/tx/${data.txHash}`}
-                                    target="_blank"
-                                    rel="noopener noreferrer"
-                                    className="text-stellar-teal hover:underline flex items-center gap-1 text-xs font-mono"
-                                >
-                                    <ExternalLink size={10} /> View Transaction on StellarExpert
-                                </a>
-                            )}
-                        </div>
-                    ),
-                    action: {
-                        label: "View Dashboard",
-                        onClick: () => window.location.href = "/dashboard"
-                    }
-                });
-            } else {
-                throw new Error(data.error || 'Installation failed');
-            }
-        } catch (error) {
-            toast.error(`Failed to install ${skill.name}`, {
-                description: String(error) || "Please try again later or check your connection."
             });
-        }
-    };
+            setStrategies(updated);
+        };
 
-    const handleExecuteAction = async (skillSlug: string, actionName: string) => {
-        const toastId = toast.loading(`Executing ${actionName}...`);
+        fetchMarketData();
+        const interval = setInterval(fetchMarketData, 5000);
+        return () => clearInterval(interval);
+    }, []);
+
+    const handleDeploy = async (strategy: typeof strategies[0]) => {
+        if (!account?.address) {
+            toast.error("Connect Wallet to deploy strategies");
+            return;
+        }
+
+        setDeployingId(strategy.id);
+        const localized = t.marketplace.strategies.items[strategy.id as keyof typeof t.marketplace.strategies.items];
+        const toastId = toast.loading(`Initializing ${localized.name}...`);
+
         try {
-            // Use execute-demo to allow execution without explicit authentication for this demo
-            const response = await fetch('/api/execute-demo', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'x-stellar-account': userWallet || ''
-                },
-                body: JSON.stringify({ strategy: `${skillSlug}:${actionName}` })
+            await StrategyService.deployStrategy(account.address, {
+                strategy_id: strategy.id,
+                name: localized.name,
+                emoji: '⚡',
+                status: 'DRAFT', 
+                yield: strategy.apy,
+                created_at: new Date().toISOString()
             });
-            const data = await response.json();
 
-            if (data.success) {
-                toast.success('Action executed successfully', { id: toastId });
-                setSelectedSkillToExecute(null);
-            } else {
-                throw new Error(data.error);
-            }
+            toast.dismiss(toastId);
+            toast.success("Strategy Template Loaded", { duration: 1000 });
+
+            const targetAsset = selectedAssets[strategy.id] || 'XLM';
+            router.push(`/dashboard?autostart=true&strategy=${strategy.id}&name=${encodeURIComponent(localized.name)}&asset=${targetAsset}`);
+
         } catch (e) {
-            toast.error(`Execution failed: ${String(e)}`, { id: toastId });
+            console.error(e);
+            toast.error("Failed to initialize strategy");
+        } finally {
+            setDeployingId(null);
         }
     };
-
-
-
-
 
     return (
-        <main className="min-h-screen bg-[#050505]">
+        <main className="min-h-screen relative overflow-x-hidden flex flex-col pt-32 sm:pt-40 md:pt-48 lg:pt-56 pb-20">
+            <div className="fixed inset-0 z-0 pointer-events-none">
+                <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-stellar-yellow/10 rounded-full blur-[120px] opacity-40"></div>
+                <div className="absolute bottom-0 left-0 w-[500px] h-[500px] bg-stellar-teal/5 rounded-full blur-[120px] opacity-40"></div>
+            </div>
+
             <Navbar />
 
-            {/* Hero Section */}
-            <section className="relative pt-52 pb-12 px-4 sm:px-6 lg:px-8">
-                <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,rgba(45,235,232,0.1),transparent_70%)]" />
+            <div className="max-w-[1600px] w-full mx-auto px-6 relative z-10">
 
-                <div className="max-w-[1600px] w-full mx-auto relative z-10 px-4">
-                    <motion.div
-                        initial={{ opacity: 0, y: 20 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        className="flex flex-col lg:flex-row items-center lg:items-center justify-between gap-12 mb-16"
-                    >
+                <div className="flex flex-col lg:flex-row items-center justify-between gap-10 lg:gap-12 mb-16 lg:mb-24 px-2 sm:px-4">
+                    <div className="flex flex-col lg:flex-row items-center gap-8 lg:gap-12">
+                        <SectionBrandLogo className="!justify-start mb-0" size="w-24 sm:w-32 lg:w-48" />
                         <div className="flex flex-col items-center lg:items-start text-center lg:text-left">
-                            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-stellar-teal/10 border border-stellar-teal/30 mb-8 self-center lg:self-start">
-                                <Package className="w-4 h-4 text-stellar-teal" />
-                                <span className="text-sm text-stellar-teal">Nirium Matrix Hub</span>
-                            </div>
-                            <div className="flex flex-col lg:flex-row items-center lg:items-center gap-6 mb-6">
-                                <SectionBrandLogo className="!justify-start mb-0" size="w-32 lg:w-40" />
-                                <h1 className="text-5xl md:text-7xl font-black tracking-tighter bg-gradient-to-r from-white via-white to-gray-400 bg-clip-text text-transparent leading-none">
-                                    Extend Your Agent
-                                </h1>
-                            </div>
-                            <p className="text-lg text-slate-400 max-w-2xl mt-4">
-                                Discover and install community-built skills to supercharge your Nirium agent.
+                            <h1 className="text-4xl sm:text-6xl md:text-7xl lg:text-8xl font-black tracking-tighter mb-4 leading-[0.85] uppercase flex flex-wrap justify-center lg:justify-start gap-x-3 sm:gap-x-4">
+                                {t.marketplace.header.title} <span className="text-stellar-teal italic">{t.marketplace.header.span}</span>
+                            </h1>
+                            <p className="text-gray-400 max-w-2xl text-base sm:text-lg leading-relaxed font-medium">
+                                {t.marketplace.header.subtitle}
                             </p>
                         </div>
+                    </div>
 
-                        {/* Stats - moved next to title on lg */}
-                        <div className="flex gap-8 px-8 py-6 bg-white/5 border border-white/10 rounded-3xl backdrop-blur-md">
-                            <div className="text-center">
-                                <div className="text-4xl font-black font-mono text-stellar-teal animate-pulse-slow">{stats.totalSkills}</div>
-                                <div className="text-[10px] text-gray-500 uppercase tracking-widest font-bold mt-1">Local Skills</div>
+                    <Link href="/treasury" className="group relative px-10 py-5 bg-white/5 border border-white/10 rounded-3xl hover:bg-white/10 transition-all overflow-hidden hidden xl:block shadow-2xl">
+                        <div className="absolute inset-0 bg-gradient-to-r from-stellar-teal/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+                        <div className="relative flex items-center gap-4">
+                            <div className="w-10 h-10 rounded-xl bg-stellar-teal/10 flex items-center justify-center border border-stellar-teal/20 group-hover:scale-110 transition-transform">
+                                <Plus className="w-6 h-6 text-stellar-teal" />
                             </div>
-                            <div className="text-center">
-                                <div className="text-4xl font-black font-mono text-stellar-teal animate-pulse-slow">
-                                    {onChainStrategyCount !== null ? onChainStrategyCount : "..."}
-                                </div>
-                                <div className="text-[10px] text-stellar-yellow uppercase tracking-widest font-bold mt-1">On-Chain Registry</div>
-                            </div>
-                            <div className="text-center">
-                                <div className="text-4xl font-black font-mono text-stellar-teal animate-pulse-slow">
-                                    {(stats.totalDownloads / 1000).toFixed(1)}K
-                                </div>
-                                <div className="text-[10px] text-gray-500 uppercase tracking-widest font-bold mt-1">Downloads</div>
-                            </div>
-                            <div className="text-center">
-                                <div className="text-4xl font-black font-mono text-stellar-teal animate-pulse-slow">{categories.length}</div>
-                                <div className="text-[10px] text-gray-500 uppercase tracking-widest font-bold mt-1">Categories</div>
+                            <div className="text-left">
+                                <div className="text-[10px] font-mono text-gray-500 uppercase tracking-[0.3em] mb-1">{t.marketplace.builder_cta.title}</div>
+                                <div className="text-base font-bold text-white tracking-tight leading-none group-hover:text-stellar-teal transition-colors">{t.marketplace.builder_cta.subtitle}</div>
                             </div>
                         </div>
-                    </motion.div>
-
-                    {/* Search Bar */}
-                    <motion.div
-                        initial={{ opacity: 0, y: 20 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ delay: 0.1 }}
-                        className="max-w-2xl mx-auto mb-12"
-                    >
-                        <div className="relative">
-                            <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
-                            <input
-                                type="text"
-                                placeholder="Search skills by name, description, or tag..."
-                                value={searchQuery}
-                                onChange={(e) => setSearchQuery(e.target.value)}
-                                className="w-full pl-12 pr-4 py-4 bg-[#080808] border border-white/5 rounded-2xl text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-stellar-teal/50 focus:border-stellar-teal transition-all"
-                            />
-                        </div>
-                    </motion.div>
+                    </Link>
                 </div>
-            </section>
 
-            {/* Featured Skills Carousel */}
-            {featuredSkills.length > 0 && (
-                <section className="px-4 sm:px-6 lg:px-8 mb-12">
-                    <div className="max-w-[1600px] w-full mx-auto">
-                        <div className="flex items-center gap-2 mb-6">
-                            <Sparkles className="w-5 h-5 text-yellow-400" />
-                            <h2 className="text-xl font-semibold text-white">Featured Skills</h2>
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10">
+                    {strategies.map((strat, i) => {
+                        const localized = t.marketplace.strategies.items[strat.id as keyof typeof t.marketplace.strategies.items];
+                        const riskKey = strat.risk as keyof typeof t.marketplace.strategies.risk_levels;
+                        
+                        return (
+                            <motion.div
+                                key={strat.id}
+                                initial={{ opacity: 0, y: 30 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                transition={{ delay: i * 0.1, type: "spring", stiffness: 100 }}
+                                whileHover={{ y: -8 }}
+                                className="bg-[#080808] p-5 sm:p-8 rounded-[1.5rem] sm:rounded-[2rem] flex flex-col border border-white/5 hover:border-stellar-teal/30 hover:shadow-[0_0_50px_rgba(45,235,232,0.05)] transition-all group relative overflow-hidden"
+                            >
+                                <div className={`aspect-video w-full rounded-2xl bg-white/5 border border-white/5 mb-8 relative overflow-hidden group-hover:bg-white/[0.08] transition-colors`}>
+                                    <div className="absolute inset-0 bg-gradient-to-b from-transparent to-[#080808]/80 group-hover:to-[#080808]/60 transition-all"></div>
+                                    <div className="absolute inset-0 flex items-center justify-center">
+                                        <Cpu size={56} className="text-white/20 group-hover:text-stellar-teal/40 group-hover:scale-110 transition-all duration-500" />
+                                    </div>
+                                    <div className="absolute top-4 right-4 bg-black/60 backdrop-blur-xl px-3 py-1.5 rounded-xl text-[10px] font-bold font-mono border border-white/10 flex items-center gap-2 group-hover:border-stellar-teal/30 transition-colors">
+                                        <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
+                                        {t.marketplace.strategies.buttons.verified} v0.5.0
+                                    </div>
+                                </div>
+
+                                <div className="flex justify-between items-start mb-3">
+                                    <h3 className="text-2xl font-black tracking-tighter text-white group-hover:text-stellar-teal transition-colors">
+                                        {localized.name}
+                                    </h3>
+                                    <div className={`text-[10px] px-2.5 py-1 rounded-lg font-black font-mono uppercase tracking-wider ${
+                                        strat.risk === 'very_low' ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20' :
+                                        strat.risk === 'low' ? 'bg-green-500/10 text-green-400 border border-green-500/20' :
+                                        strat.risk === 'medium' ? 'bg-amber-500/10 text-amber-500 border border-amber-500/20' :
+                                        'bg-red-500/10 text-red-500 border border-red-500/20'
+                                    }`}>
+                                        {t.marketplace.strategies.risk_levels[riskKey]} {t.marketplace.strategies.risk_levels.risk_label}
+                                    </div>
+                                </div>
+
+                                <p className="text-sm text-gray-400 mb-6 flex-1 leading-relaxed font-medium">
+                                    {localized.description}
+                                </p>
+
+                                <div className="flex flex-wrap gap-2 mb-8">
+                                    {strat.tags.map(tag => (
+                                        <span key={tag} className="text-[10px] font-bold uppercase tracking-[0.1em] px-3 py-1 rounded-full bg-white/5 border border-white/10 text-gray-400 group-hover:border-white/20 transition-colors">
+                                            {tag}
+                                        </span>
+                                    ))}
+                                </div>
+
+                                <div className="grid grid-cols-2 gap-4 mb-6">
+                                    <div className="bg-[#111] border border-white/5 rounded-2xl p-4 group-hover:border-stellar-teal/20 transition-all">
+                                        <div className="text-[10px] text-gray-500 uppercase tracking-[0.2em] mb-1 font-bold">{t.marketplace.strategies.stats.historical_rate}</div>
+                                        <div className="text-2xl font-mono text-stellar-teal font-black">{strat.apy}</div>
+                                    </div>
+                                    <div className="bg-[#111] border border-white/5 rounded-2xl p-4 group-hover:border-white/10 transition-all">
+                                        <div className="text-[10px] text-gray-500 uppercase tracking-[0.2em] mb-1 font-bold">{t.marketplace.strategies.stats.money_running}</div>
+                                        <div className="text-2xl font-mono text-white font-black">{strat.tvl}</div>
+                                    </div>
+                                </div>
+
+                                <div className="bg-[#111] border border-white/5 rounded-2xl p-4 mb-8 group-hover:border-white/10 transition-all relative overflow-hidden">
+                                    <div className="flex justify-between items-center mb-2 relative z-10">
+                                        <span className="text-[10px] text-gray-400 font-bold uppercase tracking-[0.2em]">{t.marketplace.strategies.stats.creator_score}</span>
+                                        <span className={`text-[10px] font-black px-2 py-0.5 rounded-md uppercase ${
+                                            strat.elo >= 2100 ? "bg-purple-500/20 text-purple-400 border border-purple-500/20" : 
+                                            strat.elo >= 1800 ? "bg-yellow-500/20 text-yellow-500 border border-yellow-500/20" : 
+                                            "bg-slate-500/20 text-slate-400 border border-slate-500/20"
+                                        }`}>
+                                            {strat.elo >= 2100 ? t.marketplace.strategies.tiers.matrix : 
+                                             strat.elo >= 1800 ? t.marketplace.strategies.tiers.gold : 
+                                             t.marketplace.strategies.tiers.silver}
+                                        </span>
+                                    </div>
+                                    <div className="text-lg font-mono text-white mb-3 relative z-10 font-bold">{strat.elo}</div>
+
+                                    <div className="flex justify-between items-center pt-3 border-t border-white/5 relative z-10">
+                                        <span className="text-[10px] text-gray-500 uppercase tracking-[0.2em] font-bold">{t.marketplace.strategies.stats.our_fee}</span>
+                                        <span className="text-[10px] text-stellar-teal font-mono font-black">{t.marketplace.strategies.stats.fee_desc}</span>
+                                    </div>
+                                </div>
+
+                                <div className="flex justify-between items-center mb-6 px-1">
+                                    <span className="text-[10px] text-gray-400 font-bold uppercase tracking-[0.2em]">{t.marketplace.strategies.stats.wallet_label}</span>
+                                    <div className="flex items-center bg-black/60 border border-white/10 rounded-xl p-1 shadow-inner">
+                                        <button
+                                            onClick={() => setSelectedAssets({ ...selectedAssets, [strat.id]: 'USDC' })}
+                                            className={`px-4 py-1.5 rounded-lg text-xs font-black transition-all ${
+                                                (selectedAssets[strat.id] || 'XLM') === 'USDC' 
+                                                ? 'bg-stellar-yellow text-black shadow-lg shadow-stellar-yellow/10' 
+                                                : 'text-gray-500 hover:text-white'
+                                            }`}
+                                        >
+                                            USDC
+                                        </button>
+                                        <button
+                                            onClick={() => setSelectedAssets({ ...selectedAssets, [strat.id]: 'XLM' })}
+                                            className={`px-4 py-1.5 rounded-lg text-xs font-black transition-all ${
+                                                (selectedAssets[strat.id] || 'XLM') === 'XLM' 
+                                                ? 'bg-[#4ca2ff] text-white shadow-lg shadow-blue-500/10' 
+                                                : 'text-gray-500 hover:text-white'
+                                            }`}
+                                        >
+                                            XLM
+                                        </button>
+                                    </div>
+                                </div>
+
+                                <div className="flex gap-3 mt-auto">
+                                    <button
+                                        onClick={() => toast.info('Historical benchmarks loading...', { icon: '📊' })}
+                                        className="flex-1 bg-white/5 hover:bg-white/10 text-white py-4 rounded-xl text-[11px] font-black tracking-widest transition-all flex items-center justify-center gap-2 border border-white/5 font-mono uppercase">
+                                        <Copy size={16} /> {t.marketplace.strategies.buttons.test}
+                                    </button>
+                                    <button
+                                        onClick={() => handleDeploy(strat)}
+                                        disabled={deployingId === strat.id}
+                                        className="flex-1 bg-stellar-yellow text-black py-4 rounded-xl text-[11px] font-black tracking-widest hover:shadow-[0_0_30px_rgba(255,200,0,0.2)] transition-all flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed font-mono uppercase">
+                                        {deployingId === strat.id ? (
+                                            <div className="w-5 h-5 border-3 border-black border-t-transparent rounded-full animate-spin"></div>
+                                        ) : (
+                                            <>{t.marketplace.strategies.buttons.deploy} <ArrowRight size={16} /></>
+                                        )}
+                                    </button>
+                                </div>
+                            </motion.div>
+                        );
+                    })}
+
+                    <Link href="/treasury" className="border-2 border-dashed border-white/10 rounded-[1.5rem] sm:rounded-[2rem] p-6 sm:p-10 flex flex-col items-center justify-center text-center gap-6 hover:bg-white/[0.03] hover:border-stellar-teal/30 transition-all text-gray-400 hover:text-white cursor-pointer min-h-[400px] sm:min-h-[500px] group relative overflow-hidden">
+                        <div className="absolute inset-0 bg-gradient-to-br from-stellar-teal/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                        <div className="w-24 h-24 rounded-3xl bg-white/5 group-hover:bg-stellar-teal/10 flex items-center justify-center mb-2 transition-all border border-white/5 group-hover:border-stellar-teal/20 group-hover:scale-110 group-hover:-rotate-3 shadow-2xl">
+                            <Zap size={48} className="group-hover:text-stellar-teal transition-all duration-500" />
                         </div>
+                        <div className="space-y-2 relative z-10">
+                            <h3 className="text-2xl font-black font-mono tracking-tighter group-hover:text-stellar-teal transition-colors uppercase italic">{t.marketplace.custom_builder.title}</h3>
+                            <p className="text-sm max-w-xs text-gray-500 font-medium leading-relaxed">
+                                {t.marketplace.custom_builder.subtitle}<br />
+                                <span className="text-stellar-teal font-mono text-[10px] uppercase tracking-widest font-black">{t.marketplace.custom_builder.features}</span>
+                            </p>
+                        </div>
+                        <div className="flex items-center gap-3 mt-4 relative z-10">
+                            <span className="text-[10px] font-black font-mono bg-blue-500/10 text-blue-400 px-3 py-1 rounded-full border border-blue-500/20 shadow-sm">XLM</span>
+                            <span className="text-[10px] font-black font-mono bg-stellar-yellow/10 text-stellar-yellow px-3 py-1 rounded-full border border-stellar-yellow/20 shadow-sm">USDC</span>
+                            <span className="text-[10px] font-black font-mono bg-white/5 text-gray-600 px-3 py-1 rounded-full border border-white/5">{t.marketplace.custom_builder.export}</span>
+                        </div>
+                    </Link>
+                </div>
 
-                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                            {featuredSkills.slice(0, 3).map((skill, idx) => (
-                                <motion.div
-                                    key={skill.id}
-                                    initial={{ opacity: 0, y: 20 }}
-                                    animate={{ opacity: 1, y: 0 }}
-                                    transition={{ delay: 0.1 + idx * 0.1 }}
-                                    className="group relative overflow-hidden rounded-2xl bg-[#080808] border border-white/5 p-6 hover:border-stellar-teal/50 hover:shadow-[0_0_30px_rgba(45,235,232,0.1)] transition-all cursor-pointer"
-                                >
-                                    <div className="absolute top-4 right-4">
-                                        <span className="px-2 py-1 text-xs bg-stellar-yellow/20 text-stellar-yellow rounded-full flex items-center gap-1">
-                                            <Sparkles className="w-3 h-3" /> Featured
+                <div className="mt-32 sm:mt-48 mb-12 sm:mb-16 px-4">
+                    <h2 className="text-4xl sm:text-6xl md:text-7xl font-black tracking-tighter uppercase italic leading-[0.85] text-white flex flex-wrap gap-x-3 sm:gap-x-4">
+                        {t.marketplace.plugins.title} <span className="text-stellar-yellow">{t.marketplace.plugins.span}</span>
+                    </h2>
+                    <p className="text-gray-400 max-w-2xl text-base sm:text-xl mt-6 leading-relaxed font-medium">
+                        {t.marketplace.plugins.subtitle}
+                    </p>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-8 px-4">
+                    {plugins.map((skill, idx) => {
+                        const localized = t.marketplace.plugins.items[skill.id as keyof typeof t.marketplace.plugins.items];
+                        return (
+                            <motion.div
+                                key={skill.id}
+                                initial={{ opacity: 0, scale: 0.95 }}
+                                animate={{ opacity: 1, scale: 1 }}
+                                transition={{ delay: 0.1 + idx * 0.1 }}
+                                whileHover={{ scale: 1.02 }}
+                                className="group relative overflow-hidden flex flex-col rounded-[1.5rem] sm:rounded-3xl bg-[#080808] border border-white/5 p-6 sm:p-8 hover:border-stellar-teal/50 hover:shadow-[0_0_40px_rgba(45,235,232,0.08)] transition-all cursor-pointer"
+                            >
+                                {skill.isPremium && (
+                                    <div className="absolute top-6 right-6">
+                                        <span className="px-3 py-1 text-[10px] font-black uppercase tracking-widest bg-stellar-yellow/10 text-stellar-yellow rounded-full flex items-center gap-1.5 border border-stellar-yellow/20">
+                                            <Sparkles className="w-3 h-3" /> {t.marketplace.plugins.buttons.premium}
+                                        </span>
+                                    </div>
+                                )}
+
+                                <div className={`w-14 h-14 rounded-2xl bg-gradient-to-br ${CATEGORY_COLORS[skill.category] || 'from-slate-500 to-slate-600'} flex items-center justify-center mb-6 shadow-xl group-hover:scale-110 transition-transform duration-500`}>
+                                    {(() => {
+                                        const Icon = CATEGORY_ICONS[skill.category] || Code2;
+                                        return <Icon className="w-7 h-7 text-white" />;
+                                    })()}
+                                </div>
+
+                                <h3 className="text-xl font-black text-white mb-3 group-hover:text-stellar-teal transition-colors tracking-tight">
+                                    {localized.name}
+                                </h3>
+                                <p className="text-[10px] text-gray-500 uppercase tracking-[0.2em] font-black mt-1 mb-8 flex-1 leading-relaxed opacity-80 group-hover:opacity-100 transition-opacity">
+                                    {localized.description}
+                                </p>
+
+                                <div className="flex items-center justify-between text-[11px] font-bold text-slate-500 mt-auto pt-6 border-t border-white/5">
+                                    <div className="flex items-center gap-4">
+                                        <span className="flex items-center gap-1.5 hover:text-white transition-colors">
+                                            <Download className="w-4 h-4 text-stellar-teal" />
+                                            {(skill.downloads / 1000).toFixed(1)}K
+                                        </span>
+                                        <span className="flex items-center gap-1.5 hover:text-white transition-colors">
+                                            <Star className="w-4 h-4 text-yellow-400 fill-yellow-400" />
+                                            {skill.elo}
                                         </span>
                                     </div>
 
-                                    <div className={`w-12 h-12 rounded-xl bg-gradient-to-br ${CATEGORY_COLORS[skill.category] || 'from-slate-500 to-slate-600'} flex items-center justify-center mb-4`}>
-                                        {(() => {
-                                            const Icon = CATEGORY_ICONS[skill.category] || Code2;
-                                            return <Icon className="w-6 h-6 text-white" />;
-                                        })()}
-                                    </div>
-
-                                    <h3 className="text-lg font-semibold text-white mb-2 group-hover:text-stellar-teal transition-colors">
-                                        {skill.name}
-                                    </h3>
-                                    <p className="text-[10px] text-gray-500 uppercase tracking-widest font-bold mt-1 mb-4 line-clamp-2">
-                                        {skill.description}
-                                    </p>
-
-                                    <div className="flex items-center justify-between text-sm text-slate-500">
-                                        <div className="flex items-center gap-3">
-                                            <span className="flex items-center gap-1">
-                                                <Download className="w-4 h-4" />
-                                                {(skill.downloads / 1000).toFixed(1)}K
-                                            </span>
-                                            <span className="flex items-center gap-1">
-                                                <Star className="w-4 h-4 text-yellow-400 fill-yellow-400" />
-                                                {skill.elo} ELO
-                                            </span>
-                                        </div>
-
-                                        {installedSkills[skill.id] || installedSkills[skill.slug] ? (
-                                            <div className="flex gap-2 z-20 relative">
-                                                <Link href="/agents">
-                                                    <button
-                                                        onClick={(e) => e.stopPropagation()}
-                                                        className="flex items-center gap-2 px-3 py-1.5 bg-green-500/10 text-green-400 rounded-lg hover:bg-green-500/20 text-sm font-medium transition-colors border border-green-500/20"
-                                                    >
-                                                        <span className="relative flex h-2 w-2">
-                                                            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
-                                                            <span className="relative inline-flex rounded-full h-2 w-2 bg-green-500"></span>
-                                                        </span>
-                                                        Monitor
-                                                    </button>
-                                                </Link>
-
+                                    {installedSkills[skill.id] || installedSkills[skill.slug] ? (
+                                        <div className="flex gap-2 z-20 relative">
+                                            <Link href="/dashboard">
                                                 <button
-                                                    onClick={(e) => {
-                                                        e.preventDefault();
-                                                        e.stopPropagation();
-                                                        setSelectedSkillToInstall(skill);
-                                                    }}
-                                                    className="flex items-center justify-center p-2 bg-stellar-teal/10 text-stellar-teal rounded-lg hover:bg-stellar-teal/20 transition-all border border-stellar-teal/20"
-                                                    title="Install to another unit"
+                                                    onClick={(e) => e.stopPropagation()}
+                                                    className="flex items-center gap-2 px-4 py-2 bg-green-500/10 text-green-400 rounded-xl hover:bg-green-500/20 text-[10px] font-black uppercase tracking-widest transition-all border border-green-500/20"
                                                 >
-                                                    <UserPlus size={16} />
+                                                    <span className="relative flex h-1.5 w-1.5">
+                                                        <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
+                                                        <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-green-500"></span>
+                                                    </span>
+                                                    {t.marketplace.plugins.buttons.monitor}
                                                 </button>
-                                            </div>
-                                        ) : (
+                                            </Link>
+
                                             <button
                                                 onClick={(e) => {
+                                                    e.preventDefault();
                                                     e.stopPropagation();
                                                     setSelectedSkillToInstall(skill);
                                                 }}
-                                                className={`flex items-center gap-2 px-3 py-1.5 rounded-lg text-sm font-bold transition-colors border z-10 relative ${
-                                                    skill.isPremium 
-                                                    ? 'bg-stellar-teal/20 hover:bg-stellar-teal text-white border-stellar-teal/50 hover:text-black shadow-lg shadow-stellar-teal/5' 
-                                                    : 'bg-slate-700/50 hover:bg-stellar-yellow hover:text-black text-white border-slate-600/50 hover:border-stellar-yellow'
-                                                }`}
+                                                className="flex items-center justify-center p-2.5 bg-stellar-teal/10 text-stellar-teal rounded-xl hover:bg-stellar-teal/20 transition-all border border-stellar-teal/20"
+                                                title="Install to another unit"
                                             >
-                                                <Zap className="w-3.5 h-3.5" />
-                                                {skill.isPremium ? `Pay ${skill.price}` : 'Install'}
+                                                <UserPlus size={18} />
                                             </button>
-                                        )}
-                                    </div>
-                                </motion.div>
-                            ))}
-                        </div>
-                    </div>
-                </section>
-            )}
-
-            {/* Categories */}
-            <section className="px-4 sm:px-6 lg:px-8 mb-8">
-                <div className="max-w-[1600px] w-full mx-auto">
-                    <div className="flex flex-wrap gap-3">
-                        <button
-                            onClick={() => setSelectedCategory(null)}
-                            className={`px-4 py-2 rounded-xl font-medium transition-all ${!selectedCategory
-                                ? 'bg-purple-500 text-white'
-                                : 'bg-slate-800 text-slate-300 hover:bg-slate-700'
-                                }`}
-                        >
-                            All Skills
-                        </button>
-                        {categories.map(cat => {
-                            const Icon = CATEGORY_ICONS[cat.id] || Code2;
-                            return (
-                                <button
-                                    key={cat.id}
-                                    onClick={() => setSelectedCategory(cat.id)}
-                                    className={`px-4 py-2 rounded-xl font-medium transition-all flex items-center gap-2 ${selectedCategory === cat.id
-                                        ? 'bg-purple-500 text-white'
-                                        : 'bg-slate-800 text-slate-300 hover:bg-slate-700'
-                                        }`}
-                                >
-                                    <Icon className="w-4 h-4" />
-                                    {cat.name}
-                                    <span className="text-xs opacity-60">({cat.count})</span>
-                                </button>
-                            );
-                        })}
-                    </div>
-                </div>
-            </section>
-
-            {/* Sort Options */}
-            <section className="px-4 sm:px-6 lg:px-8 mb-6">
-                <div className="max-w-[1600px] w-full mx-auto flex items-center justify-between">
-                    <p className="text-slate-400">
-                        {filteredSkills.length} skills found
-                    </p>
-                    <div className="flex items-center gap-2">
-                        <Filter className="w-4 h-4 text-slate-500" />
-                        <select
-                            value={sortBy}
-                            onChange={(e) => setSortBy(e.target.value as any)}
-                            className="bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:ring-2 focus:ring-stellar-teal/50"
-                        >
-                            <option value="downloads">Most Downloads</option>
-                            <option value="elo">Highest ELO</option>
-                            <option value="newest">Newest</option>
-                        </select>
-                    </div>
-                </div>
-            </section>
-
-            {/* Skills Grid */}
-            <section className="px-4 sm:px-6 lg:px-8 pb-24">
-                <div className="max-w-[1600px] w-full mx-auto">
-                    {loading ? (
-                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                            {[...Array(6)].map((_, i) => (
-                                <div key={i} className="animate-pulse">
-                                    <div className="bg-slate-800/50 rounded-2xl h-64 border border-slate-700/50" />
+                                        </div>
+                                    ) : (
+                                        <button
+                                            onClick={(e) => {
+                                                e.stopPropagation();
+                                                setSelectedSkillToInstall(skill);
+                                            }}
+                                            className={`flex items-center gap-2 px-6 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-[0.2em] transition-all border z-10 relative ${
+                                                skill.isPremium 
+                                                ? 'bg-stellar-teal/20 hover:bg-stellar-teal text-white border-stellar-teal/50 hover:text-black shadow-lg shadow-stellar-teal/20 hover:scale-105 active:scale-95' 
+                                                : 'bg-white/5 hover:bg-stellar-yellow hover:text-black text-white border-white/10 hover:border-stellar-yellow hover:scale-105 active:scale-95'
+                                            }`}
+                                        >
+                                            <Zap className="w-4 h-4" />
+                                            {skill.isPremium ? `Pay ${skill.price}` : t.marketplace.plugins.buttons.install}
+                                        </button>
+                                    )}
                                 </div>
-                            ))}
-                        </div>
-                    ) : (
-                        <AnimatePresence mode="wait">
-                            <motion.div
-                                key={selectedCategory || 'all'}
-                                initial={{ opacity: 0 }}
-                                animate={{ opacity: 1 }}
-                                exit={{ opacity: 0 }}
-                                className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
-                            >
-                                {filteredSkills.map((skill, idx) => (
-                                    <motion.div
-                                        key={skill.id}
-                                        initial={{ opacity: 0, y: 20 }}
-                                        animate={{ opacity: 1, y: 0 }}
-                                        transition={{ delay: idx * 0.05 }}
-                                        className="group bg-slate-800/50 rounded-2xl border border-slate-700/50 p-6 hover:border-purple-500/30 hover:bg-slate-800/80 transition-all"
-                                    >
-                                        <div className="flex items-start justify-between mb-4">
-                                            <div className={`w-10 h-10 rounded-lg bg-gradient-to-br ${CATEGORY_COLORS[skill.category] || 'from-slate-500 to-slate-600'} flex items-center justify-center`}>
-                                                {(() => {
-                                                    const Icon = CATEGORY_ICONS[skill.category] || Code2;
-                                                    return <Icon className="w-5 h-5 text-white" />;
-                                                })()}
-                                            </div>
-                                            <div className="flex items-center gap-2">
-                                                {skill.isVerified && (
-                                                    <span title="Verified">
-                                                        <CheckCircle className="w-4 h-4 text-green-400" aria-label="Verified" />
-                                                    </span>
-                                                )}
-                                                <div className="flex flex-wrap gap-2 mt-2">
-                                                    {skill.tags.map(tag => (
-                                                        <span 
-                                                            key={tag} 
-                                                            className={`px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider ${
-                                                                tag === 'x402' ? 'bg-stellar-teal/15 text-stellar-teal border border-stellar-teal/30' : 
-                                                                tag === 'MPP' ? 'bg-stellar-yellow/15 text-stellar-yellow border border-stellar-yellow/30' : 
-                                                                'bg-white/5 text-slate-400 border border-white/10'
-                                                            }`}
-                                                        >
-                                                            {tag}
-                                                        </span>
-                                                    ))}
-                                                </div>
-                                                <span className="text-xs text-slate-500">v{skill.version}</span>
-                                            </div>
-                                        </div>
-
-                                        <h3 className="text-lg font-semibold text-white mb-1 group-hover:text-stellar-teal transition-colors">
-                                            {skill.name}
-                                        </h3>
-                                        <p className="text-sm text-slate-500 mb-1">by {skill.author}</p>
-                                        <p className="text-[10px] text-gray-500 uppercase tracking-widest font-bold mt-1 mb-4 line-clamp-2">
-                                            {skill.description}
-                                        </p>
-
-                                        {/* Tags */}
-                                        <div className="flex flex-wrap gap-2 mb-4">
-                                            {skill.tags.slice(0, 3).map(tag => (
-                                                <span
-                                                    key={tag}
-                                                    className="px-2 py-1 text-xs bg-slate-700/50 text-slate-300 rounded-md"
-                                                >
-                                                    {tag}
-                                                </span>
-                                            ))}
-                                        </div>
-
-                                        {/* Stats & Install */}
-                                        <div className="flex items-center justify-between pt-4 border-t border-slate-700/50">
-                                            <div className="flex items-center gap-4 text-sm text-slate-500">
-                                                <span className="flex items-center gap-1">
-                                                    <Download className="w-4 h-4" />
-                                                    {skill.downloads.toLocaleString()}
-                                                </span>
-                                                <span className="flex items-center gap-1">
-                                                    <Star className="w-4 h-4 text-yellow-400 fill-yellow-400" />
-                                                    {skill.elo} ELO ({skill.reviewCount})
-                                                </span>
-                                            </div>
-
-                                            {skill.isPremium && (
-                                                <div className="absolute top-2 left-2 bg-stellar-teal text-black text-[10px] font-black px-1.5 py-0.5 rounded-full flex items-center gap-1 z-20 shadow-lg shadow-stellar-teal/20">
-                                                    <DollarSign size={10} />
-                                                    PREMIUM
-                                                </div>
-                                            )}
-                                            {skill.isFeatured && (
-                                                <div className="absolute top-2 right-2 bg-stellar-yellow/90 backdrop-blur-md text-black text-[10px] font-bold px-2 py-0.5 rounded-md flex items-center gap-1 z-10">
-                                                    <Sparkles size={10} />
-                                                    Featured
-                                                </div>
-                                            )}
-
-                                            {installedSkills[skill.id] || installedSkills[skill.slug] ? (
-                                                <div className="flex gap-2">
-                                                    <Link href="/agents">
-                                                        <div className="flex items-center gap-2 px-3 py-1.5 bg-green-500/10 text-green-400 rounded-lg text-sm font-medium border border-green-500/20 hover:bg-green-500/20 transition-all cursor-pointer">
-                                                            <span className="relative flex h-2 w-2">
-                                                                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
-                                                                <span className="relative inline-flex rounded-full h-2 w-2 bg-green-500"></span>
-                                                            </span>
-                                                            Monitor
-                                                        </div>
-                                                    </Link>
-
-                                                    {skill.actions && (
-                                                        <button
-                                                            onClick={(e) => {
-                                                                e.preventDefault();
-                                                                e.stopPropagation();
-                                                                setSelectedSkillToExecute(skill);
-                                                            }}
-                                                            className="flex items-center gap-2 px-3 py-1.5 bg-blue-500/10 text-blue-400 rounded-lg hover:bg-blue-500/20 text-sm font-medium transition-colors border border-blue-500/20"
-                                                            title="Run Action"
-                                                        >
-                                                            <Play className="w-3 h-3" />
-                                                        </button>
-                                                    )}
-
-                                                    <button
-                                                        onClick={(e) => {
-                                                            e.preventDefault();
-                                                            e.stopPropagation();
-                                                            setSelectedSkillToInstall(skill);
-                                                        }}
-                                                        className="flex items-center gap-2 px-3 py-1.5 bg-stellar-teal/10 text-stellar-teal rounded-lg hover:bg-stellar-teal/20 text-sm font-medium transition-colors border border-stellar-teal/20"
-                                                        title="Install to another agent"
-                                                    >
-                                                        <UserPlus className="w-3 h-3" />
-                                                    </button>
-                                                </div>
-                                            ) : (
-                                                <button
-                                                    onClick={() => setSelectedSkillToInstall(skill)}
-                                                    className="px-3 py-1.5 bg-stellar-yellow text-black rounded-lg text-sm font-bold hover:shadow-[0_0_20px_rgba(255,200,0,0.3)] transition-colors flex items-center gap-1"
-                                                >
-                                                    <Zap className="w-3.5 h-3.5" />
-                                                    Install
-                                                </button>
-                                            )}
-                                        </div>
-                                    </motion.div>
-                                ))}
                             </motion.div>
-                        </AnimatePresence>
-                    )}
-
-                    {!loading && filteredSkills.length === 0 && (
-                        <div className="text-center py-16">
-                            <Package className="w-16 h-16 text-slate-600 mx-auto mb-4" />
-                            <h3 className="text-xl font-semibold text-white mb-2">No skills found</h3>
-                            <p className="text-slate-400">
-                                Try adjusting your search or filter criteria.
-                            </p>
-                        </div>
-                    )}
+                        );
+                    })}
                 </div>
-            </section>
 
-            {/* CTA Section */}
-            <section className="px-4 sm:px-6 lg:px-8 pb-24">
-                <div className="max-w-3xl mx-auto">
-                    <div className="bg-[#080808] rounded-2xl border border-white/5 p-8 text-center mt-12 mb-20">
-                        <Code2 className="w-12 h-12 text-stellar-teal mx-auto mb-4" />
-                        <h3 className="text-2xl font-bold text-white mb-2">Build Your Own Skill</h3>
-                        <p className="text-slate-400 mb-6">
-                            Create and publish skills for the Nirium community.
-                            Share your trading strategies, integrations, and automation tools.
-                        </p>
-                        <div className="flex flex-wrap justify-center gap-3">
-                            <Link
-                                href="/docs"
-                                className="inline-flex items-center gap-2 px-6 py-3 bg-purple-500 text-white rounded-xl font-medium hover:bg-purple-600 transition-colors"
-                            >
-                                Read the Developer Docs
-                                <ChevronRight className="w-4 h-4" />
-                            </Link>
-                            <Link
-                                href="/strategies/builder"
-                                className="inline-flex items-center gap-2 px-6 py-3 bg-white/5 text-white border border-white/10 rounded-xl font-medium hover:bg-white/10 transition-colors"
-                            >
-                                Open Strategy Builder
-                                <ChevronRight className="w-4 h-4" />
-                            </Link>
-                        </div>
-                    </div>
-                </div>
-            </section>
+            </div>
 
-            {/* Install Modal */}
             <InstallSkillModal
                 skill={selectedSkillToInstall}
                 isOpen={!!selectedSkillToInstall}
                 onClose={() => setSelectedSkillToInstall(null)}
-                //@ts-ignore
+                isInstalling={isInstalling}
                 onInstall={handleInstall}
             />
-            {/* Execute Modal */}
-            <AnimatePresence>
-                {selectedSkillToExecute && (
-                    <motion.div
-                        initial={{ opacity: 0 }}
-                        animate={{ opacity: 1 }}
-                        exit={{ opacity: 0 }}
-                        className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm"
-                        onClick={() => setSelectedSkillToExecute(null)}
-                    >
-                        <motion.div
-                            initial={{ scale: 0.95, opacity: 0 }}
-                            animate={{ scale: 1, opacity: 1 }}
-                            exit={{ scale: 0.95, opacity: 0 }}
-                            onClick={(e) => e.stopPropagation()}
-                            className="w-full max-w-md bg-[#0A0A0A] border border-white/10 rounded-2xl p-6 shadow-2xl"
-                        >
-                            <h3 className="text-xl font-bold mb-4 flex items-center gap-2">
-                                <Play className="w-5 h-5 text-stellar-teal" />
-                                Execute {selectedSkillToExecute.name}
-                            </h3>
-                            <div className="space-y-3">
-                                {selectedSkillToExecute.actions?.map(action => (
-                                    <button
-                                        key={action.name}
-                                        onClick={() => handleExecuteAction(selectedSkillToExecute.slug, action.name)}
-                                        className="w-full flex items-center justify-between p-4 rounded-xl bg-white/5 hover:bg-white/10 border border-white/5 hover:border-stellar-teal/30 transition-all group"
-                                    >
-                                        <div className="text-left">
-                                            <div className="font-mono text-stellar-teal text-sm group-hover:text-white transition-colors">{action.name}</div>
-                                            <div className="text-xs text-gray-500">{action.description}</div>
-                                        </div>
-                                        <ChevronRight className="w-4 h-4 text-gray-600 group-hover:text-stellar-teal" />
-                                    </button>
-                                ))}
-                            </div>
-                        </motion.div>
-                    </motion.div>
-                )}
-            </AnimatePresence>
-        </main >
+
+            {/* Marketplace Governance Footer */}
+            <div className="max-w-[1600px] w-full mx-auto px-6 mt-24 pt-12 border-t border-white/5 opacity-50 hover:opacity-100 transition-opacity">
+                <div className="flex flex-col md:flex-row items-center justify-between gap-8">
+                    <div className="flex items-center gap-4">
+                        <div className="w-10 h-10 rounded-xl bg-stellar-teal/10 border border-stellar-teal/20 flex items-center justify-center">
+                            <ShieldAlert className="w-5 h-5 text-stellar-teal" />
+                        </div>
+                        <div className="text-left">
+                            <div className="text-[10px] font-black uppercase tracking-[0.2em] text-stellar-teal mb-1">Marketplace Governance</div>
+                            <p className="text-[11px] text-gray-500 max-w-xl leading-relaxed">
+                                All strategies and plugins listed in the Nirium Marketplace are vetted for technical compatibility with the Soroban environment. 
+                                By installing any capability, users agree to operate within the <strong className="text-white/70">Stellar Community Code of Conduct</strong>. 
+                                Nirium reserves the right to delist any agent that violates SDF/SCF ethical standards.
+                            </p>
+                        </div>
+                    </div>
+                    <div className="flex items-center gap-6">
+                        <Link href="/terms" className="text-[10px] font-black uppercase tracking-widest text-gray-400 hover:text-white transition-colors">Ethics Protocol</Link>
+                        <Link href="/disclaimers" className="text-[10px] font-black uppercase tracking-widest text-gray-400 hover:text-white transition-colors">Risk Policy</Link>
+                        <a href="https://stellar.org/community" target="_blank" rel="noopener noreferrer" className="text-[10px] font-black uppercase tracking-widest text-stellar-teal hover:brightness-125 transition-all underline underline-offset-4 decoration-stellar-teal/30">Stellar Ecosystem</a>
+                    </div>
+                </div>
+            </div>
+        </main>
     );
 }

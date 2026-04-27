@@ -18,7 +18,6 @@ import {
 } from "lucide-react";
 import { motion } from "framer-motion";
 import Link from "next/link";
-import Footer from "@/components/layout/Footer";
 import { SectionBrandLogo } from "@/components/ui/SectionBrandLogo";
 
 export default function HowToUsePage() {
@@ -40,7 +39,7 @@ export default function HowToUsePage() {
                         <div className="flex flex-col items-center lg:items-start text-center lg:text-left">
                             <div className="inline-flex items-center gap-2 px-3 py-1 bg-stellar-teal/10 border border-stellar-teal/30 rounded-full text-stellar-teal text-xs font-mono mb-6 self-center lg:self-start">
                                 <BookOpen size={14} />
-                                OPERATIONS MANUAL v0.0.7
+                                OPERATIONS MANUAL v0.5.0
                             </div>
                             <h1 className="text-4xl md:text-7xl font-black tracking-tighter mb-6 leading-none uppercase">
                                 HOW TO <span className="text-gradient">OPERATE</span>
@@ -115,10 +114,10 @@ export default function HowToUsePage() {
                                 <div className="space-y-4">
                                     <h4 className="text-white font-bold flex items-center gap-2">
                                         <Shield size={18} className="text-stellar-teal" />
-                                        Non-Custodial Safety
+                                        Stellar Ethics & Conduct
                                     </h4>
                                     <p className="text-sm text-gray-400 leading-relaxed">
-                                        Nirium uses a dual-auth system. Your <span className="text-white font-bold">Owner Key</span> never leaves your cold wallet, meaning only you can withdraw funds. The <span className="text-stellar-yellow font-bold">Agent Auth</span> only authorizes execution, preventing any unauthorized outflows.
+                                        Nirium adheres strictly to the <span className="text-white font-bold">Stellar Code of Conduct</span>. All automated behaviors are designed for transparency, preventing predatory extraction and ensuring that every transaction serves a legitimate protocol function within the 2026 institutional framework.
                                     </p>
                                 </div>
                                 <div className="space-y-4">
@@ -197,7 +196,7 @@ const STEPS = [
     },
     {
         title: "Skill Integration",
-        description: "Empower your agent via the Neural Marketplace. Install modular skills like 'Atomic Flash Loan', 'Price Monitor', or 'Whale Tracker' to customize your unit's intelligence.",
+        description: "Empower your agent via the Neural Marketplace. Install modular skills like 'Atomic Execution Logic', 'Price Monitor', or 'Liquidity Balancer' to customize your unit's intelligence.",
         icon: Cpu, // Changed icon to represent modular chips/skills
         color: "from-stellar-yellow to-purple-600",
         features: [

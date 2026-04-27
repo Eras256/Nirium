@@ -14,7 +14,7 @@ const horizonServer = new Horizon.Server("https://horizon-testnet.stellar.org");
 const USDC_ASSET = new Asset('USDC', 'GBBD47IF6LWK7P7MDEVSCWR7DPUWV3NY3DTQEVFL4NAT4AQH3ZLLFLA5');
 
 // x402 Pattern: Using standard Transactions for maximum wallet compatibility (Freighter/LOBSTR)
-const PREMIUM_SKILLS = ['flash-loan-executor', 'whale-tracker', 'arbitrage-bot'];
+const PREMIUM_SKILLS = ['flash-loan-executor', 'whale-tracker', 'arbitrage-bot', 'price-oracle', 'telegram-alerts-pro', 'soroswap-lp-manager'];
 
 export async function POST(
     request: Request,

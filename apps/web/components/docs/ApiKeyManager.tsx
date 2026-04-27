@@ -6,6 +6,8 @@ import { Key, Lock, Copy, CheckCircle, RefreshCw, AlertTriangle, Shield } from '
 import { toast } from 'sonner';
 import { API_URL } from '@/lib/constants';
 
+import { useLanguage } from '@/context/LanguageContext';
+
 interface ApiKeyData {
     apiKey: string;
     keyInfo: {
@@ -17,6 +19,7 @@ interface ApiKeyData {
 
 export default function ApiKeyManager() {
     const { address: accountStr, isConnected, signMessage } = useFreighter();
+    const { t } = useLanguage();
     const account = isConnected ? { address: accountStr, chains: ['stellar:testnet'] } : null;
 
     const [isLoading, setIsLoading] = useState(false);
@@ -30,7 +33,7 @@ export default function ApiKeyManager() {
         console.log("Generating key initiated...");
 
         if (!account) {
-            const msg = "Please connect your wallet first using the button in the navbar.";
+            const msg = t.agents.console.no_wallet;
             toast.error(msg);
             setErrorMsg(msg);
             return;
@@ -97,11 +100,11 @@ export default function ApiKeyManager() {
             if (!keyData.success && !keyData.apiKey) throw new Error(keyData.error || 'Failed to generate key');
 
             setGeneratedKey(keyData);
-            toast.success("API Key Generated Successfully!");
+            toast.success(t.agents.console.success);
 
         } catch (error: any) {
             console.error("Key Generation Error:", error);
-            const msg = error.message || "Failed to generate API Key";
+            const msg = error.message || t.agents.console.generate_button; // Fallback to button label if generic fail
             setErrorMsg(msg);
             toast.error(msg);
         } finally {
@@ -126,19 +129,19 @@ export default function ApiKeyManager() {
                     <Key className="w-6 h-6 text-stellar-yellow" />
                 </div>
                 <div>
-                    <h3 className="text-xl font-bold text-white">Agent Console</h3>
-                    <p className="text-sm text-gray-400">Generate secure credentials for your external agents.</p>
+                    <h3 className="text-xl font-bold text-white">{t.agents.console.title}</h3>
+                    <p className="text-sm text-gray-400">{t.agents.console.subtitle}</p>
                 </div>
             </div>
 
             {!account ? (
                 <div className="flex flex-col items-center justify-center py-8 bg-white/5 rounded-lg border border-dashed border-white/20">
                     <Lock className="w-8 h-8 text-gray-500 mb-3" />
-                    <p className="text-gray-300 font-medium">Wallet Not Connected</p>
-                    <p className="text-sm text-gray-500 mb-4">Connect your wallet to generate keys</p>
+                    <p className="text-gray-300 font-medium">{t.agents.console.no_wallet}</p>
+                    <p className="text-sm text-gray-500 mb-4">{t.agents.console.connect_prompt}</p>
                     {/* Note: The user should use the main Navbar connect button */}
                     <div className="text-xs text-stellar-teal bg-stellar-teal/10 px-3 py-1 rounded-full">
-                        Use Navbar to Connect
+                        {t.agents.console.use_navbar}
                     </div>
                 </div>
             ) : !generatedKey ? (
@@ -146,8 +149,7 @@ export default function ApiKeyManager() {
                     <div className="p-4 bg-blue-500/10 border border-blue-500/20 rounded-lg flex items-start gap-3">
                         <Shield className="w-5 h-5 text-blue-400 mt-0.5" />
                         <div className="text-sm text-blue-200">
-                            <strong>Security Note:</strong> You will be asked to sign a message to prove ownership of this wallet.
-                            This signature is used securely to generate your unique API Key.
+                            <strong>Security Note:</strong> {t.agents.console.security_note}
                         </div>
                     </div>
 
@@ -168,12 +170,12 @@ export default function ApiKeyManager() {
                         {isLoading ? (
                             <>
                                 <RefreshCw className="w-5 h-5 animate-spin" />
-                                Generating Secure Key...
+                                {t.agents.console.generating}
                             </>
                         ) : (
                             <>
                                 <Key className="w-5 h-5" />
-                                Generate New API Key
+                                {t.agents.console.generate_button}
                             </>
                         )}
                     </button>
@@ -182,11 +184,11 @@ export default function ApiKeyManager() {
                 <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
                     <div className="p-4 bg-green-500/10 border border-green-500/20 rounded-lg flex items-center gap-2 text-green-400">
                         <CheckCircle className="w-5 h-5" />
-                        <span className="font-bold">API Key Generated Successfully</span>
+                        <span className="font-bold">{t.agents.console.success}</span>
                     </div>
 
                     <div className="relative">
-                        <div className="text-xs text-gray-500 mb-1 ml-1 uppercase font-bold tracking-wider">Your Secret API Key</div>
+                        <div className="text-xs text-gray-500 mb-1 ml-1 uppercase font-bold tracking-wider">{t.agents.console.secret_label}</div>
                         <div className="flex items-center gap-2 bg-black border border-stellar-teal/50 rounded-lg p-1 pr-2">
                             <div className="flex-1 bg-transparent font-mono text-stellar-teal px-3 py-2 text-lg truncate">
                                 {generatedKey.apiKey}
@@ -201,27 +203,31 @@ export default function ApiKeyManager() {
                         </div>
                         <div className="mt-2 flex items-center gap-2 text-xs text-amber-500">
                             <AlertTriangle className="w-3 h-3" />
-                            Warning: This key will not be shown again. Copy it now.
+                            {t.agents.console.warning}
                         </div>
                     </div>
 
                     <div className="grid grid-cols-2 gap-4 text-sm">
                         <div className="bg-white/5 p-3 rounded-lg">
-                            <span className="text-gray-500 block text-xs">Permission Scope</span>
+                            <span className="text-gray-500 block text-xs">{t.agents.console.permissions}</span>
                             <span className="text-white font-mono">execute, subscribe</span>
                         </div>
                         <div className="bg-white/5 p-3 rounded-lg">
-                            <span className="text-gray-500 block text-xs">Limit</span>
+                            <span className="text-gray-500 block text-xs">{t.agents.console.limit}</span>
                             <span className="text-white font-mono">60 req/min</span>
                         </div>
                     </div>
 
                     <button
                         onClick={() => setGeneratedKey(null)}
-                        className="text-sm text-gray-500 hover:text-white underline w-full text-center"
+                        className="text-[10px] text-gray-600 hover:text-white underline w-full text-center uppercase tracking-widest"
                     >
-                        Close and Clear from Screen
+                        {t.agents.console.close}
                     </button>
+
+                    <div className="pt-4 mt-2 border-t border-white/5 text-[9px] text-gray-700 text-center uppercase tracking-[0.2em] font-mono italic">
+                        Aligned with SCF 7.0 & Stellar Code of Conduct (April 2026)
+                    </div>
                 </div>
             )}
         </div>

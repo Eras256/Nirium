@@ -3,13 +3,16 @@ import { motion } from 'framer-motion';
 import Navbar from "@/components/layout/Navbar";
 import FiatRamp from "@/components/layout/FiatRamp";
 import { SectionBrandLogo } from "@/components/ui/SectionBrandLogo";
+import { useLanguage } from "../../context/LanguageContext";
 
 export default function RampPage() {
+    const { t } = useLanguage();
+
     return (
         <div className="min-h-screen bg-black text-white selection:bg-emerald-500/30 font-sans overflow-x-hidden relative flex flex-col">
             <Navbar />
             
-            <div className="flex-1 flex flex-col relative pt-20">
+            <div className="flex-1 flex flex-col relative pt-32 sm:pt-40 md:pt-48 lg:pt-56">
                 {/* Background FX */}
                 <div className="absolute inset-0 z-0">
                     <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(0,0,0,0)_0%,rgba(0,0,0,1)_100%)] mix-blend-multiply z-10" />
@@ -29,14 +32,14 @@ export default function RampPage() {
                             <SectionBrandLogo />
                             <div className="flex items-center space-x-2 px-4 py-1.5 rounded-full border border-emerald-500/20 bg-emerald-500/10">
                                 <span>🏦</span>
-                                <span className="text-sm font-semibold text-emerald-400">Treasury Protocol</span>
+                                <span className="text-sm font-semibold text-emerald-400">{t.ramp.header.badge}</span>
                             </div>
                         </div>
                         <h1 className="text-4xl md:text-5xl font-black mt-6 tracking-tight bg-gradient-to-r from-emerald-200 via-white to-teal-400 bg-clip-text text-transparent">
-                            Global Fiat to Testnet
+                            {t.ramp.header.title}
                         </h1>
                         <p className="mt-4 text-gray-400 max-w-2xl mx-auto text-lg leading-relaxed">
-                            Simulate institutional liquidity injections from traditional banking rails straight into the Nirium Vaults. Powered by Etherfuse Sandbox.
+                            {t.ramp.header.subtitle}
                         </p>
                     </motion.div>
 

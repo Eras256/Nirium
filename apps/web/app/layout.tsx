@@ -12,11 +12,11 @@ const inconsolata = Inconsolata({ subsets: ["latin"], variable: "--font-inconsol
 export const metadata: Metadata = {
     metadataBase: new URL('https://nirium.xyz'),
     title: {
-        default: "Nirium | Institutional Autonomous Intelligence Protocol",
+        default: "Nirium Protocol | Autonomous Treasury Infrastructure on Stellar (Testnet)",
         template: "%s | Nirium Protocol"
     },
-    description: "The first Atomic Intelligence Protocol on Stellar. Orchestrate mission-critical DeFi operations with autonomous agents powered by Soroban Smart Contracts and AI.",
-    keywords: ["Stellar ecosystem", "AI Agents", "DeFi infrastructure", "Institutional Crypto", "Soroban", "Smart Contracts", "Nirium AI", "Autonomous Trading SDK"],
+    description: "Institutional DeFi infrastructure powered by autonomous agents on Stellar/Soroban. x402 micropayments, MPP session budgets, cross-border FX (MXN-USDC), multi-asset vaults. SDK v0.5.0. Testnet — not financial advice.",
+    keywords: ["Stellar ecosystem", "AI Agents", "DeFi infrastructure", "Soroban", "Smart Contracts", "Nirium", "Treasury Automation", "x402", "MPP", "Stellar Testnet", "cross-border FX", "MXN USDC"],
     authors: [{ name: "Nirium Core" }],
     creator: "Nirium",
     publisher: "Nirium Protocol",
@@ -37,8 +37,8 @@ export const metadata: Metadata = {
         apple: "/brand/logo.png",
     },
     openGraph: {
-        title: "Nirium | Institutional Autonomous Intelligence Protocol",
-        description: "Orchestrate mission-critical DeFi operations with autonomous AI agents on the Stellar network using Soroban Smart Contracts. Institutional-grade tooling.",
+        title: "Nirium Protocol | Treasury Automation on Stellar Testnet",
+        description: "Experimental infrastructure for automated treasury operations and cross-border FX on Stellar Testnet. Powered by autonomous AI agents and Soroban Smart Contracts. Not financial advice.",
         url: "https://nirium.xyz",
         siteName: "Nirium Protocol",
         images: [
@@ -54,14 +54,16 @@ export const metadata: Metadata = {
     },
     twitter: {
         card: "summary_large_image",
-        title: "Nirium | Autonomous Intelligence Protocol",
-        description: "The unified AI infrastructure layer for Stellar. Execute atomic operations instantly securely.",
+        title: "Nirium Protocol | Treasury Infrastructure on Stellar Testnet",
+        description: "Experimental DeFi infrastructure on Stellar Testnet. Autonomous AI agents for treasury automation and cross-border FX. Not financial advice.",
         creator: "@NiriumXYZ",
         images: ["/og-image.png"],
     },
 };
 
 import MarketTicker from "@/components/dashboard/MarketTicker";
+import TestnetBanner from "@/components/layout/TestnetBanner";
+import ChatBot from "@/components/ui/ChatBot";
 
 export default function RootLayout({
     children,
@@ -75,7 +77,7 @@ export default function RootLayout({
         "applicationCategory": "FinanceApplication",
         "operatingSystem": "Web",
         "url": "https://nirium.xyz",
-        "description": "Nirium is an institutional-grade autonomous intelligence protocol on the Stellar network. It provides agentic workflows via Soroban smart contracts.",
+        "description": "Nirium is an experimental autonomous infrastructure protocol on the Stellar Testnet. It provides agentic workflows via Soroban smart contracts. Currently in development — not financial advice.",
         "creator": {
             "@type": "Organization",
             "name": "Nirium Core"
@@ -90,7 +92,7 @@ export default function RootLayout({
                     "http://schema.org/MobileWebPlatform"
                 ]
             },
-            "name": "Deploy Autonomous Agent on Stellar Network"
+            "name": "Explore Nirium Dashboard on Stellar Testnet"
         }
     };
 
@@ -102,14 +104,16 @@ export default function RootLayout({
                     dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
                 />
                 <Providers>
+                    <TestnetBanner />
                     <MarketTicker />
                     {/* Background Layers */}
-                    <div className="fixed inset-0 z-[-1] bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-[0.03] pointer-events-none"></div>
+                    <div className="fixed inset-0 z-[-1] bg-[url('/noise.svg')] opacity-[0.03] pointer-events-none"></div>
                     <div className="fixed inset-0 z-[-2] bg-gradient-to-br from-[#050505] via-[#0A0A0A] to-[#050505] pointer-events-none"></div>
                     <div className="fixed inset-0 z-[-3] bg-[radial-gradient(circle_at_50%_50%,rgba(138,43,226,0.05),transparent_50%)] pointer-events-none"></div>
 
                     {children}
                     <Footer />
+                    <ChatBot />
                     <Toaster position="bottom-right" theme="dark" />
                 </Providers>
                 <Analytics />

@@ -137,7 +137,8 @@ export default function NiriumTermsModal({ walletAddress }: NiriumTermsProps) {
                                     { icon: Scale, text: t.legal_modal.item_non_custodial },
                                     { icon: AlertTriangle, text: t.legal_modal.item_elo_historical },
                                     { icon: Shield, text: t.legal_modal.item_systemic_risk },
-                                    { icon: ExternalLink, text: t.legal_modal.item_liability }
+                                    { icon: ExternalLink, text: t.legal_modal.item_liability },
+                                    { icon: Globe, text: t.legal_modal.item_scf_coc }
                                 ].map((item, idx) => (
                                     <li key={idx} className="flex items-start gap-3.5 group">
                                         <div className="mt-0.5 w-4 h-4 rounded bg-white/5 flex items-center justify-center text-stellar-teal shrink-0 group-hover:bg-stellar-teal group-hover:text-black transition-all">

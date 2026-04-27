@@ -1242,7 +1242,7 @@ components:
       properties:
         companyName:
           type: string
-          example: Isacap Essential SAPI de CV
+          example: Institutional Partner LLC
         contactEmail:
           type: string
           format: email

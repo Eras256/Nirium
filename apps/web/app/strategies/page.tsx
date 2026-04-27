@@ -2,14 +2,14 @@
 
 import { SectionBrandLogo } from "@/components/ui/SectionBrandLogo";
 import Navbar from "@/components/layout/Navbar";
-import { Copy, ArrowRight, Zap, TrendingUp, ShieldAlert, Cpu, Plus } from "lucide-react";
-import { motion } from "framer-motion";
+import { Copy, ArrowRight, Zap, TrendingUp, ShieldAlert, Cpu, Plus, Sparkles, Download, Star, Code2, UserPlus, Database, Bell, Settings, BarChart3, Link2 } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
 import Link from "next/link";
 import { useState, useEffect } from "react";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
+import InstallSkillModal from "@/components/marketplace/InstallSkillModal";
 
-// Base Template Definitions
 const BASE_STRATEGIES = [
     {
         id: "nirium-usdc-loop",
@@ -23,12 +23,12 @@ const BASE_STRATEGIES = [
     },
     {
         id: "turbo-sniper",
-        name: "Memetic Volatility Hunter",
-        description: "Monitors creating pools for high-velocity meme tokens. Enters and exits within the same block.",
+        name: "Micro-Liquidity Optimizer",
+        description: "Responds to sudden liquidity events and market inefficiencies in new Soroban pools. High-speed execution with risk-managed entry/exit.",
         risk: "High",
-        tags: ["Degen", "High Yield"],
+        tags: ["Volatility", "DeFi"],
         color: "from-purple-500 to-pink-500",
-        baseApy: 420.69,
+        baseApy: 32.8,
         elo: 1541
     },
     {
@@ -50,117 +50,106 @@ const BASE_STRATEGIES = [
         color: "from-orange-500 to-red-500",
         baseApy: 45.2,
         elo: 1609
+    }
+];
+
+const CATEGORY_ICONS: Record<string, any> = {
+    trading: TrendingUp,
+    analysis: BarChart3,
+    notification: Bell,
+    integration: Link2,
+    data: Database,
+    utility: Settings
+};
+
+const CATEGORY_COLORS: Record<string, string> = {
+    trading: "from-emerald-500 to-green-600",
+    analysis: "from-blue-500 to-indigo-600",
+    notification: "from-orange-500 to-amber-600",
+    integration: "from-purple-500 to-violet-600",
+    data: "from-cyan-500 to-teal-600",
+    utility: "from-gray-500 to-slate-600"
+};
+
+const BASE_PLUGINS = [
+    {
+        id: "flash-loan-executor",
+        name: "Flash Loan Executor",
+        slug: "flash-loan-executor",
+        description: "EXECUTE ATOMIC FLASH LOANS USING SOROBAN SINGLE-INVOCATION PRIMITIVES. BILLED VIA X402.",
+        category: "trading",
+        tags: ["flash-loan", "stellar", "x402"],
+        color: "from-emerald-500 to-green-600",
+        downloads: 12500,
+        elo: 1200,
+        isPremium: false,
+        price: null
     },
     {
-        id: "lending-loop-max",
-        name: "Blend Recursive Yield",
-        description: "Maximizes yield by recursively borrowing and supplying XLM across Blend protocol.",
-        risk: "Medium",
-        tags: ["Leverage", "Lending"],
-        color: "from-indigo-500 to-blue-600",
-        baseApy: 22.4,
-        elo: 2037
+        id: "price-oracle",
+        name: "Multi-Source Price Oracle",
+        slug: "price-oracle",
+        description: "AGGREGATE PRICES FROM COINGECKO, DEFILLAMA, PYTH. REAL-TIME MPP SUBSCRIPTION.",
+        category: "data",
+        tags: ["oracle", "price", "MPP"],
+        color: "from-cyan-500 to-teal-600",
+        downloads: 8900,
+        elo: 1200,
+        isPremium: true,
+        price: "1.00 USDC/mo"
     },
     {
-        id: "blue-chip-dca",
-        name: "Weighted DCA Accumulator",
-        description: "Intelligently buys XLM dips using TWAP over 4-hour intervals. Best for long-term holding.",
-        risk: "Low",
-        tags: ["Savings", "Long Term"],
-        color: "from-gray-700 to-gray-500",
-        baseApy: 12.1,
-        elo: 2104
+        id: "telegram-alerts-pro",
+        name: "Telegram Alerts Pro",
+        slug: "telegram-alerts-pro",
+        description: "ADVANCED TELEGRAM NOTIFICATIONS WITH RICH FORMATTING. MPP ENABLED.",
+        category: "notification",
+        tags: ["telegram", "alerts", "MPP"],
+        color: "from-orange-500 to-amber-600",
+        downloads: 15700,
+        elo: 1200,
+        isPremium: true,
+        price: "1.00 USDC/mo"
     },
     {
-        id: "stable-yield-agg",
-        name: "Lending Optimization Loop",
-        description: "Auto-rotates USDC capital between Blend and Phoenix to capture the highest lending rates.",
-        risk: "Very Low",
-        tags: ["Stablecoin", "Savings"],
-        color: "from-teal-500 to-cyan-600",
-        baseApy: 18.5,
-        elo: 1427
-    },
-    {
-        id: "soroswap-amm-active",
-        name: "Soroswap AMM Position",
-        description: "Concentrated liquidity provision with automated range rebalancing to maximize trading fees.",
-        risk: "High",
-        tags: ["Liquidity", "High Yield"],
+        id: "soroswap-lp-manager",
+        name: "Soroswap LP Manager",
+        slug: "soroswap-lp-manager",
+        description: "AUTOMATED REBALANCE AND YIELD FARMING FOR SOROSWAP LIQUIDITY POOLS.",
+        category: "trading",
+        tags: ["soroswap", "lp"],
         color: "from-pink-500 to-rose-500",
-        baseApy: 65.4,
-        elo: 1660
+        downloads: 6789,
+        elo: 1200,
+        isPremium: true,
+        price: "0.50 USDC/mo"
     },
     {
-        id: "phoenix-delta-neutral",
-        name: "Delta Neutral Phoenix Farmer",
-        description: "Farms funding rates by longing Spot XLM and shorting Perp XLM. Market neutral strategy.",
-        risk: "Low",
-        tags: ["Hedging", "Complex"],
-        color: "from-slate-800 to-blue-900",
-        baseApy: 28.3,
-        elo: 2167
+        id: "ipfs-blackbox-logger",
+        name: "IPFS Blackbox Logger",
+        slug: "ipfs-blackbox-logger",
+        description: "ARCHIVES ALL AGENT EXECUTION LOGS TO DECENTRALIZED IPFS STORAGE FOR AUDIT.",
+        category: "utility",
+        tags: ["ipfs", "audit", "logs"],
+        color: "from-gray-500 to-slate-500",
+        downloads: 2980,
+        elo: 1200,
+        isPremium: false,
+        price: null
     },
     {
-        id: "mev-capture",
-        name: "MEV Extraction Engine",
-        description: "Front-runs low-slippage DEX transactions by detecting pending swaps in the mempool and executing ahead of them atomically.",
-        risk: "High",
-        tags: ["MEV", "Degen"],
-        color: "from-orange-600 to-red-700",
-        baseApy: 112.5,
-        elo: 1892
-    },
-    {
-        id: "perp-funding-arb",
-        name: "Perp Funding Rate Arbitrage",
-        description: "Continuously harvests positive funding rates on Bluefin perpetuals. Holds delta-neutral exposure to capture funding every 8 hours.",
-        risk: "Low",
-        tags: ["Derivatives", "Safe"],
-        color: "from-violet-700 to-indigo-800",
-        baseApy: 32.8,
-        elo: 1987
-    },
-    {
-        id: "pyth-oracle-sniper",
-        name: "Oracle Latency Arbitrageur",
-        description: "Exploits latency between on-chain Pyth price updates and DEX spot prices. Executes within the same block as oracle refresh.",
-        risk: "Medium",
-        tags: ["Oracle", "Technical"],
-        color: "from-emerald-600 to-teal-700",
-        baseApy: 58.1,
-        elo: 1469
-    },
-    {
-        id: "dual-yield-compounder",
-        name: "Dual Token Yield Compounder",
-        description: "Simultaneously earns XLM staking rewards and USDC lending yield by splitting capital across Blend and native validators.",
-        risk: "Very Low",
-        tags: ["Savings", "Staking"],
-        color: "from-cyan-600 to-blue-700",
-        baseApy: 19.3,
-        elo: 1897
-    },
-    {
-        id: "liquidation-hunter",
-        name: "Liquidation Vector",
-        description: "Monitors undercollateralized positions across Blend protocol. Triggers liquidations at protocol discount.",
-        risk: "High",
-        tags: ["Liquidation", "High Yield"],
-        color: "from-red-700 to-rose-800",
-        baseApy: 87.4,
-        elo: 1573
-    },
-    {
-        id: "cross-chain-bridge-arb",
-        name: "Cross-Chain Spread Capture",
-        description: "Detects price discrepancies between Stellar and other chains via Wormhole. Bridges and trades atomically before spread closes.",
-        risk: "Medium",
-        tags: ["Bridge", "Arbitrage"],
-        color: "from-fuchsia-600 to-purple-700",
-        baseApy: 41.7,
-        elo: 1584
-    },
+        id: "eliza-trading-brain",
+        name: "ElizaOS Trading Brain",
+        slug: "eliza-trading-brain",
+        description: "EMBEDS AN ELIZAOS AI AGENT AS A DECISION-MAKING LAYER FOR TRADING STRATEGIES.",
+        category: "analysis",
+        tags: ["eliza", "ai"],
+        color: "from-blue-500 to-indigo-600",
+        downloads: 7654,
+        elo: 1200,
+        isPremium: false,
+        price: null
+    }
 ];
 
 import { useFreighter } from "@/hooks/useFreighter";
@@ -171,9 +160,12 @@ export default function StrategiesPage() {
     const router = useRouter();
     const [deployingId, setDeployingId] = useState<string | null>(null);
     const [selectedAssets, setSelectedAssets] = useState<Record<string, 'XLM' | 'USDC'>>({});
+    const [installedSkills, setInstalledSkills] = useState<{ [key: string]: boolean }>({});
+    const [selectedSkillToInstall, setSelectedSkillToInstall] = useState<any | null>(null);
     const [strategies, setStrategies] = useState(BASE_STRATEGIES.map(s => ({
         ...s, apy: `${s.baseApy}%`, tvl: "Loading..."
     })));
+    const [plugins, setPlugins] = useState(BASE_PLUGINS);
 
     // Load Live Market Data (Simulated Realism)
     useEffect(() => {
@@ -220,7 +212,7 @@ export default function StrategiesPage() {
                     dynamicApy = 30 + (Math.random() * 6 - 2);
                     dynamicTvl = 2100 + Math.random() * 120;
                 } else if (s.id === 'pyth-oracle-sniper') {
-                    dynamicApy = 50 + (Math.random() * 20 - 8);
+                    dynamicApy = 18 + (Math.random() * 4 - 2);
                     dynamicTvl = 720 + Math.random() * 60;
                 } else if (s.id === 'dual-yield-compounder') {
                     dynamicApy = 19 + (Math.random() * 1.5);
@@ -307,22 +299,22 @@ export default function StrategiesPage() {
                         <SectionBrandLogo className="!justify-start mb-0" size="w-32 lg:w-48" />
                         <div className="flex flex-col items-center lg:items-start text-center lg:text-left">
                             <h1 className="text-5xl md:text-7xl font-black tracking-tighter mb-4 leading-none uppercase">
-                                PROTOCOL <span className="text-stellar-teal italic">ARSENAL</span>
+                                PROTOCOL <span className="text-stellar-teal italic">MARKETPLACE</span>
                             </h1>
                             <p className="text-gray-400 max-w-2xl text-lg leading-relaxed">
-                                Deploy autonomous kernels to the Stellar Network targeting <span className="text-stellar-teal font-bold uppercase tracking-widest text-[11px] border border-stellar-teal/20 px-2 rounded ml-1 mr-1">XLM</span> or <span className="text-stellar-yellow font-bold uppercase tracking-widest text-[11px] border border-stellar-yellow/20 px-2 rounded">USDC</span> vaults.
+                                Deploy autonomous kernels to the Stellar Network targeting <span className="text-stellar-teal font-bold uppercase tracking-widest text-[11px] border border-stellar-teal/20 px-2 rounded ml-1 mr-1">XLM</span> or <span className="text-stellar-yellow font-bold uppercase tracking-widest text-[11px] border border-stellar-yellow/20 px-2 rounded">USDC</span> vaults. <span className="text-[10px] text-gray-500 block mt-2 italic font-mono uppercase tracking-widest">// Aligned with Stellar Code of Conduct & SCF 7.0 Merit Criteria</span>
                             </p>
                         </div>
                     </div>
 
                     {/* Stats or Action */}
-                    <Link href="/strategies/builder" className="group relative px-8 py-4 bg-white/5 border border-white/10 rounded-2xl hover:bg-white/10 transition-all overflow-hidden hidden xl:block">
+                    <Link href="/treasury" className="group relative px-8 py-4 bg-white/5 border border-white/10 rounded-2xl hover:bg-white/10 transition-all overflow-hidden hidden xl:block">
                         <div className="absolute inset-0 bg-gradient-to-r from-stellar-teal/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
                         <div className="relative flex items-center gap-3">
                             <Plus className="w-5 h-5 text-stellar-teal" />
                             <div className="text-left">
                                 <div className="text-xs font-mono text-gray-500 uppercase tracking-widest mb-1">Architect Unit</div>
-                                <div className="text-sm font-bold text-white tracking-tight leading-none group-hover:text-stellar-teal transition-colors">Launch Strategy Builder</div>
+                                <div className="text-sm font-bold text-white tracking-tight leading-none group-hover:text-stellar-teal transition-colors">Launch Treasury Builder</div>
                             </div>
                         </div>
                     </Link>
@@ -346,7 +338,7 @@ export default function StrategiesPage() {
                                 </div>
                                 <div className="absolute top-2 right-2 bg-black/40 backdrop-blur-md px-2 py-1 rounded text-xs font-mono border border-white/10 flex items-center gap-1">
                                     <div className="w-1.5 h-1.5 bg-green-500 rounded-full"></div>
-                                    SECURE KERNEL v0.0.7
+                                    SECURE KERNEL v0.5.0
                                 </div>
                             </div>
 
@@ -436,18 +428,22 @@ export default function StrategiesPage() {
                                     )}
                                 </button>
                             </div>
+                            <div className="mt-4 pt-4 border-t border-white/5 flex items-center gap-2 text-[8px] text-gray-600 uppercase tracking-widest font-mono italic">
+                                <ShieldAlert size={10} className="text-gray-700" />
+                                <span>Follows Stellar Community Ethics</span>
+                            </div>
                         </motion.div>
                     ))}
 
                     {/* "Create New" Card */}
-                    <Link href="/strategies/builder" className="border border-dashed border-white/10 rounded-2xl p-6 flex flex-col items-center justify-center text-center gap-4 hover:bg-white/5 hover:border-stellar-teal/30 transition-all text-gray-400 hover:text-white cursor-pointer min-h-[400px] group">
+                    <Link href="/treasury" className="border border-dashed border-white/10 rounded-2xl p-6 flex flex-col items-center justify-center text-center gap-4 hover:bg-white/5 hover:border-stellar-teal/30 transition-all text-gray-400 hover:text-white cursor-pointer min-h-[400px] group">
                         <div className="w-16 h-16 rounded-full bg-white/5 group-hover:bg-stellar-teal/10 flex items-center justify-center mb-2 transition-colors border border-white/5 group-hover:border-stellar-teal/20">
                             <Zap size={32} className="group-hover:text-stellar-teal transition-colors" />
                         </div>
-                        <h3 className="text-xl font-bold font-mono tracking-tight group-hover:text-stellar-teal transition-colors">ARCHITECT NEW PROTOCOL</h3>
+                        <h3 className="text-xl font-bold font-mono tracking-tight group-hover:text-stellar-teal transition-colors">ARCHITECT TREASURY RULES</h3>
                         <p className="text-sm max-w-xs text-gray-400">
-                            Visual drag-and-drop Builder with 6 node categories:<br />
-                            <span className="text-stellar-teal font-mono text-[10px] uppercase">Atomic Engine · AI Intelligence · Swaps · Security · Social · Signals</span>
+                            Visual drag-and-drop Builder for institutional flows:<br />
+                            <span className="text-stellar-teal font-mono text-[10px] uppercase">Fiat Integrations · Triggers · Allocation · Compliance</span>
                         </p>
                         <div className="flex items-center gap-2 mt-2">
                             <span className="text-[10px] font-mono bg-blue-500/10 text-[#4ca2ff] px-2 py-0.5 rounded">XLM</span>
@@ -456,7 +452,119 @@ export default function StrategiesPage() {
                         </div>
                     </Link>
                 </div>
+
+                {/* Plugins Section */}
+                <div className="mt-32 mb-12">
+                    <h2 className="text-4xl md:text-5xl font-black tracking-tighter uppercase italic leading-none text-white">
+                        PROTOCOL <span className="text-stellar-yellow">PLUGINS</span>
+                    </h2>
+                    <p className="text-gray-400 max-w-2xl text-lg mt-4 leading-relaxed">
+                        Extend your agent's capabilities with modular on-chain integrations and data feeds.
+                    </p>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    {plugins.map((skill, idx) => (
+                        <motion.div
+                            key={skill.id}
+                            initial={{ opacity: 0, y: 20 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            transition={{ delay: 0.1 + idx * 0.1 }}
+                            className="group relative overflow-hidden flex flex-col rounded-2xl bg-[#080808] border border-white/5 p-6 hover:border-stellar-teal/50 hover:shadow-[0_0_30px_rgba(45,235,232,0.1)] transition-all cursor-pointer"
+                        >
+                            {skill.isPremium && (
+                                <div className="absolute top-4 right-4">
+                                    <span className="px-2 py-1 text-xs bg-stellar-yellow/20 text-stellar-yellow rounded-full flex items-center gap-1">
+                                        <Sparkles className="w-3 h-3" /> Premium
+                                    </span>
+                                </div>
+                            )}
+
+                            <div className={`w-12 h-12 rounded-xl bg-gradient-to-br ${CATEGORY_COLORS[skill.category] || 'from-slate-500 to-slate-600'} flex items-center justify-center mb-4`}>
+                                {(() => {
+                                    const Icon = CATEGORY_ICONS[skill.category] || Code2;
+                                    return <Icon className="w-6 h-6 text-white" />;
+                                })()}
+                            </div>
+
+                            <h3 className="text-lg font-semibold text-white mb-2 group-hover:text-stellar-teal transition-colors">
+                                {skill.name}
+                            </h3>
+                            <p className="text-[10px] text-gray-500 uppercase tracking-widest font-bold mt-1 mb-6 flex-1 line-clamp-2">
+                                {skill.description}
+                            </p>
+
+                            <div className="flex items-center justify-between text-sm text-slate-500 mt-auto pt-4 border-t border-white/5">
+                                <div className="flex items-center gap-3">
+                                    <span className="flex items-center gap-1">
+                                        <Download className="w-4 h-4" />
+                                        {(skill.downloads / 1000).toFixed(1)}K
+                                    </span>
+                                    <span className="flex items-center gap-1">
+                                        <Star className="w-4 h-4 text-yellow-400 fill-yellow-400" />
+                                        {skill.elo}
+                                    </span>
+                                </div>
+
+                                {installedSkills[skill.id] || installedSkills[skill.slug] ? (
+                                    <div className="flex gap-2 z-20 relative">
+                                        <Link href="/agents">
+                                            <button
+                                                onClick={(e) => e.stopPropagation()}
+                                                className="flex items-center gap-2 px-3 py-1.5 bg-green-500/10 text-green-400 rounded-lg hover:bg-green-500/20 text-sm font-medium transition-colors border border-green-500/20"
+                                            >
+                                                <span className="relative flex h-2 w-2">
+                                                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
+                                                    <span className="relative inline-flex rounded-full h-2 w-2 bg-green-500"></span>
+                                                </span>
+                                                Monitor
+                                            </button>
+                                        </Link>
+
+                                        <button
+                                            onClick={(e) => {
+                                                e.preventDefault();
+                                                e.stopPropagation();
+                                                setSelectedSkillToInstall(skill);
+                                            }}
+                                            className="flex items-center justify-center p-2 bg-stellar-teal/10 text-stellar-teal rounded-lg hover:bg-stellar-teal/20 transition-all border border-stellar-teal/20"
+                                            title="Install to another unit"
+                                        >
+                                            <UserPlus size={16} />
+                                        </button>
+                                    </div>
+                                ) : (
+                                    <button
+                                        onClick={(e) => {
+                                            e.stopPropagation();
+                                            setSelectedSkillToInstall(skill);
+                                        }}
+                                        className={`flex items-center gap-2 px-3 py-1.5 rounded-lg text-sm font-bold transition-colors border z-10 relative ${
+                                            skill.isPremium 
+                                            ? 'bg-stellar-teal/20 hover:bg-stellar-teal text-white border-stellar-teal/50 hover:text-black shadow-lg shadow-stellar-teal/5' 
+                                            : 'bg-slate-700/50 hover:bg-stellar-yellow hover:text-black text-white border-slate-600/50 hover:border-stellar-yellow'
+                                        }`}
+                                    >
+                                        <Zap className="w-3.5 h-3.5" />
+                                        {skill.isPremium ? `Pay ${skill.price}` : 'Install'}
+                                    </button>
+                                )}
+                            </div>
+                        </motion.div>
+                    ))}
+                </div>
             </div>
+
+            <InstallSkillModal
+                skill={selectedSkillToInstall}
+                isOpen={!!selectedSkillToInstall}
+                onClose={() => setSelectedSkillToInstall(null)}
+                onInstall={() => {
+                    setInstalledSkills((prev) => ({ ...prev, [selectedSkillToInstall?.id]: true }));
+                    setSelectedSkillToInstall(null);
+                    toast.success(`${selectedSkillToInstall?.name} installed successfully!`);
+                }}
+            />
         </main>
     )
 }

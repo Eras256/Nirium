@@ -1,6 +1,6 @@
 # nirium
 
-Official TypeScript SDK for the **Nirium Protocol** — autonomous DeFi agent on Stellar/Soroban.
+Official TypeScript SDK for the **Nirium Protocol** — autonomous DeFi agent infrastructure on Stellar/Soroban.
 
 ## Install
 
@@ -47,6 +47,8 @@ agent.subscribe((signal) => {
 | Skills | `getSkills()`, `installSkill()`, `uninstallSkill()` |
 | Webhooks | `registerWebhook()`, `getWebhooks()`, `deleteWebhook()`, `testWebhook()` |
 | WebSocket | `subscribe()`, `onLog()`, `disconnect()` |
+| x402 Payments | `initX402()`, `x402Fetch()` |
+| MPP Payments | `initMpp()`, `mppFetch()` |
 
 ## Authentication
 
@@ -65,6 +67,31 @@ const agent = new Agent({
 });
 ```
 
+## Payment Protocols
+
+### x402 — Pay-Per-Request
+```typescript
+agent.initX402({
+  secretKey: 'S...',           // Stellar secret key
+  network: 'stellar:testnet',
+});
+
+const response = await agent.x402Fetch('https://api.nirium.xyz/api/v1/premium/signals');
+const data = await response.json();
+```
+
+### MPP — Session-Based Budget Delegation
+```typescript
+agent.initMpp({
+  secretKey: 'S...',
+  network: 'stellar:testnet',
+  mode: 'pull',
+});
+
+const response = await agent.mppFetch('https://api.nirium.xyz/api/v1/mpp/signals');
+const data = await response.json();
+```
+
 ### Endpoint Access Model
 
 | Access | Endpoints |
@@ -72,11 +99,18 @@ const agent = new Agent({
 | **Public** (no key) | `health`, `loop/status`, `execute-demo`, `signals/recent`, `skills` list |
 | **Protected** (API key) | `execute`, `market`, `loop/start\|stop\|scan`, `subscriptions`, `skills/install`, `webhooks` |
 | **WebSocket** (JWT) | `/ws/signals` — real-time signal stream |
+| **x402 Premium** | `/api/v1/premium/signals` ($0.02), `/api/v1/premium/market` ($0.05) |
 
 ## Requirements
 
 - Node.js >= 18
 - TypeScript >= 5.0
+
+## Links
+
+- [Full SDK Documentation](../../SDKs.md)
+- [API Documentation](../../API_DOCUMENTATION_OPENAPI.yaml)
+- [MCP Integration Guide](../../MCP_INTEGRATION_GUIDE.md)
 
 ## License
 

@@ -3,9 +3,10 @@
 import React, { useState, useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, Brain, Cpu, Key, Globe, Check, AlertCircle, Loader2 } from 'lucide-react';
+import { X, Brain, Cpu, Key, Globe, Check, AlertCircle, Loader2, Shield } from 'lucide-react';
 import { aiService, LLMConfig } from '@/lib/aiService';
 import { toast } from 'sonner';
+import { useLanguage } from '@/context/LanguageContext';
 
 interface AISettingsModalProps {
     isOpen: boolean;
@@ -37,6 +38,7 @@ const MODELS: Record<string, string[]> = {
 };
 
 export default function AISettingsModal({ isOpen, onClose }: AISettingsModalProps) {
+    const { t } = useLanguage();
     const [config, setConfig] = useState<LLMConfig>({ provider: 'nirium', model: 'nirium-matrix-v1' });
     const [isTesting, setIsTesting] = useState(false);
     const [testResult, setTestResult] = useState<'success' | 'error' | null>(null);
@@ -64,10 +66,10 @@ export default function AISettingsModal({ isOpen, onClose }: AISettingsModalProp
         setIsSaving(false);
 
         if (result.success) {
-            toast.success('AI Matrix Updated', { description: result.message });
+            toast.success(t.ai_modal.matrix_updated, { description: result.message });
             onClose();
         } else {
-            toast.warning('Configuration Saved Locally', { description: result.message });
+            toast.warning(t.ai_modal.config_saved_local, { description: result.message });
             onClose();
         }
     };
@@ -81,9 +83,9 @@ export default function AISettingsModal({ isOpen, onClose }: AISettingsModalProp
         setTestResult(ok ? 'success' : 'error');
 
         if (ok) {
-            toast.success('Ollama Connected', { description: 'Local neural host is online.' });
+            toast.success(t.ai_modal.ollama_connected, { description: t.ai_modal.ollama_online });
         } else {
-            toast.error('Connection Failed', { description: 'Ensure Ollama is running with OLLAMA_ORIGINS="*"' });
+            toast.error(t.ai_modal.connection_failed, { description: t.ai_modal.ollama_error_hint });
         }
     };
 
@@ -114,8 +116,8 @@ export default function AISettingsModal({ isOpen, onClose }: AISettingsModalProp
                                     <Brain className="w-5 h-5 sm:w-6 sm:h-6" />
                                 </div>
                                 <div>
-                                    <h2 className="text-base sm:text-lg font-bold text-white tracking-tighter">AI Sovereignty</h2>
-                                    <p className="text-[9px] text-gray-500 uppercase tracking-widest font-black opacity-60">Neural Matrix</p>
+                                    <h2 className="text-base sm:text-lg font-bold text-white tracking-tighter">{t.ai_modal.title}</h2>
+                                    <p className="text-[9px] text-gray-500 uppercase tracking-widest font-black opacity-60">{t.ai_modal.subtitle}</p>
                                 </div>
                             </div>
                             <button onClick={onClose} className="p-2 text-gray-500 hover:text-white transition-all rounded-lg hover:bg-white/5">
@@ -127,7 +129,7 @@ export default function AISettingsModal({ isOpen, onClose }: AISettingsModalProp
                         <div className="flex-1 p-5 sm:p-6 space-y-6 overflow-y-auto custom-scrollbar bg-black/20">
                             {/* Provider Selector */}
                             <div className="space-y-3">
-                                <label className="text-[9px] font-black text-gray-400 uppercase tracking-widest ml-1">Connect Neural Host</label>
+                                <label className="text-[9px] font-black text-gray-400 uppercase tracking-widest ml-1">{t.ai_modal.connect_host}</label>
                                 <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 sm:gap-3">
                                     {PROVIDERS.map((p) => {
                                         const Icon = p.icon;
@@ -155,7 +157,7 @@ export default function AISettingsModal({ isOpen, onClose }: AISettingsModalProp
                             <div className="space-y-4 animate-in fade-in slide-in-from-top-1">
                                 {/* Model Selector */}
                                 <div className="space-y-1.5">
-                                    <label className="text-[9px] font-black text-gray-400 uppercase tracking-widest ml-1">Model Architecture</label>
+                                    <label className="text-[9px] font-black text-gray-400 uppercase tracking-widest ml-1">{t.ai_modal.model_architecture}</label>
                                     <div className="relative">
                                         {config.provider === 'ollama' ? (
                                             <input
@@ -185,7 +187,7 @@ export default function AISettingsModal({ isOpen, onClose }: AISettingsModalProp
                                 {/* API Key (for Cloud Providers) */}
                                 {(config.provider !== 'nirium' && config.provider !== 'ollama') && (
                                     <div className="space-y-1.5">
-                                        <label className="text-[9px] font-black text-gray-400 uppercase tracking-widest ml-1">Private API Key</label>
+                                        <label className="text-[9px] font-black text-gray-400 uppercase tracking-widest ml-1">{t.ai_modal.private_api_key}</label>
                                         <div className="relative">
                                             <input
                                                 type="password"
@@ -202,7 +204,7 @@ export default function AISettingsModal({ isOpen, onClose }: AISettingsModalProp
                                 {/* Ollama Endpoint */}
                                 {config.provider === 'ollama' && (
                                     <div className="space-y-1.5">
-                                        <label className="text-[9px] font-black text-gray-400 uppercase tracking-widest ml-1">Local Host</label>
+                                        <label className="text-[9px] font-black text-gray-400 uppercase tracking-widest ml-1">{t.ai_modal.local_host}</label>
                                         <div className="flex gap-2">
                                             <input
                                                 type="text"
@@ -216,11 +218,22 @@ export default function AISettingsModal({ isOpen, onClose }: AISettingsModalProp
                                                 className="px-4 bg-white/5 border border-white/10 rounded-xl text-[9px] font-black text-white hover:bg-white/10 transition-all flex items-center gap-1.5 tracking-wider"
                                             >
                                                 {isTesting ? <Loader2 size={10} className="animate-spin" /> : testResult === 'success' ? <Check size={10} className="text-green-400" /> : <Globe size={10} />}
-                                                TEST
+                                                {t.ai_modal.test}
                                             </button>
                                         </div>
                                     </div>
                                 )}
+
+                                {/* Stellar Conduct Alignment */}
+                                <div className="mt-6 p-4 bg-pulse-violet/5 border border-pulse-violet/10 rounded-xl space-y-2 group transition-all hover:bg-pulse-violet/10">
+                                    <div className="flex items-center gap-2 text-pulse-violet">
+                                        <Shield size={14} className="shrink-0" />
+                                        <span className="text-[10px] font-black uppercase tracking-widest">Stellar Compliance Alignment</span>
+                                    </div>
+                                    <p className="text-[10px] text-gray-400 leading-relaxed italic">
+                                        {t.ai_modal.conduct_agreement}
+                                    </p>
+                                </div>
                             </div>
                         </div>
 
@@ -230,7 +243,7 @@ export default function AISettingsModal({ isOpen, onClose }: AISettingsModalProp
                                 onClick={onClose}
                                 className="flex-1 py-2.5 rounded-xl bg-white/5 border border-white/10 text-[9px] sm:text-[10px] font-bold text-gray-400 hover:text-white transition-all uppercase tracking-widest"
                             >
-                                Cancel
+                                {t.ai_modal.cancel}
                             </button>
                             <button
                                 onClick={handleSave}
@@ -238,7 +251,7 @@ export default function AISettingsModal({ isOpen, onClose }: AISettingsModalProp
                                 className="flex-1 py-2.5 rounded-xl bg-pulse-violet border border-pulse-violet/50 text-[9px] sm:text-[10px] font-bold text-white shadow-[0_0_15px_rgba(112,0,255,0.4)] hover:brightness-110 transition-all uppercase tracking-widest flex items-center justify-center gap-2"
                             >
                                 {isSaving && <Loader2 size={12} className="animate-spin" />}
-                                Sync Matrix
+                                {t.ai_modal.sync_matrix}
                             </button>
                         </div>
                     </motion.div>

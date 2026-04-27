@@ -43,10 +43,11 @@ class NativeFreighterModule extends FreighterModule {
 }
 // ──────────────────────────────────────────────────────────────────
 
-let isInitialized = false;
-
 function ensureInit() {
-    if (!isInitialized) {
+    if (typeof window === 'undefined') return;
+    if ((window as any).__swkInitialized) return;
+    (window as any).__swkInitialized = true;
+    {
 
         // 1. All default DApp wallets from the ecosystem (xBull, Albedo, LOBSTR, etc)
         // EXCEPT Freighter (we filter it out to inject our extended version)
@@ -56,13 +57,14 @@ function ensureInit() {
         const nativeFreighter = new NativeFreighterModule();
 
         // 3. WalletConnect (The officially supported method for Mobile)
+        const origin = typeof window !== 'undefined' ? window.location.origin : 'https://nirium.xyz';
         const wcModule = new WalletConnectModule({
-            projectId: "5e98f060f64c1bd7e543bc8836528d22",
+            projectId: "8505f6eaaa44b34387416821007c224f",
             metadata: {
                 name: 'Nirium Protocol',
                 description: 'Institutional-grade autonomous Stellar AI Agent Swarm.',
-                url: 'https://nirium.xyz',
-                icons: ['https://nirium.xyz/icon.png']
+                url: origin,
+                icons: [`${origin}/icon.png`]
             }
         });
 
@@ -76,7 +78,6 @@ function ensureInit() {
                 hideUnsupportedWallets: false
             }
         });
-        isInitialized = true;
     }
 }
 

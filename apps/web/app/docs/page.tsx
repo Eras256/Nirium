@@ -2,33 +2,35 @@
 
 import Link from "next/link";
 import { useSearchParams } from "next/navigation"; // Added
-import { Suspense, useState, useEffect } from "react"; // Restored useEffect
+import { Suspense, useState, useEffect, useRef } from "react"; // Restored useEffect & added useRef
 import {
     ArrowLeft, Book, Code, Shield, Layers, Cpu, Database, Zap,
     GitBranch, FileCode, Rocket, CheckCircle, AlertTriangle,
     Terminal, Globe, Lock, TrendingUp, ChevronRight, ChevronLeft, ExternalLink,
-    Play, Settings, Users, Workflow, Key, Lightbulb, HardDrive, FileCheck, BookOpen, Activity, Heart, Clock
+    Play, Settings, Users, Workflow, Key, Lightbulb, HardDrive, FileCheck, BookOpen, Activity, Heart, Clock,
+    Handshake
 } from "lucide-react";
 import { SectionBrandLogo } from "@/components/ui/SectionBrandLogo";
 import { useLanguage } from "../../context/LanguageContext";
 import Navbar from "@/components/layout/Navbar";
 import ApiKeyManager from "@/components/docs/ApiKeyManager";
 
-type TabId = 'overview' | 'architecture' | 'contracts' | 'agent' | 'frontend' | 'api' | 'security' | 'ideas' | 'builder';
+type TabId = 'overview' | 'architecture' | 'contracts' | 'agent' | 'frontend' | 'api' | 'security' | 'blueprints' | 'builder';
 
 function DocsContent() {
     const { t } = useLanguage();
     const searchParams = useSearchParams();
+    const scrollContainerRef = useRef<HTMLDivElement>(null);
 
     const tabs = [
         { id: 'overview' as TabId, label: t.docs.nav.overview, icon: Book },
-        { id: 'api' as TabId, label: 'API & SANDBOX', icon: Terminal },
-        { id: 'ideas' as TabId, label: t.docs.nav.ideas, icon: Lightbulb },
+        { id: 'api' as TabId, label: t.docs.nav.api_sandbox, icon: Terminal },
+        { id: 'blueprints' as TabId, label: "BLUEPRINTS", icon: Lightbulb },
         { id: 'architecture' as TabId, label: t.docs.nav.architecture, icon: Layers },
-        { id: 'contracts' as TabId, label: t.docs.nav.security, icon: Code },
-        { id: 'agent' as TabId, label: 'UNIDADES AUTÓNOMAS', icon: Cpu },
-        { id: 'builder' as TabId, label: 'ARQUITECTO DE ESTRATEGIAS', icon: Workflow },
-        { id: 'frontend' as TabId, label: 'INTERFAZ DE COMANDO', icon: Globe },
+        { id: 'contracts' as TabId, label: t.docs.nav.contracts, icon: Code },
+        { id: 'agent' as TabId, label: t.docs.nav.agent, icon: Cpu },
+        { id: 'builder' as TabId, label: t.docs.nav.builder, icon: Workflow },
+        { id: 'frontend' as TabId, label: t.docs.nav.frontend, icon: Globe },
         { id: 'security' as TabId, label: t.docs.nav.security, icon: Shield },
     ];
     const initialTabParam = searchParams.get('tab');
@@ -44,6 +46,16 @@ function DocsContent() {
         }
     }, [searchParams]);
 
+    const scroll = (direction: 'left' | 'right') => {
+        if (scrollContainerRef.current) {
+            const scrollAmount = 300;
+            scrollContainerRef.current.scrollBy({
+                left: direction === 'left' ? -scrollAmount : scrollAmount,
+                behavior: 'smooth'
+            });
+        }
+    };
+
     return (
         <main className="min-h-screen bg-black text-white font-sans selection:bg-stellar-teal/30">
             <Navbar />
@@ -53,7 +65,7 @@ function DocsContent() {
                 <div className="absolute bottom-0 right-0 w-[500px] h-[500px] bg-stellar-teal/10 blur-[120px] rounded-full" />
             </div>
 
-            <div className="relative z-10 pt-36">
+            <div className="relative z-10 pt-32 sm:pt-40 md:pt-48 lg:pt-56">
                 <div className="max-w-[1600px] w-full mx-auto px-6 pb-8 border-b border-white/10">
                     <Link href="/" className="inline-flex items-center gap-2 text-gray-400 hover:text-white mb-6 transition-colors">
                         <ArrowLeft className="w-4 h-4" />
@@ -69,9 +81,9 @@ function DocsContent() {
                                         <Book className="w-6 h-6 text-white" />
                                     </div>
                                     <div className="flex items-center gap-3">
-                                        <h1 className="text-4xl md:text-7xl font-black font-mono tracking-tighter uppercase leading-none">{t.docs.overview.title}</h1>
+                                        <h1 className="text-3xl sm:text-5xl md:text-7xl font-black font-mono tracking-tighter uppercase leading-none">{t.docs.overview.title}</h1>
                                         <span className="px-2 py-0.5 bg-green-500/20 text-green-400 text-xs font-mono rounded-full border border-green-500/30 animate-pulse">
-                                            v0.0.7
+                                            v0.5.0
                                         </span>
                                     </div>
                                 </div>
@@ -90,9 +102,27 @@ function DocsContent() {
                     </div>
                 </div>
 
-                <div className="sticky top-16 z-20 bg-black/80 backdrop-blur-xl border-b border-white/10">
-                    <div className="max-w-[1600px] w-full mx-auto px-6">
-                        <div className="flex overflow-x-auto scrollbar-hide gap-1 py-2">
+                <div className="sticky top-16 z-20 bg-black/80 backdrop-blur-xl border-b border-white/10 group/nav">
+                    {/* Navigation Arrows */}
+                    <button 
+                        onClick={() => scroll('left')}
+                        className="absolute left-0 top-0 bottom-0 z-30 w-10 bg-gradient-to-r from-black via-black/80 to-transparent items-center justify-start pl-2 opacity-0 group-hover/nav:opacity-100 transition-opacity hidden md:flex"
+                    >
+                        <ChevronLeft className="w-5 h-5 text-stellar-teal" />
+                    </button>
+                    <button 
+                        onClick={() => scroll('right')}
+                        className="absolute right-0 top-0 bottom-0 z-30 w-10 bg-gradient-to-l from-black via-black/80 to-transparent items-center justify-end pr-2 opacity-0 group-hover/nav:opacity-100 transition-opacity hidden md:flex"
+                    >
+                        <ChevronRight className="w-5 h-5 text-stellar-teal" />
+                    </button>
+
+                    <div
+                        ref={scrollContainerRef}
+                        className="overflow-x-auto scrollbar-none"
+                        style={{ scrollbarWidth: 'none', msOverflowStyle: 'none', WebkitOverflowScrolling: 'touch' }}
+                    >
+                        <div className="flex gap-1 py-2 px-10 min-w-max">
                             {tabs.map((tab) => (
                                 <button
                                     key={tab.id}
@@ -113,7 +143,7 @@ function DocsContent() {
                 <div className="max-w-[1600px] w-full mx-auto px-6 py-12">
                     <div className="min-h-[60vh]">
                         {activeTab === 'overview' && <OverviewSection />}
-                        {activeTab === 'ideas' && <IdeasSection />}
+                        {activeTab === 'blueprints' && <IdeasSection />}
                         {activeTab === 'architecture' && <ArchitectureSection />}
                         {activeTab === 'contracts' && <ContractsSection />}
                         {activeTab === 'agent' && <AgentSection />}
@@ -184,14 +214,19 @@ function DocsContent() {
     );
 }
 
+function LocalizedLoading() {
+    const { t } = useLanguage();
+    return (
+        <div className="min-h-screen bg-black flex items-center justify-center">
+            <div className="animate-pulse text-stellar-teal font-mono">{t.docs.nav.loading}</div>
+        </div>
+    );
+}
+
 export default function DocsPage() {
     return (
         // @ts-ignore - React 19 type mismatch in Next.js
-        <Suspense fallback={
-            <div className="min-h-screen bg-black flex items-center justify-center">
-                <div className="animate-pulse text-stellar-teal font-mono">LOADING FIELD MANUAL...</div>
-            </div>
-        }>
+        <Suspense fallback={<LocalizedLoading />}>
             <DocsContent />
         </Suspense>
     );
@@ -202,19 +237,27 @@ function OverviewSection() {
     return (
         <div className="space-y-12">
             {/* Hero Stats */}
-            <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-5 gap-4">
                 {[
-                    { label: t.docs.overview.stats.version, value: 'v0.0.7', color: 'text-stellar-teal' },
-                    { label: t.docs.overview.stats.tests, value: '12/12 ✓', color: 'text-green-400' },
-                    { label: t.docs.overview.stats.plugins, value: '13+ Active', color: 'text-purple-400' },
-                    { label: t.docs.overview.stats.fee, value: '0.3%', color: 'text-amber-400' },
-                    { label: t.docs.overview.stats.assets, value: 'XLM + USDC', color: 'text-blue-400' },
+                    { label: t.docs.overview.hero.version, value: 'v0.5.0', color: 'text-stellar-teal' },
+                    { label: t.docs.overview.hero.contracts, value: '6 Testnet', color: 'text-green-400' },
+                    { label: t.docs.overview.hero.helpers, value: '30+', color: 'text-purple-400' },
+                    { label: t.docs.overview.hero.fee, value: '0.5%', color: 'text-amber-400' },
+                    { label: t.docs.overview.hero.coins, value: 'XLM · USDC · CETES', color: 'text-blue-400' },
                 ].map((stat) => (
                     <div key={stat.label} className="bg-white/5 border border-white/10 rounded-xl p-4">
                         <div className="text-xs text-gray-500 uppercase tracking-wider mb-1">{stat.label}</div>
                         <div className={`text-2xl font-bold ${stat.color}`}>{stat.value}</div>
                     </div>
                 ))}
+            </div>
+
+            {/* Testnet Notice — PDD compliance */}
+            <div className="bg-amber-500/10 border border-amber-500/30 rounded-xl px-5 py-3 flex items-center gap-3 text-sm">
+                <AlertTriangle className="w-4 h-4 text-amber-400 shrink-0" />
+                <span className="text-amber-200">
+                    {t.docs.overview.testnet_notice}
+                </span>
             </div>
 
             {/* Executive Summary */}
@@ -225,14 +268,16 @@ function OverviewSection() {
                 </h2>
                 <div className="prose prose-invert max-w-none text-gray-300 space-y-4">
                     <p className="text-lg leading-relaxed">
-                        <strong>Nirium</strong> is an institutional-grade DeFi protocol on the Stellar Network that integrates
-                        <strong className="text-stellar-teal"> atomic path execution</strong> with
-                        <strong className="text-stellar-yellow"> autonomous AI agents</strong>.
+                        {t.docs.overview.summary_p1}
                     </p>
                     <p>
-                        The protocol leverages <strong>Soroban Smart Contracts</strong> to guarantee
-                        transaction safety at the protocol level, while <strong>ElizaOS</strong> powers intelligent off-chain
-                        agents that analyze market conditions and orchestrate transactions via Multi-Operation Transactions.
+                        {t.docs.overview.summary_p2}
+                    </p>
+                    <p className="text-sm text-stellar-teal bg-stellar-teal/5 border border-stellar-teal/20 rounded-lg p-4 not-prose">
+                        {t.docs.overview.summary_who}
+                    </p>
+                    <p className="text-xs text-gray-500">
+                        {t.docs.overview.summary_warning}
                     </p>
                 </div>
             </section>
@@ -244,31 +289,31 @@ function OverviewSection() {
                     {t.docs.overview.progressive_title}
                 </h2>
                 <p className="text-gray-400 mb-6">
-                    Nirium solves the biggest AI-Crypto dilemma: <strong className="text-white">Security vs. Autonomy</strong>
+                    {t.docs.overview.progressive_subtitle}
                 </p>
                 <div className="grid md:grid-cols-2 gap-6">
                     <div className="bg-black/40 p-6 rounded-xl border border-stellar-yellow/30 hover:border-stellar-yellow/50 transition-colors">
                         <h3 className="text-xl font-bold text-stellar-yellow mb-4 flex items-center gap-2">
                             <Shield className="w-5 h-5" />
-                            Copilot Mode
+                            {t.docs.overview.control_approve.title}
                         </h3>
                         <ul className="space-y-3 text-gray-300">
-                            <li className="flex items-center gap-2"><CheckCircle className="w-4 h-4 text-green-400" /> User signs every transaction</li>
-                            <li className="flex items-center gap-2"><CheckCircle className="w-4 h-4 text-green-400" /> Human-speed execution</li>
-                            <li className="flex items-center gap-2"><CheckCircle className="w-4 h-4 text-green-400" /> Non-custodial & Trustless</li>
-                            <li className="flex items-center gap-2"><CheckCircle className="w-4 h-4 text-green-400" /> Best for security-focused users</li>
+                            <li className="flex items-center gap-2"><CheckCircle className="w-4 h-4 text-green-400" /> {t.docs.overview.control_approve.item1}</li>
+                            <li className="flex items-center gap-2"><CheckCircle className="w-4 h-4 text-green-400" /> {t.docs.overview.control_approve.item2}</li>
+                            <li className="flex items-center gap-2"><CheckCircle className="w-4 h-4 text-green-400" /> {t.docs.overview.control_approve.item3}</li>
+                            <li className="flex items-center gap-2"><CheckCircle className="w-4 h-4 text-green-400" /> {t.docs.overview.control_approve.item4}</li>
                         </ul>
                     </div>
                     <div className="bg-black/40 p-6 rounded-xl border border-stellar-teal/30 hover:border-stellar-teal/50 transition-colors">
                         <h3 className="text-xl font-bold text-stellar-teal mb-4 flex items-center gap-2">
                             <Zap className="w-5 h-5" />
-                            Autonomous Mode
+                            {t.docs.overview.control_auto.title}
                         </h3>
                         <ul className="space-y-3 text-gray-300">
-                            <li className="flex items-center gap-2"><CheckCircle className="w-4 h-4 text-green-400" /> Agent signs with Private Key</li>
-                            <li className="flex items-center gap-2"><CheckCircle className="w-4 h-4 text-green-400" /> Superhuman speed (milliseconds)</li>
-                            <li className="flex items-center gap-2"><CheckCircle className="w-4 h-4 text-green-400" /> Fully Agentic Loop</li>
-                            <li className="flex items-center gap-2"><CheckCircle className="w-4 h-4 text-green-400" /> Best for HFT & MEV searchers</li>
+                            <li className="flex items-center gap-2"><CheckCircle className="w-4 h-4 text-green-400" /> {t.docs.overview.control_auto.item1}</li>
+                            <li className="flex items-center gap-2"><CheckCircle className="w-4 h-4 text-green-400" /> {t.docs.overview.control_auto.item2}</li>
+                            <li className="flex items-center gap-2"><CheckCircle className="w-4 h-4 text-green-400" /> {t.docs.overview.control_auto.item3}</li>
+                            <li className="flex items-center gap-2"><CheckCircle className="w-4 h-4 text-green-400" /> {t.docs.overview.control_auto.item4}</li>
                         </ul>
                     </div>
                 </div>
@@ -278,16 +323,16 @@ function OverviewSection() {
             <section>
                 <h2 className="text-2xl font-bold mb-6 flex items-center gap-3">
                     <Rocket className="text-amber-400" />
-                    Key Features (v0.0.7)
+                    {t.docs.overview.features_title}
                 </h2>
                 <div className="grid md:grid-cols-3 gap-4">
                     {[
-                        { icon: Workflow, title: 'Visual Strategy Builder', desc: 'Drag-and-drop node editor for custom strategies', color: 'text-purple-400' },
-                        { icon: BookOpen, title: 'Operations Manual', desc: 'Step-by-step guide for protocol operators', color: 'text-stellar-teal' },
-                        { icon: Layers, title: 'Strategy Marketplace', desc: '16+ pre-built strategies. XLM & USDC asset selector on each card.', color: 'text-blue-400' },
-                        { icon: TrendingUp, title: 'Dashboard Command Center', desc: 'Real-time metrics, Active Fleet, execution logs', color: 'text-green-400' },
-                        { icon: Lock, title: 'Multi-Asset Vaults', desc: 'Deploy XLM or USDC vaults — per-strategy asset selection', color: 'text-amber-400' },
-                        { icon: HardDrive, title: 'Neural Archive & Supabase', desc: 'Hybrid decentralized storage for forensic logs via IPFS', color: 'text-pink-400' },
+                        { icon: Workflow, title: t.docs.overview.features.builder.title, desc: t.docs.overview.features.builder.desc, color: 'text-purple-400' },
+                        { icon: BookOpen, title: t.docs.overview.features.guides.title, desc: t.docs.overview.features.guides.desc, color: 'text-stellar-teal' },
+                        { icon: Layers, title: t.docs.overview.features.marketplace.title, desc: t.docs.overview.features.marketplace.desc, color: 'text-blue-400' },
+                        { icon: TrendingUp, title: t.docs.overview.features.dashboard.title, desc: t.docs.overview.features.dashboard.desc, color: 'text-green-400' },
+                        { icon: Lock, title: t.docs.overview.features.wallets.title, desc: t.docs.overview.features.wallets.desc, color: 'text-amber-400' },
+                        { icon: HardDrive, title: t.docs.overview.features.ipfs.title, desc: t.docs.overview.features.ipfs.desc, color: 'text-pink-400' },
                     ].map((feature) => (
                         <div key={feature.title} className="bg-white/5 border border-white/10 rounded-xl p-5 hover:bg-white/10 transition-colors">
                             <feature.icon className={`w-6 h-6 ${feature.color} mb-3`} />
@@ -302,47 +347,43 @@ function OverviewSection() {
             <section className="bg-green-500/5 border border-green-500/20 rounded-2xl p-8">
                 <h2 className="text-2xl font-bold mb-6 flex items-center gap-3">
                     <CheckCircle className="text-green-400" />
-                    Verified On-Chain Execution
+                    {t.docs.overview.transactions_title}
                 </h2>
                 <div className="overflow-x-auto">
                     <table className="w-full text-left">
                         <thead>
                             <tr className="border-b border-white/10 text-gray-400 text-sm">
-                                <th className="py-3 px-4">Transaction</th>
-                                <th className="py-3 px-4">Amount</th>
-                                <th className="py-3 px-4">Fee</th>
-                                <th className="py-3 px-4">Status</th>
-                                <th className="py-3 px-4">Link</th>
+                                <th className="py-3 px-4">{t.docs.overview.tx_table.tx}</th>
+                                <th className="py-3 px-4">{t.docs.overview.tx_table.amount}</th>
+                                <th className="py-3 px-4">{t.docs.overview.tx_table.fee}</th>
+                                <th className="py-3 px-4">{t.docs.overview.tx_table.status}</th>
+                                <th className="py-3 px-4">{t.docs.overview.tx_table.link}</th>
                             </tr>
                         </thead>
                         <tbody className="text-sm">
-                            <tr className="border-b border-white/5">
-                                <td className="py-3 px-4 font-mono text-stellar-teal">5X6TDFkYvjvCb2LS...</td>
-                                <td className="py-3 px-4">0.1 XLM</td>
-                                <td className="py-3 px-4 text-gray-400">0.0003 XLM</td>
-                                <td className="py-3 px-4"><span className="text-green-400">✓ Success</span></td>
-                                <td className="py-3 px-4">
-                                    <a href="https://stellar.expert/explorer/testnet/tx/5X6TDFkYvjvCb2LSE37DC7qNFs7UDgNy9izTs7amNanG" target="_blank" className="text-stellar-teal hover:underline flex items-center gap-1">
-                                        View <ExternalLink className="w-3 h-3" />
-                                    </a>
-                                </td>
-                            </tr>
-                            <tr className="border-b border-white/5">
-                                <td className="py-3 px-4 font-mono text-stellar-teal">ExYe8kirfrUVkehc...</td>
-                                <td className="py-3 px-4">0.05 XLM</td>
-                                <td className="py-3 px-4 text-gray-400">0.0001 XLM</td>
-                                <td className="py-3 px-4"><span className="text-green-400">✓ Success</span></td>
-                                <td className="py-3 px-4">
-                                    <a href="https://stellar.expert/explorer/testnet/tx/ExYe8kirfrUVkehcz63NvDzSzZPz2gAoLoVyCpUcVESP" target="_blank" className="text-stellar-teal hover:underline flex items-center gap-1">
-                                        View <ExternalLink className="w-3 h-3" />
-                                    </a>
-                                </td>
-                            </tr>
+                            {[
+                                { hash: '7389da0b46ff7437…5328158', label: 'revoke_agent(1218)', amount: 'Soroban', fee: '0.0009446 XLM', link: 'https://stellar.expert/explorer/testnet/tx/7389da0b46ff743702847a0e15d1829ed84c4e6a621c36193d5c95d6e5328158' },
+                                { hash: '5X6TDFkYvjvCb2LS…NanG', label: 'create_vault()', amount: 'Soroban', fee: '0.0003 XLM', link: 'https://stellar.expert/explorer/testnet/tx/5X6TDFkYvjvCb2LSE37DC7qNFs7UDgNy9izTs7amNanG' },
+                                { hash: 'ExYe8kirfrUVkehc…VESP', label: 'deposit()', amount: '0.05 XLM', fee: '0.0001 XLM', link: 'https://stellar.expert/explorer/testnet/tx/ExYe8kirfrUVkehcz63NvDzSzZPz2gAoLoVyCpUcVESP' },
+                            ].map((tx) => (
+                                <tr key={tx.hash} className="border-b border-white/5">
+                                    <td className="py-3 px-4 font-mono text-stellar-teal text-xs">{tx.hash}</td>
+                                    <td className="py-3 px-4 text-gray-300 text-xs font-mono">{tx.label}</td>
+                                    <td className="py-3 px-4 text-gray-400 text-xs">{tx.fee}</td>
+                                    <td className="py-3 px-4"><span className="text-green-400">✓ {t.docs.overview.tx_table.success}</span></td>
+                                    <td className="py-3 px-4">
+                                        <a href={tx.link} target="_blank" className="text-stellar-teal hover:underline flex items-center gap-1">
+                                            {t.docs.overview.tx_table.view} <ExternalLink className="w-3 h-3" />
+                                        </a>
+                                    </td>
+                                </tr>
+                            ))}
                         </tbody>
                     </table>
                 </div>
                 <div className="mt-4 text-sm text-gray-400">
-                    <strong>Agent Wallet:</strong> <code className="text-stellar-teal">G...stellar_address</code>
+                    <strong>Operator Wallet:</strong> <code className="text-stellar-teal">GC7FWETCRCBY4UC4XNLE3WD5X25EPHUKRKUJZ2XHVBJN7RGHTHZDTJ5Y</code>
+                    <span className="ml-3 text-xs text-amber-400">⚠ Testnet — no real funds at risk</span>
                 </div>
             </section>
         </div>
@@ -361,8 +402,8 @@ function ArchitectureSection() {
                         {`┌─────────────────────────────────────────────────────────────────────────┐
 │                           USER INTERFACE                                 │
 │  ┌───────────┐  ┌───────────┐  ┌───────────┐  ┌───────────┐  ┌────────┐ │
-│  │ Dashboard │  │ Strategies│  │ Analytics │  │  Builder  │  │ Agents │ │
-│  │ XLM/USDC  │  │ Arsenal   │  │ (Charts)  │  │ Drag/Drop │  │  CMD   │ │
+│  │ Dashboard │  │Marketplace│  │ Analytics │  │ Treasury  │  │ Sandbox│ │
+│  │ XLM/USDC  │  │  Skills   │  │ (Charts)  │  │ Rules     │  │  API   │ │
 │  └─────┬─────┘  └─────┬─────┘  └─────┬─────┘  └─────┬─────┘  └────┬───┘ │
 └────────┼──────────────┼──────────────┼──────────────┼──────────────┼────┘
          │              │              │              │              │
@@ -370,58 +411,52 @@ function ArchitectureSection() {
 ┌─────────────────────────────────────────────────────────────────────────┐
 │                        @stellar/freighter-api                           │
 │       (Wallet Connection, Auto-Reconnect, Transaction Signing)          │
-└───────────────────────────────┬─────────────────────────────────────────┘
-                                │
-          ┌─────────────────────┼──────────────────────────┐
-          ▼                     ▼                          ▼
-┌──────────────────┐  ┌──────────────────┐  ┌─────────────────────────┐
-│    SUPABASE      │  │   LOCALSTORAGE   │  │     STELLAR TESTNET     │
-│  (Persistence)   │  │    (Cache)       │  │  (Blockchain)           │
-│  - strategies    │  │  - drafts        │  │  - soroban_contracts    │
-│  - profiles      │  │  - fleet         │  │  - SDEX_Liquidity       │
-│  - agent_logs    │  │                  │  │  - Vault<XLM|USDC>      │
-└──────────────────┘  └──────────────────┘  └─────────────────────────┘
-         │
-         ▼
-┌──────────────────┐
-│  NEURAL ARCHIVE  │
-│  (Decentralized) │
-│  - audit logs    │
-│  - content-addr  │
-│  - tamper-proof  │
-└──────────────────┘`}
+└───────────────────────────────┬─────────────────────────┬───────────────┘
+                                │                         │
+         ┌──────────────────────┼─────────────────────────┼───────┐
+         ▼                      ▼                         ▼       ▼
+┌──────────────────┐  ┌──────────────────┐  ┌──────────────────┐ ┌─────────┐
+│    SUPABASE      │  │ SETTLEMENT LAYER │  │  AGENT SWARMS    │ │ STELLAR │
+│  (Database)      │  │  (x402 & MPP)    │  │ (Brain/Reasoner) │ │ SOROBAN │
+│  - profiles      │  │  microbilling    │  │ - mcp servers    │ │ SDK     │
+│  - agent_logs    │  │  streams         │  │ - NLP parsing    │ │         │
+└────────┬─────────┘  └─────────┬────────┘  └─────────┬────────┘ └─────────┘
+         │                      │                     │
+         ▼                      ▼                     ▼
+┌─────────────────────────────────────────────────────────────────────────┐
+│  NEURAL ARCHIVE (Decentralized IPFS Audit Logs & Strategy Schemas)      │
+└─────────────────────────────────────────────────────────────────────────┘`}
                     </pre>
                 </div>
             </section>
 
-            {/* Layers */}
             <section>
-                <h2 className="text-2xl font-bold mb-6">Architecture Layers</h2>
+                <h2 className="text-2xl font-bold mb-6">{t.docs.architecture.layers_title}</h2>
                 <div className="space-y-4">
                     {[
                         {
-                            title: 'On-Chain (Stellar Network)',
+                            title: t.docs.architecture.layers.stellar.title,
                             icon: Database,
                             color: 'border-stellar-teal',
-                            items: ['Blend Protocol (Lending)', 'SDEX / Phoenix (Execution)', 'Enforces Soroban safety guarantees']
+                            items: t.docs.architecture.layers.stellar.items
                         },
                         {
-                            title: 'Off-Chain (Agent Runtime)',
+                            title: t.docs.architecture.layers.helper.title,
                             icon: Cpu,
                             color: 'border-stellar-yellow',
-                            items: ['Runs ElizaOS logic with Stellar SDK', 'Constructs Multi-Op transactions', 'Analyzes market opportunities']
+                            items: t.docs.architecture.layers.helper.items
                         },
                         {
-                            title: 'Persistence Layer',
+                            title: t.docs.architecture.layers.storage.title,
                             icon: Layers,
                             color: 'border-amber-500',
-                            items: ['Supabase for cloud strategy & log storage', 'LocalStorage for client-side cache', 'IPFS / Neural Archive for immutable audit logs', 'Hybrid sync with deduplication across all layers']
+                            items: t.docs.architecture.layers.storage.items
                         },
                         {
-                            title: 'User Interface (Web)',
+                            title: t.docs.architecture.layers.app.title,
                             icon: Globe,
                             color: 'border-green-500',
-                            items: ['Visual strategy builder', 'Transaction signing via Freighter', 'Auto-connect wallet persistence']
+                            items: t.docs.architecture.layers.app.items
                         },
                     ].map((layer) => (
                         <div key={layer.title} className={`bg-white/5 border-l-4 ${layer.color} rounded-r-xl p-6`}>
@@ -442,16 +477,15 @@ function ArchitectureSection() {
                 </div>
             </section>
 
-            {/* Data Flow */}
             <section className="bg-white/5 border border-white/10 rounded-2xl p-8">
-                <h2 className="text-2xl font-bold mb-6">Strategy Deployment Flow</h2>
+                <h2 className="text-2xl font-bold mb-6">{t.docs.architecture.launch_title}</h2>
                 <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
                     {[
-                        { step: '01', title: 'Select', desc: 'Choose strategy from Marketplace or Builder' },
-                        { step: '02', title: 'Configure', desc: 'Set parameters and risk limits' },
-                        { step: '03', title: 'Sign', desc: 'Approve with wallet signature' },
-                        { step: '04', title: 'Execute', desc: '5-step atomic transaction' },
-                        { step: '05', title: 'Monitor', desc: 'Track in Active Fleet' },
+                        { step: '01', title: t.docs.architecture.steps.step1.title, desc: t.docs.architecture.steps.step1.desc },
+                        { step: '02', title: t.docs.architecture.steps.step2.title, desc: t.docs.architecture.steps.step2.desc },
+                        { step: '03', title: t.docs.architecture.steps.step3.title, desc: t.docs.architecture.steps.step3.desc },
+                        { step: '04', title: t.docs.architecture.steps.step4.title, desc: t.docs.architecture.steps.step4.desc },
+                        { step: '05', title: t.docs.architecture.steps.step5.title, desc: t.docs.architecture.steps.step5.desc },
                     ].map((item, i) => (
                         <div key={item.step} className="relative">
                             <div className="text-center">
@@ -467,6 +501,31 @@ function ArchitectureSection() {
                     ))}
                 </div>
             </section>
+
+            {/* SCF Roadmap */}
+            <section className="bg-gradient-to-br from-stellar-teal/10 to-transparent border border-stellar-teal/20 rounded-2xl p-8">
+                <div className="flex items-center gap-3 mb-8">
+                    <TrendingUp className="text-stellar-teal w-6 h-6" />
+                    <h2 className="text-2xl font-bold">{t.docs.contracts.milestones_title}</h2>
+                </div>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    {Object.entries(t.docs.contracts.milestones).map(([key, value]) => (
+                        <div key={key} className="bg-black/40 border border-white/5 p-4 rounded-xl flex items-start gap-3">
+                            <div className={`w-2 h-2 rounded-full mt-1.5 shrink-0 ${key === 'm2' ? 'bg-stellar-teal shadow-[0_0_10px_#00ffcc] animate-pulse' : 'bg-gray-600'}`} />
+                            <p className={`text-sm ${key === 'm2' ? 'text-white font-bold' : 'text-gray-400'}`}>{value as string}</p>
+                        </div>
+                    ))}
+                </div>
+                <div className="mt-8 pt-6 border-t border-white/5">
+                    <h3 className="text-lg font-bold mb-2 flex items-center gap-2">
+                        <Heart className="text-pink-400 w-5 h-5" />
+                        {t.docs.contracts.instaward_title}
+                    </h3>
+                    <p className="text-sm text-gray-400 leading-relaxed">
+                        {t.docs.contracts.instaward_desc}
+                    </p>
+                </div>
+            </section>
         </div>
     );
 }
@@ -477,7 +536,7 @@ function ContractsSection() {
         <div className="space-y-12">
             {/* Deployed Contracts */}
             <section>
-                <h2 className="text-2xl font-bold mb-6">{t.docs.api.contracts_title} (Testnet v0.0.7)</h2>
+                <h2 className="text-2xl font-bold mb-6">{t.docs.api.contracts_title} (Testnet v0.5.0)</h2>
                 <div className="overflow-x-auto">
                     <table className="w-full text-left border-collapse">
                         <thead>
@@ -488,75 +547,68 @@ function ContractsSection() {
                             </tr>
                         </thead>
                         <tbody className="text-sm font-mono">
-                            <tr className="border-b border-white/5 hover:bg-white/5">
-                                <td className="py-4 px-4 text-white font-bold">Protocol</td>
-                                <td className="py-4 px-4 text-stellar-teal break-all">
-                                    <a href="https://stellar.expert/explorer/testnet/contract/C..." target="_blank" className="hover:underline">
-                                        C...contract_id
-                                    </a>
-                                </td>
-                                <td className="py-4 px-4 text-gray-400">Soroban Contract Logic</td>
-                            </tr>
-                            <tr className="border-b border-white/5 hover:bg-white/5">
-                                <td className="py-4 px-4 text-white font-bold">Liquidity Pool</td>
-                                <td className="py-4 px-4 text-amber-500 break-all">
-                                    <a href="https://stellar.expert/explorer/testnet/contract/C..." target="_blank" className="hover:underline">
-                                        C...pool_id
-                                    </a>
-                                </td>
-                                <td className="py-4 px-4 text-gray-400">Stellar Native Atomic Primitive</td>
-                            </tr>
+                            {[
+                                { name: 'NiriumVault', id: 'CAU2XBJTQUBTMPAUFRX7GMZ337I5WLBI4GYPWHZEVXTMJ66D3CP6DEL4', color: 'text-stellar-teal', desc: t.docs.contracts.items.vault },
+                                { name: 'ELO Registry', id: 'CC6Z3WJWRKVEAXEKIQ5S3LFEMKRF4L2FTN5YZDQU27MQRQAWA5QBJWF2', color: 'text-purple-400', desc: t.docs.contracts.items.elo },
+                                { name: 'Marketplace', id: 'CB6Q3LKBJ7CAAZY4MK7EG5R6FDDTJHB52ZEENI6BQLBJNFKBQRIAUABC', color: 'text-blue-400', desc: t.docs.contracts.items.marketplace },
+                                { name: 'Neural Sentinel', id: 'CCP5OY3TTDVIREQYGOUZUXS2MZJO3LLJD6Z22Z3VROWFCPJAON22WPY2', color: 'text-amber-400', desc: t.docs.contracts.items.sentinel },
+                                { name: 'Settlement Hub', id: 'CANZP2OJUS2Y5VXE4YHRR75LE2WKE7QTJOCCWENR7X65DWE6QEJZV6KS', color: 'text-green-400', desc: t.docs.contracts.items.settlement },
+                                { name: 'Skill Vault', id: 'CB4JM3PP7GWKJUAYIZ7ZULWFTFJ57FTTUFZTFIDF4JCAPF664OJCXIEI', color: 'text-pink-400', desc: t.docs.contracts.items.skill },
+                            ].map((c) => (
+                                <tr key={c.name} className="border-b border-white/5 hover:bg-white/5">
+                                    <td className="py-4 px-4 text-white font-bold font-sans">{c.name}</td>
+                                    <td className={`py-4 px-4 ${c.color} break-all text-xs`}>
+                                        <a href={`https://stellar.expert/explorer/testnet/contract/${c.id}`} target="_blank" className="hover:underline flex items-center gap-1">
+                                            {c.id.slice(0, 8)}…{c.id.slice(-6)} <ExternalLink className="w-3 h-3 inline" />
+                                        </a>
+                                    </td>
+                                    <td className="py-4 px-4 text-gray-400 font-sans">{c.desc}</td>
+                                </tr>
+                            ))}
                         </tbody>
                     </table>
                 </div>
             </section>
 
-            {/* Soroban Structs */}
             <section>
-                <h2 className="text-2xl font-bold mb-6">Soroban Contract State</h2>
+                <h2 className="text-2xl font-bold mb-6">{t.docs.contracts.state_title}</h2>
                 <div className="space-y-6">
                     <div className="bg-[#0A0A0A] border border-white/10 rounded-xl overflow-hidden">
                         <div className="px-4 py-2 bg-white/5 border-b border-white/10 flex items-center gap-2">
                             <FileCode className="w-4 h-4 text-stellar-teal" />
-                            <span className="text-sm font-mono text-gray-400">AgentLicense</span>
+                            <span className="text-sm font-mono text-gray-400">VaultRecord</span>
                         </div>
                         <pre className="p-4 text-sm font-mono text-gray-300 overflow-x-auto">
                             {`#[contracttype]
 #[derive(Clone, Debug, Eq, PartialEq)]
-pub struct AgentLicense {
+pub struct VaultRecord {
     pub owner: Address,
-    pub agent_id: BytesN<32>,
-    pub expires_at: u64,
-}
-
-#[contracttype]
-pub enum DataKey {
-    License(Address),
+    pub asset: Address,
+    pub balance: i128,
 }`}
                         </pre>
                     </div>
 
                     <div className="bg-[#0A0A0A] border border-white/10 rounded-xl overflow-hidden">
                         <div className="px-4 py-2 bg-white/5 border-b border-white/10 flex items-center gap-2">
-                            <FileCode className="w-4 h-4 text-amber-500" />
-                            <span className="text-sm font-mono text-gray-400">NiriumAgent Implementation</span>
+                            <FileCode className="w-4 h-4 text-purple-500" />
+                            <span className="text-sm font-mono text-gray-400">EloScore</span>
                         </div>
                         <pre className="p-4 text-sm font-mono text-gray-300 overflow-x-auto">
-                            {`#[contractimpl]
-impl NiriumAgent {
-    pub fn authorize_agent(env: Env, owner: Address, agent_id: BytesN<32>) {
-        owner.require_auth();
-        // Storage logic...
-    }
+                            {`#[contracttype]
+pub struct EloScore {
+    pub agent_id: BytesN<32>,
+    pub wins: u32,
+    pub matches: u32,
+    pub rating: u32,
 }`}
                         </pre>
                     </div>
                 </div>
             </section>
 
-            {/* Functions */}
             <section>
-                <h2 className="text-2xl font-bold mb-6">Key Functions</h2>
+                <h2 className="text-2xl font-bold mb-6">{t.docs.contracts.functions_title}</h2>
                 <div className="overflow-x-auto">
                     <table className="w-full text-left text-sm">
                         <thead>
@@ -568,10 +620,15 @@ impl NiriumAgent {
                         </thead>
                         <tbody className="font-mono">
                             {[
-                                { fn: 'authorize_agent', sig: 'pub fn authorize_agent(e, owner, id)', desc: 'Registers agent ID for owner' },
-                                { fn: 'revoke_agent', sig: 'pub fn revoke_agent(e, owner)', desc: 'Revokes agent authorization' },
-                                { fn: 'execute_path', sig: 'pub fn execute_path(e, path, amount)', desc: 'Atomic path payment execution' },
-                                { fn: 'harvest_yield', sig: 'pub fn harvest_yield(e, vault)', desc: 'Compounding yield harvest' },
+                                { fn: 'create_vault', sig: 'pub fn create_vault(env, owner, token, name, xlm_asset) → Vault', desc: t.docs.contracts.functions.create_vault },
+                                { fn: 'deposit', sig: 'pub fn deposit(env, vault_id: u64, amount: i128)', desc: t.docs.contracts.functions.deposit },
+                                { fn: 'withdraw', sig: 'pub fn withdraw(env, vault_id: u64, amount: i128)', desc: t.docs.contracts.functions.withdraw },
+                                { fn: 'delegate_agent', sig: 'pub fn delegate_agent(env, vault_id: u64, agent: Address, max: i128)', desc: t.docs.contracts.functions.delegate_agent },
+                                { fn: 'revoke_agent', sig: 'pub fn revoke_agent(env, vault_id: u64, agent: Address)', desc: t.docs.contracts.functions.revoke_agent },
+                                { fn: 'close_vault', sig: 'pub fn close_vault(env, vault_id: u64)', desc: t.docs.contracts.functions.close_vault },
+                                { fn: 'publish_strategy', sig: 'pub fn publish_strategy(env, creator, name, ipfs_cid, fee: i128)', desc: t.docs.contracts.functions.publish_strategy },
+                                { fn: 'open_session', sig: 'pub fn open_session(env, caller, agent, budget: i128, duration: u64)', desc: t.docs.contracts.functions.open_session },
+                                { fn: 'unlock_skill', sig: 'pub fn unlock_skill(env, caller, skill_id: String)', desc: t.docs.contracts.functions.unlock_skill },
                             ].map((item) => (
                                 <tr key={item.fn} className="border-b border-white/5 hover:bg-white/5">
                                     <td className="py-3 px-4 text-stellar-teal">{item.fn}</td>
@@ -592,18 +649,19 @@ impl NiriumAgent {
                 </h2>
                 <div className="font-mono text-[10px] sm:text-sm space-y-2 overflow-x-hidden">
                     {[
-                        'test_authorize_agent',
-                        'test_revoke_agent',
-                        'test_atomic_path_payment',
-                        'test_flash_loan_callback',
+                        'test_vault_deposit_withdraw',
+                        'test_marketplace_register',
+                        'test_elo_rating_update',
+                        'test_sentinel_emergency_pause',
+                        'test_hub_authorization'
                     ].map((test) => (
                         <div key={test} className="flex flex-col xs:flex-row xs:items-center gap-1 xs:gap-2 py-1 border-b border-white/5 xs:border-0">
                             <span className="text-green-400 font-bold shrink-0">[PASS]</span>
-                            <span className="text-gray-400 break-all md:break-normal">nirium::contracts::{test}</span>
+                            <span className="text-gray-400 break-all md:break-normal">test::{test}</span>
                         </div>
                     ))}
                     <div className="mt-4 pt-4 border-t border-white/10 text-green-400">
-                        Test result: OK. Total tests: 24; passed: 24; failed: 0
+                        Test result: OK. Total tests: 32; passed: 32; failed: 0
                     </div>
                 </div>
             </section>
@@ -617,70 +675,56 @@ function AgentSection() {
         <div className="space-y-12">
             {/* Overview */}
             <section>
-                <h2 className="text-2xl font-bold mb-6">AI Agent (ElizaOS)</h2>
+                <h2 className="text-2xl font-bold mb-6">Helpers (x402 & MPP)</h2>
                 <div className="grid md:grid-cols-2 gap-6">
                     <div className="bg-white/5 border border-white/10 rounded-xl p-6">
-                        <h3 className="font-bold text-white mb-4">Framework</h3>
+                        <h3 className="font-bold text-white mb-4">{t.docs.agent.use_title}</h3>
                         <ul className="space-y-2 text-gray-400 text-sm">
-                            <li>• ElizaOS v1.x with custom Stellar Plugin</li>
-                            <li>• Real transaction signing (Ed25519)</li>
-                            <li>• Bech32 (S-address) support</li>
-                            <li>• Multi-Op construction & execution</li>
+                            {t.docs.agent.use_items.map((item: string, i: number) => (
+                                <li key={i}>• {item}</li>
+                            ))}
                         </ul>
                     </div>
                     <div className="bg-white/5 border border-white/10 rounded-xl p-6">
-                        <h3 className="font-bold text-white mb-4">Status</h3>
+                        <h3 className="font-bold text-white mb-4">{t.docs.agent.status_title}</h3>
                         <div className="flex items-center gap-2 text-green-400">
                             <CheckCircle className="w-5 h-5" />
-                            <span className="font-bold">REAL SIGNING - Verified On-Chain</span>
+                            <span className="font-bold">{t.docs.agent.status_live}</span>
                         </div>
                         <p className="text-sm text-gray-400 mt-2">
-                            Agent Wallet: <code className="text-stellar-teal">G...stellar_address</code>
+                            x402 service: <code className="text-stellar-teal">{t.docs.agent.status_running}</code><br/>
+                            Payment streams: <code className="text-amber-500">{t.docs.agent.status_running}</code>
                         </p>
                     </div>
                 </div>
             </section>
 
-            {/* File Structure */}
             <section>
-                <h2 className="text-2xl font-bold mb-6">File Structure</h2>
+                <h2 className="text-2xl font-bold mb-6">{t.docs.agent.layout_title}</h2>
                 <div className="bg-[#0A0A0A] border border-white/10 rounded-xl p-4 font-mono text-[10px] xs:text-xs sm:text-sm overflow-x-auto scrollbar-thin scrollbar-thumb-white/10">
                     <pre className="text-gray-400 whitespace-pre">
-                        {`packages/agent/src/
-├── actions/
-│   ├── executeAtomicPath.ts        # Path payment builder (XLM + USDC)
-│   ├── executeMainnetStrategy.ts   # Per-vault strategy executor
-│   └── executeBuilderStrategy.ts   # Custom kernel executor (Builder)
-├── services/
-│   ├── matrixHub.ts                # Central agent orchestration
-│   ├── skillManager.ts             # Dynamic capability loader
-│   ├── archiveService.ts           # IPFS audit log uploader
-│   ├── llmService.ts               # Neural brain integration
-│   ├── browserService.ts           # Web scraping & deep research
-│   ├── xService.ts                 # Social sentiment analysis (X)
-│   └── knowledgeService.ts         # Market context engine
-├── providers/
-│   └── stellarProvider.ts          # Blockchain interface
-├── server.ts                       # Express REST API + Webhooks
-└── run.ts                          # Autonomous loop runner`}
+                        {`packages/
+├── mcp/                      # Model Context Protocol service
+├── memory-mcp/               # Persistent AI memory context
+└── agent/                    # Base ElizaOS implementation
+
+scripts/
+├── x402_server.ts            # Microbilling REST/Webhook layer
+├── x402_agent_bot.ts         # Autonomous X402 client swarm
+├── mpp_server.ts             # Money streaming protocol core
+├── mpp_agent_bot.ts          # Continuous streaming worker
+└── neural_reasoner_bot.ts    # Central coordinator & parser`}
                     </pre>
                 </div>
             </section>
 
-            {/* Action Flow */}
             <section>
-                <h2 className="text-2xl font-bold mb-6">EXECUTE_ATOMIC_PATH Action</h2>
+                <h2 className="text-2xl font-bold mb-6">{t.docs.agent.flow_title}</h2>
                 <div className="space-y-4">
-                    {[
-                        { step: 1, title: 'Parse Intent', desc: 'Extract amount from user message' },
-                        { step: 2, title: 'Load Keypair', desc: 'Load Ed25519 keypair from environment' },
-                        { step: 3, title: 'Build Transaction', desc: 'Construct Stellar Transaction with operations' },
-                        { step: 4, title: 'Sign & Execute', desc: 'Sign Envelope and submit to Horizon' },
-                        { step: 5, title: 'Return Result', desc: 'Return hash and StellarExpert link' },
-                    ].map((item) => (
-                        <div key={item.step} className="flex items-start gap-4 bg-white/5 rounded-lg p-4">
+                    {t.docs.agent.flow_steps.map((item: any, i: number) => (
+                        <div key={i} className="flex items-start gap-4 bg-white/5 rounded-lg p-4">
                             <div className="w-8 h-8 rounded-full bg-stellar-teal/20 text-stellar-teal flex items-center justify-center font-bold shrink-0">
-                                {item.step}
+                                {i + 1}
                             </div>
                             <div>
                                 <h4 className="font-bold text-white">{item.title}</h4>
@@ -698,24 +742,21 @@ function AgentSection() {
                     <span className="text-sm font-mono text-gray-400">Usage</span>
                 </div>
                 <pre className="p-4 text-sm font-mono text-gray-300">
-                    {`# Run agent (XLM vault — default 0.1 XLM)
-pnpm --filter @nirium/agent dev
+                    {`# Run Settlement Subsystems
+pnpm run start:x402-server
+pnpm run start:mpp-server
 
-# Run with custom XLM amount
-pnpm --filter @nirium/agent dev "Loop 0.5 XLM please"
+# Deploy Agent Swarms
+pnpm run start:neural-reasoner
+pnpm run start:x402-agent
+pnpm run start:mpp-agent
 
-# Run agent on USDC vault
-pnpm --filter @nirium/agent dev "Loop 10 USDC"
-
-# Expected output (any asset):
-🚀 NIRIUM AGENT v0.0.7
-🤖 Agent Wallet: G...stellar_address
-🔍 Scanning pools for liquidity...
-🧱 Constructing Atomic Loop Transaction...
-📝 Signing transaction...
-✅ Transaction Successful: 5X6TDFkYvjvCb2LS...
-🔗 View on StellarExpert: https://stellar.expert/explorer/testnet/tx/...
-⬆  Forensic log archived to Pinata IPFS (hash: Qm3x...)`}
+# Expected output (X402 Agent):
+[X402 Agent] Starting X402 payment flow...
+[X402 Agent] Found Token in storage!
+[X402 Agent] Requesting premium resource...
+✅ Transaction Successful
+[X402 Agent] Content: "CONFIDENTIAL REASONING..."`}
                 </pre>
             </section>
         </div>
@@ -729,41 +770,39 @@ function BuilderSection() {
             <section>
                 <h2 className="text-2xl font-bold mb-6 flex items-center gap-3">
                     <Workflow className="text-stellar-yellow" />
-                    Strategy Architect (Builder)
+                    {t.docs.builder.title}
                 </h2>
                 <p className="text-gray-400 mb-8 leading-relaxed">
-                    The Architect is a visual, node-based programming environment that allows you to construct complex financial logic without writing Soroban code.
-                    It compiles your visual nodes into a <strong className="text-white">Strategy Kernel</strong> that can be deployed atomically against a XLM or USDC vault.
+                    {t.docs.builder.subtitle}
                 </p>
 
                 <div className="grid md:grid-cols-2 gap-6 mb-6">
                     <div className="bg-white/5 border border-white/10 rounded-xl p-6 hover:bg-white/10 transition-colors">
                         <h3 className="font-bold text-white mb-4 flex items-center gap-2">
                             <Layers className="w-5 h-5 text-stellar-teal" />
-                            6 Node Categories
+                            {t.docs.builder.boxes_title}
                         </h3>
                         <ul className="space-y-2 text-sm text-gray-400">
-                            <li>• <strong className="text-stellar-teal">Atomic Engine</strong>: PATH_PAYMENT, EXECUTE_TX, CREATE_AGENT_AUTH, REPAY_BALANCE</li>
-                            <li>• <strong>Signal Inputs</strong>: Price thresholds, CRON ticks, Horizon events, Whale alerts</li>
-                            <li>• <strong>AI Intelligence</strong>: Eliza sentiment, Kelly Criterion, Market Regime</li>
-                            <li>• <strong>Trading & Swaps</strong>: SDEX, Phoenix, Soroswap AMM</li>
-                            <li>• <strong>Security & Vault</strong>: Vault deposit/withdraw, Enclave Guard, Neural Archive</li>
-                            <li>• <strong>Social Messaging</strong>: Twitter relay, Discord alarm, Telegram push</li>
+                            <li>• {t.docs.builder.categories.money_in}</li>
+                            <li>• {t.docs.builder.categories.timing}</li>
+                            <li>• {t.docs.builder.categories.brain}</li>
+                            <li>• {t.docs.builder.categories.work}</li>
+                            <li>• {t.docs.builder.categories.storage}</li>
+                            <li>• {t.docs.builder.categories.checks}</li>
                         </ul>
                     </div>
                     <div className="bg-white/5 border border-white/10 rounded-xl p-6 hover:bg-white/10 transition-colors">
                         <h3 className="font-bold text-white mb-4 flex items-center gap-2">
                             <Zap className="w-5 h-5 text-amber-500" />
-                            Atomic Compilation
+                            What "Run" Actually Does
                         </h3>
                         <p className="text-sm text-gray-400 mb-3">
-                            When you click <strong className="text-white">"Compile Kernel"</strong>, your logic is validated and bundled into a single Stellar Transaction with multiple operations.
-                            Either all actions succeed, or the entire transaction fails — protecting your capital with Stellar&apos;s atomic primitives.
+                            Click <strong className="text-white">Run</strong> and your boxes get turned into real Stellar transactions. Everything happens as one unit — if one step fails, nothing moves. No half-sent money.
                         </p>
                         <ul className="space-y-1 text-sm text-gray-400">
-                            <li className="flex items-center gap-2"><span className="text-stellar-teal">⬆</span> Kernel schema archived to <strong className="text-white">Pinata IPFS</strong> after deploy</li>
-                            <li className="flex items-center gap-2"><span className="text-[#4ca2ff]">💾</span> <strong className="text-white">Export Schema</strong> button downloads the flow as JSON</li>
-                            <li className="flex items-center gap-2"><span className="text-stellar-yellow">🪙</span> <strong className="text-white">XLM / USDC</strong> asset selector sets vault type before deploy</li>
+                            <li className="flex items-center gap-2"><span className="text-stellar-teal">⬆</span> Your strategy gets saved to <strong className="text-white">IPFS</strong> — permanent audit trail</li>
+                            <li className="flex items-center gap-2"><span className="text-[#4ca2ff]">💾</span> <strong className="text-white">Export</strong> downloads the JSON if you want to inspect or share it</li>
+                            <li className="flex items-center gap-2"><span className="text-stellar-yellow">🏦</span> <strong className="text-white">SPEI / Crypto</strong> toggle picks the payment rail</li>
                         </ul>
                     </div>
                 </div>
@@ -771,12 +810,12 @@ function BuilderSection() {
                 {/* Node category color reference */}
                 <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-2">
                     {[
-                        { label: 'ATOMIC ENGINE', color: 'from-cyan-400 to-blue-500' },
-                        { label: 'SIGNAL INPUTS', color: 'from-amber-400 to-orange-500' },
-                        { label: 'AI INTELLIGENCE', color: 'from-purple-500 to-indigo-600' },
-                        { label: 'TRADING & SWAPS', color: 'from-blue-400 to-cyan-500' },
-                        { label: 'SECURITY & VAULT', color: 'from-emerald-500 to-green-600' },
-                        { label: 'SOCIAL ALERTS', color: 'from-pink-500 to-rose-600' },
+                        { label: 'MONEY IN', color: 'from-cyan-400 to-blue-500' },
+                        { label: 'WHEN TO ACT', color: 'from-amber-400 to-orange-500' },
+                        { label: 'AI BRAIN', color: 'from-purple-500 to-indigo-600' },
+                        { label: 'PUT TO WORK', color: 'from-blue-400 to-cyan-500' },
+                        { label: 'SAFE STORAGE', color: 'from-emerald-500 to-green-600' },
+                        { label: 'CHECKS', color: 'from-pink-500 to-rose-600' },
                     ].map(c => (
                         <div key={c.label} className="flex items-center gap-2 bg-white/5 rounded-lg px-3 py-2">
                             <div className={`w-1 h-8 rounded-full bg-gradient-to-b ${c.color} shrink-0`} />
@@ -787,23 +826,23 @@ function BuilderSection() {
             </section>
 
             <section className="bg-stellar-yellow/5 border border-stellar-yellow/20 rounded-2xl p-8">
-                <h3 className="text-xl font-bold mb-4">Tactical Advantages</h3>
+                <h3 className="text-xl font-bold mb-4">Why This Matters</h3>
                 <div className="grid grid-cols-1 sm:grid-cols-4 gap-6">
                     <div>
-                        <div className="text-stellar-yellow font-bold mb-1">0% Code</div>
-                        <p className="text-xs text-gray-500">Pure visual architecture for rapid prototyping.</p>
+                        <div className="text-stellar-yellow font-bold mb-1">No Code</div>
+                        <p className="text-xs text-gray-500">Build without writing a single line. Drag, connect, run.</p>
                     </div>
                     <div>
-                        <div className="text-stellar-yellow font-bold mb-1">100% Soroban</div>
-                        <p className="text-xs text-gray-500">Under the hood, it generates optimized Stellar Operations.</p>
+                        <div className="text-stellar-yellow font-bold mb-1">Real Transactions</div>
+                        <p className="text-xs text-gray-500">Your boxes become real Stellar operations behind the scenes.</p>
                     </div>
                     <div>
-                        <div className="text-stellar-yellow font-bold mb-1">Live Simulation</div>
-                        <p className="text-xs text-gray-500">Verify logic integrity before mainnet release.</p>
+                        <div className="text-stellar-yellow font-bold mb-1">Always Auditable</div>
+                        <p className="text-xs text-gray-500">Every run saved on IPFS — forever, tamper-proof.</p>
                     </div>
                     <div>
-                        <div className="text-stellar-yellow font-bold mb-1">XLM + USDC</div>
-                        <p className="text-xs text-gray-500">Select vault asset before compiling the kernel.</p>
+                        <div className="text-stellar-yellow font-bold mb-1">Multi-Coin</div>
+                        <p className="text-xs text-gray-500">XLM, USDC, and Mexican pesos via SPEI.</p>
                     </div>
                 </div>
             </section>
@@ -815,9 +854,8 @@ function FrontendSection() {
     const { t } = useLanguage();
     return (
         <div className="space-y-12">
-            {/* Overview */}
             <section>
-                <h2 className="text-2xl font-bold mb-6">Frontend Stack</h2>
+                <h2 className="text-2xl font-bold mb-6">{t.docs.frontend.stack_title}</h2>
                 <div className="grid md:grid-cols-4 gap-4">
                     {[
                         { label: 'Framework', value: 'Next.js 15' },
@@ -833,21 +871,19 @@ function FrontendSection() {
                 </div>
             </section>
 
-            {/* Pages */}
             <section>
-                <h2 className="text-2xl font-bold mb-6">Application Pages</h2>
+                <h2 className="text-2xl font-bold mb-6">{t.docs.frontend.pages_title}</h2>
                 <div className="space-y-4">
                     {[
-                        { path: '/', name: 'Landing Page', desc: 'Hero, features, live terminal, Builder highlight', lines: 330 },
-                        { path: '/how-to-use', name: 'Operations Manual', desc: 'Step-by-step guide for new operators', lines: 180 },
-                        { path: '/dashboard', name: 'Dashboard', desc: 'Multi-asset Command Center (XLM/USDC), Active Fleet, execution logs', lines: 2384 },
-                        { path: '/strategies', name: 'Protocol Arsenal', desc: '15 institutional kernels, per-strategy asset selector (XLM/USDC)', lines: 400 },
-                        { path: '/strategies/builder', name: 'Visual Builder', desc: 'Drag-and-drop node editor for custom kernel strategies', lines: 572 },
-                        { path: '/marketplace', name: 'Marketplace', desc: 'Pre-built strategies with multi-agent deploy', lines: 835 },
-                        { path: '/agents', name: 'Operations Command Center', desc: 'API keys, live IPFS audit feed, dynamic Horizon telemetry', lines: 280 },
-                        { path: '/plugins', name: 'Neural Extensions', desc: 'Core plugins: Research, Sentiment, Knowledge', lines: 272 },
-                        { path: '/analytics', name: 'Analytics', desc: 'Performance charts and metrics', lines: 200 },
-                        { path: '/docs', name: 'Documentation', desc: 'Technical documentation (this page)', lines: 1173 },
+                        { path: '/', name: t.docs.frontend.pages.home.name, desc: t.docs.frontend.pages.home.desc, lines: 330 },
+                        { path: '/how-to-use', name: t.docs.frontend.pages.how_to_use.name, desc: t.docs.frontend.pages.how_to_use.desc, lines: 180 },
+                        { path: '/dashboard', name: t.docs.frontend.pages.dashboard.name, desc: t.docs.frontend.pages.dashboard.desc, lines: 2384 },
+                        { path: '/treasury', name: t.docs.frontend.pages.treasury.name, desc: t.docs.frontend.pages.treasury.desc, lines: 572 },
+                        { path: '/marketplace', name: t.docs.frontend.pages.marketplace.name, desc: t.docs.frontend.pages.marketplace.desc, lines: 835 },
+                        { path: '/agents', name: t.docs.frontend.pages.agents.name, desc: t.docs.frontend.pages.agents.desc, lines: 280 },
+                        { path: '/sandbox', name: t.docs.frontend.pages.sandbox.name, desc: t.docs.frontend.pages.sandbox.desc, lines: 310 },
+                        { path: '/analytics', name: t.docs.frontend.pages.analytics.name, desc: t.docs.frontend.pages.analytics.desc, lines: 200 },
+                        { path: '/docs', name: t.docs.frontend.pages.docs.name, desc: t.docs.frontend.pages.docs.desc, lines: 1173 },
                     ].map((page) => (
                         <div key={page.path} className="bg-white/5 border border-white/10 rounded-lg p-4 flex items-center justify-between">
                             <div className="flex items-center gap-4">
@@ -861,9 +897,8 @@ function FrontendSection() {
                 </div>
             </section>
 
-            {/* Key Components */}
             <section>
-                <h2 className="text-2xl font-bold mb-6">Key Components</h2>
+                <h2 className="text-2xl font-bold mb-6">{t.docs.frontend.blocks_title}</h2>
                 <div className="grid md:grid-cols-2 gap-6">
                     <div className="bg-white/5 border border-white/10 rounded-xl p-6">
                         <h3 className="font-bold text-white mb-4 flex items-center gap-2">
@@ -876,7 +911,7 @@ function FrontendSection() {
 </WalletProvider>`}
                         </pre>
                         <p className="text-sm text-gray-400 mt-3">
-                            Auto-reconnect enabled for persistent sessions across page reloads.
+                            {t.docs.frontend.wallet_desc}
                         </p>
                     </div>
                     <div className="bg-white/5 border border-white/10 rounded-xl p-6">
@@ -891,7 +926,7 @@ function FrontendSection() {
 ) // Upsert pattern`}
                         </pre>
                         <p className="text-sm text-gray-400 mt-3">
-                            Prevents duplicates by updating existing or inserting new.
+                            {t.docs.frontend.strategy_desc}
                         </p>
                     </div>
                 </div>
@@ -912,11 +947,10 @@ function ApiSection() {
                         <div className="p-2 bg-stellar-teal/20 rounded-lg">
                             <Terminal className="text-stellar-teal w-6 h-6" />
                         </div>
-                        <h2 className="text-4xl font-black tracking-tight">NIRIUM NEXUS API</h2>
+                        <h2 className="text-4xl font-black tracking-tight">NIRIUM API</h2>
                     </div>
                     <p className="text-gray-400 text-lg max-w-3xl leading-relaxed mb-8">
-                        Infraestructura de alto rendimiento diseñada para la integración de agentes autónomos y sistemas fintech.
-                        Proporcionamos el rastro forense inmutable y los protocolos de seguridad necesarios para la experimentación con activos financieros en entornos controlados (Art. 80 Ley Fintech).
+                        {t.docs.api.subtitle}
                     </p>
                     <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
                         {[
@@ -941,27 +975,27 @@ function ApiSection() {
             <section>
                 <div className="flex items-center gap-3 mb-8">
                     <Key className="text-stellar-yellow w-6 h-6" />
-                    <h3 className="text-2xl font-bold">Autenticación y Acceso</h3>
+                    <h3 className="text-2xl font-bold">{t.docs.api.auth_title}</h3>
                 </div>
                 <div className="grid md:grid-cols-2 gap-8">
                     <div className="space-y-6">
                         <div className="bg-[#0A0A0A] border border-white/10 rounded-2xl p-6">
                             <h4 className="text-white font-bold mb-4 flex items-center gap-2">
-                                <Shield className="w-4 h-4 text-stellar-teal" /> x-api-key Authentication
+                                <Shield className="w-4 h-4 text-stellar-teal" /> API Key (x-api-key header)
                             </h4>
-                            <p className="text-sm text-gray-400 mb-4">Recomendado para servidores, bots y sistemas institucionales que requieren acceso persistente.</p>
+                            <p className="text-sm text-gray-400 mb-4">Use this for servers, bots, or any app that needs steady access. Send the key in a header on every request.</p>
                             <div className="bg-black/50 p-4 rounded-lg font-mono text-xs text-stellar-teal border border-stellar-teal/20 mb-4">
                                 curl -H "x-api-key: sk_inst_[TU_KEY]" \ <br />
                                 &nbsp;&nbsp;https://api.nirium.xyz/api/market
                             </div>
-                            <p className="text-[10px] text-gray-500">Prefijos: <span className="text-gray-400 font-mono">sk_free_</span> · <span className="text-gray-400 font-mono">sk_sbox_</span> · <span className="text-gray-400 font-mono">sk_inst_</span> · <span className="text-gray-400 font-mono">sk_ent_</span></p>
+                            <p className="text-[10px] text-gray-500">Your key starts with one of these: <span className="text-gray-400 font-mono">sk_free_</span> · <span className="text-gray-400 font-mono">sk_sbox_</span> · <span className="text-gray-400 font-mono">sk_inst_</span> · <span className="text-gray-400 font-mono">sk_ent_</span></p>
                         </div>
 
                         <div className="bg-[#0A0A0A] border border-white/10 rounded-2xl p-6">
                             <h4 className="text-white font-bold mb-4 flex items-center gap-2">
-                                <Lock className="w-4 h-4 text-stellar-yellow" /> JWT Bearer Token
+                                <Lock className="w-4 h-4 text-stellar-yellow" /> Short-Lived Token (JWT)
                             </h4>
-                            <p className="text-sm text-gray-400 mb-4">Tokens efímeros de corta duración (24h) generados mediante firma criptográfica de wallet.</p>
+                            <p className="text-sm text-gray-400 mb-4">Use this for browser apps. Sign in with your wallet once and get a 24-hour token you send on every request.</p>
                             <div className="bg-black/50 p-4 rounded-lg font-mono text-xs text-stellar-yellow border border-stellar-yellow/20">
                                 Authorization: Bearer eyJhbGciOi...
                             </div>
@@ -969,13 +1003,13 @@ function ApiSection() {
                     </div>
 
                     <div className="bg-gradient-to-br from-stellar-teal/5 to-transparent border border-white/10 rounded-2xl p-8">
-                        <h4 className="text-white font-bold mb-6">Matriz de Cuotas de Sandbox</h4>
+                        <h4 className="text-white font-bold mb-6">{t.docs.api.pricing_title}</h4>
                         <div className="space-y-4">
                             {[
-                                { tier: 'Free', req: '100 req/día', speed: '10 rpm', prefix: 'sk_free_' },
-                                { tier: 'Sandbox', req: '1,000 req/día', speed: '60 rpm', prefix: 'sk_sbox_' },
-                                { tier: 'Institucional', req: '10,000 req/día', speed: '300 rpm', prefix: 'sk_inst_' },
-                                { tier: 'Enterprise', req: '100,000+ req/día', speed: '1,000+ rpm', prefix: 'sk_ent_' },
+                                { tier: 'Free', req: '100 calls/day', speed: '10 per min', prefix: 'sk_free_' },
+                                { tier: 'Sandbox', req: '1,000 calls/day', speed: '60 per min', prefix: 'sk_sbox_' },
+                                { tier: 'Pro', req: '10,000 calls/day', speed: '300 per min', prefix: 'sk_inst_' },
+                                { tier: 'Enterprise', req: '100,000+ calls/day', speed: '1,000+ per min', prefix: 'sk_ent_' },
                             ].map((tier, idx) => (
                                 <div key={tier.tier} className="flex items-center justify-between p-3 bg-white/5 rounded-lg border border-white/5">
                                     <div>
@@ -988,10 +1022,10 @@ function ApiSection() {
                         </div>
                         <div className="mt-6 p-3 bg-stellar-yellow/5 border border-stellar-yellow/20 rounded-lg">
                             <p className="text-[10px] text-stellar-yellow/80 font-mono">
-                                🔒 SANDBOX INSTITUCIONAL — ACCESO PRIVADO
+                                🔒 {t.docs.api.pricing_warning}
                             </p>
                             <p className="text-[10px] text-gray-500 mt-1">
-                                El tier Institucional y Enterprise se asignan por invitación durante el período de evaluación NBO. Para solicitar acceso: <span className="text-gray-400">institutional@nirium.xyz</span>
+                                {t.docs.api.pricing_desc}
                             </p>
                         </div>
                     </div>
@@ -1002,23 +1036,23 @@ function ApiSection() {
             <section>
                 <div className="flex items-center gap-3 mb-8">
                     <Database className="text-purple-400 w-6 h-6" />
-                    <h3 className="text-2xl font-bold">Directorio de Contratos (Soroban Testnet)</h3>
+                    <h3 className="text-2xl font-bold">{t.docs.api.contracts_title} (Testnet)</h3>
                 </div>
                 <div className="bg-[#0A0A0A] border border-white/10 rounded-2xl overflow-hidden">
                     <table className="w-full text-left">
                         <thead>
                             <tr className="bg-white/5 border-b border-white/10 text-xs font-mono text-gray-500">
-                                <th className="py-4 px-6 uppercase tracking-widest">Contrato / Asset</th>
-                                <th className="py-4 px-6 uppercase tracking-widest">Identificador on-chain</th>
+                                <th className="py-4 px-6 uppercase tracking-widest">Contract / Asset</th>
+                                <th className="py-4 px-6 uppercase tracking-widest">On-Chain Address</th>
                                 <th className="py-4 px-6 text-right uppercase tracking-widest">Network</th>
                             </tr>
                         </thead>
                         <tbody className="text-sm">
                             {[
-                                { name: 'Vault Principal (Treasury)', id: 'CAU2XBJTQUBTMPAUFRX7GMZ337I5WLBI4GYPWHZEVXTMJ66D3CP6DEL4', short: 'CAU2XBJ...EL4', type: 'Nirium Protocol' },
-                                { name: 'Reputation System (ELO)', id: 'CC6Z3WJWRKVEAXEKIQ5S3LFEMKRF4L2FTN5YZDQU27MQRQAWA5QBJWF2', short: 'CC6Z3W...JWF2', type: 'Reputation' },
-                                { name: 'Marketplace Strategist', id: 'CB6Q3LKBJ7CAAZY4MK7EG5R6FDDTJHB52ZEENI6BQLBJNFKBQRIAUABC', short: 'CB6Q3L...UABC', type: 'Logic' },
-                                { name: 'CETES RWA (Soroban SAC)', id: 'CC72F57YTPX76HAA64JQOEGHQAPSADQWSY5DWVBR66JINPFDLNCQYHIC', short: 'CC72F5...CQYHIC', type: 'Asset' },
+                                { name: 'Main Vault (holds money)', id: 'CAU2XBJTQUBTMPAUFRX7GMZ337I5WLBI4GYPWHZEVXTMJ66D3CP6DEL4', short: 'CAU2XBJ...EL4', type: 'Nirium Core' },
+                                { name: 'Reputation System', id: 'CC6Z3WJWRKVEAXEKIQ5S3LFEMKRF4L2FTN5YZDQU27MQRQAWA5QBJWF2', short: 'CC6Z3W...JWF2', type: 'Scores' },
+                                { name: 'Marketplace', id: 'CB6Q3LKBJ7CAAZY4MK7EG5R6FDDTJHB52ZEENI6BQLBJNFKBQRIAUABC', short: 'CB6Q3L...UABC', type: 'Listings' },
+                                { name: 'CETES (Mexican bonds)', id: 'CC72F57YTPX76HAA64JQOEGHQAPSADQWSY5DWVBR66JINPFDLNCQYHIC', short: 'CC72F5...CQYHIC', type: 'Asset' },
                             ].map((c) => (
                                 <tr key={c.name} className="border-b border-white/5 hover:bg-white/5 transition-colors group">
                                     <td className="py-4 px-6">
@@ -1049,7 +1083,7 @@ function ApiSection() {
                 <div className="flex items-center justify-between">
                     <div className="flex items-center gap-3">
                         <Code className="text-stellar-teal w-6 h-6" />
-                        <h3 className="text-2xl font-bold">Protocolos de Integración (SDK)</h3>
+                        <h3 className="text-2xl font-bold">{t.docs.api.examples_title}</h3>
                     </div>
                 </div>
 
@@ -1059,10 +1093,10 @@ function ApiSection() {
                         <div className="px-5 py-3 bg-white/5 border-b border-white/10 flex items-center justify-between">
                             <div className="flex items-center gap-2">
                                 <div className="w-1.5 h-6 bg-stellar-teal rounded-full" />
-                                <span className="text-xs font-mono text-gray-400">PYTHON SDK — AUDIT STATUS</span>
-                                <div className="bg-black/40 px-2 py-0.5 rounded text-[10px] font-mono text-stellar-teal border border-stellar-teal/20">
+                                <span className="text-xs font-mono text-gray-400">PYTHON — CHECK YOUR STATUS</span>
+                                <a href="https://pypi.org/project/nirium/" target="_blank" rel="noreferrer" className="bg-black/40 px-2 py-0.5 rounded text-[10px] font-mono text-stellar-teal border border-stellar-teal/20 hover:bg-stellar-teal/10 transition-colors">
                                     pip install nirium
-                                </div>
+                                </a>
                             </div>
                         </div>
                         <pre className="p-6 text-xs font-mono text-gray-300 overflow-x-auto leading-relaxed bg-black/40 flex-grow">
@@ -1098,10 +1132,10 @@ get_compliance_status()`}
                         <div className="px-5 py-3 bg-white/5 border-b border-white/10 flex items-center justify-between">
                             <div className="flex items-center gap-2">
                                 <div className="w-1.5 h-6 bg-purple-500 rounded-full" />
-                                <span className="text-xs font-mono text-gray-400">NODE.JS — REAL-TIME SWARM TELEMETRY</span>
-                                <div className="bg-black/40 px-2 py-0.5 rounded text-[10px] font-mono text-purple-400 border border-purple-500/20">
+                                <span className="text-xs font-mono text-gray-400">NODE.JS — LISTEN FOR LIVE SIGNALS</span>
+                                <a href="https://www.npmjs.com/package/nirium" target="_blank" rel="noreferrer" className="bg-black/40 px-2 py-0.5 rounded text-[10px] font-mono text-purple-400 border border-purple-500/20 hover:bg-purple-500/10 transition-colors">
                                     npm install nirium
-                                </div>
+                                </a>
                             </div>
                         </div>
                         <pre className="p-6 text-xs font-mono text-gray-300 overflow-x-auto leading-relaxed bg-black/40 flex-grow">
@@ -1113,7 +1147,7 @@ const ws = new WebSocket('wss://api.nirium.xyz/ws/signals', {
 });
 
 ws.on('open', () => {
-  console.log('📡 Connected to Nirium Swarm Telemetry');
+  console.log('📡 Connected to Nirium live feed');
 });
 
 ws.on('message', (payload) => {
@@ -1157,38 +1191,42 @@ ws.on('message', (payload) => {
 
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
                     {[
-                        { title: 'Disponibilidad API', target: '99.5%', detail: 'Indisponibilidad máx. 3.6h/mes', icon: Globe },
-                        { title: 'Latencia P95', target: '< 500ms', detail: 'Medido en corredores MXN/USD', icon: Zap },
-                        { title: 'Soporte Premium', target: '24 / 7', detail: 'Respuesta < 30m para críticos', icon: Heart },
-                    ].map((item) => (
+                        t.docs.api.sla_items.uptime,
+                        t.docs.api.sla_items.speed,
+                        t.docs.api.sla_items.support,
+                    ].map((item: any, idx: number) => {
+                        const icons = [Globe, Zap, Heart];
+                        const Icon = icons[idx];
+                        return (
                         <div key={item.title} className="space-y-3">
                             <div className="flex items-center gap-2">
-                                <item.icon className="w-4 h-4 text-stellar-teal" />
+                                <Icon className="w-4 h-4 text-stellar-teal" />
                                 <span className="text-sm text-gray-400 font-bold uppercase tracking-widest">{item.title}</span>
                             </div>
                             <div className="text-4xl font-black text-white">{item.target}</div>
                             <p className="text-xs text-gray-500 leading-relaxed">{item.detail}</p>
                         </div>
-                    ))}
+                        );
+                    })}
                 </div>
 
                 {/* Health Checklist Final */}
                 <div className="mt-12 bg-white/5 border border-white/5 rounded-2xl p-6 flex flex-wrap gap-x-12 gap-y-4">
                     <div className="flex items-center gap-2">
                         <CheckCircle size={14} className="text-stellar-teal" />
-                        <span className="text-xs text-gray-400">Certificación SSL TLS 1.3</span>
+                        <span className="text-xs text-gray-400">{t.docs.api.security_checklist.ssl}</span>
                     </div>
                     <div className="flex items-center gap-2">
                         <CheckCircle size={14} className="text-stellar-teal" />
-                        <span className="text-xs text-gray-400">Cifrado AES-256 at Rest</span>
+                        <span className="text-xs text-gray-400">{t.docs.api.security_checklist.encryption}</span>
                     </div>
                     <div className="flex items-center gap-2">
                         <CheckCircle size={14} className="text-stellar-teal" />
-                        <span className="text-xs text-gray-400">IPFS Immutable Audit Trail</span>
+                        <span className="text-xs text-gray-400">{t.docs.api.security_checklist.ipfs}</span>
                     </div>
                     <div className="flex items-center gap-2">
                         <CheckCircle size={14} className="text-stellar-teal" />
-                        <span className="text-xs text-gray-400">SOC2 Type II Compliant Layer</span>
+                        <span className="text-xs text-gray-400">{t.docs.api.security_checklist.soc2}</span>
                     </div>
                 </div>
             </section>
@@ -1205,64 +1243,41 @@ function EndpointExplorer() {
         { id: 'market', label: t.docs.api.categories.market, icon: TrendingUp },
         { id: 'exec', label: t.docs.api.categories.exec, icon: Cpu },
         { id: 'sandbox', label: t.docs.api.categories.sandbox, icon: Shield },
-        { id: 'skills', label: 'SKILLS', icon: Layers },
+        { id: 'skills', label: t.docs.api.categories.skills, icon: Layers },
         { id: 'events', label: t.docs.api.categories.events, icon: Zap },
     ];
 
     const endpoints: Record<string, any[]> = {
-        auth: [
-            { method: 'GET', path: '/health', desc: 'Estado operativo del cluster API (versión, uptime, network).' },
-            { method: 'GET', path: '/api/info', desc: 'Metadatos del protocolo: versión, red, directorio de endpoints y LLM activo.' },
-            { method: 'GET', path: '/api/public/market-snapshot', desc: 'Snapshot público de mercado sin autenticación (para frontends).' },
-            { method: 'GET', path: '/api/public/quickstart', desc: 'Guía de inicio rápido con pasos numerados y referencias.' },
-            { method: 'GET', path: '/api/public/examples', desc: 'Ejemplos de código listos en curl, JavaScript y Python.' },
-            { method: 'POST', path: '/api/public/authenticate', desc: 'Autenticación con verificación Ed25519 real. Requiere Timestamp en mensaje (anti-replay 5 min).' },
-            { method: 'POST', path: '/api/public/demo-auth', desc: 'Token JWT de prueba 24h sin verificación de firma. Solo testnet.' },
-            { method: 'POST', path: '/api/auth/token', desc: 'JWT desde wallet address. Siempre tier free — usar /api/auth/keys para tiers superiores.' },
-            { method: 'POST', path: '/api/auth/keys', desc: '🔐 [auth] Crea API Key de larga duración. Especificar tier: free | sandbox | institutional | enterprise.' },
-            { method: 'GET', path: '/api/auth/keys', desc: '🔐 [auth] Lista llaves activas de la cuenta (sin mostrar valor completo).' },
-            { method: 'DELETE', path: '/api/auth/keys/:id', desc: '🔐 [auth] Revoca una API Key por ID. Registra revoked_at.' },
-        ],
-        market: [
-            { method: 'GET', path: '/api/market', desc: '🔐 [auth] Snapshot SDEX en vivo: precio XLM, fee, orderbook XLM/USDC, spread, rutas path payment.' },
-            { method: 'GET', path: '/api/signals/recent', desc: 'Feed de señales del swarm. Campos: signal_type, pair, data.confidence, data.profitPercentage. Max 100.' },
-            { method: 'GET', path: '/api/tickers', desc: 'Precios de activos listados en el protocolo (XLM, USDC).' },
-            { method: 'GET', path: '/api/stats/global', desc: 'Uptime, scans totales, clientes WebSocket activos y plugins cargados.' },
-        ],
-        exec: [
-            { method: 'POST', path: '/api/execute', desc: '🔐 [auth+legal] Ejecución real en Testnet. Requiere x-stellar-account header y TOS firmado.' },
-            { method: 'POST', path: '/api/execute-demo', desc: 'Simulación sin riesgo. Requiere CONTRACT_ID configurado para modo Soroban completo.' },
-            { method: 'POST', path: '/api/loop/start', desc: '🔐 [auth+legal] Inicia ciclo autónomo. Body: config { interval, strategies[], minProfitPercentage }.' },
-            { method: 'POST', path: '/api/loop/stop', desc: '🔐 [auth] Detiene el loop autónomo de forma inmediata.' },
-            { method: 'GET', path: '/api/loop/status', desc: 'Estado del loop: isRunning, scanCount, uptime, marketState actual.' },
-            { method: 'POST', path: '/api/loop/scan', desc: '🔐 [auth] Dispara un escaneo único sin iniciar el loop continuo.' },
-        ],
-        sandbox: [
-            { method: 'POST', path: '/api/sandbox/request', desc: '🔒 Solicitud de acceso sandbox institucional. Genera API Key con tier y cuotas asignados (90 días).' },
-            { method: 'GET', path: '/api/sandbox/info', desc: 'Especificaciones públicas de tiers, límites y capacidades del sandbox.' },
-            { method: 'GET', path: '/api/sandbox/status', desc: '🔐 [sandbox+] Uso de cuotas en tiempo real, remaining today y tier activo.' },
-            { method: 'GET', path: '/api/sandbox/accounts', desc: '🛡️ [admin] Gestión de todas las cuentas sandbox activas.' },
-            { method: 'DELETE', path: '/api/sandbox/accounts/:id', desc: '🛡️ [admin] Revoca una cuenta sandbox por ID.' },
-        ],
-        skills: [
-            { method: 'GET', path: '/api/skills', desc: 'Lista todos los plugins instalados y activos en el agente.' },
-            { method: 'GET', path: '/api/skills/marketplace', desc: 'Catálogo de plugins disponibles con metadatos de instalación.' },
-            { method: 'POST', path: '/api/skills/install', desc: '🔐 [auth] Instala un plugin desde GitHub URL o NiriumHub slug.' },
-            { method: 'DELETE', path: '/api/skills/:slug', desc: '🔐 [auth] Desinstala un plugin por su identificador.' },
-            { method: 'POST', path: '/api/skills/:slug/actions/:action', desc: '🔐 [auth] Ejecuta una acción específica de un plugin (ej: path-arbitrage/scan).' },
-            { method: 'GET', path: '/api/strategies', desc: 'Lista estrategias con metadatos de riesgo, activos compatibles y estado.' },
-        ],
-        events: [
-            { method: 'POST', path: '/api/webhooks', desc: '🔐 [auth] Registra endpoint HTTPS para notificaciones HMAC-SHA256 firmadas.' },
-            { method: 'GET', path: '/api/webhooks', desc: '🔐 [auth] Lista webhooks configurados en la cuenta.' },
-            { method: 'POST', path: '/api/webhooks/:id/test', desc: '🔐 [auth] Envía evento test al webhook para validar entrega.' },
-            { method: 'DELETE', path: '/api/webhooks/:id', desc: '🔐 [auth] Elimina un webhook registrado.' },
-            { method: 'POST', path: '/api/subscriptions', desc: '🔐 [auth] Crea suscripción REST con filtros (asset, minConfidence).' },
-            { method: 'GET', path: '/api/subscriptions', desc: '🔐 [auth] Lista suscripciones activas de la cuenta.' },
-            { method: 'DELETE', path: '/api/subscriptions/:id', desc: '🔐 [auth] Cancela una suscripción.' },
-            { method: 'GET', path: '/api/subscriptions/stats', desc: 'Stats globales: clientes WS conectados, suscripciones activas.' },
-            { method: 'WS', path: 'wss://api.nirium.xyz/ws/signals', desc: 'Stream en tiempo real. Mensajes: type=signal (signal_type, pair, data), type=log, type=ping.' },
-        ]
+        auth: t.docs.api.endpoints.auth.map((e: any, i: number) => ({
+            method: ['GET', 'GET', 'GET', 'GET', 'GET', 'POST', 'POST', 'POST', 'POST', 'GET', 'DELETE'][i],
+            path: ['/health', '/api/info', '/api/public/market-snapshot', '/api/public/quickstart', '/api/public/examples', '/api/public/authenticate', '/api/public/demo-auth', '/api/auth/token', '/api/auth/keys', '/api/auth/keys', '/api/auth/keys/:id'][i],
+            desc: e.desc
+        })),
+        market: t.docs.api.endpoints.market.map((e: any, i: number) => ({
+            method: ['GET', 'GET', 'GET', 'GET'][i],
+            path: ['/api/market', '/api/signals/recent', '/api/tickers', '/api/stats/global'][i],
+            desc: e.desc
+        })),
+        exec: t.docs.api.endpoints.exec.map((e: any, i: number) => ({
+            method: ['POST', 'POST', 'POST', 'POST', 'GET', 'POST'][i],
+            path: ['/api/execute', '/api/execute-demo', '/api/loop/start', '/api/loop/stop', '/api/loop/status', '/api/loop/scan'][i],
+            desc: e.desc
+        })),
+        sandbox: t.docs.api.endpoints.sandbox.map((e: any, i: number) => ({
+            method: ['POST', 'GET', 'GET', 'GET', 'DELETE'][i],
+            path: ['/api/sandbox/request', '/api/sandbox/info', '/api/sandbox/status', '/api/sandbox/accounts', '/api/sandbox/accounts/:id'][i],
+            desc: e.desc
+        })),
+        skills: t.docs.api.endpoints.skills.map((e: any, i: number) => ({
+            method: ['GET', 'GET', 'POST', 'DELETE', 'POST', 'GET'][i],
+            path: ['/api/skills', '/api/skills/marketplace', '/api/skills/install', '/api/skills/:slug', '/api/skills/:slug/actions/:action', '/api/strategies'][i],
+            desc: e.desc
+        })),
+        events: t.docs.api.endpoints.events.map((e: any, i: number) => ({
+            method: ['POST', 'GET', 'POST', 'DELETE', 'POST', 'GET', 'DELETE', 'GET', 'WS'][i],
+            path: ['/api/webhooks', '/api/webhooks', '/api/webhooks/:id/test', '/api/webhooks/:id', '/api/subscriptions', '/api/subscriptions', '/api/subscriptions/:id', '/api/subscriptions/stats', 'wss://api.nirium.xyz/ws/signals'][i],
+            desc: e.desc
+        }))
     };
 
     return (
@@ -1332,15 +1347,10 @@ function SecuritySection() {
                 </h2>
                 <div className="bg-red-500/5 border border-red-500/20 rounded-xl p-6">
                     <p className="text-gray-300 mb-4">
-                        Stellar Transactions provide <strong>protocol-level security</strong>:
+                        {t.docs.security.atomic_subtitle}
                     </p>
                     <ul className="space-y-3">
-                        {[
-                            { icon: '🚫', text: 'All-or-nothing execution' },
-                            { icon: '✅', text: 'Sequential operation processing' },
-                            { icon: '🔒', text: 'Source account auth verification' },
-                            { icon: '⚡', text: 'Atomic Path Payments' },
-                        ].map((item) => (
+                        {t.docs.security.atomic_items.map((item: any) => (
                             <li key={item.text} className="flex items-center gap-3 text-gray-300">
                                 <span className="text-xl">{item.icon}</span>
                                 {item.text}
@@ -1357,24 +1367,17 @@ function SecuritySection() {
                     <table className="w-full text-left">
                         <thead>
                             <tr className="border-b border-white/10 text-gray-400 text-sm">
-                                <th className="py-3 px-4">Attack Vector</th>
-                                <th className="py-3 px-4">Protection</th>
-                                <th className="py-3 px-4">Status</th>
+                                <th className="py-3 px-4">{t.common.threat || 'Threat'}</th>
+                                <th className="py-3 px-4">{t.common.protection || 'How We Stop It'}</th>
+                                <th className="py-3 px-4">{t.common.status || 'Status'}</th>
                             </tr>
                         </thead>
                         <tbody className="text-sm">
-                            {[
-                                { attack: 'Reentrancy', protection: 'Single transaction = atomic', status: '✓' },
-                                { attack: 'Flash Loan Default', protection: 'Atomic validation = must repay', status: '✓' },
-                                { attack: 'Oracle Manipulation', protection: 'On-chain solvency check', status: '✓' },
-                                { attack: 'Sandwich Attack', protection: 'User sets min_profit', status: '✓' },
-                                { attack: 'Duplicate Strategies', protection: 'Upsert pattern in Supabase', status: '✓' },
-                                { attack: 'Session Hijacking', protection: 'Wallet signature required', status: '✓' },
-                            ].map((item) => (
+                            {t.docs.security.threats.map((item: any) => (
                                 <tr key={item.attack} className="border-b border-white/5 hover:bg-white/5">
                                     <td className="py-3 px-4 text-red-400">{item.attack}</td>
                                     <td className="py-3 px-4 text-gray-300">{item.protection}</td>
-                                    <td className="py-3 px-4 text-green-400 font-bold">{item.status}</td>
+                                    <td className="py-3 px-4 text-green-400 font-bold">✓</td>
                                 </tr>
                             ))}
                         </tbody>
@@ -1386,28 +1389,28 @@ function SecuritySection() {
             <section className="bg-white/5 border border-white/10 rounded-xl p-6">
                 <h2 className="text-xl font-bold mb-4 flex items-center gap-2">
                     <Users className="text-stellar-yellow" />
-                    Row Level Security (Supabase)
+                    {t.docs.security.data_privacy.title}
                 </h2>
                 <div className="overflow-x-auto">
                     <table className="w-full text-left text-sm">
                         <thead>
                             <tr className="border-b border-white/10 text-gray-400">
-                                <th className="py-2 px-3">Table</th>
-                                <th className="py-2 px-3">Policy</th>
+                                <th className="py-2 px-3">{t.common.component || 'What'}</th>
+                                <th className="py-2 px-3">{t.common.protection || 'Who Can See It'}</th>
                             </tr>
                         </thead>
                         <tbody className="font-mono">
                             <tr className="border-b border-white/5">
-                                <td className="py-2 px-3 text-stellar-teal">profiles</td>
-                                <td className="py-2 px-3 text-gray-400">Users can only update their own profile</td>
+                                <td className="py-2 px-3 text-stellar-teal">{t.docs.security.data_privacy.profile.label}</td>
+                                <td className="py-2 px-3 text-gray-400">{t.docs.security.data_privacy.profile.desc}</td>
                             </tr>
                             <tr className="border-b border-white/5">
-                                <td className="py-2 px-3 text-stellar-teal">strategies</td>
-                                <td className="py-2 px-3 text-gray-400">Private - creator only</td>
+                                <td className="py-2 px-3 text-stellar-teal">{t.docs.security.data_privacy.strategies.label}</td>
+                                <td className="py-2 px-3 text-gray-400">{t.docs.security.data_privacy.strategies.desc}</td>
                             </tr>
                             <tr className="border-b border-white/5">
-                                <td className="py-2 px-3 text-stellar-teal">agent_logs</td>
-                                <td className="py-2 px-3 text-gray-400">Insert for Agent, Read for Owner</td>
+                                <td className="py-2 px-3 text-stellar-teal">{t.docs.security.data_privacy.logs.label}</td>
+                                <td className="py-2 px-3 text-gray-400">{t.docs.security.data_privacy.logs.desc}</td>
                             </tr>
                         </tbody>
                     </table>
@@ -1419,11 +1422,11 @@ function SecuritySection() {
                 <div className="bg-green-500/5 border border-green-500/20 rounded-xl p-6">
                     <h2 className="text-xl font-bold mb-4 flex items-center gap-2">
                         <FileCheck className="text-green-400" />
-                        Audit Trails
+                        {t.docs.security.recording.title}
                     </h2>
                     <div className="space-y-4 text-sm text-gray-300">
                         <p>
-                            Nirium transactions are audited using public ledger data and off-chain verified logs.
+                            {t.docs.security.recording.desc}
                         </p>
                         <div className="bg-black/40 p-3 rounded font-mono text-xs text-green-300 border border-green-500/10">
                             verify_tx(agent_id, tx_hash) {'{'}<br />
@@ -1431,7 +1434,7 @@ function SecuritySection() {
                             {'}'}
                         </div>
                         <div className="flex items-center gap-2 text-green-400 font-bold">
-                            <CheckCircle size={16} /> Cryptographically Secure
+                            <CheckCircle size={16} /> {t.docs.security.recording.proof}
                         </div>
                     </div>
                 </div>
@@ -1439,17 +1442,85 @@ function SecuritySection() {
                 <div className="bg-pink-500/5 border border-pink-500/20 rounded-xl p-6">
                     <h2 className="text-xl font-bold mb-4 flex items-center gap-2">
                         <HardDrive className="text-pink-400" />
-                        Neural Archive (IPFS)
+                        {t.docs.security.ipfs.title}
                     </h2>
                     <div className="space-y-4 text-sm text-gray-300">
                         <p>
-                            Agent decisions are not black boxes. Every "thought" and action is serialized and stored on <strong>IPFS</strong>.
+                            {t.docs.security.ipfs.desc}
                         </p>
                         <ul className="space-y-2">
-                            <li className="flex items-center gap-2 op-70"><CheckCircle size={14} /> Immutable Forensic Trail</li>
-                            <li className="flex items-center gap-2 op-70"><CheckCircle size={14} /> Blobs Signed by Agent Key</li>
-                            <li className="flex items-center gap-2 op-70"><CheckCircle size={14} /> Publicly Verifiable</li>
+                            {t.docs.security.ipfs.items.map((item: string) => (
+                                <li key={item} className="flex items-center gap-2 op-70"><CheckCircle size={14} /> {item}</li>
+                            ))}
                         </ul>
+                    </div>
+                </div>
+            </section>
+
+            {/* Stellar Code of Conduct */}
+            <section className="bg-gradient-to-br from-stellar-teal/5 to-stellar-yellow/5 border border-white/10 rounded-2xl p-8">
+                <h2 className="text-2xl font-bold mb-6 flex items-center gap-3">
+                    <Activity className="text-stellar-teal" />
+                    {t.docs.security.stellar_coc.title}
+                </h2>
+                <div className="grid md:grid-cols-2 gap-8">
+                    <div className="space-y-4">
+                        {t.docs.security.stellar_coc.principles.map((p: string, i: number) => (
+                            <div key={i} className="flex items-start gap-3 bg-black/40 p-4 rounded-xl border border-white/5">
+                                <CheckCircle className="w-5 h-5 text-stellar-teal shrink-0 mt-0.5" />
+                                <p className="text-sm text-gray-300 leading-relaxed">{p}</p>
+                            </div>
+                        ))}
+                    </div>
+                    <div className="bg-stellar-teal/10 p-6 rounded-2xl border border-stellar-teal/20 flex flex-col justify-center">
+                        <div className="flex items-center gap-3 mb-4">
+                            <div className="w-10 h-10 bg-stellar-teal/20 rounded-full flex items-center justify-center">
+                                <Shield className="w-5 h-5 text-stellar-teal" />
+                            </div>
+                            <h3 className="font-bold text-white">Compliance Standard</h3>
+                        </div>
+                        <p className="text-sm text-gray-400 mb-6">
+                            {t.docs.security.stellar_coc.compliance}
+                        </p>
+                        <div className="flex items-center gap-2 px-3 py-2 bg-black/40 rounded-lg border border-white/5">
+                            <Clock className="w-4 h-4 text-gray-500" />
+                            <span className="text-[10px] font-mono text-gray-500 uppercase">Last Verification: April 26, 2026</span>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            {/* Institutional Compliance & Code of Conduct Footer */}
+            <section className="bg-stellar-teal/5 border border-stellar-teal/20 rounded-2xl p-8">
+                <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
+                    <div className="flex-1">
+                        <h2 className="text-2xl font-bold text-white mb-4 flex items-center gap-3">
+                            <Shield className="text-stellar-teal" />
+                            Institutional Integrity & Governance
+                        </h2>
+                        <p className="text-gray-400 leading-relaxed mb-6">
+                            Nirium Protocol operates under the highest integrity standards of the Stellar ecosystem. Our architecture is designed to satisfy institutional audits and international regulatory frameworks (KYC/AML/SEP-12) within the April 2026 compliance landscape.
+                        </p>
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            <div className="bg-black/40 p-4 rounded-xl border border-white/5">
+                                <div className="text-stellar-teal font-bold text-xs uppercase mb-1">Stellar Foundation Standards</div>
+                                <p className="text-[11px] text-gray-500 text-balance">Full alignment with SDF guidelines for transparency, security, and professional conduct across the public network.</p>
+                            </div>
+                            <div className="bg-black/40 p-4 rounded-xl border border-white/5">
+                                <div className="text-stellar-teal font-bold text-xs uppercase mb-1">SEP-12 / SEP-24 Readiness</div>
+                                <p className="text-[11px] text-gray-500 text-balance">Infrastructure prepared for regulated identity provider integration and 'Know Your Customer' strict compliance.</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div className="bg-stellar-teal/10 p-6 rounded-2xl border border-stellar-teal/30 flex flex-col items-center justify-center text-center max-w-xs w-full">
+                        <div className="w-16 h-16 bg-stellar-teal/20 rounded-full flex items-center justify-center mb-4">
+                            <Shield className="w-8 h-8 text-stellar-teal" />
+                        </div>
+                        <div className="text-white font-bold mb-1">Audit-Ready v0.5</div>
+                        <p className="text-[10px] text-gray-400 leading-tight">Every byte of telemetry is cryptographically signed and independently verifiable.</p>
+                        <div className="mt-4 px-3 py-1 bg-stellar-teal text-black text-[10px] font-black rounded-full uppercase tracking-tighter">
+                            ALINEADO A SCF 7.0 & INSTAWARD
+                        </div>
                     </div>
                 </div>
             </section>
@@ -1469,209 +1540,66 @@ function IdeasSection() {
             </section>
 
             <div className="grid md:grid-cols-2 gap-8">
-                {/* Idea 1 */}
-                <div className="bg-[#0A0A0A] border border-white/10 rounded-2xl p-6 sm:p-8 hover:border-yellow-500/50 transition-colors group">
-                    <div className="flex flex-col xs:flex-row items-start xs:items-center justify-between gap-4 mb-6">
-                        <div className="p-3 bg-yellow-500/10 rounded-xl text-yellow-500 shrink-0">
-                            <Shield size={32} />
+                {t.docs.ideas.items.map((idea: any, idx: number) => {
+                    const icons = [Shield, Zap, Globe, Users, TrendingUp, Zap, Globe, Shield, Code, Database, Handshake, Cpu];
+                    const borders = [
+                        'hover:border-yellow-500/50',
+                        'hover:border-stellar-teal/50',
+                        'hover:border-purple-500/50',
+                        'hover:border-green-500/50',
+                        'hover:border-blue-500/50',
+                        'hover:border-rose-500/50',
+                        'hover:border-amber-500/50',
+                        'hover:border-violet-500/50',
+                        'hover:border-teal-500/50',
+                        'hover:border-cyan-500/50',
+                        'hover:border-indigo-500/50',
+                        'hover:border-emerald-500/50'
+                    ];
+                    const bgIcons = [
+                        'bg-yellow-500/10 text-yellow-500',
+                        'bg-stellar-teal/10 text-stellar-teal',
+                        'bg-purple-500/10 text-purple-500',
+                        'bg-green-500/10 text-green-500',
+                        'bg-blue-500/10 text-blue-400',
+                        'bg-rose-500/10 text-rose-400',
+                        'bg-amber-500/10 text-amber-400',
+                        'bg-violet-500/10 text-violet-400',
+                        'bg-teal-500/10 text-teal-400',
+                        'bg-cyan-500/10 text-stellar-teal',
+                        'bg-indigo-500/10 text-indigo-400',
+                        'bg-emerald-500/10 text-emerald-400'
+                    ];
+                    const Icon = icons[idx] || Code;
+
+                    return (
+                        <div key={idea.name} className={`bg-[#0A0A0A] border border-white/10 rounded-2xl p-6 sm:p-8 transition-colors group ${borders[idx]}`}>
+                            <div className="flex flex-col xs:flex-row items-start xs:items-center justify-between gap-4 mb-6">
+                                <div className={`p-3 rounded-xl shrink-0 ${bgIcons[idx]}`}>
+                                    <Icon size={32} />
+                                </div>
+                                <span className="px-3 py-1 rounded-full bg-white/5 text-[10px] sm:text-xs font-mono text-gray-400 self-start xs:self-center">
+                                    {t.docs.ideas.difficulty}: {idea.diff === 'Easy' ? t.docs.ideas.easy : idea.diff === 'Medium' ? t.docs.ideas.medium : t.docs.ideas.hard}
+                                </span>
+                            </div>
+                            <h3 className="text-xl sm:text-2xl font-bold text-white mb-2">{idea.name}</h3>
+                            <p className="text-gray-400 mb-6 sm:min-h-[60px] text-sm sm:text-base leading-relaxed">
+                                {idea.desc}
+                            </p>
+                            <div className="bg-black/50 rounded-lg p-4 font-mono text-[10px] sm:text-sm text-stellar-teal/80 overflow-x-auto scrollbar-thin">
+                                {idea.code.split('\n').map((line: string, lIdx: number) => (
+                                    <div key={lIdx}>
+                                        {line.startsWith('#') || line.startsWith('//') ? (
+                                            <span className="text-gray-500">{line}</span>
+                                        ) : (
+                                            line
+                                        )}
+                                    </div>
+                                ))}
+                            </div>
                         </div>
-                        <span className="px-3 py-1 rounded-full bg-white/5 text-[10px] sm:text-xs font-mono text-gray-400 self-start xs:self-center">{t.docs.ideas.difficulty}: Medium</span>
-                    </div>
-                    <h3 className="text-xl sm:text-2xl font-bold text-white mb-2">PortfolioGuard Bot</h3>
-                    <p className="text-gray-400 mb-6 sm:min-h-[60px] text-sm sm:text-base leading-relaxed">
-                        A Telegram bot that monitors user portfolios 24/7. If collateral health drops below 1.1, it automatically rebalances via Nirium to repay debt and prevent liquidation.
-                    </p>
-                    <div className="bg-black/50 rounded-lg p-4 font-mono text-[10px] sm:text-sm text-yellow-500/80 overflow-x-auto scrollbar-thin">
-                        <span className="text-gray-500"># Use Python SDK</span><br />
-                        agent.listen(portfolio_health, (health) =&gt; {'{'}<br />
-                        &nbsp;&nbsp;if health &lt; 1.1: agent.execute("Repay")<br />
-                        {'}'})
-                    </div>
-                </div>
-
-                {/* Idea 2 */}
-                <div className="bg-[#0A0A0A] border border-white/10 rounded-2xl p-6 sm:p-8 hover:border-stellar-teal/50 transition-colors group">
-                    <div className="flex flex-col xs:flex-row items-start xs:items-center justify-between gap-4 mb-6">
-                        <div className="p-3 bg-stellar-teal/10 rounded-xl text-stellar-teal shrink-0">
-                            <Zap size={32} />
-                        </div>
-                        <span className="px-3 py-1 rounded-full bg-white/5 text-[10px] sm:text-xs font-mono text-gray-400 self-start xs:self-center">Difficulty: Hard</span>
-                    </div>
-                    <h3 className="text-xl sm:text-2xl font-bold text-white mb-2">ArbSwarm DAO</h3>
-                    <p className="text-gray-400 mb-6 sm:min-h-[60px] text-sm sm:text-base leading-relaxed">
-                        A DAO where users pool XLM. Thousands of micro-agents scan DEXs for 0.5% discrepancies and execute atomic path payments. Profits are split 80/20 between Agent and DAO.
-                    </p>
-                    <div className="bg-black/50 rounded-lg p-4 font-mono text-[10px] sm:text-sm text-stellar-teal/80 overflow-x-auto scrollbar-thin">
-                        <span className="text-gray-500"># Use TypeScript SDK</span><br />
-                        const profit = await calculateArb(poolA, poolB);<br />
-                        if (profit &gt; gas) await loop.execute(flashLoan);
-                    </div>
-                </div>
-
-                {/* Idea 3 */}
-                <div className="bg-[#0A0A0A] border border-white/10 rounded-2xl p-6 sm:p-8 hover:border-purple-500/50 transition-colors group">
-                    <div className="flex flex-col xs:flex-row items-start xs:items-center justify-between gap-4 mb-6">
-                        <div className="p-3 bg-purple-500/10 rounded-xl text-purple-500 shrink-0">
-                            <Globe size={32} />
-                        </div>
-                        <span className="px-3 py-1 rounded-full bg-white/5 text-[10px] sm:text-xs font-mono text-gray-400 self-start xs:self-center">Difficulty: Easy</span>
-                    </div>
-                    <h3 className="text-xl sm:text-2xl font-bold text-white mb-2">NewsTrader Oracle</h3>
-                    <p className="text-gray-400 mb-6 sm:min-h-[60px] text-sm sm:text-base leading-relaxed">
-                        Connect standard Web2 news APIs (Bloomberg, X) to Stellar. When "Regulatory Approval" is detected, buy the related token via Nirium Swaps instantly.
-                    </p>
-                    <div className="bg-black/50 rounded-lg p-4 font-mono text-[10px] sm:text-sm text-purple-500/80 overflow-x-auto scrollbar-thin">
-                        <span className="text-gray-500"># Use JS SDK + Vercel</span><br />
-                        onNewsReceived(async (headline) =&gt; {'{'}<br />
-                        &nbsp;&nbsp;if (isBullish(headline)) loop.buy("XLM")<br />
-                        {'}'})
-                    </div>
-                </div>
-
-                {/* Idea 4 */}
-                <div className="bg-[#0A0A0A] border border-white/10 rounded-2xl p-6 sm:p-8 hover:border-green-500/50 transition-colors group">
-                    <div className="flex flex-col xs:flex-row items-start xs:items-center justify-between gap-4 mb-6">
-                        <div className="p-3 bg-green-500/10 rounded-xl text-green-500 shrink-0">
-                            <Users size={32} />
-                        </div>
-                        <span className="px-3 py-1 rounded-full bg-white/5 text-[10px] sm:text-xs font-mono text-gray-400 self-start xs:self-center">Difficulty: Hard</span>
-                    </div>
-                    <h3 className="text-xl sm:text-2xl font-bold text-white mb-2">GameFi NPC Economy</h3>
-                    <p className="text-gray-400 mb-6 sm:min-h-[60px] text-sm sm:text-base leading-relaxed">
-                        Fully autonomous NPCs in a Stellar game that manage their own inventory shops. They buy items low from players and sell high, managing their own capital via Nirium.
-                    </p>
-                    <div className="bg-black/50 rounded-lg p-4 font-mono text-[10px] sm:text-sm text-green-500/80 overflow-x-auto scrollbar-thin">
-                        <span className="text-gray-500"># Use Unity + C# (API)</span><br />
-                        npc.OnTradeOffer((item) =&gt; {'{'}<br />
-                        &nbsp;&nbsp;if (market.val(item) &gt; offer) npc.pay(offer)<br />
-                        {'}'})
-                    </div>
-                </div>
-            </div>
-
-            {/* Idea 5 */}
-            <div className="bg-[#0A0A0A] border border-white/10 rounded-2xl p-8 hover:border-blue-500/50 transition-colors group">
-                <div className="flex items-start justify-between mb-6">
-                    <div className="p-3 bg-blue-500/10 rounded-xl text-blue-400">
-                        <TrendingUp size={32} />
-                    </div>
-                    <span className="px-3 py-1 rounded-full bg-white/5 text-xs font-mono text-gray-400">Difficulty: Medium</span>
-                </div>
-                <h3 className="text-2xl font-bold text-white mb-2">USDC Yield Maximizer</h3>
-                <p className="text-gray-400 mb-6 min-h-[60px]">
-                    Deploy USDC into a Nirium vault, then use the agent to auto-rotate capital between Blend, Phoenix, and SDEX — always chasing the highest lending rate. Earn delta-neutral stablecoin yield automatically.
-                </p>
-                <div className="bg-black/50 rounded-lg p-4 font-mono text-sm text-blue-400/80">
-                    <span className="text-gray-500"># Use TypeScript SDK — USDC vault</span><br />
-                    const best = await findBestRate(['blend', 'phoenix', 'sdex']);<br />
-                    await loop.deposit(vault, &apos;USDC&apos;, 100);<br />
-                    await loop.supply(best.protocol, amount);
-                </div>
-            </div>
-
-            {/* Idea 6 */}
-            <div className="bg-[#0A0A0A] border border-white/10 rounded-2xl p-8 hover:border-rose-500/50 transition-colors group">
-                <div className="flex items-start justify-between mb-6">
-                    <div className="p-3 bg-rose-500/10 rounded-xl text-rose-400">
-                        <Zap size={32} />
-                    </div>
-                    <span className="px-3 py-1 rounded-full bg-white/5 text-xs font-mono text-gray-400">Difficulty: Hard</span>
-                </div>
-                <h3 className="text-2xl font-bold text-white mb-2">Liquidation Sniper Bot</h3>
-                <p className="text-gray-400 mb-6 min-h-[60px]">
-                    Monitor every undercollateralized position on Blend. The moment health factor drops below 1.0, execute a liquidation via Nirium and claim the bonus — all in a single atomic transaction.
-                </p>
-                <div className="bg-black/50 rounded-lg p-4 font-mono text-sm text-rose-400/80">
-                    <span className="text-gray-500">// Monitor + strike in one block</span><br />
-                    onHealthAlert(async (pos) =&gt; {'{'}<br />
-                    &nbsp;&nbsp;const loan = await loop.flashLoan(pos.debt);<br />
-                    &nbsp;&nbsp;await blend.liquidate(pos.id, loan);<br />
-                    {'}'})
-                </div>
-            </div>
-
-            {/* Idea 7 */}
-            <div className="bg-[#0A0A0A] border border-white/10 rounded-2xl p-8 hover:border-amber-500/50 transition-colors group">
-                <div className="flex items-start justify-between mb-6">
-                    <div className="p-3 bg-amber-500/10 rounded-xl text-amber-400">
-                        <Globe size={32} />
-                    </div>
-                    <span className="px-3 py-1 rounded-full bg-white/5 text-xs font-mono text-gray-400">Difficulty: Easy</span>
-                </div>
-                <h3 className="text-2xl font-bold text-white mb-2">Onchain Payroll Protocol</h3>
-                <p className="text-gray-400 mb-6 min-h-[60px]">
-                    A DAO treasury deploys USDC into a Nirium vault. The yield generated weekly is automatically streamed as payroll to contributors&apos; wallets on a schedule — the treasury principal remains untouched forever.
-                </p>
-                <div className="bg-black/50 rounded-lg p-4 font-mono text-sm text-amber-400/80">
-                    <span className="text-gray-500"># Cron via Vercel + Nirium API</span><br />
-                    every_friday = vault.yield_since(last_week)<br />
-                    for member in dao.members:<br />
-                    &nbsp;&nbsp;loop.transfer(member.wallet, share)
-                </div>
-            </div>
-
-            {/* Idea 8 */}
-            <div className="bg-[#0A0A0A] border border-white/10 rounded-2xl p-8 hover:border-violet-500/50 transition-colors group">
-                <div className="flex items-start justify-between mb-6">
-                    <div className="p-3 bg-violet-500/10 rounded-xl text-violet-400">
-                        <Shield size={32} />
-                    </div>
-                    <span className="px-3 py-1 rounded-full bg-white/5 text-xs font-mono text-gray-400">Difficulty: Hard</span>
-                </div>
-                <h3 className="text-2xl font-bold text-white mb-2">On-Chain Insurance Fund</h3>
-                <p className="text-gray-400 mb-6 min-h-[60px]">
-                    Users pay a small USDC premium weekly. The pool sits in a Nirium vault generating yield. When a covered protocol is exploited (detected via oracle), the agent autonomously pays out claims from the yield reserve first, then principal if needed.
-                </p>
-                <div className="bg-black/50 rounded-lg p-4 font-mono text-sm text-violet-400/80">
-                    <span className="text-gray-500">// Oracle-triggered payout</span><br />
-                    onExploitDetected(async (protocol) =&gt; {'{'}<br />
-                    &nbsp;&nbsp;const reserve = await vault.yieldBalance();<br />
-                    &nbsp;&nbsp;await loop.payout(claimants, reserve);<br />
-                    {'}'})
-                </div>
-            </div>
-
-            {/* Idea 9 */}
-            <div className="bg-[#0A0A0A] border border-white/10 rounded-2xl p-8 hover:border-teal-500/50 transition-colors group">
-                <div className="flex items-start justify-between mb-6">
-                    <div className="p-3 bg-teal-500/10 rounded-xl text-teal-400">
-                        <Code size={32} />
-                    </div>
-                    <span className="px-3 py-1 rounded-full bg-white/5 text-xs font-mono text-gray-400">Difficulty: Medium</span>
-                </div>
-                <h3 className="text-2xl font-bold text-white mb-2">Eliza Social Sentiment Trader</h3>
-                <p className="text-gray-400 mb-6 min-h-[60px]">
-                    An ElizaOS agent scans X/Twitter, Telegram, and Discord 24/7 for Stellar ecosystem project mentions. When a verified influencer posts bullish content, the agent opens a position via Nirium swap within the same block.
-                </p>
-                <div className="bg-black/50 rounded-lg p-4 font-mono text-sm text-teal-400/80">
-                    <span className="text-gray-500">// Eliza plugin integration</span><br />
-                    agent.on(&apos;BULLISH_SIGNAL&apos;, async (signal) =&gt; {'{'}<br />
-                    &nbsp;&nbsp;if (signal.confidence &gt; 0.85) {'{'}<br />
-                    &nbsp;&nbsp;&nbsp;&nbsp;await loop.execute(&apos;momentum-buy&apos;, signal);<br />
-                    &nbsp;&nbsp;{'}'}<br />
-                    {'}'})
-                </div>
-            </div>
-
-            {/* Idea 10 */}
-            <div className="bg-[#0A0A0A] border border-white/10 rounded-2xl p-8 hover:border-cyan-500/50 transition-colors group">
-                <div className="flex items-start justify-between mb-6">
-                    <div className="p-3 bg-cyan-500/10 rounded-xl text-stellar-teal">
-                        <Database size={32} />
-                    </div>
-                    <span className="px-3 py-1 rounded-full bg-white/5 text-xs font-mono text-gray-400">Difficulty: Easy</span>
-                </div>
-                <h3 className="text-2xl font-bold text-white mb-2">Proof-of-Transparency Hedge Fund</h3>
-                <p className="text-gray-400 mb-6 min-h-[60px]">
-                    A fund where every trade decision is signed by the agent and uploaded immutably to the Neural Archive. Investors can verify the entire decision history on-chain at any time. Zero black boxes — full cryptographic accountability.
-                </p>
-                <div className="bg-black/50 rounded-lg p-4 font-mono text-sm text-stellar-teal/80">
-                    <span className="text-gray-500">// Every decision = IPFS archive</span><br />
-                    const cid = await ipfs.upload(tradeDecision);<br />
-                    await stellar.tx.emitEvent({'{'} cid, hash {'}'});<br />
-                    <span className="text-gray-500">// Investors verify anytime</span>
-                </div>
-
+                    );
+                })}
             </div>
         </div>
     );
