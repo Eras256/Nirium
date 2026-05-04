@@ -33,17 +33,25 @@ function buildTickers(market: any, prev: any, t: any): TickerItem[] {
     const baseFee = market?.baseFee ?? null;
     const blendApy = market?.blendSupplyApy ?? null;
     const prevBlend = prev?.blendSupplyApy ?? null;
-    const etherfuseApy = market?.etherfuseApy ?? null;
-    const prevEtherfuse = prev?.etherfuseApy ?? null;
+    const cetesApy = market?.cetesApy ?? 3.38;
+    const prevCetes = prev?.cetesApy ?? 3.38;
 
     return [
         {
-            label: t.common.tickers.xlm_usdc,
+            label: "XLM/USDC",
             value: xlm != null ? `$${fmt(xlm)}` : '$0.1732',
             change: prevXlm != null && xlm != null
                 ? `${xlm >= prevXlm ? '+' : ''}${((xlm - prevXlm) / prevXlm * 100).toFixed(3)}%`
                 : '+0.000%',
             trend: trend(xlm, prevXlm),
+        },
+        {
+            label: "🇲🇽 CETES APY",
+            value: cetesApy != null && cetesApy > 0 ? `${cetesApy.toFixed(2)}%` : '3.38%',
+            change: prevCetes != null && cetesApy != null && cetesApy > 0
+                ? `${cetesApy >= prevCetes ? '+' : ''}${(cetesApy - prevCetes).toFixed(2)}%`
+                : '+0.01%',
+            trend: trend(cetesApy, prevCetes) === 'neutral' ? 'up' : trend(cetesApy, prevCetes),
         },
         {
             label: t.common.tickers.sdex_spread,
@@ -52,28 +60,6 @@ function buildTickers(market: any, prev: any, t: any): TickerItem[] {
                 ? `${spread >= prevSpread ? '+' : ''}${(spread - prevSpread).toFixed(2)}bps`
                 : '—',
             trend: spread != null ? trend(spread, prevSpread) : 'neutral',
-        },
-        {
-            label: t.common.tickers.blend_apy,
-            value: blendApy != null && blendApy > 0 ? `${blendApy.toFixed(2)}%` : '5.12%',
-            change: prevBlend != null && blendApy != null && blendApy > 0
-                ? `${blendApy >= prevBlend ? '+' : ''}${(blendApy - prevBlend).toFixed(2)}%`
-                : '+0.01%',
-            trend: trend(blendApy, prevBlend) === 'neutral' ? 'up' : trend(blendApy, prevBlend),
-        },
-        {
-            label: t.common.tickers.etherfuse_apy,
-            value: etherfuseApy != null && etherfuseApy > 0 ? `${etherfuseApy.toFixed(2)}%` : '5.78%',
-            change: prevEtherfuse != null && etherfuseApy != null && etherfuseApy > 0
-                ? `${etherfuseApy >= prevEtherfuse ? '+' : ''}${(etherfuseApy - prevEtherfuse).toFixed(2)}%`
-                : '+0.01%',
-            trend: trend(etherfuseApy, prevEtherfuse) === 'neutral' ? 'up' : trend(etherfuseApy, prevEtherfuse),
-        },
-        {
-            label: t.common.tickers.base_fee,
-            value: baseFee != null ? String(baseFee) : '100',
-            change: '0',
-            trend: 'neutral',
         },
         {
             label: "COMPLIANCE",
@@ -92,11 +78,9 @@ const MarketTicker = () => {
     // Initial placeholder tickers localized with real-looking data
     useEffect(() => {
         setTickers([
-            { label: t.common.tickers.xlm_usdc, value: '$0.1732', change: '+0.045%', trend: 'up' },
+            { label: "XLM/USDC", value: '$0.1732', change: '+0.045%', trend: 'up' },
+            { label: "🇲🇽 CETES APY", value: '3.38%', change: '+0.01%', trend: 'up' },
             { label: t.common.tickers.sdex_spread, value: '0.81bps', change: '-0.02bps', trend: 'down' },
-            { label: t.common.tickers.blend_apy, value: '5.12%', change: '+0.01%', trend: 'up' },
-            { label: t.common.tickers.etherfuse_apy, value: '5.78%', change: '+0.01%', trend: 'up' },
-            { label: t.common.tickers.base_fee, value: '100', change: '0', trend: 'neutral' },
             { label: "COMPLIANCE", value: "NON-FINANCIAL ADVICE // EST DATA", change: "STARK", trend: 'neutral' },
         ]);
     }, [t]);
@@ -120,20 +104,18 @@ const MarketTicker = () => {
                         xlmPrice: 0.1732,
                         sdexSpread: 0.81,
                         baseFee: 100,
-                        blendSupplyApy: 5.12,
-                        etherfuseApy: 5.78,
+                        cetesApy: 3.38,
                     };
-                    
+
                     const volatility = 0.0012; // Sufficient to move 4th decimal
                     const change = 1 + (Math.random() * volatility * 2 - volatility);
-                    
+
                     data = {
                         market: {
                             xlmPrice: mockBase.xlmPrice * change,
                             sdexSpread: Math.max(0.1, mockBase.sdexSpread + (Math.random() * 0.12 - 0.06)),
                             baseFee: 100,
-                            blendSupplyApy: Math.max(1.0, mockBase.blendSupplyApy + (Math.random() * 0.06 - 0.03)),
-                            etherfuseApy: Math.max(1.0, mockBase.etherfuseApy + (Math.random() * 0.04 - 0.02)),
+                            cetesApy: Math.max(1.0, mockBase.cetesApy + (Math.random() * 0.04 - 0.02)),
                         }
                     };
                 }
@@ -143,14 +125,13 @@ const MarketTicker = () => {
                 setTickers(built);
             } catch (err) {
                 // Fallback simulation to keep it alive
-                const mockBase = prevMarket.current || { xlmPrice: 0.1732, sdexSpread: 0.81, baseFee: 100, blendSupplyApy: 5.12, etherfuseApy: 5.78 };
+                const mockBase = prevMarket.current || { xlmPrice: 0.1732, sdexSpread: 0.81, baseFee: 100, cetesApy: 3.38 };
                 const change = 1 + (Math.random() * 0.001 * 2 - 0.001);
                 const fallbackMarket = {
                     xlmPrice: mockBase.xlmPrice * change,
                     sdexSpread: mockBase.sdexSpread + 0.01,
                     baseFee: 100,
-                    blendSupplyApy: mockBase.blendSupplyApy + 0.01,
-                    etherfuseApy: mockBase.etherfuseApy + 0.01,
+                    cetesApy: mockBase.cetesApy + 0.01,
                 };
                 const built = buildTickers(fallbackMarket, prevMarket.current, t);
                 prevMarket.current = fallbackMarket;

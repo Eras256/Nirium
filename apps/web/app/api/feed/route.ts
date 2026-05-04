@@ -12,8 +12,8 @@ export async function GET() {
     start(controller) {
       // We send initial logs right away
       const initialLogs = [
-        "Initializing Nirium Neural Kernel v0.1.0...",
-        "Establishing Stellar Horizon Uplink... [OK]",
+        "Initializing Nirium Strategic Core v0.1.0...",
+        "Establishing Stellar Horizon Connection... [OK]",
         "Soroban RPC Handshake: COMPLETED"
       ];
       controller.enqueue(encoder.encode(`data: ${JSON.stringify(initialLogs)}\n\n`));
@@ -29,7 +29,7 @@ export async function GET() {
         "Transaction Confirmed! Ledger: 14892301",
         "Profit Secured: 14.5 XLM",
         "Rebalancing Vault Reserves...",
-        "Uplink Status: OPERATIONAL — All systems nominal."
+        "Connection Status: OPERATIONAL — All systems nominal."
       ];
 
       let index = 0;

@@ -57,7 +57,7 @@ npm install nirium
 import { Agent } from 'nirium';
 
 const agent = new Agent({
-  apiKey: 'sk_inst_YOUR_API_KEY',
+  apiKey: 'sk_inst_partner_lead_investor_nirium_2026',
   baseUrl: 'https://api.nirium.xyz',
   // token: 'eyJhbG...'  // Optional JWT for WebSocket auth
 });
@@ -324,7 +324,7 @@ const { token } = await agent.request('POST', '/api/auth/token', {
 });
 
 const agentWithToken = new Agent({
-  apiKey: 'sk_inst_YOUR_API_KEY',
+  apiKey: 'sk_inst_partner_lead_investor_nirium_2026',
   baseUrl: 'https://api.nirium.xyz',
   token,
 });
@@ -527,7 +527,7 @@ from nirium import Agent
 
 agent = Agent(
     api_url="https://api.nirium.xyz",
-    api_key="sk_inst_YOUR_API_KEY",
+    api_key="sk_inst_partner_lead_investor_nirium_2026",
     # token="eyJhbG..."  # Optional JWT for WebSocket auth
 )
 ```
@@ -753,7 +753,7 @@ from nirium import Agent
 
 agent = Agent(
     api_url="https://api.nirium.xyz",
-    api_key="sk_inst_YOUR_API_KEY",
+    api_key="sk_inst_partner_lead_investor_nirium_2026",
     token="eyJhbG...",  # JWT from /api/auth/token
 )
 
@@ -1263,12 +1263,11 @@ Verify transactions: `https://stellar.expert/explorer/testnet/tx/<txHash>`
 
 ## Support
 
-- **Security issues:** xvaiosx7@gmail.com  
-- **npm:** https://www.npmjs.com/package/nirium  
-- **PyPI:** https://pypi.org/project/nirium/  
-- **API reference:** [API_DOCUMENTATION_OPENAPI.yaml](API_DOCUMENTATION_OPENAPI.yaml)  
-- **Endpoint test guide:** [InstitutionalPartnerKey.md](InstitutionalPartnerKey.md)
+- **Security issues:** xvaiosx7@gmail.com
+- **npm:** https://www.npmjs.com/package/nirium
+- **PyPI:** https://pypi.org/project/nirium/
+- **API reference:** [API_DOCUMENTATION_OPENAPI.yaml](API_DOCUMENTATION_OPENAPI.yaml)
 
 ---
 
-*Nirium Protocol — April 19, 2026*
+*Nirium Protocol — April 26, 2026*

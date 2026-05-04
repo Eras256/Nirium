@@ -1,8 +1,8 @@
 /**
- * Neural Archive Storage Utility
+ * Protocol Archive Storage Utility
  *
- * Uploads strategy code and metadata to Neural Archive (Stellar's decentralized storage layer).
- * Endpoint: /v1/blobs (Neural Archive Testnet 2025/2026 REST API)
+ * Uploads strategy code and metadata to Protocol Archive (Stellar's decentralized storage layer).
+ * Endpoint: /v1/blobs (Protocol Archive Testnet 2025/2026 REST API)
  */
 
 const ARCHIVE_PUBLISHER = process.env.NEXT_PUBLIC_ARCHIVE_PUBLISHER_URL || 'https://ipfs.io/api/v0';
@@ -15,7 +15,7 @@ export interface StorageResult {
 }
 
 /**
- * Uploads JSON data to Neural Archive decentralized storage.
+ * Uploads JSON data to Protocol Archive decentralized storage.
  * @param data Object or string to upload
  * @returns blobId and aggregator download URL
  */
@@ -31,7 +31,7 @@ export async function uploadToStorage(data: any): Promise<StorageResult> {
         });
 
         if (!response.ok) {
-            throw new Error(`Neural Archive Storage Error: ${response.status} ${response.statusText}`);
+            throw new Error(`Protocol Archive Storage Error: ${response.status} ${response.statusText}`);
         }
 
         const result = await response.json();
@@ -42,8 +42,8 @@ export async function uploadToStorage(data: any): Promise<StorageResult> {
         } else if (result.alreadyCertified?.blobId) {
             blobId = result.alreadyCertified.blobId;
         } else {
-            // Neural Archive testnet may be unstable — use deterministic mock ID
-            console.warn('[storage] Could not parse Neural Archive response, using simulated blob ID.');
+            // Protocol Archive testnet may be unstable — use deterministic mock ID
+            console.warn('[storage] Could not parse Protocol Archive response, using simulated blob ID.');
             const simId = `blob_${Math.random().toString(36).substring(2, 9)}`;
             return { blobId: simId, url: '#', simulated: true };
         }
@@ -54,7 +54,7 @@ export async function uploadToStorage(data: any): Promise<StorageResult> {
         };
 
     } catch (error) {
-        console.error('[storage] Failed to upload to Neural Archive:', error);
+        console.error('[storage] Failed to upload to Protocol Archive:', error);
         // Graceful degradation for demo / testnet instability
         return { blobId: `archive_fallback_${Date.now()}`, url: '#', simulated: true };
     }

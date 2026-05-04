@@ -7,7 +7,8 @@ export interface ActiveStrategy {
     name: string;
     emoji: string;
     status: string;
-    yield: string;
+    yield?: string;
+    rate?: string;
     asset?: 'XLM' | 'USDC';  // vault asset type
     tx_digest?: string;
     created_at?: string;

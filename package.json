@@ -30,6 +30,7 @@
   "dependencies": {
     "@radix-ui/react-slot": "^1.2.4",
     "@stellar/mpp": "^0.4.0",
+    "@vercel/analytics": "^1.6.1",
     "@x402/core": "^2.9.0",
     "@x402/express": "^2.9.0",
     "@x402/fetch": "^2.9.0",

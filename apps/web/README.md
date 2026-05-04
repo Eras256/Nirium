@@ -47,7 +47,7 @@ The agent API URL defaults to `https://api.nirium.xyz`. For local dev set `NEXT_
 |---|---|
 | `/` | Landing page with hero, market ticker (5 live indicators), protocol integrations |
 | `/dashboard` | Main operator dashboard — agent fleet, neural feed, revenue, settlement |
-| `/agents` | Swarm agent list with status and performance metrics |
+| `/agents` | Cluster agent list with status and performance metrics |
 | `/analytics` | Protocol analytics and execution history |
 | `/treasury` | Treasury / revenue tracking |
 | `/strategies` | Strategy explorer and builder |
@@ -80,7 +80,7 @@ The landing page and dashboard show 5 real-time indicators:
 ## Key Components
 
 - `MarketTicker` — live 5-indicator ticker strip
-- `NeuralFeed` — real-time agent decision logs
+- `ProtocolFeed` — real-time agent decision logs
 - `ProtocolRevenue` — revenue tracking (testnet simulation)
 - `AISettingsModal` — LLM provider configuration
 - `ApiKeyManager` — institutional API key management

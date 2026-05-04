@@ -70,7 +70,7 @@ export async function POST(req: Request) {
 
         // ── QUOTE ──────────────────────────────────────────────────────────
         if (action === 'quote') {
-            const { amount, walletAddress } = body;
+            const { amount, walletAddress, bondId = 'CETES', fiat = 'MXN' } = body;
             const quoteId = crypto.randomUUID();
             // Per Etherfuse docs: customerId = org UUID
             const customerId = await getOrgId();
@@ -81,8 +81,10 @@ export async function POST(req: Request) {
                 blockchain: 'stellar',
                 quoteAssets: {
                     type: 'onramp',
-                    sourceAsset: 'MXN',
-                    targetAsset: 'CETES:GC3CW7EDYRTWQ635VDIGY6S4ZUF5L6TQ7AA4MWS7LEQDBLUSZXV7UPS4'
+                    sourceAsset: fiat,
+                    targetAsset: bondId === 'CETES' 
+                        ? 'CETES:GC3CW7EDYRTWQ635VDIGY6S4ZUF5L6TQ7AA4MWS7LEQDBLUSZXV7UPS4' 
+                        : bondId
                 },
                 sourceAmount: String(amount),
                 walletAddress,

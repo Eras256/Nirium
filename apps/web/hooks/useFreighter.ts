@@ -62,13 +62,19 @@ function ensureInit() {
             projectId: "8505f6eaaa44b34387416821007c224f",
             metadata: {
                 name: 'Nirium Protocol',
-                description: 'Institutional-grade autonomous Stellar AI Agent Swarm.',
+                description: 'Institutional-grade autonomous Stellar Strategic Fleet.',
                 url: origin,
                 icons: [`${origin}/icon.png`]
             }
         });
 
-        // Use custom dark theme parameters exactly as Soroswap
+        // StellarWalletsKit.init() re-calls WalletConnect Core.init() internally, even though
+        // the WalletConnectModule constructor already triggered it. Suppress the benign warning.
+        const _warn = console.warn;
+        console.warn = (...args: any[]) => {
+            if (typeof args[0] === 'string' && args[0].includes('WalletConnect Core is already initialized')) return;
+            _warn.apply(console, args);
+        };
         StellarWalletsKit.init({
             modules: [...defaults, nativeFreighter, wcModule],
             network: Networks.TESTNET,
@@ -78,6 +84,7 @@ function ensureInit() {
                 hideUnsupportedWallets: false
             }
         });
+        console.warn = _warn;
     }
 }
 

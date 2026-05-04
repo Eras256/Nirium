@@ -32,10 +32,12 @@ export async function GET() {
             }
         ).then(res => res.ok ? res.json() : []) : Promise.resolve([]);
 
-        // 3. Fetch from Horizon (Live On-chain Settlements)
+        // 3. Fetch from Horizon (Live On-chain Settlements) — 5s timeout so we never block OpsConsole
         const horizonPromise = fetch(
-            `https://horizon-testnet.stellar.org/accounts/${TREASURY}/operations?order=desc&limit=20`
-        ).then(res => res.ok ? res.json() : { _embedded: { records: [] } });
+            `https://horizon-testnet.stellar.org/accounts/${TREASURY}/operations?order=desc&limit=20`,
+            { signal: AbortSignal.timeout(5000) }
+        ).then(res => res.ok ? res.json() : { _embedded: { records: [] } })
+         .catch(() => ({ _embedded: { records: [] } }));
 
         const [agentData, activityData, horizonData] = await Promise.all([
             agentLogsPromise, 

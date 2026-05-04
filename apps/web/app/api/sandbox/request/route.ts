@@ -16,7 +16,7 @@ const SandboxRequestSchema = z.object({
         .toLowerCase(),
     walletAddress: z.string()
         .regex(/^G[A-Z0-9]{55}$/, 'Invalid Stellar wallet address'),
-    tier: z.enum(['sandbox', 'institutional']).default('sandbox'),
+    tier: z.enum(['sandbox']).default('sandbox'),
     message: z.string().optional()
 });
 
@@ -101,26 +101,16 @@ export async function POST(request: Request) {
             );
         }
 
-        // 5. Generate API Key
-        const tierPrefix = validatedData.tier === 'institutional' ? 'inst' : 'sbox';
-        const randomPart = crypto.randomBytes(32).toString('hex');
-        const apiKey = `sk_${tierPrefix}_${randomPart}`;
-
-        // Hash the API key for storage (SHA-256)
+        // 5. Generate API Key — sandbox tier only (institutional/enterprise require manual provisioning)
+        const apiKey = `sk_sbox_${crypto.randomBytes(32).toString('hex')}`;
         const apiKeyHash = crypto.createHash('sha256').update(apiKey).digest('hex');
 
-        // 6. Set tier quotas
-        const quotas = validatedData.tier === 'institutional'
-            ? {
-                requestsPerMinute: 300,
-                requestsPerDay: 10000,
-                maxStrategiesPerDay: 500
-            }
-            : {
-                requestsPerMinute: 60,
-                requestsPerDay: 1000,
-                maxStrategiesPerDay: 100
-            };
+        // 6. Sandbox tier quotas
+        const quotas = {
+            requestsPerMinute: 60,
+            requestsPerDay: 1000,
+            maxStrategiesPerDay: 100
+        };
 
         // 7. Set expiration (90 days)
         const expiresAt = new Date();
@@ -208,19 +198,25 @@ export async function POST(request: Request) {
 export async function GET() {
     return NextResponse.json({
         name: 'Nirium Sandbox Program',
-        description: 'Enterprise-grade sandbox accounts for institutional testing',
+        description: 'Testnet sandbox accounts for developers. Institutional/enterprise access requires manual approval — contact xvaiosx7@gmail.com.',
         tiers: {
             sandbox: {
                 requestsPerMinute: 60,
                 requestsPerDay: 1000,
                 maxStrategiesPerDay: 100,
-                duration: '90 days'
+                duration: '90 days',
+                provisioning: 'self-serve'
             },
             institutional: {
                 requestsPerMinute: 300,
                 requestsPerDay: 10000,
                 maxStrategiesPerDay: 500,
-                duration: '90 days'
+                provisioning: 'manual — contact xvaiosx7@gmail.com'
+            },
+            enterprise: {
+                requestsPerMinute: 1000,
+                requestsPerDay: 'unlimited',
+                provisioning: 'manual — contact xvaiosx7@gmail.com'
             }
         },
         features: [

@@ -14,7 +14,7 @@ interface AISettingsModalProps {
 }
 
 const PROVIDERS = [
-    { id: 'nirium', name: 'Nirium Cloud', icon: Globe, description: 'Proprietary institutional matrix' },
+    { id: 'nirium', name: 'Nirium Cloud', icon: Globe, description: 'Proprietary institutional core' },
     { id: 'openai', name: 'OpenAI', icon: Cpu, description: 'GPT-4o / GPT-4 Turbo' },
     { id: 'anthropic', name: 'Anthropic', icon: Brain, description: 'Claude 3.5 Sonnet' },
     { id: 'minimax', name: 'MiniMax', icon: Cpu, description: 'Abab 6.5 / Video-01' },
@@ -26,7 +26,7 @@ const PROVIDERS = [
 ];
 
 const MODELS: Record<string, string[]> = {
-    nirium: ['nirium-matrix-v1', 'stellar-quantum-alpha'],
+    nirium: ['nirium-core-v1', 'stellar-quantum-alpha'],
     openai: ['gpt-4o', 'gpt-4-turbo', 'gpt-3.5-turbo'],
     anthropic: ['claude-3-5-sonnet-20240620', 'claude-3-opus-20240229'],
     minimax: ['abab6.5-chat', 'abab6.5s-chat'],
@@ -39,7 +39,7 @@ const MODELS: Record<string, string[]> = {
 
 export default function AISettingsModal({ isOpen, onClose }: AISettingsModalProps) {
     const { t } = useLanguage();
-    const [config, setConfig] = useState<LLMConfig>({ provider: 'nirium', model: 'nirium-matrix-v1' });
+    const [config, setConfig] = useState<LLMConfig>({ provider: 'nirium', model: 'nirium-core-v1' });
     const [isTesting, setIsTesting] = useState(false);
     const [testResult, setTestResult] = useState<'success' | 'error' | null>(null);
     const [mounted, setMounted] = useState(false);
@@ -66,7 +66,7 @@ export default function AISettingsModal({ isOpen, onClose }: AISettingsModalProp
         setIsSaving(false);
 
         if (result.success) {
-            toast.success(t.ai_modal.matrix_updated, { description: result.message });
+            toast.success(t.ai_modal.hub_updated, { description: result.message });
             onClose();
         } else {
             toast.warning(t.ai_modal.config_saved_local, { description: result.message });
@@ -251,7 +251,7 @@ export default function AISettingsModal({ isOpen, onClose }: AISettingsModalProp
                                 className="flex-1 py-2.5 rounded-xl bg-pulse-violet border border-pulse-violet/50 text-[9px] sm:text-[10px] font-bold text-white shadow-[0_0_15px_rgba(112,0,255,0.4)] hover:brightness-110 transition-all uppercase tracking-widest flex items-center justify-center gap-2"
                             >
                                 {isSaving && <Loader2 size={12} className="animate-spin" />}
-                                {t.ai_modal.sync_matrix}
+                                {t.ai_modal.sync_protocol}
                             </button>
                         </div>
                     </motion.div>

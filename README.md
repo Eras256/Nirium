@@ -1,113 +1,154 @@
-# Nirium Protocol — Infraestructura Institucional sobre Stellar
+# Nirium Protocol — Institutional Infrastructure on Stellar
 
-![Network](https://img.shields.io/badge/Red-Stellar%20Testnet-orange?style=for-the-badge)
-![Status](https://img.shields.io/badge/Estado-Testnet%20Activo-yellow?style=for-the-badge)
+![Network](https://img.shields.io/badge/Network-Stellar%20Testnet-orange?style=for-the-badge)
+![Status](https://img.shields.io/badge/Status-Testnet%20Active-yellow?style=for-the-badge)
 ![API](https://img.shields.io/badge/API-v2.5%20%7C%2044%20Endpoints-blue?style=for-the-badge)
 ![Security](https://img.shields.io/badge/JARGUS%20Audit-78%2F78%20PASS-brightgreen?style=for-the-badge)
-![SCF](https://img.shields.io/badge/SCF-Round%2043%20Aplicante-purple?style=for-the-badge)
-![x402](https://img.shields.io/badge/x402-En%20Producción-teal?style=for-the-badge)
-![MPP](https://img.shields.io/badge/MPP-En%20Producción-teal?style=for-the-badge)
-![Institutional Partner](https://img.shields.io/badge/Institutional Partner-Contratos%20Firmados-green?style=for-the-badge)
-
-> **DISCLAIMER:** Nirium es software experimental desplegado exclusivamente en Stellar Testnet. Todas las operaciones usan tokens de prueba sin valor monetario. No es asesoría financiera. No es un producto de inversión. Los smart contracts no han sido auditados formalmente por un tercero. Úsalo bajo tu propio riesgo.
+![SCF](https://img.shields.io/badge/SCF%2043-Panel%20Review-blueviolet?style=for-the-badge)
+![SCF7](https://img.shields.io/badge/SCF%207.0-Aligned-purple?style=for-the-badge)
+![x402](https://img.shields.io/badge/x402-In%20Production-teal?style=for-the-badge)
+![MPP](https://img.shields.io/badge/MPP-In%20Production-teal?style=for-the-badge)
+![CoC](https://img.shields.io/badge/Stellar%20CoC-Aligned%20Apr%2026%202026-green?style=for-the-badge)
+![SCF](https://img.shields.io/badge/SCF-Kickstart%20Active-success?style=for-the-badge)
 
 ---
 
-**Nirium** es infraestructura DeFi institucional impulsada por agentes autónomos sobre Stellar/Soroban. Permite a fintechs e instituciones financieras automatizar operaciones de tesorería, FX cross-border y gestión de rendimiento — reemplazando mesas de trading manuales lentas con ejecución autónoma 24/7, auditabilidad completa on-chain y liquidación en segundos.
+> **⚠️ MANDATORY LEGAL DISCLAIMER (SCF 7.0 — Updated April 26, 2026)**
+>
+> Nirium is **experimental software** deployed **exclusively on Stellar Testnet**. All operations use **test tokens with no real monetary value**. Smart contracts have not been formally audited by an independent third party (audit planned for Month 3, post-funding).
+>
+> **Nirium is not financial advice. It is not an investment product. It does not guarantee yields, dividends, asset appreciation, or returns of any kind.** Reference rate data displayed on the dashboard (Blend APY, Etherfuse CETES) represents **public protocol information only** — not projections or promises of return. XLM and Stellar assets are volatile. Use at your own risk.
+>
+> This project does not use SCF funds for speculation, trading, investment advice, or marketing of products promising interest or appreciation, in accordance with the [SCF 7.0 Official Rules](https://stellar.gitbook.io/scf-handbook/scf-awards/official-rules-for-submissions).
 
-Implementamos **x402** y **MPP** en producción antes de que la Linux Foundation anunciara x402 como estándar (2 Abril 2026) y antes de que Stripe/Tempo publicaran MPP (Marzo 2026). Construimos el playbook; luego el mercado lo validó.
+---
 
-Los agentes son el motor de ejecución. La automatización institucional B2B y A2A es el mercado.
+**Nirium** is an institutional treasury automation infrastructure powered by autonomous agents on Stellar/Soroban. It enables fintechs and financial institutions to automate treasury operations, cross-border FX, and cash-flow management — replacing slow manual trading desks with 24/7 autonomous execution, full on-chain auditability, and settlement in seconds.
 
-## Qué Hace
+We shipped **x402** in production on April 2, 2026 — the same day the Linux Foundation launched the x402 Foundation (contributing Coinbase's protocol). We shipped **MPP** on April 3, 2026 — within 16 days of Stripe and Tempo publishing the Machine Payment Protocol (March 18, 2026). We were tracking both specifications as they emerged and built the implementation immediately.
 
-Nirium resuelve el **cuello de botella de tesorería manual**: las fintechs que mueven capital cross-border enfrentan altos costos de FX, liquidación lenta y procesos propensos a errores. Nirium reemplaza estos flujos con:
+**Execution Nodes are the execution engine. Institutional B2B and A2A automation is the market.**
 
-- **Agentes Autónomos** — unidades de ejecución impulsadas por IA con sus propias wallets Stellar, operando 24/7 contra liquidez en vivo de SDEX/Soroswap/Blend
-- **x402 Micropagos** — los agentes pagan por inteligencia premium por request en USDC, sin necesidad de cuenta
-- **MPP Session Budgets** — las instituciones delegan un presupuesto USDC a un agente vía Soroban escrow; el agente ejecuta dentro de límites, fondos no usados reembolsables
-- **API Institucional** — 44 endpoints con auth multi-tier (sandbox, API key, JWT), webhooks, suscripciones de señales y skill marketplace
-- **Audit Trail Engine** — cada decisión de agente es firmada HMAC, indexada en IPFS y traducida a resúmenes legibles para sala de juntas
-- **Multi-LLM** — agnóstico de proveedor (OpenAI, Anthropic, Gemini, Grok, Ollama, y más) con hot-swap vía API
-- **Etherfuse CETES** — on-ramp MXN → CETES → USDC vía SPEI, integrado en testnet, corredor MXN-USDC a 0.8% all-in
-- **MCP Server** — expone Nirium como herramientas para Claude Desktop, Cursor y cualquier IDE compatible con MCP
+---
 
-## Arquitectura
+## What It Does
+
+Nirium solves the **manual treasury bottleneck**: fintechs moving cross-border capital face high FX costs, slow settlement, and error-prone processes. Nirium replaces these workflows with:
+
+- **Execution Nodes** — software units with their own Stellar wallets, operating 24/7 against live liquidity on SDEX, Soroswap, and Blend Protocol
+- **x402 Micropayments** — agents pay for premium intelligence per-request in USDC on Stellar, no account or subscription required
+- **MPP Session Budgets** — Optimized for **passive funding** (fondeos pasivos) and **mass payroll execution** (pagos de nómina masivos). Institutions delegate a USDC budget to an agent via Soroban escrow; the agent executes within limits, unused funds are refundable
+- **Institutional API** — 44 endpoints with multi-tier auth (sandbox, API key, JWT), webhooks, real-time signal subscriptions, and a skill marketplace
+- **Protocol Archive** — every agent decision is HMAC-SHA256 signed, immutably recorded, and translated into human-readable compliance summaries — no blockchain expertise required
+- **Multi-LLM** — provider-agnostic (OpenAI, Anthropic, Gemini, Grok, Ollama, and more) with hot-swap via API, no redeployment needed
+- **Etherfuse CETES** — MXN → tokenized CETES → USDC corridor via SPEI on testnet (displayed rate is a protocol reference only, not a guaranteed return)
+- **MCP Server** — exposes Nirium as 12 tools for Claude Desktop, Cursor, and any MCP-compatible IDE
+
+---
+
+## Architecture
 
 ```
-Fintech / Institución (B2B / A2A)
+Fintech / Institution (B2B / A2A)
         |
         v
-  [Dashboard Next.js 15 — nirium.xyz]
+  [Next.js 15 Dashboard — nirium.xyz]
+  [i18n: EN / ES / ZH — 21 routes]
         |
         v
   [Agent API — api.nirium.xyz — 44 endpoints]
-        |-- Auth (JWT / API Key / Sandbox)
-        |-- legalShield middleware
+        |-- Auth (JWT / API Key / Sandbox tiers)
+        |-- legalShield middleware (SCF CoC compliance)
         |-- x402 + MPP payment middleware
-        |-- Rate limiting (institucional: 300rpm)
-        |-- AML + domainLock + obfuscation
+        |-- Sliding-window rate limiting (300 rpm institutional)
+        |-- AML screening + domainLock + obfuscation
         |
         v
-  [Capa de Ejecución Autónoma]
-        |-- Neural Reasoner (decisiones impulsadas por LLM)
-        |-- Swarm (30 agentes, racing mode, intervalos 3–12s)
-        |-- Strategy Router (flash-loan, path-arb, cross-dex, blend-yield, soroswap)
+  [Autonomous Execution Layer]
+        |-- Institutional Execution Nodes (multi-LLM decisions)
+        |-- Execution Cluster (30 nodes, racing mode, 3–12s intervals)
+        |-- Strategy Router (flash-loan, path-arb, cross-dex, blend, soroswap)
         |
         v
-  [Smart Contracts Soroban — Stellar Testnet]
-        |-- NiriumVault (tesorería, flash loans, delegación)
-        |-- ELO Reputation (scoring on-chain)
-        |-- Strategy Marketplace (registro CID)
-        |-- Skill Vault (pay-gate x402)
-        |-- Settlement Hub (escrow sessions MPP)
-        |-- Neural Sentinel (rendimiento de agentes)
+  [Soroban Smart Contracts — Stellar Testnet]
+        |-- NiriumVault      (non-custodial treasury, flash loans, 2-of-3 delegation)
+        |-- Protocol Reputation (on-chain agent scoring)
+        |-- Strategy Marketplace (strategy registry, CID)
+        |-- Skill Vault      (x402 per-request pay-gate)
+        |-- Settlement Hub   (MPP session escrow)
+        |-- Protocol Sentinel (circuit-breaker + agent monitoring)
         |
         v
-  [Supabase] ← agent_logs, auth_keys, webhooks, swarm_agents
-  [IPFS / Pinata] ← audit trail, BlackBox Archive
+  [Supabase] ← protocol_logs, auth_keys, webhooks, fleet_agents, subscriptions
+  [Protocol Archive] ← HMAC-SHA256 signature + immutable record per agent action
 ```
 
-## Características Principales
+---
 
-### API Institucional (44 endpoints)
-Autenticación multi-tier con cuentas sandbox, API key tiers (free/institutional) y JWT para WebSocket. RBAC completo, rate limiting sliding-window, verificaciones AML y domain lock.
+## Core Features
 
-| Acceso | Endpoints |
+### Institutional API (44 endpoints, OpenAPI v2.5.0)
+
+Multi-tier authentication with sandbox accounts, API key tiers (free/institutional), and JWT for WebSocket. Full RBAC, sliding-window rate limiting, AML checks, and domain lock.
+
+| Access Level | Endpoints |
 |---|---|
-| Público (sin key) | health, loop/status, execute-demo, signals/recent, skills |
-| Protegido (API key) | execute, market, tickers, stats, loop control, webhooks, subscriptions, skills/install |
-| WebSocket (JWT) | /ws/signals — stream de señales en tiempo real |
-| Solo Admin | system/health, config/llm |
+| Public (no key) | health, loop/status, execute-demo, signals/recent, skills |
+| Protected (API key) | execute, market, tickers, stats, loop control, webhooks, subscriptions, skills/install |
+| WebSocket (JWT) | `/ws/signals` — real-time signal stream |
+| Admin only | system/health, config/llm |
 
-### Ejecución Autónoma
-Cinco tipos de estrategia ejecutadas on-chain vía Soroban:
-- `flash-loan-arb` — flash loan en invocación única, garantía matemática de solvencia
-- `path-arb` — arbitraje de path payment multi-hop en SDEX
-- `cross-dex-arb` — arbitraje cross-venue (SDEX × Soroswap)
-- `blend-yield` — captura de rendimiento en Blend Protocol
-- `soroswap-swap` — ejecución directa en Soroswap
+Full specification: [API_DOCUMENTATION_OPENAPI.yaml](API_DOCUMENTATION_OPENAPI.yaml)
+
+### Autonomous On-Chain Execution (Soroban)
+
+Five strategy types executed via Soroban smart contracts — all verifiable on Stellar Expert:
+
+- `routing-optimization` — automated path payment discovery for XLM-USDC corridors
+- `liquidity-provisioning` — automated liquidity depth management on Stellar AMMs
+- `lst-stabilization` — algorithmic parity maintenance for afXLM/vXLM tokens
+- `blend-optimization` — non-custodial liquidity allocation on Blend Protocol
+- `atomic-swap` — multi-hop execution on Soroswap with minimum slippage enforcement
 
 ### x402 + MPP + MCP
-Cualquier agente de IA (Claude, GPT, custom) puede pagar por inteligencia premium de Nirium por request con USDC en Stellar — sin configurar cuenta. El servidor MCP expone Nirium como 12 herramientas para Claude Desktop, Cursor y cualquier IDE compatible. 13/13 tests PASS (19 Abril 2026).
+
+Any AI agent (Claude, GPT, custom) can access Nirium's premium intelligence **per-request** by paying USDC on Stellar — no account or subscription needed. Adopted on launch day alongside emerging industry standards:
+
+- x402 integrated April 2, 2026 — same day as the Linux Foundation x402 Foundation launch
+- MPP integrated April 3, 2026 — 16 days after Stripe/Tempo published the spec (March 18, 2026)
+
+The MCP server exposes Nirium as **12 tools** for Claude Desktop, Cursor, and any MCP-compatible IDE. **13/13 integration tests PASS** (April 19, 2026).
 
 ### Audit Trail Engine
-Cada acción de agente: firmada HMAC-SHA256 → registrada en Supabase → CID IPFS vía Pinata → traducida por LLM a resumen legible por humanos. Exportable como JSON cifrado. Listo para compliance sin experiencia en blockchain.
 
-### Market Ticker en Vivo
-El dashboard muestra en tiempo real:
-- **XLM/USDC** — precio con oráculo multi-tier (Reflector → CoinGecko → Stellar Expert)
-- **SDEX SPREAD** — spread real del orderbook XLM/USDC en basis points
-- **BLEND APY** — rendimiento de supply de Blend Protocol (~5.12% fallback)
-- **ETHERFUSE APY** — rendimiento de CETES tokenizados vía Etherfuse (~5.78%)
-- **BASE FEE** — fee base de la red Stellar en tiempo real
+```
+Agent action
+    → HMAC-SHA256 signature (agent key)
+    → Immutable database record
+    → LLM translation to human-readable compliance summary
+    → Encrypted JSON export (ready for due diligence)
+```
 
-### SDKs Publicados
+Designed for regulatory compliance without requiring blockchain expertise from the institutional team.
 
-| SDK | Paquete | Versión |
+### Live Market Ticker (Reference Data)
+
+> *Data shown is public protocol information. It does not constitute investment advice or return projections.*
+
+| Ticker | Source | Description |
 |---|---|---|
-| TypeScript | [nirium (npm)](https://www.npmjs.com/package/nirium) | 0.5.0 |
-| Python | [nirium (PyPI)](https://pypi.org/project/nirium/) | 0.5.0 |
+| **XLM/USDC** | Reflector → CoinGecko → Stellar Expert | Multi-tier oracle price feed |
+| **SDEX SPREAD** | Stellar Horizon orderbook | Live XLM/USDC spread in basis points |
+| **BLEND APY** | Blend Protocol on-chain | Liquidity reference rate (~5.12%) |
+| **ETHERFUSE APY** | Etherfuse testnet | Tokenized CETES reference rate (~5.78%) |
+| **BASE FEE** | Stellar Horizon | Live network base fee |
+
+### Published SDKs (npm + PyPI)
+
+| SDK | Package | Version | Install |
+|---|---|---|---|
+| TypeScript | [nirium (npm)](https://www.npmjs.com/package/nirium) | 0.5.0 | `npm install nirium` |
+| Python | [nirium (PyPI)](https://pypi.org/project/nirium/) | 0.5.0 | `pip install nirium` |
 
 ```typescript
 import { Agent } from 'nirium';
@@ -123,138 +164,252 @@ from nirium import Agent
 agent = Agent(api_url="https://api.nirium.xyz", api_key="sk_inst_...")
 
 market = await agent.get_market()
-result = await agent.execute("path-arb", "XLM-USDC", {"amount": 5000}, stellar_account="G...")
+result = await agent.execute("routing-optimization", "XLM-USDC", {"amount": 5000}, stellar_account="G...")
+async for signal in agent.listen():
+    print(signal)
 ```
 
-## Contratos Desplegados (Stellar Testnet)
+See [SDKs.md](SDKs.md) for full SDK documentation.
 
-| Contrato | Contract ID |
+---
+
+## Deployed Contracts (Stellar Testnet)
+
+| Contract | Contract ID |
 |---|---|
-| **NiriumVault** (primario, Vault 2000 activo) | `CDHDX63NUYSFCIPJTTS46N5PYLTI7J5WIAIOP7TZSPBNUTLI32AY7GA2` |
-| ELO Reputation | `CC6Z3WJWRKVEAXEKIQ5S3LFEMKRF4L2FTN5YZDQU27MQRQAWA5QBJWF2` |
+| **NiriumVault** (primary — Vault 2000 active) | `CDHDX63NUYSFCIPJTTS46N5PYLTI7J5WIAIOP7TZSPBNUTLI32AY7GA2` |
+| Protocol Reputation | `CC6Z3WJWRKVEAXEKIQ5S3LFEMKRF4L2FTN5YZDQU27MQRQAWA5QBJWF2` |
 | Strategy Marketplace | `CB6Q3LKBJ7CAAZY4MK7EG5R6FDDTJHB52ZEENI6BQLBJNFKBQRIAUABC` |
-| Neural Sentinel | `CCP5OY3TTDVIREQYGOUZUXS2MZJO3LLJD6Z22Z3VROWFCPJAON22WPY2` |
+| Protocol Sentinel | `CCP5OY3TTDVIREQYGOUZUXS2MZJO3LLJD6Z22Z3VROWFCPJAON22WPY2` |
 | Settlement Hub | `CANZP2OJUS2Y5VXE4YHRR75LE2WKE7QTJOCCWENR7X65DWE6QEJZV6KS` |
 | Skill Vault | `CB4JM3PP7GWKJUAYIZ7ZULWFTFJ57FTTUFZTFIDF4JCAPF664OJCXIEI` |
 
-Todos verificables en [Stellar Expert (Testnet)](https://stellar.expert/explorer/testnet).
+All verifiable at [Stellar Expert (Testnet)](https://stellar.expert/explorer/testnet).
 
-## Proyectos Paralelos
+---
+
+## Side Projects
 
 ### x402-VPN — Institutional Mesh Proxy
-Un proxy público que expone cualquier API legacy detrás de un pay-gate x402 sobre Stellar. Caso de uso principal: un banco, fintech o proveedor de datos monetiza sus APIs por request en USDC sin reescribir su backend. También funciona como VPN agéntica — los agentes pagan por acceso a capacidad de red privada.
+A public proxy that exposes any legacy API behind an x402 pay-gate on Stellar. Primary use case: a bank, fintech, or data provider monetizes its APIs per-request in USDC without rewriting its backend. Also functions as an agentic VPN — agents pay for access to private network capacity.
 
-Live en: [x402-vpn.vercel.app](https://x402-vpn.vercel.app)
+Live: [x402-vpn.vercel.app](https://x402-vpn.vercel.app)
 
 ### /build — Startup Ideas Hub
-Dashboard interactivo con ideas de startups construibles con la API y SDKs de Nirium, toolkit de developer, endpoints de referencia y ejemplos de código en TypeScript/Python/cURL/MCP.
+Interactive dashboard with 12 production-ready startup ideas buildable on the Nirium API and SDKs. Includes a developer toolkit, reference endpoints, and code examples in TypeScript, Python, cURL, and MCP.
 
-Live en: [nirium.xyz/build](https://nirium.xyz/build)
+Live: [nirium.xyz/build](https://nirium.xyz/build)
 
-## Inicio Rápido
+---
 
-### Requisitos
+## Quick Start
+
+### Requirements
 - Node.js 20+, pnpm 9+
-- Wallet Freighter (modo testnet) para interacciones en el dashboard
+- [Freighter Wallet](https://freighter.app/) in testnet mode for dashboard interactions
 
-### Correr en local
+### Run Locally
 ```bash
 pnpm install
-pnpm dev          # inicia web (3000) + agent API (3001) en paralelo
+pnpm dev          # starts web (port 3000) + agent API (port 3001) in parallel
 ```
 
 ### Deploy
 ```bash
-pnpm ship         # → vercel --prod (web frontend)
-# Agent API se despliega en Railway vía git push a main (Railway CI)
+pnpm ship         # → vercel --prod (frontend)
+# Agent API deploys to Railway via git push to main
 ```
 
 ### SDK Quick Start
 ```bash
-npm install nirium       # TypeScript
-pip install nirium       # Python
+npm install nirium       # TypeScript SDK
+pip install nirium       # Python SDK
 ```
 
-Ver [SDKs.md](SDKs.md) para documentación completa del SDK e [InstitutionalPartnerKey.md](InstitutionalPartnerKey.md) para referencia completa de la API.
+---
 
-## Estructura del Proyecto
+## Project Structure
 
 ```
-nirium-core-private/
-├── apps/web/               → Dashboard Next.js 15 (nirium.xyz) — 21 rutas, i18n (en/es/zh)
-├── packages/agent/         → Servidor Express API (api.nirium.xyz) — 44 endpoints, 10 middlewares
-├── packages/sdk/           → TypeScript SDK v0.5.0 (npm: nirium)
-├── packages/sdk-python/    → Python SDK v0.5.0 (pypi: nirium)
-├── packages/contracts/     → Smart contracts Soroban (Rust) — 6 contratos, fuzz tests
-├── packages/cli/           → CLI tool v1.0.0
-├── packages/mcp/           → Servidor MCP v0.4.0 (Claude Desktop / Cursor) — 12 tools
-├── packages/memory-mcp/    → Memory MCP service
-├── packages/desktop/       → Tauri desktop wrapper
-├── scripts/                → Deploy, bots x402/MPP, postinstall, export público
-├── compliance/             → Eligibilidad SCF, social media, video demo
-└── .github/workflows/      → CI, release, security-gate, desktop release
+Nirium/                        (public repo)
+├── apps/web/                  → Next.js 15 Dashboard (nirium.xyz) — 21 routes, i18n (EN/ES/ZH)
+├── packages/sdk/              → TypeScript SDK v0.5.0 (npm: nirium)
+├── packages/sdk-python/       → Python SDK v0.5.0 (PyPI: nirium)
+├── packages/contracts/        → Soroban smart contracts (Rust) — 6 contracts, 5 fuzz targets
+├── nirium-soroban-contracts/  → Additional Soroban contracts
+├── .github/workflows/         → CI, release, security-gate, desktop release
+│
+├── packages/agent/            → [private] Express API server — 44 endpoints, execution logic
+├── packages/mcp/              → [public] MCP Server v0.4.0 — 12 tools
+├── packages/cli/              → [public] CLI tool v1.0.0
+├── packages/desktop/          → [private] Tauri desktop wrapper
 ```
 
-## Seguridad
+---
 
-- **JARGUS Audit v2.0**: 78/78 vectores PASS, 0 critical, 0 high (Abril 2026)
-- Auditoría formal por terceros planificada (capa Soroban: elegible SCF Audit Bank, 95% subsidio)
-- Ver [SECURITY.md](SECURITY.md) para política de divulgación de vulnerabilidades
-- Ver [SECURITY_AUDIT_V2.md](SECURITY_AUDIT_V2.md) para el reporte completo de 78 vectores
+## SCF 7.0 Build Award — Institutional Roadmap
+
+Nirium is optimized for the **SCF 7.0 Build Award** and the **Kickstart** program. Our milestones are designed to transition the protocol from a functional Testnet MVP to a verified, audited Mainnet deployment.
+
+Detailed Roadmap: [docs/scf-roadmap.md](docs/scf-roadmap.md)
+
+### Milestone Summary
+- **M1 (10%):** Compliance Framework & Protocol Hardening — 🚀 Start Month 1
+- **M2 (20%):** Cluster Orchestration & Pilot Integration — 🚀 Start Month 2
+- **M3 (30%):** Formal Security Audit & Risk Management — 🚀 Start Month 4
+- **M4 (40%):** Verified Mainnet Launch & LatAm Scaling — 🎯 Month 6
+
+### Regional Impact (LatAm)
+We collaborate with local **Ambassador Chapters** to ensure our MXN→USDC treasury solutions meet the highest standards of regional compliance and technical efficiency.
+
+---
+
+## Security
+
+- **JARGUS Audit v2.0**: 78/78 vectors PASS — 0 critical, 0 high (April 2026)
+- Methodology: static analysis (`cargo clippy`, grep), dynamic analysis, JARGUS full-spectrum pentesting, `cargo audit` + `pnpm audit`, fuzz testing (5 cargo-fuzz targets), manual code review
+- Formal third-party audit planned for Month 3 (JV with CNBV-regulated operator — eligible for SCF Audit Bank, 95% subsidy available)
+- See [SECURITY.md](SECURITY.md) for responsible vulnerability disclosure policy
+- See [SECURITY_AUDIT_V2.md](SECURITY_AUDIT_V2.md) for the full 78-vector JARGUS report
+
+---
+
+## SCF 7.0 Compliance — Stellar Code of Conduct (April 26, 2026)
+
+Nirium operates in full alignment with the Stellar Community Fund v7.0 framework and the [Stellar Code of Conduct](https://stellar.org/foundation/code-of-conduct) as of April 26, 2026.
+
+### Alignment with SCF Official Rules (SCF 7.0)
+
+| SCF Requirement | Nirium Status |
+|---|---|
+| Stellar must be **core and valuable** to the project, not auxiliary | ✅ 6 Soroban smart contracts, SDEX, Blend, Soroswap — Stellar is the execution layer |
+| Budget covers **development costs only**, integrated with Stellar | ✅ SCF budget: engineering, audit, testnet infrastructure only |
+| No speculation, wash trading, or insider trading with SCF funds | ✅ All contracts on Testnet; SCF funds allocated to development, not trading |
+| No investment advice or yield promises | ✅ Prominent disclaimer; APY displayed as protocol reference data only |
+| No marketing promising interest, dividends, or appreciation | ✅ Product language focuses on workflow automation and optimization, not guaranteed returns |
+| Milestone structure 10% / 20% / 30% / 40% (SCF 7.0) | ✅ M1–M4 roadmap structured accordingly |
+| Open source — contracts and SDKs publicly available | ✅ Soroban contracts + TypeScript SDK + Python SDK in public repo |
+| Team available for bootcamp and investor demos | ✅ Founder available; CNBV-regulated partner for go-to-market |
+
+### SCF Build Award Milestone Structure
+
+| Tranche | Milestone | % | Confirmed Deliverables |
+|---|---|---|---|
+| #1 | Compliance & Hardening | **10%** | Audit Trails (HMAC-SHA256), CNBV-Ready Reporting, Sentinel v1 |
+| #2 | Cluster Orchestration | **20%** | Multi-protocol rebalancing (Blend/Soroswap), Pilot Integrations, SDK v1.0 |
+| #3 | Security & Audit | **30%** | Formal Third-Party Audit (SCF Audit Bank), On-chain Circuit Breakers |
+| #4 | Mainnet Launch | **40%** | Mainnet Deployment, Institutional Corridor Activation, LatAm Scaling |
+
+> Full roadmap available in [docs/scf-roadmap.md](docs/scf-roadmap.md). Current Testnet MVP serves as the foundation for these growth milestones.
+
+### Stellar Code of Conduct Principles (April 2026)
+
+- **Transparency**: Every protocol action is auditable on-chain via Stellar Expert (Testnet)
+- **Integrity**: No front-running or predatory extraction; the system enforces best execution
+- **Safety**: Non-custodial by design; the user is the sole custodian of their keys
+- **Professionalism**: All community interactions follow SDF ethical standards
+- **Open Source**: Soroban contracts and SDKs under open license; CI/CD public in `.github/workflows`
+
+To report violations: [community@stellar.org](mailto:community@stellar.org)
+
+### SCF Kickstart Program (Operated by Ambassador Chapters)
+
+Nirium has received Kickstart funding ($5,000 USD), with full KYC complete (Airtable + Persona + W-8BEN). This funding supported the technical validation phase prior to the SCF Build Award application.
+
+> Kickstart (formerly Instaward) is SCF's early-stage funding program operated by regional Stellar Ambassador chapters. It funds prototyping and local validation — up to $15,000 per project. More info: [communityfund.stellar.org](https://communityfund.stellar.org)
+
+---
 
 ## Roadmap
 
-| Fase | Estado |
+| Milestone | Status |
 |---|---|
-| Infraestructura core + x402/MPP en Testnet | ✅ Completo |
-| API Institucional (44 endpoints) + SDKs v0.5.0 | ✅ Completo |
-| JARGUS Security Audit v2.0 (78/78 PASS) | ✅ Completo |
+| Core infrastructure + x402/MPP on Testnet | ✅ Complete |
+| Institutional API (44 endpoints) + SDKs v0.5.0 | ✅ Complete |
+| JARGUS Security Audit v2.0 (78/78 PASS) | ✅ Complete |
 | x402-VPN — Institutional Mesh Proxy | ✅ Live |
-| /build — Startup Ideas Hub | ✅ Live |
-| MCP Server v0.4.0 — 12 tools, 13/13 tests PASS | ✅ Completo |
-| Integración Etherfuse CETES (testnet + sandbox SPEI) | ✅ Completo |
-| Alianza Institutional Partner firmada (operador regulado CNBV, 80/20) | ✅ Firmado 20 Abril 2026 |
-| Stellar House CDMX — presentación institucional | ✅ Completado 20–23 Abril 2026 |
-| Etherfuse partnership — grant potencial $150K + integración técnica | 🔄 En negociación |
-| SCF Round 43 Build Award (solicitud) | ⏳ Deadline 26 Abril 2026 |
-| Sprint M1 — 6 PoCs (90 días) | 🔄 En curso |
-| Auditoría formal de seguridad por terceros | Planificado (Mes 3, JV Institutional Partner) |
-| Despliegue Mainnet | Post-auditoría |
-| Meridian 2026 Lisboa (Octubre) | Objetivo |
+| /build — Startup Ideas Hub (12 blueprints) | ✅ Live |
+| MCP Server v0.4.0 — 12 tools (13/13 tests PASS) | ✅ Complete |
+| Etherfuse CETES integration (testnet + SPEI sandbox) | ✅ Complete |
+| Institutional JV signed (CNBV-regulated operator) | ✅ Signed April 20, 2026 |
+| Stellar House CDMX 2026 — institutional presentation to SDF | ✅ Completed April 20–23, 2026 |
+| SCF Round 43 Build Award — application submitted | 🔄 In Panel Review (post-deadline Apr 26, 2026) |
+| Etherfuse partnership — $150K grant + technical integration | 🔄 Active negotiation |
+| Sprint M1 — 6 institutional PoCs (90 days) | 🔄 In progress |
+| Formal third-party security audit | Planned — Month 3 (SCF Audit Bank eligible) |
+| Mainnet Deployment | Post formal audit |
+| Meridian 2026 — Lisbon, October | Target |
+| SCF Follow-on Award (up to $300K lifetime) | Post-mainnet launch |
 
-## Credenciales Externas
+---
 
-- **3er Lugar** — Fintech World Cup México 2026 (Sui Loop, proyecto previo del fundador migrado a Nirium sobre Stellar)
-- **Stellar Scale / Kickstart** — 83/100 Bootcamp Impact, graduado activo con asesoramiento continuo de SDF
-- **SCF Instaward $5,000** — Aprobado, KYC completo (Airtable + Persona + W-8BEN)
-- **NBO Recibida** — Institutional Partner ($50,000 USD, 24 Marzo 2026); MOA firmado 20 Abril 2026
-- **Stellar House CDMX 2026** — Presentación ante SDF executives, fintechs LatAm, VCs
-- **Etherfuse** — Partnership activo, grant potencial $150K identificado, call técnica programada
+## External Credentials
 
-## Documentación
+- **3rd Place — Fintech World Cup Mexico 2026** — Sui Loop (founder's prior project, architecture migrated to Nirium on Stellar)
+- **Stellar Scale / Kickstart** — 83/100 Bootcamp Impact; active graduate with ongoing SDF mentorship
+- **SCF Kickstart $5,000** — Approved; full KYC complete (Airtable + Persona + W-8BEN); funds received
+- **Institutional NBO $50,000 USD** — JV with CNBV-regulated operator; MOA signed April 20, 2026
+- **Stellar House CDMX 2026** — Presented to SDF executives, LatAm fintechs, and VCs (invite-only, 3rd edition)
+- **Etherfuse** — Active technical partnership; $150K grant opportunity identified; technical call scheduled
 
-| Documento | Descripción |
+---
+
+## Documentation
+
+| Document | Description |
 |---|---|
-| [SDKs.md](SDKs.md) | Documentación completa de SDKs TS + Python |
-| [InstitutionalPartnerKey.md](InstitutionalPartnerKey.md) | Due diligence: 44 endpoints con curl |
-| [MCP_INTEGRATION_GUIDE.md](MCP_INTEGRATION_GUIDE.md) | Guía MCP v0.4.0 — 12 tools |
-| [SECURITY_AUDIT_V2.md](SECURITY_AUDIT_V2.md) | Reporte JARGUS 78 vectores |
-| [NIRIUM_TECHNICAL_PAPER.md](NIRIUM_TECHNICAL_PAPER.md) | Whitepaper técnico v2.0 |
-| [INSTITUTIONAL_INTEGRATION_GUIDE_EN.md](INSTITUTIONAL_INTEGRATION_GUIDE_EN.md) | Guía institucional EN |
-| [API_DOCUMENTATION_OPENAPI.yaml](API_DOCUMENTATION_OPENAPI.yaml) | OpenAPI v2.5.0 |
+| [SDKs.md](SDKs.md) | Full TypeScript + Python SDK documentation |
+| [API_DOCUMENTATION_OPENAPI.yaml](API_DOCUMENTATION_OPENAPI.yaml) | OpenAPI v2.5.0 — complete 44-endpoint specification |
+| [MCP_INTEGRATION_GUIDE.md](MCP_INTEGRATION_GUIDE.md) | MCP v0.4.0 — 12 tools for Claude Desktop / Cursor |
+| [SECURITY_AUDIT_V2.md](SECURITY_AUDIT_V2.md) | JARGUS v2.0 report — 78/78 vectors PASS |
+| [NIRIUM_TECHNICAL_PAPER.md](NIRIUM_TECHNICAL_PAPER.md) | Technical whitepaper v2.0 |
+| [SECURITY.md](SECURITY.md) | Responsible vulnerability disclosure policy |
+| [CONTRIBUTING.md](CONTRIBUTING.md) | Open source contribution guide |
 
-## Contacto
+---
 
-- **Website**: [nirium.xyz](https://nirium.xyz)
-- **API**: [api.nirium.xyz](https://api.nirium.xyz)
-- **X/Twitter**: [@NiriumXYZ](https://x.com/Niriumstellar)
-- **Build Hub**: [nirium.xyz/build](https://nirium.xyz/build)
-- **x402-VPN**: [x402-vpn.vercel.app](https://x402-vpn.vercel.app)
-- **Security**: xvaiosx7@gmail.com
+## Developer Quick Start
+
+```bash
+# Testnet — no real funds required
+curl https://api.nirium.xyz/api/health
+
+# Sandbox API Key (free)
+curl https://api.nirium.xyz/api/sandbox/status \
+  -H "x-api-key: YOUR_SANDBOX_KEY"
+
+# WebSocket — real-time signals
+wscat -c "wss://api.nirium.xyz/ws/signals" \
+  -H "Authorization: Bearer YOUR_JWT"
+```
+
+---
+
+## Contact
+
+| Channel | Link |
+|---|---|
+| **Website** | [nirium.xyz](https://nirium.xyz) |
+| **API** | [api.nirium.xyz](https://api.nirium.xyz) |
+| **Build Hub** | [nirium.xyz/build](https://nirium.xyz/build) |
+| **x402-VPN** | [x402-vpn.vercel.app](https://x402-vpn.vercel.app) |
+| **X / Twitter** | [@NiriumXYZ](https://x.com/Niriumstellar) |
+| **SCF / Community** | [communityfund.stellar.org](https://communityfund.stellar.org) |
+| **Security** | xvaiosx7@gmail.com |
+
+---
 
 ## Legal
 
-[Términos de Servicio](https://nirium.xyz/terms) · [Divulgación de Riesgos](https://nirium.xyz/risk-disclosure) · [Política de Privacidad](https://nirium.xyz/privacy) · [Disclaimers](https://nirium.xyz/disclaimers)
+Nirium Protocol employs a **Dual-Licensing Strategy** to balance protocol protection with ecosystem growth:
+
+- **Core Protocol & Dashboard:** Licensed under the [Business Source License 1.1 (BSL)](LICENSE). Source is available for audit and non-commercial use. Commercial use is restricted until **April 2, 2028**.
+- **SDKs & Integration Tools:** Licensed under the [Apache License 2.0](https://www.apache.org/licenses/LICENSE-2.0). Permissive and integration-friendly for all fintechs and developers.
+
+For full details, see [LICENSING.md](LICENSING.md).
+
+This project operates under the [Stellar Community Fund v7.0](https://stellar.gitbook.io/scf-handbook) framework and the [Stellar Code of Conduct](https://stellar.org/foundation/code-of-conduct) (updated April 26, 2026).
 
 ---
-*Nirium Protocol — software experimental. No es asesoría financiera. Solo testnet. Actualizado 23 Abril 2026.*
+
+*Nirium Protocol — experimental software. Not financial advice. Stellar Testnet only. Updated April 26, 2026.*

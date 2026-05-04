@@ -3,7 +3,6 @@ import { Inter, Inconsolata } from "next/font/google";
 import { Toaster } from "sonner";
 import "./globals.css";
 import { Providers } from "./providers";
-import Footer from "@/components/layout/Footer";
 import { Analytics } from "@vercel/analytics/next";
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
@@ -112,7 +111,6 @@ export default function RootLayout({
                     <div className="fixed inset-0 z-[-3] bg-[radial-gradient(circle_at_50%_50%,rgba(138,43,226,0.05),transparent_50%)] pointer-events-none"></div>
 
                     {children}
-                    <Footer />
                     <ChatBot />
                     <Toaster position="bottom-right" theme="dark" />
                 </Providers>

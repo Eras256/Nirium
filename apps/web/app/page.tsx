@@ -1,916 +1,1033 @@
-/** Nirium Protocol - Final Institutional Build (April 2026) **/
+/** Nirium Protocol — Autonomous Treasury for LatAm Fintechs (April 2026) **/
 'use client';
 
-import { useFreighter } from "@/hooks/useFreighter";
 import Link from "next/link";
-import { Suspense, useState, useEffect } from "react";
-import { toast } from "sonner";
-import { useRouter } from "next/navigation";
-import {
-    Zap, Shield, Cpu, Layers, Terminal as TerminalIcon,
-    ArrowRight, Bot, Activity, Landmark, Database,
-    Download, ChevronRight, Workflow, TrendingUp, Lock,
-    Globe, Code2, BarChart3, Repeat2, Trophy, ExternalLink,
-    Brain, Puzzle, LineChart, User, Smartphone,
-    KeyRound, Send, Webhook, Package, Github, Coins, Radio,
-    Rocket, Wallet, Gift, Wand2, ScrollText, PlayCircle, Clock,
-    AlertTriangle, Check, X as XIcon, Timer, DollarSign, ShieldCheck,
-    Apple
-} from "lucide-react";
+import { useState, Suspense } from "react";
+import dynamic from "next/dynamic";
 import { motion } from "framer-motion";
-import dynamic from 'next/dynamic';
-
-const NeuralCanvas = dynamic(() => import('@/components/3d/NeuralCanvas').then((mod) => mod.NeuralCanvas), { ssr: false });
+import {
+    ArrowRight, Bot, FileCheck,
+    Check, ExternalLink, Sparkles, TrendingUp, Lock,
+    Building2, Workflow, ChevronRight, Zap, Layers
+} from "lucide-react";
 import Navbar from "@/components/layout/Navbar";
-import { SectionBrandLogo } from "@/components/ui/SectionBrandLogo";
+import Footer from "@/components/layout/Footer";
+import OpsConsole from "@/components/layout/OpsConsole";
 import { Button } from "@/components/ui/Button";
 import { useLanguage } from "@/context/LanguageContext";
-import { supabase } from "@/lib/supabase";
-import ProtocolRevenue from "@/components/dashboard/ProtocolRevenue";
-import OpsConsole from "@/components/layout/OpsConsole";
 
-const getAgentData = (t: any) => [
-    { name: 'Titan', role: t.home.institutional_use_cases.agent_roles.coordinator, color: '#FFD700' },
-    { name: 'Eliza', role: t.home.institutional_use_cases.agent_roles.sentiment, color: '#2DEBE8' },
-    { name: 'Maux', role: t.home.institutional_use_cases.agent_roles.liquidity, color: '#A78BFA' },
-    { name: 'Chronos', role: t.home.institutional_use_cases.agent_roles.arbitrage, color: '#F97316' },
-    { name: 'Astra', role: t.home.institutional_use_cases.agent_roles.explorer, color: '#34D399' },
-    { name: 'Void', role: t.home.institutional_use_cases.agent_roles.strategy, color: '#6B7280' },
-    { name: 'Nexus', role: t.home.institutional_use_cases.agent_roles.signals, color: '#EC4899' },
-    { name: 'Gaia', role: t.home.institutional_use_cases.agent_roles.optimizer, color: '#10B981' },
-    { name: 'Orion', role: t.home.institutional_use_cases.agent_roles.hunter, color: '#3B82F6' },
-    { name: 'Sentinel', role: t.home.institutional_use_cases.agent_roles.auditor, color: '#EF4444' },
-    { name: 'Matrix', role: t.home.institutional_use_cases.agent_roles.analyst, color: '#8B5CF6' },
-    { name: 'Atlas', role: t.home.institutional_use_cases.agent_roles.support, color: '#F59E0B' },
-    { name: 'Nova', role: t.home.institutional_use_cases.agent_roles.listings, color: '#60A5FA' },
-    { name: 'Cyber', role: t.home.institutional_use_cases.agent_roles.mcp, color: '#2DEBE8' },
-    { name: 'Nirium-1', role: t.home.institutional_use_cases.agent_roles.maintenance, color: '#FCD34D' },
-];
-
-const getContractData = (t: any) => [
-    { name: t.home.institutional_use_cases.contract_display.vault, addr: 'CAU2...EL4', full: 'CAU2XBJTQUBTMPAUFRX7GMZ337I5WLBI4GYPWHZEVXTMJ66D3CP6DEL4', role_key: 'vault', color: '#00F3FF' },
-    { name: t.home.institutional_use_cases.contract_display.elo, addr: 'CC6Z...JWF2', full: 'CC6Z3WJWRKVEAXEKIQ5S3LFEMKRF4L2FTN5YZDQU27MQRQAWA5QBJWF2', role_key: 'elo', color: '#A78BFA' },
-    { name: t.home.institutional_use_cases.contract_display.marketplace, addr: 'CB6Q...UABC', full: 'CB6Q3LKBJ7CAAZY4MK7EG5R6FDDTJHB52ZEENI6BQLBJNFKBQRIAUABC', role_key: 'marketplace', color: '#34D399' },
-    { name: t.home.institutional_use_cases.contract_display.sentinel, addr: 'CCP5...WPY2', full: 'CCP5OY3TTDVIREQYGOUZUXS2MZJO3LLJD6Z22Z3VROWFCPJAON22WPY2', role_key: 'sentinel', color: '#EF4444' },
-    { name: t.home.institutional_use_cases.contract_display.settlement, addr: 'CANZ...Z6KS', full: 'CANZP2OJUS2Y5VXE4YHRR75LE2WKE7QTJOCCWENR7X65DWE6QEJZV6KS', role_key: 'settlement', color: '#F59E0B' },
-];
-
-
-
+const TreasuryCanvas = dynamic(
+    () => import('@/components/3d/TreasuryCanvas').then((m) => m.TreasuryCanvas),
+    { ssr: false }
+);
 
 export default function Home() {
-    const { t } = useLanguage();
-    const router = useRouter();
-    const { address: accountStr, isConnected } = useFreighter();
-    const [agentLog, setAgentLog] = useState<string[]>([]);
-    const [ticker, setTicker] = useState(0);
+    const { language } = useLanguage();
+    const lang = (en: string, es: string, zh: string) =>
+        language === 'zh' ? zh : language === 'es' ? es : en;
+    const [copied, setCopied] = useState(false);
 
-    const handleLaunch = () => {
-        if (!isConnected) {
-            toast.error(t.nav.auth_matrix, { description: t.nav.stellar_connected });
-            return;
-        }
-        router.push("/dashboard");
+    const codeSnippet = `import { NiriumAgent } from '@nirium/sdk';
+
+const agent = new NiriumAgent({ apiKey: process.env.NIRIUM_KEY });
+
+await agent.start({
+    base: 'USDC',
+    targetAssets: ['CETES'],
+    strategy: 'spread_auto_rebalance',
+    threshold: 1.5, // minimum % spread to trigger swap
+});`;
+
+    const handleCopy = () => {
+        navigator.clipboard.writeText(codeSnippet);
+        setCopied(true);
+        setTimeout(() => setCopied(false), 2000);
     };
 
-    useEffect(() => {
-        const FALLBACK_LOGS = [
-            "[Matrix] Neural Matrix Uplink established. Swarm broadcasting on-chain...",
-            "[Titan] Vault architecture synchronized — 3 asset classes active",
-            "[Astra] DeFindex USDC route analysis complete — evaluating testnet paths",
-        ];
-
-        const fetchLogs = async () => {
-            try {
-                const res = await fetch('/api/logs');
-                if (!res.ok) return;
-                const data: any[] = await res.json();
-
-                if (data && data.length > 0) {
-                    setAgentLog(data.slice(0, 8).map((l: any) => `[${l.agent_id}] ${l.message}`).reverse());
-                }
-            } catch (e) {
-                console.warn("[Neural Feed] fetch error:", e);
-            }
-        };
-
-        setAgentLog(FALLBACK_LOGS);
-        fetchLogs();
-        const pollInterval = setInterval(fetchLogs, 5000);
-        return () => clearInterval(pollInterval);
-    }, []);
-
-    // Animate swarm count ticker
-    useEffect(() => {
-        const interval = setInterval(() => setTicker(t => t + Math.floor(Math.random() * 3 + 1)), 4000);
-        return () => clearInterval(interval);
-    }, []);
-
-    const fadeUp = (delay = 0) => ({
-        initial: { opacity: 0, y: 30 },
-        whileInView: { opacity: 1, y: 0 },
-        viewport: { once: true },
-        transition: { duration: 0.6, delay },
-    });
-
     return (
-        <main className="min-h-screen bg-[#050505] text-white selection:bg-stellar-teal/30 overflow-hidden relative">
+        <main className="min-h-screen bg-black text-white antialiased">
             <Navbar />
 
-            {/* Background Gradients */}
-            <div className="fixed inset-0 z-0 pointer-events-none">
-                <div className="absolute top-0 left-0 w-full h-[500px] bg-gradient-to-b from-stellar-yellow/10 to-transparent opacity-50" />
-                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full h-full bg-[radial-gradient(circle_at_50%_50%,rgba(45,235,232,0.03),transparent_70%)]" />
-            </div>
+            {/* HERO */}
+            <section className="relative pt-28 pb-16 sm:pt-36 sm:pb-20 overflow-hidden">
+                <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_rgba(45,235,232,0.08),transparent_60%)]" />
 
-            {/* ── HERO ─────────────────────────────────────────────────── */}
-            <section className="relative z-10 container mx-auto px-4 pt-28 sm:pt-36 pb-20 sm:pb-32">
-                <div className="grid lg:grid-cols-2 gap-12 lg:gap-16 items-center">
-                    <motion.div
-                        initial={{ opacity: 0, x: -50 }}
-                        animate={{ opacity: 1, x: 0 }}
-                        transition={{ duration: 0.8 }}
-                        className="space-y-6 sm:space-y-8 flex flex-col items-center md:items-start"
-                    >
-                        <div className="flex flex-wrap justify-center md:justify-start gap-2 sm:gap-3 mb-2">
-                            <div className="inline-flex items-center gap-2 px-3 py-1 bg-white/5 border border-white/10 rounded-full text-[9px] sm:text-[10px] font-mono text-stellar-teal">
-                                <span className="relative flex h-2 w-2">
-                                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-stellar-teal opacity-75"></span>
-                                    <span className="relative inline-flex rounded-full h-2 w-2 bg-stellar-teal"></span>
-                                </span>
-                                v0.5.0 // {t.home.institutional_use_cases.extra.mpp_enabled}
-                            </div>
-                        </div>
- 
-                        <div className="flex flex-col md:flex-row items-center md:items-start gap-8 sm:gap-12 w-full">
-                            <SectionBrandLogo className="mb-0 !opacity-100 shrink-0" size="w-40 xs:w-48 sm:w-56 md:w-64" />
-                            <div className="flex-1 w-full">
-                                <h1 className="text-4xl xs:text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-black tracking-tighter leading-[0.8] lg:leading-[0.75] uppercase italic text-center md:text-left">
-                                    {t.home.hero_title_1} <br />
-                                    <span className="text-transparent bg-clip-text bg-gradient-to-r from-stellar-teal to-stellar-yellow">{t.home.hero_title_2}</span>
-                                </h1>
-                            </div>
-                        </div>
+                <div className="relative max-w-7xl mx-auto px-6">
+                    <div className="flex flex-col lg:flex-row items-center gap-8 lg:gap-0">
 
-                        <p className="text-zinc-400 text-base sm:text-lg md:text-xl max-w-xl leading-relaxed text-center md:text-left">
-                            {t.home.hero_subtitle}
-                        </p>
-
-                        {/* Disclaimer */}
-                        {t.home.hero_disclaimer && (
-                            <p className="text-[10px] sm:text-xs text-zinc-600 font-mono max-w-xl leading-relaxed text-center md:text-left border-l-2 border-zinc-700 pl-3">
-                                {t.home.hero_disclaimer}
-                            </p>
-                        )}
-
-                        {/* Live swarm counter pill */}
-                        <div className="flex flex-wrap justify-center md:justify-start gap-2 sm:gap-3">
-                            <StatPill label={t.home.stat_agents} value="1.4%" color="teal" />
-                            <StatPill label={t.home.stat_contracts} value="5s" color="yellow" />
-                            <StatPill label={t.home.stat_throughput} value="✓" color="purple" />
-                        </div>
-
-                        <div className="flex flex-wrap justify-center md:justify-start gap-3 sm:gap-4 pt-2">
-                            <Link href="/dashboard" className="w-full sm:w-auto">
-                                <Button size="hero" className="w-full sm:w-auto bg-stellar-yellow text-black hover:bg-stellar-yellow/90 font-black italic tracking-tight rounded-full px-8">
-                                    {t.home.launch_dashboard} <ArrowRight className="ml-2 w-5 h-5" />
-                                </Button>
-                            </Link>
-                            <Link href="/docs" className="w-full sm:w-auto">
-                                <Button size="hero" variant="outline" className="w-full sm:w-auto border-white/10 hover:border-white/20 text-white font-bold rounded-full px-8">
-                                    {t.home.read_protocol}
-                                </Button>
-                            </Link>
-                        </div>
-                    </motion.div>
-
-                    <div className="relative mt-12 lg:mt-0 lg:h-[600px]">
-                        {/* Neural Orb (Desktop only or static on mobile) */}
-                        <div className="hidden lg:block absolute inset-0">
-                            <Suspense fallback={<div className="w-full h-full flex items-center justify-center text-stellar-teal font-mono animate-pulse">{t.home.institutional_use_cases.extra.connecting_neural}</div>}>
-                                <NeuralCanvas />
-                            </Suspense>
-                        </div>
-
-                        {/* Responsive Duo (Neural Feed + Protocol Revenue) */}
-                        <div className="relative lg:absolute lg:-bottom-5 lg:left-4 xl:left-12 flex flex-col xl:flex-row items-center xl:items-end gap-6 lg:gap-8 z-20 pointer-events-auto px-4 lg:px-0">
-                            {/* 1. OpsConsole Terminal Style (Neural Feed) */}
+                        {/* ── LEFT: text column ── */}
+                        <div className="flex-1 flex flex-col items-center lg:items-start text-center lg:text-left lg:pr-12 pt-8 lg:pt-16">
                             <motion.div
-                                initial={{ opacity: 0, y: 20 }}
+                                initial={{ opacity: 0, y: 12 }}
                                 animate={{ opacity: 1, y: 0 }}
-                                transition={{ delay: 0.8, duration: 0.8 }}
-                                className="w-full lg:w-[300px] max-w-[400px] shadow-[0_20px_50px_rgba(0,0,0,0.5)]"
+                                transition={{ duration: 0.5 }}
+                                className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-stellar-teal/20 bg-stellar-teal/5 text-stellar-teal text-[10px] font-black uppercase tracking-widest mb-6"
                             >
-                                <OpsConsole 
-                                    isExpanded={false} 
-                                    onToggleExpand={() => {}} 
-                                    walletAddress={accountStr || undefined}
-                                    heightClass="h-[280px]"
+                                <Sparkles className="w-3 h-3" />
+                                Powered by Etherfuse · Stellar Testnet · Mainnet Q3 2026
+                            </motion.div>
+
+                            <motion.h1
+                                initial={{ opacity: 0, y: 12 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                transition={{ duration: 0.6, delay: 0.05 }}
+                                className="text-4xl sm:text-5xl lg:text-6xl xl:text-7xl font-black leading-[1.05] tracking-tight"
+                            >
+                                {language === 'zh' ? (
+                                    <>
+                                        您的 USDC 闲置无收益。
+                                        <br />
+                                        <span className="bg-gradient-to-r from-stellar-teal to-stellar-yellow bg-clip-text text-transparent">
+                                            Nirium 自动投资 CETES。
+                                        </span>
+                                    </>
+                                ) : language === 'es' ? (
+                                    <>
+                                        Tu USDC parado no genera nada.
+                                        <br />
+                                        <span className="bg-gradient-to-r from-stellar-teal to-stellar-yellow bg-clip-text text-transparent">
+                                            Nirium lo invierte en CETES automáticamente.
+                                        </span>
+                                    </>
+                                ) : (
+                                    <>
+                                        Your idle USDC earns nothing.
+                                        <br />
+                                        <span className="bg-gradient-to-r from-stellar-teal to-stellar-yellow bg-clip-text text-transparent">
+                                            Nirium invests it in CETES automatically.
+                                        </span>
+                                    </>
+                                )}
+                            </motion.h1>
+
+                            <motion.p
+                                initial={{ opacity: 0, y: 12 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                transition={{ duration: 0.6, delay: 0.1 }}
+                                className="mt-5 text-base sm:text-lg text-white/60 max-w-xl leading-relaxed"
+                            >
+                                {lang(
+                                    'Non-custodial software that rebalances your treasury between liquid USDC and Mexican government bonds (CETES) tokenized via Etherfuse — no dedicated CFO, no spreadsheets, no custody risk.',
+                                    'Software no custodial que rebalancea tu tesorería entre USDC líquido y bonos del gobierno mexicano (CETES) tokenizados vía Etherfuse — sin CFO dedicado, sin Excel, sin riesgo de custodia.',
+                                    '非托管软件，通过 Etherfuse 将您的财库在流动性 USDC 和代币化墨西哥政府债券 (CETES) 之间重新平衡 — 无需专门的 CFO，无需表格，无托管风险。'
+                                )}
+                            </motion.p>
+
+                            {/* 3 numbers */}
+                            <motion.div
+                                initial={{ opacity: 0, y: 12 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                transition={{ duration: 0.6, delay: 0.15 }}
+                                className="mt-10 grid grid-cols-3 gap-6 w-full max-w-sm"
+                            >
+                                <div>
+                                    <div className="text-2xl sm:text-3xl font-black text-white">~3.38%</div>
+                                    <div className="text-[10px] uppercase tracking-widest text-white/40 mt-1">
+                                        {lang('CETES Rate', 'Tasa CETES', 'CETES 利率')}
+                                    </div>
+                                </div>
+                                <div className="border-x border-white/5 px-4">
+                                    <div className="text-2xl sm:text-3xl font-black text-white">~4s</div>
+                                    <div className="text-[10px] uppercase tracking-widest text-white/40 mt-1">
+                                        {lang('Settlement', 'Liquidación', '结算时间')}
+                                    </div>
+                                </div>
+                                <div>
+                                    <div className="text-2xl sm:text-3xl font-black text-white">~0.8%</div>
+                                    <div className="text-[10px] uppercase tracking-widest text-white/40 mt-1">
+                                        {lang('Total cost', 'Costo total', '总成本')}
+                                    </div>
+                                </div>
+                            </motion.div>
+
+                            {/* CTAs */}
+                            <motion.div
+                                initial={{ opacity: 0, y: 12 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                transition={{ duration: 0.6, delay: 0.2 }}
+                                className="mt-8 flex flex-col sm:flex-row gap-3"
+                            >
+                                <Link href="/docs">
+                                    <Button size="lg" variant="premium" className="w-full sm:w-auto">
+                                        {lang('View Documentation', 'Ver Documentación', '查看文档')}
+                                        <ArrowRight className="ml-2 w-4 h-4" />
+                                    </Button>
+                                </Link>
+                                <a href="mailto:hello@nirium.xyz">
+                                    <Button size="lg" variant="outline" className="w-full sm:w-auto border-white/20 hover:bg-white/5">
+                                        {lang('Request Pilot Access', 'Solicitar Acceso Piloto', '申请试点访问')}
+                                    </Button>
+                                </a>
+                            </motion.div>
+
+                            {/* Status line */}
+                            <motion.div
+                                initial={{ opacity: 0 }}
+                                animate={{ opacity: 1 }}
+                                transition={{ duration: 0.6, delay: 0.3 }}
+                                className="mt-6 flex items-center gap-3 text-xs text-white/40"
+                            >
+                                <span className="inline-flex items-center gap-1.5">
+                                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+                                    {lang('Testnet live', 'Testnet en vivo', '测试网运行中')}
+                                </span>
+                                <span>·</span>
+                                <span>{lang('Mainnet Q3 2026 after audit', 'Mainnet Q3 2026 tras auditoría', '主网 Q3 2026 审计后上线')}</span>
+                            </motion.div>
+                        </div>
+
+                        {/* ── RIGHT: 3D vault orb + live terminal ── */}
+                        <div className="w-full lg:w-[520px] xl:w-[580px] shrink-0 flex flex-col gap-4">
+                            <motion.div
+                                initial={{ opacity: 0, scale: 0.9 }}
+                                animate={{ opacity: 1, scale: 1 }}
+                                transition={{ duration: 1, delay: 0.2 }}
+                                className="w-full h-[340px] sm:h-[420px] lg:h-[480px] relative"
+                            >
+                                {/* Orbit labels */}
+                                <div className="absolute top-[8%] right-[6%] z-10 flex items-center gap-1.5 px-2 py-1 rounded-full border border-stellar-teal/20 bg-black/60 backdrop-blur-sm">
+                                    <span className="w-1.5 h-1.5 rounded-full bg-stellar-teal animate-pulse" />
+                                    <span className="text-[9px] font-mono text-stellar-teal/80">USDC</span>
+                                </div>
+                                <div className="absolute bottom-[18%] left-[4%] z-10 flex items-center gap-1.5 px-2 py-1 rounded-full border border-stellar-yellow/20 bg-black/60 backdrop-blur-sm">
+                                    <span className="w-1.5 h-1.5 rounded-full bg-stellar-yellow animate-pulse" />
+                                    <span className="text-[9px] font-mono text-stellar-yellow/80">CETES 3.38% (Banxico)</span>
+                                </div>
+                                <Suspense fallback={<div className="w-full h-full flex items-center justify-center text-stellar-teal/40 font-mono text-xs animate-pulse">Loading vault...</div>}>
+                                    <TreasuryCanvas />
+                                </Suspense>
+                            </motion.div>
+
+                            {/* Live agent terminal */}
+                            <motion.div
+                                initial={{ opacity: 0, y: 16 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                transition={{ duration: 0.8, delay: 0.9 }}
+                            >
+                                <OpsConsole
+                                    isExpanded={false}
+                                    onToggleExpand={() => {}}
+                                    heightClass="h-[200px]"
                                 />
                             </motion.div>
+                        </div>
 
-                            {/* 2. Protocol Revenue (Compact) */}
-                            <motion.div
-                                initial={{ opacity: 0, y: 20 }}
-                                animate={{ opacity: 1, y: 0 }}
-                                transition={{ delay: 1.1, duration: 0.8 }}
-                                className="w-full lg:w-[300px] max-w-[400px] shadow-[0_20px_60px_rgba(45,235,232,0.15)]"
-                            >
-                                <div className="w-full lg:w-[300px] max-w-[400px] h-[280px]">
-                                    <ProtocolRevenue compact={true} />
-                                </div>
-                            </motion.div>
+                    </div>
+                </div>
+            </section>
+
+            {/* THE PROBLEM */}
+            <section className="py-20 border-t border-white/5">
+                <div className="max-w-4xl mx-auto px-6">
+                    <h2 className="text-2xl sm:text-3xl font-bold text-center text-white/90">
+                        {lang('The problem', 'El problema', '问题所在')}
+                    </h2>
+                    <div className="mt-12 grid sm:grid-cols-3 gap-6">
+                        <div className="text-center">
+                            <div className="text-5xl font-black text-red-400/80">$0</div>
+                            <p className="mt-3 text-sm text-white/60">
+                                {lang('Return from idle USDC in treasury', 'Retorno generado por USDC parado en treasury', 'USDC 闲置产生的回报')}
+                            </p>
+                        </div>
+                        <div className="text-center">
+                            <div className="text-5xl font-black text-red-400/80">7+</div>
+                            <p className="mt-3 text-sm text-white/60">
+                                {lang('Days a CFO locks capital in traditional bonds', 'Días que un CFO bloquea capital en bonos tradicionales', 'CFO 锁定资金于传统债券的天数')}
+                            </p>
+                        </div>
+                        <div className="text-center">
+                            <div className="text-5xl font-black text-red-400/80">~150bps</div>
+                            <p className="mt-3 text-sm text-white/60">
+                                {lang('MX↔USA FX spread on traditional rails', 'Spread FX MX↔USA en bancos tradicionales', '传统银行 MX↔美国外汇点差')}
+                            </p>
                         </div>
                     </div>
                 </div>
             </section>
 
-            {/* ── VALUE PROPOSITION — COMPETITOR COMPARISON ─────────────── */}
-            {t.home.value_prop && (
-            <section className="py-20 sm:py-28 border-y border-white/5 bg-gradient-to-b from-black via-stellar-teal/[0.02] to-black relative overflow-hidden">
-                <div className="absolute top-0 left-0 w-full h-full bg-[radial-gradient(circle_at_30%_20%,rgba(45,235,232,0.04),transparent_60%)] pointer-events-none" />
-                <div className="container mx-auto px-4 relative z-10">
-                    <motion.div {...fadeUp()} className="text-center mb-16 space-y-4">
-                        <div className="inline-flex items-center gap-2 px-3 py-1 bg-stellar-teal/10 border border-stellar-teal/30 text-stellar-teal text-[10px] font-black uppercase tracking-widest mb-4">
-                            <DollarSign className="w-3 h-3" />
-                            <span>CROSS-BORDER PAYMENTS</span>
-                        </div>
-                        <h2 className="text-4xl md:text-6xl font-black tracking-tighter uppercase italic leading-none">
-                            {t.home.value_prop.title} <span className="text-stellar-teal">{t.home.value_prop.span}</span>
-                        </h2>
-                        <p className="text-gray-400 max-w-2xl mx-auto text-lg">{t.home.value_prop.subtitle}</p>
-                    </motion.div>
+            {/* HOW IT WORKS */}
+            <section className="py-20 border-t border-white/5">
+                <div className="max-w-5xl mx-auto px-6">
+                    <h2 className="text-2xl sm:text-3xl font-bold text-center">
+                        {lang('How it works', 'Cómo funciona', '工作原理')}
+                    </h2>
+                    <p className="mt-4 text-center text-white/60 max-w-xl mx-auto">
+                        {lang(
+                            'Three steps. No CFO. No spreadsheets. No WhatsApp.',
+                            'Tres pasos. Sin CFO. Sin Excel. Sin WhatsApp.',
+                            '三步。无需 CFO。无需表格。无需 WhatsApp。'
+                        )}
+                    </p>
 
-                    {/* Comparison Table */}
-                    <motion.div {...fadeUp(0.1)} className="max-w-4xl mx-auto">
-                        <div className="overflow-x-auto rounded-2xl border border-white/10 bg-black/60 backdrop-blur-sm">
-                            <table className="w-full text-sm">
-                                <thead>
-                                    <tr className="border-b border-white/10">
-                                        <th className="text-left px-6 py-4 text-gray-500 font-mono text-[10px] uppercase tracking-widest">{t.home.value_prop.col_provider}</th>
-                                        <th className="text-left px-6 py-4 text-gray-500 font-mono text-[10px] uppercase tracking-widest">{t.home.value_prop.col_cost}</th>
-                                        <th className="text-left px-6 py-4 text-gray-500 font-mono text-[10px] uppercase tracking-widest">{t.home.value_prop.col_speed}</th>
-                                        <th className="text-left px-6 py-4 text-gray-500 font-mono text-[10px] uppercase tracking-widest">{t.home.value_prop.col_custody}</th>
-                                        <th className="text-left px-6 py-4 text-gray-500 font-mono text-[10px] uppercase tracking-widest">{t.home.value_prop.col_yield}</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    {(t.home.value_prop.competitors as any[]).map((c: any, i: number) => {
-                                        const isNoCustody = c.custody?.startsWith('No') || c.custody?.startsWith('无');
-                                        const isNoYield = c.yield?.startsWith('No') || c.yield?.startsWith('无');
-                                        return (
-                                            <tr key={i} className="border-b border-white/5 hover:bg-white/[0.02] transition-colors">
-                                                <td className="px-6 py-4 text-gray-300 font-medium">{c.name}</td>
-                                                <td className="px-6 py-4 text-red-400/80 font-mono text-xs">{c.cost}</td>
-                                                <td className="px-6 py-4 text-gray-500 font-mono text-xs">{c.speed}</td>
-                                                <td className="px-6 py-4">
-                                                    {isNoCustody ? (
-                                                        <span className="inline-flex items-center gap-1 text-red-400/70 text-xs"><XIcon className="w-3 h-3" /> {c.custody}</span>
-                                                    ) : (
-                                                        <span className="inline-flex items-center gap-1 text-green-400/70 text-xs"><Check className="w-3 h-3" /> {c.custody}</span>
-                                                    )}
-                                                </td>
-                                                <td className="px-6 py-4">
-                                                    {isNoYield ? (
-                                                        <span className="inline-flex items-center gap-1 text-red-400/70 text-xs"><XIcon className="w-3 h-3" /> {c.yield}</span>
-                                                    ) : (
-                                                        <span className="inline-flex items-center gap-1 text-green-400/70 text-xs"><Check className="w-3 h-3" /> {c.yield}</span>
-                                                    )}
-                                                </td>
-                                            </tr>
-                                        );
-                                    })}
-                                    {/* Nirium Row — highlighted */}
-                                    <tr className="bg-stellar-teal/5 border-t-2 border-stellar-teal/30">
-                                        <td className="px-6 py-5">
-                                            <div className="flex items-center gap-2">
-                                                <div className="w-2 h-2 rounded-full bg-stellar-teal shadow-[0_0_8px_rgba(45,235,232,0.8)]" />
-                                                <span className="text-white font-black text-sm">{t.home.value_prop.nirium_name}</span>
-                                            </div>
-                                        </td>
-                                        <td className="px-6 py-5">
-                                            <span className="text-stellar-teal font-black text-lg">{t.home.value_prop.nirium_cost}</span>
-                                        </td>
-                                        <td className="px-6 py-5">
-                                            <span className="text-stellar-yellow font-bold text-sm">{t.home.value_prop.nirium_speed}</span>
-                                        </td>
-                                        <td className="px-6 py-5">
-                                            <span className="inline-flex items-center gap-1 text-green-400 font-bold text-xs"><ShieldCheck className="w-4 h-4" /> {t.home.value_prop.nirium_custody}</span>
-                                        </td>
-                                        <td className="px-6 py-5">
-                                            <span className="inline-flex items-center gap-1 text-green-400 font-bold text-xs"><Check className="w-4 h-4" /> {t.home.value_prop.nirium_yield}</span>
-                                        </td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                        </div>
-
-                        {/* Savings callout + CTA */}
-                        <div className="mt-8 flex flex-col sm:flex-row items-center justify-between gap-6">
-                            <motion.div {...fadeUp(0.2)} className="flex items-center gap-6">
-                                <div className="text-center">
-                                    <div className="text-5xl md:text-6xl font-black text-stellar-teal tracking-tighter">{t.home.value_prop.savings_value}</div>
-                                    <div className="text-[10px] font-mono text-gray-500 uppercase tracking-widest mt-1">{t.home.value_prop.savings_title}</div>
+                    <div className="mt-14 grid md:grid-cols-3 gap-6">
+                        {[
+                            {
+                                num: '01',
+                                icon: Workflow,
+                                title: lang('Connect your wallet', 'Conecta tu wallet', '连接钱包'),
+                                body: lang(
+                                    'Non-custodial 2-of-3 Soroban vault. You hold the keys. Nirium never touches your funds.',
+                                    'Vault Soroban 2-de-3 non-custodial. Tú controlas las llaves. Nirium nunca toca tus fondos.',
+                                    'Soroban 2-of-3 非托管保险库。您持有密钥。Nirium 永远无法触及您的资金。'
+                                ),
+                            },
+                            {
+                                num: '02',
+                                icon: Bot,
+                                title: lang('Agent reads the spread', 'El agente analiza el spread', '智能体读取价差'),
+                                body: lang(
+                                    '24/7 monitoring: CETES rate via Etherfuse vs USDC on Blend. Rebalances only when spread exceeds your threshold.',
+                                    'Monitoreo 24/7: tasa CETES vía Etherfuse vs USDC en Blend. Decide rebalanceo solo si el spread supera tu umbral.',
+                                    '全天候监控：通过 Etherfuse 获取 CETES 利率与 Blend 上的 USDC 利率对比。仅在价差超过阈值时才触发再平衡。'
+                                ),
+                            },
+                            {
+                                num: '03',
+                                icon: TrendingUp,
+                                title: lang('Rebalances automatically', 'Rebalancea automáticamente', '自动再平衡'),
+                                body: lang(
+                                    'Stellar tx settled in ~4s. Every action signed with HMAC-SHA256 and IPFS-anchored for CNBV.',
+                                    'Tx en Stellar liquidada en ~4s. Cada acción firmada con HMAC-SHA256 y anclada en IPFS para CNBV.',
+                                    'Stellar 交易约 4 秒完成。每个操作均经 HMAC-SHA256 签名并锚定至 IPFS 供合规使用。'
+                                ),
+                            },
+                        ].map((step) => (
+                            <div
+                                key={step.num}
+                                className="relative p-6 rounded-xl border border-white/10 bg-white/[0.02] hover:border-stellar-teal/30 transition-colors"
+                            >
+                                <div className="flex items-start justify-between mb-4">
+                                    <div className="p-2.5 rounded-lg bg-stellar-teal/10">
+                                        <step.icon className="w-5 h-5 text-stellar-teal" />
+                                    </div>
+                                    <div className="text-xs font-mono text-white/30">{step.num}</div>
                                 </div>
-                                <p className="text-gray-400 text-sm max-w-xs">{t.home.value_prop.savings_desc}</p>
-                            </motion.div>
-                            <Link href="/sandbox">
-                                <Button size="hero" className="bg-stellar-teal text-black hover:bg-stellar-teal/90 font-black italic tracking-tight rounded-full px-8">
-                                    {t.home.value_prop.cta} <ArrowRight className="ml-2 w-5 h-5" />
+                                <h3 className="text-lg font-bold mb-2">{step.title}</h3>
+                                <p className="text-sm text-white/60 leading-relaxed">{step.body}</p>
+                            </div>
+                        ))}
+                    </div>
+                </div>
+            </section>
+
+            {/* SETTLEMENT RAILS: x402 & MPP */}
+            <section className="py-20 border-t border-white/5 bg-gradient-to-b from-black to-stellar-teal/[0.03] relative overflow-hidden">
+                <div className="absolute top-0 right-0 w-1/2 h-full bg-[radial-gradient(circle_at_100%_0%,rgba(45,235,232,0.04),transparent_70%)] pointer-events-none" />
+                <div className="max-w-5xl mx-auto px-6 relative z-10">
+                    <div className="text-center mb-12">
+                        <div className="inline-flex items-center gap-2 px-3 py-1 mb-4 bg-stellar-teal/10 border border-stellar-teal/20 rounded-full text-stellar-teal text-[10px] font-black uppercase tracking-widest">
+                            <Zap className="w-3 h-3" />
+                            {lang('Settlement infrastructure', 'Infraestructura de liquidación', '结算基础设施')}
+                        </div>
+                        <h2 className="text-2xl sm:text-3xl font-bold">
+                            {lang('The rails underneath', 'Los rieles por debajo', '底层通道')}
+                        </h2>
+                        <p className="mt-4 text-white/50 max-w-xl mx-auto text-sm">
+                            {lang(
+                                'x402 and MPP are the two open standards Nirium implements natively on Stellar to enable machine-to-machine billing and session-scoped institutional flows.',
+                                'x402 y MPP son los dos estándares abiertos que Nirium implementa de forma nativa en Stellar para habilitar facturación máquina a máquina y flujos institucionales acotados por sesión.',
+                                'x402 和 MPP 是 Nirium 在 Stellar 上原生实现的两个开放标准，用于支持机器间计费和会话范围的机构流程。'
+                            )}
+                        </p>
+                    </div>
+
+                    <div className="grid md:grid-cols-2 gap-6">
+                        {/* x402 */}
+                        <div className="group relative p-8 rounded-2xl bg-black/60 border border-white/10 hover:border-stellar-teal/40 transition-all duration-500">
+                            <div className="absolute top-4 right-6 text-[36px] opacity-[0.07] font-black italic text-stellar-teal group-hover:opacity-[0.14] transition-opacity select-none">x402</div>
+                            <div className="w-14 h-14 rounded-xl bg-stellar-teal/10 border border-stellar-teal/20 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
+                                <Zap className="w-7 h-7 text-stellar-teal" />
+                            </div>
+                            <h3 className="text-xl font-black uppercase tracking-tight mb-3">
+                                {lang('x402 — Per-request micropayment', 'x402 — Micropago por solicitud', 'x402 — 按请求微支付')}
+                            </h3>
+                            <p className="text-sm text-white/55 leading-relaxed mb-6">
+                                {lang(
+                                    'HTTP 402 native billing. Every agent action triggers an on-chain payment before execution — no subscriptions, no prepaid credits. One request, one signed transaction, one immutable record.',
+                                    'Facturación nativa HTTP 402. Cada acción del agente activa un pago on-chain antes de ejecutarse — sin suscripciones, sin créditos prepagados. Una solicitud, una transacción firmada, un registro inmutable.',
+                                    'HTTP 402 原生计费。每个智能体操作在执行前触发链上支付 — 无订阅、无预充值。一次请求，一笔签名交易，一条不可变记录。'
+                                )}
+                            </p>
+                            <div className="flex items-center gap-3 pt-4 border-t border-white/[0.06]">
+                                <div className="text-[9px] font-mono text-stellar-teal uppercase tracking-widest font-bold">Soroban Verified</div>
+                                <div className="h-px flex-1 bg-white/5 rounded-full overflow-hidden">
+                                    <motion.div
+                                        initial={{ width: 0 }}
+                                        whileInView={{ width: '100%' }}
+                                        viewport={{ once: true }}
+                                        transition={{ duration: 1.5, ease: 'easeOut' }}
+                                        className="h-full bg-stellar-teal"
+                                    />
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* MPP */}
+                        <div className="group relative p-8 rounded-2xl bg-black/60 border border-white/10 hover:border-stellar-yellow/40 transition-all duration-500">
+                            <div className="absolute top-4 right-6 text-[36px] opacity-[0.07] font-black italic text-stellar-yellow group-hover:opacity-[0.14] transition-opacity select-none">MPP</div>
+                            <div className="w-14 h-14 rounded-xl bg-stellar-yellow/10 border border-stellar-yellow/20 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
+                                <Layers className="w-7 h-7 text-stellar-yellow" />
+                            </div>
+                            <h3 className="text-xl font-black uppercase tracking-tight mb-3">
+                                {lang('MPP — Session budget protocol', 'MPP — Protocolo de presupuesto por sesión', 'MPP — 会话预算协议')}
+                            </h3>
+                            <p className="text-sm text-white/55 leading-relaxed mb-6">
+                                {lang(
+                                    'Machine Payment Protocol scopes a XLM budget to a single authenticated session. Optimized for passive funding and mass payroll execution, agents operate within a capped spend window — enabling institutional-grade spend controls.',
+                                    'Machine Payment Protocol acota un presupuesto XLM a una sesión autenticada. Optimizado para fondeos pasivos y pagos de nómina masivos, los agentes operan dentro de una ventana de gasto limitada — habilitando controles de gasto de nivel institucional.',
+                                    'Machine Payment Protocol 将 XLM 预算限定在单个已认证会话中。针对被动资金和大规模工资发放进行了优化，智能体在有限的消费窗口内运行 — 实现机构级消费控制。'
+                                )}
+                            </p>
+                            <div className="flex items-center gap-3 pt-4 border-t border-white/[0.06]">
+                                <div className="text-[9px] font-mono text-stellar-yellow uppercase tracking-widest font-bold">Freighter Ready</div>
+                                <div className="h-px flex-1 bg-white/5 rounded-full overflow-hidden">
+                                    <motion.div
+                                        initial={{ width: 0 }}
+                                        whileInView={{ width: '100%' }}
+                                        viewport={{ once: true }}
+                                        transition={{ duration: 1.5, ease: 'easeOut', delay: 0.2 }}
+                                        className="h-full bg-stellar-yellow"
+                                    />
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            {/* USE CASES */}
+            <section className="py-20 border-t border-white/5">
+                <div className="max-w-5xl mx-auto px-6">
+                    <h2 className="text-2xl sm:text-3xl font-bold text-center">
+                        {lang('Core use cases', 'Casos de uso principales', '核心使用场景')}
+                    </h2>
+                    <p className="mt-4 text-center text-white/50 max-w-xl mx-auto text-sm">
+                        {lang(
+                            'Built on Soroban. Integrates Blend, Soroswap, Phoenix, and Etherfuse Stablebonds.',
+                            'Construido en Soroban. Integra Blend, Soroswap, Phoenix y Etherfuse Stablebonds.',
+                            '构建于 Soroban。集成 Blend、Soroswap、Phoenix 和 Etherfuse 稳定债券。'
+                        )}
+                    </p>
+
+                    <div className="mt-12 grid md:grid-cols-3 gap-6">
+                        {[
+                            {
+                                num: '01',
+                                color: 'border-stellar-teal/30 bg-stellar-teal/[0.04]',
+                                accent: 'text-stellar-teal',
+                                title: lang('Cross-border treasury automation', 'Automatización de tesorería cross-border', '跨境财库自动化'),
+                                body: lang(
+                                    'Programmable rules for MXN↔USDC routing via Stellar Path Payments. Configurable thresholds, SPEI windows, and CETES allocation through Etherfuse Stablebonds. Replaces manual treasury desks with rule-based execution and immutable audit logs.',
+                                    'Reglas programables para rutas MXN↔USDC vía Stellar Path Payments. Umbrales configurables, ventanas SPEI y asignación a CETES via Etherfuse Stablebonds. Reemplaza mesas de tesorería manuales con ejecución basada en reglas y logs inmutables.',
+                                    '通过 Stellar Path Payments 实现 MXN↔USDC 可编程路由规则。可配置阈值、SPEI 窗口，并通过 Etherfuse 稳定债券分配至 CETES。以规则驱动执行和不可变审计日志替代人工财库操作。'
+                                ),
+                                tag: 'Stellar Path Payments · Etherfuse · CETES',
+                            },
+                            {
+                                num: '02',
+                                color: 'border-purple-500/20 bg-purple-500/[0.03]',
+                                accent: 'text-purple-400',
+                                title: lang('Institutional settlement rails', 'Rieles de liquidación institucional', '机构结算通道'),
+                                body: lang(
+                                    'Native x402 integration for per-request micro-billing and MPP for session-based institutional flows. Sponsored XLM gas, sub-5-second finality, and on-chain reconciliation for high-frequency operations.',
+                                    'Integración nativa de x402 para micro-billing por solicitud y MPP para flujos institucionales por sesión. Gas XLM patrocinado, finalidad sub-5 segundos y reconciliación on-chain para operaciones de alta frecuencia.',
+                                    '原生 x402 集成用于按请求微计费，MPP 用于基于会话的机构流程。赞助 XLM gas、5 秒以内结算以及面向高频操作的链上对账。'
+                                ),
+                                tag: 'x402 · MPP · Sponsored Transactions',
+                            },
+                            {
+                                num: '03',
+                                color: 'border-stellar-yellow/20 bg-stellar-yellow/[0.03]',
+                                accent: 'text-stellar-yellow',
+                                title: lang('DeFi-integrated treasury management', 'Gestión de tesorería integrada con DeFi', 'DeFi 集成财库管理'),
+                                body: lang(
+                                    'Automated allocation across Blend lending vaults and Soroswap liquidity pools, with risk parameters set by treasury operators. All execution is bundled into atomic Soroban transactions with all-or-nothing semantics.',
+                                    'Asignación automatizada en vaults de lending de Blend y pools de liquidez de Soroswap, con parámetros de riesgo configurables. Toda ejecución se agrupa en transacciones Soroban atómicas con semántica todo-o-nada.',
+                                    '跨 Blend 借贷金库和 Soroswap 流动性池的自动化分配，由财库运营商设置风险参数。所有执行均打包为具有全有或全无语义的原子 Soroban 交易。'
+                                ),
+                                tag: 'Blend · Soroswap · Atomic Soroban txs',
+                            },
+                        ].map((item) => (
+                            <div key={item.num} className={`p-6 rounded-xl border ${item.color} flex flex-col gap-4`}>
+                                <div className="flex items-center justify-between">
+                                    <span className={`text-[10px] font-mono font-bold ${item.accent}`}>{item.num}</span>
+                                    <span className={`text-[9px] font-mono ${item.accent}/60 text-right leading-tight max-w-[160px]`}>{item.tag}</span>
+                                </div>
+                                <h3 className="text-base font-black text-white leading-tight">{item.title}</h3>
+                                <p className="text-sm text-white/55 leading-relaxed">{item.body}</p>
+                            </div>
+                        ))}
+                    </div>
+                </div>
+            </section>
+
+            {/* CODE SNIPPET */}
+            <section className="py-20 border-t border-white/5">
+                <div className="max-w-4xl mx-auto px-6">
+                    <h2 className="text-2xl sm:text-3xl font-bold text-center">
+                        {lang('Five lines of code', 'Cinco líneas de código', '五行代码')}
+                    </h2>
+                    <p className="mt-4 text-center text-white/60 max-w-xl mx-auto">
+                        {lang(
+                            'Connect your API key. Define your rules. The agent does the rest.',
+                            'Conecta tu API key. Define tus reglas. El agente hace el resto.',
+                            '连接您的 API 密钥。定义规则。智能体完成其余操作。'
+                        )}
+                    </p>
+
+                    <div className="mt-10 relative rounded-xl border border-white/10 bg-black overflow-hidden">
+                        <div className="flex items-center justify-between px-4 py-3 border-b border-white/5 bg-white/[0.02]">
+                            <div className="flex items-center gap-2">
+                                <span className="w-2.5 h-2.5 rounded-full bg-red-500/50" />
+                                <span className="w-2.5 h-2.5 rounded-full bg-yellow-500/50" />
+                                <span className="w-2.5 h-2.5 rounded-full bg-green-500/50" />
+                                <span className="ml-3 text-xs text-white/40 font-mono">treasury.ts</span>
+                            </div>
+                            <button
+                                onClick={handleCopy}
+                                className="text-xs text-white/50 hover:text-stellar-teal transition-colors font-mono"
+                            >
+                                {copied
+                                    ? lang('Copied!', '¡Copiado!', '已复制！')
+                                    : lang('Copy', 'Copiar', '复制')}
+                            </button>
+                        </div>
+                        <pre className="p-6 text-sm text-white/80 font-mono leading-relaxed overflow-x-auto">
+                            <code>{codeSnippet}</code>
+                        </pre>
+                    </div>
+
+                    <div className="mt-6 text-center">
+                        <Link
+                            href="/developers"
+                            className="inline-flex items-center gap-2 text-sm text-stellar-teal hover:underline"
+                        >
+                            {lang('Full developer docs', 'Ver documentación completa', '完整开发者文档')}
+                            <ChevronRight className="w-4 h-4" />
+                        </Link>
+                    </div>
+                </div>
+            </section>
+
+            {/* WHO USES NIRIUM */}
+            <section className="py-24 border-t border-white/5 relative overflow-hidden">
+                <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_20%_60%,rgba(45,235,232,0.04),transparent_55%)] pointer-events-none" />
+                <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_80%_20%,rgba(255,200,0,0.03),transparent_55%)] pointer-events-none" />
+
+                <div className="max-w-6xl mx-auto px-6 relative z-10">
+                    <div className="text-center mb-16">
+                        <div className="inline-flex items-center gap-2 px-3 py-1.5 mb-5 bg-white/[0.04] border border-white/10 rounded-full text-white/40 text-[10px] font-mono uppercase tracking-widest">
+                            <span className="w-1 h-1 rounded-full bg-stellar-teal" />
+                            {lang('Infrastructure layer', 'Capa de infraestructura', '基础设施层')}
+                        </div>
+                        <h2 className="text-3xl sm:text-4xl font-black tracking-tight">
+                            {lang('Who plugs into Nirium', '¿Quién conecta Nirium?', '谁在接入 Nirium')}
+                        </h2>
+                        <p className="mt-4 text-white/45 max-w-lg mx-auto text-sm leading-relaxed">
+                            {lang(
+                                "Nirium is not a remittance product — it's the autonomous treasury layer that remittance fintechs, SaaS, and on-chain protocols connect to.",
+                                'Nirium no es un producto de remesas — es la capa de tesorería autónoma a la que fintechs, SaaS y protocolos on-chain se conectan.',
+                                'Nirium 不是汇款产品 — 而是汇款金融科技、SaaS 和链上协议接入的自主财库层。'
+                            )}
+                        </p>
+                    </div>
+
+                    <div className="grid lg:grid-cols-3 gap-5">
+
+                        {/* Card 1 — LATAM Fintechs */}
+                        <motion.div
+                            whileHover={{ y: -4 }}
+                            transition={{ duration: 0.2 }}
+                            className="group relative rounded-2xl border border-white/10 bg-gradient-to-b from-stellar-teal/[0.06] to-black/40 overflow-hidden hover:border-stellar-teal/30 transition-colors duration-300"
+                        >
+                            <div className="absolute top-0 right-0 w-40 h-40 bg-stellar-teal/10 rounded-full blur-3xl opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+                            <div className="relative p-7 flex flex-col h-full">
+                                <div className="flex items-center justify-between mb-6">
+                                    <span className="text-[9px] font-black uppercase tracking-[0.2em] text-stellar-teal/70 font-mono">
+                                        {lang('LATAM Fintech', 'LATAM Fintech', 'LATAM 金融科技')}
+                                    </span>
+                                    <span className="text-[9px] font-mono text-white/20">01</span>
+                                </div>
+                                <div className="flex items-center gap-3 mb-5">
+                                    <div className="w-10 h-10 rounded-xl bg-stellar-teal/10 border border-stellar-teal/20 flex items-center justify-center shrink-0 group-hover:border-stellar-teal/40 transition-colors">
+                                        <Building2 className="w-5 h-5 text-stellar-teal" />
+                                    </div>
+                                    <h3 className="text-base font-black text-white leading-tight">
+                                        {lang('Mexican fintechs & PSPs', 'Fintechs y PSPs mexicanos', '墨西哥金融科技与支付机构')}
+                                    </h3>
+                                </div>
+                                <div className="space-y-2 mb-5">
+                                    <div className="flex items-start gap-2.5 px-3 py-2.5 rounded-lg bg-red-500/[0.06] border border-red-500/10">
+                                        <span className="text-red-400/60 text-[9px] font-black uppercase tracking-widest shrink-0 pt-px">BEFORE</span>
+                                        <span className="text-[11px] text-white/50 leading-snug">
+                                            {lang('USDC sits idle between SPEI windows — 0% yield on treasury float', 'USDC parado entre ventanas SPEI — rendimiento 0% sobre el float', 'USDC 在 SPEI 窗口间闲置 — 财库浮动零收益')}
+                                        </span>
+                                    </div>
+                                    <div className="flex items-start gap-2.5 px-3 py-2.5 rounded-lg bg-stellar-teal/[0.06] border border-stellar-teal/10">
+                                        <span className="text-stellar-teal text-[9px] font-black uppercase tracking-widest shrink-0 pt-px">AFTER</span>
+                                        <span className="text-[11px] text-white/70 leading-snug">
+                                            {lang('Agent auto-parks float in CETES. Redeems before the next SPEI cycle.', 'Agente estaciona el float en CETES y redime antes del ciclo SPEI.', '智能体自动将浮动存入 CETES，并在下一 SPEI 周期前赎回。')}
+                                        </span>
+                                    </div>
+                                </div>
+                                <div className="mt-auto pt-4 border-t border-white/[0.06] flex items-center justify-between">
+                                    <div className="flex items-center gap-1.5">
+                                        <span className="w-1.5 h-1.5 rounded-full bg-stellar-teal animate-pulse" />
+                                        <span className="text-[10px] font-mono text-stellar-teal">~3.38% annual on idle float</span>
+                                    </div>
+                                    <ChevronRight className="w-3.5 h-3.5 text-white/20 group-hover:text-stellar-teal transition-colors" />
+                                </div>
+                            </div>
+                        </motion.div>
+
+                        {/* Card 2 — SMBs / No-CFO */}
+                        <motion.div
+                            whileHover={{ y: -4 }}
+                            transition={{ duration: 0.2 }}
+                            className="group relative rounded-2xl border border-white/10 bg-gradient-to-b from-stellar-yellow/[0.05] to-black/40 overflow-hidden hover:border-stellar-yellow/30 transition-colors duration-300"
+                        >
+                            <div className="absolute top-0 right-0 w-40 h-40 bg-stellar-yellow/10 rounded-full blur-3xl opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+                            <div className="relative p-7 flex flex-col h-full">
+                                <div className="flex items-center justify-between mb-6">
+                                    <span className="text-[9px] font-black uppercase tracking-[0.2em] text-stellar-yellow/70 font-mono">
+                                        {lang('Corporate treasury', 'Tesorería corporativa', '企业财库')}
+                                    </span>
+                                    <span className="text-[9px] font-mono text-white/20">02</span>
+                                </div>
+                                <div className="flex items-center gap-3 mb-5">
+                                    <div className="w-10 h-10 rounded-xl bg-stellar-yellow/10 border border-stellar-yellow/20 flex items-center justify-center shrink-0 group-hover:border-stellar-yellow/40 transition-colors">
+                                        <Bot className="w-5 h-5 text-stellar-yellow" />
+                                    </div>
+                                    <h3 className="text-base font-black text-white leading-tight">
+                                        {lang('SaaS & SMBs $1M–$10M ARR', 'SaaS y PyMEs $1M–$10M ARR', 'SaaS 及中小企业 $1M–$10M ARR')}
+                                    </h3>
+                                </div>
+                                <div className="space-y-2 mb-5">
+                                    <div className="flex items-start gap-2.5 px-3 py-2.5 rounded-lg bg-red-500/[0.06] border border-red-500/10">
+                                        <span className="text-red-400/60 text-[9px] font-black uppercase tracking-widest shrink-0 pt-px">BEFORE</span>
+                                        <span className="text-[11px] text-white/50 leading-snug">
+                                            {lang('CFO manually decides where to park USDC between billing cycles', 'CFO decide manualmente dónde estacionar USDC entre ciclos de facturación', 'CFO 在计费周期间手动决定 USDC 存放')}
+                                        </span>
+                                    </div>
+                                    <div className="flex items-start gap-2.5 px-3 py-2.5 rounded-lg bg-stellar-yellow/[0.06] border border-stellar-yellow/10">
+                                        <span className="text-stellar-yellow text-[9px] font-black uppercase tracking-widest shrink-0 pt-px">AFTER</span>
+                                        <span className="text-[11px] text-white/70 leading-snug">
+                                            {lang('Autonomous agent rebalances 24/7. Treasury ops require zero human decisions.', 'Agente autónomo rebalancea 24/7. Tesorería opera sin decisiones humanas.', '自主智能体全天候再平衡。财库无需人工决策。')}
+                                        </span>
+                                    </div>
+                                </div>
+                                <div className="mt-auto pt-4 border-t border-white/[0.06] flex items-center justify-between">
+                                    <div className="flex items-center gap-1.5">
+                                        <span className="w-1.5 h-1.5 rounded-full bg-stellar-yellow animate-pulse" />
+                                        <span className="text-[10px] font-mono text-stellar-yellow">0 manual decisions / week</span>
+                                    </div>
+                                    <ChevronRight className="w-3.5 h-3.5 text-white/20 group-hover:text-stellar-yellow transition-colors" />
+                                </div>
+                            </div>
+                        </motion.div>
+
+                        {/* Card 3 — DeFi Protocols */}
+                        <motion.div
+                            whileHover={{ y: -4 }}
+                            transition={{ duration: 0.2 }}
+                            className="group relative rounded-2xl border border-white/10 bg-gradient-to-b from-purple-500/[0.05] to-black/40 overflow-hidden hover:border-purple-500/30 transition-colors duration-300"
+                        >
+                            <div className="absolute top-0 right-0 w-40 h-40 bg-purple-500/10 rounded-full blur-3xl opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+                            <div className="relative p-7 flex flex-col h-full">
+                                <div className="flex items-center justify-between mb-6">
+                                    <span className="text-[9px] font-black uppercase tracking-[0.2em] text-purple-400/70 font-mono">
+                                        {lang('On-chain protocols', 'Protocolos on-chain', '链上协议')}
+                                    </span>
+                                    <span className="text-[9px] font-mono text-white/20">03</span>
+                                </div>
+                                <div className="flex items-center gap-3 mb-5">
+                                    <div className="w-10 h-10 rounded-xl bg-purple-500/10 border border-purple-500/20 flex items-center justify-center shrink-0 group-hover:border-purple-500/40 transition-colors">
+                                        <Layers className="w-5 h-5 text-purple-400" />
+                                    </div>
+                                    <h3 className="text-base font-black text-white leading-tight">
+                                        {lang('Protocols on Stellar / Soroban', 'Protocolos en Stellar / Soroban', 'Stellar / Soroban 链上协议')}
+                                    </h3>
+                                </div>
+                                <div className="space-y-2 mb-5">
+                                    <div className="flex items-start gap-2.5 px-3 py-2.5 rounded-lg bg-red-500/[0.06] border border-red-500/10">
+                                        <span className="text-red-400/60 text-[9px] font-black uppercase tracking-widest shrink-0 pt-px">BEFORE</span>
+                                        <span className="text-[11px] text-white/50 leading-snug">
+                                            {lang('Protocol treasury sits idle or needs human operators to rebalance', 'Treasury del protocolo parado o necesita operadores para rebalancear', '协议财库闲置或需要人工操作员再平衡')}
+                                        </span>
+                                    </div>
+                                    <div className="flex items-start gap-2.5 px-3 py-2.5 rounded-lg bg-purple-500/[0.06] border border-purple-500/10">
+                                        <span className="text-purple-400 text-[9px] font-black uppercase tracking-widest shrink-0 pt-px">AFTER</span>
+                                        <span className="text-[11px] text-white/70 leading-snug">
+                                            {lang('SDK integration — the protocol self-manages its treasury. Zero human ops.', 'Integración SDK — el protocolo autogestiona su tesorería. Cero humanos.', 'SDK 集成 — 协议自主管理财库。零人工操作。')}
+                                        </span>
+                                    </div>
+                                </div>
+                                <div className="mt-auto pt-4 border-t border-white/[0.06] flex items-center justify-between">
+                                    <div className="flex items-center gap-1.5">
+                                        <span className="w-1.5 h-1.5 rounded-full bg-purple-400 animate-pulse" />
+                                        <span className="text-[10px] font-mono text-purple-400">lending pools · DAO treasuries</span>
+                                    </div>
+                                    <ChevronRight className="w-3.5 h-3.5 text-white/20 group-hover:text-purple-400 transition-colors" />
+                                </div>
+                            </div>
+                        </motion.div>
+
+                    </div>
+                </div>
+            </section>
+
+            {/* WHY NIRIUM */}
+            <section className="py-20 border-t border-white/5">
+                <div className="max-w-5xl mx-auto px-6">
+                    <h2 className="text-2xl sm:text-3xl font-bold text-center">
+                        {lang('Why Nirium', 'Por qué Nirium', '为什么选择 Nirium')}
+                    </h2>
+
+                    {/* Arbiter callout */}
+                    <div className="mt-10 relative rounded-xl border border-stellar-yellow/20 bg-stellar-yellow/[0.04] px-6 py-5 text-center overflow-hidden">
+                        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_rgba(255,200,0,0.06),transparent_70%)]" />
+                        <p className="relative text-base sm:text-lg font-black text-white tracking-tight">
+                            {lang(
+                                '"Soroban is the immutable arbiter — the LLM suggests, the contract decides. A committed AI cannot transfer funds."',
+                                '"Soroban es el árbitro inmutable — el LLM sugiere, el contrato decide. Un agente comprometido no puede transferir fondos."',
+                                '"Soroban 是不可变的仲裁者 — LLM 建议，合约决定。被攻击的 AI 无法转移资金。"'
+                            )}
+                        </p>
+                        <p className="relative mt-2 text-xs text-stellar-yellow/60 font-mono uppercase tracking-widest">
+                            Nirium Security Model — Soroban + HMAC-SHA256 + IPFS
+                        </p>
+                    </div>
+
+                    <div className="mt-10 grid md:grid-cols-3 gap-6">
+                        {[
+                            {
+                                icon: Lock,
+                                title: lang('100% non-custodial', '100% non-custodial', '100% 非托管'),
+                                body:  lang(
+                                    'Soroban 2-of-3 vault. Owner + 2 cosigners. Nirium never has access to your funds.',
+                                    'Vault Soroban 2-de-3. Owner + 2 cosignatarios. Nirium nunca tiene acceso a tus fondos.',
+                                    'Soroban 2-of-3 保险库。Owner + 2 共签人。Nirium 永远无法访问您的资金。'
+                                ),
+                                link: '/security',
+                            },
+                            {
+                                icon: FileCheck,
+                                title: lang('CNBV-ready compliance', 'Compliance CNBV-ready', '符合 CNBV 合规'),
+                                body:  lang(
+                                    'Every decision signed with HMAC-SHA256 and IPFS-anchored. Exportable reports for regulators.',
+                                    'Cada decisión firmada con HMAC-SHA256 y anclada en IPFS. Reporte exportable para reguladores.',
+                                    '每个决策均经 HMAC-SHA256 签名并锚定至 IPFS。可导出报告供监管机构使用。'
+                                ),
+                                link: '/compliance',
+                            },
+                            {
+                                icon: Building2,
+                                title: lang('Powered by Etherfuse', 'Powered by Etherfuse', '由 Etherfuse 驱动'),
+                                body:  lang(
+                                    'Direct access to tokenized CETES — Mexican government T-bills — via Etherfuse. KYC onramp for humans. Swap without KYC for agents.',
+                                    'Acceso directo a CETES tokenizados — Bonos del Gobierno Mexicano — vía Etherfuse. Onramp KYC para humanos. Swap sin KYC para agentes.',
+                                    '通过 Etherfuse 直接访问代币化 CETES — 墨西哥政府国库券。人工 KYC 通道。智能体无需 KYC 即可兑换。'
+                                ),
+                                link: '/treasury',
+                            },
+                        ].map((feature) => (
+                            <Link
+                                key={feature.title}
+                                href={feature.link}
+                                className="group p-6 rounded-xl border border-white/10 bg-white/[0.02] hover:border-stellar-teal/30 transition-colors"
+                            >
+                                <div className="p-2.5 rounded-lg bg-stellar-teal/10 w-fit mb-4">
+                                    <feature.icon className="w-5 h-5 text-stellar-teal" />
+                                </div>
+                                <h3 className="text-lg font-bold mb-2">{feature.title}</h3>
+                                <p className="text-sm text-white/60 leading-relaxed mb-4">{feature.body}</p>
+                                <div className="text-xs text-stellar-teal/80 group-hover:text-stellar-teal flex items-center gap-1.5">
+                                    {lang('Learn more', 'Ver más', '了解更多')}
+                                    <ChevronRight className="w-3 h-3" />
+                                </div>
+                            </Link>
+                        ))}
+                    </div>
+                </div>
+            </section>
+
+            {/* PRICING */}
+            <section className="py-20 border-t border-white/5">
+                <div className="max-w-5xl mx-auto px-6">
+                    <h2 className="text-2xl sm:text-3xl font-bold text-center">
+                        {lang('Public pricing', 'Precios públicos', '公开定价')}
+                    </h2>
+                    <p className="mt-4 text-center text-white/60">
+                        {lang('No enterprise contracts until the big plan.', 'Sin contratos enterprise hasta el plan grande.', '大计划前无需企业合同。')}
+                    </p>
+
+                    <div className="mt-12 grid md:grid-cols-3 gap-6">
+                        {/* Free */}
+                        <div className="p-6 rounded-xl border border-white/10 bg-white/[0.02]">
+                            <div className="text-xs uppercase tracking-widest text-white/40 mb-2">Sandbox</div>
+                            <div className="text-3xl font-black mb-1">{lang('Free', 'Gratis', '免费')}</div>
+                            <div className="text-sm text-white/40 mb-6">
+                                {lang('Full testnet access', 'Testnet completo', '完整测试网访问')}
+                            </div>
+                            <ul className="space-y-2.5 text-sm text-white/70 mb-8">
+                                <li className="flex gap-2"><Check className="w-4 h-4 text-stellar-teal shrink-0 mt-0.5" />{lang('1 test wallet', '1 wallet de prueba', '1 个测试钱包')}</li>
+                                <li className="flex gap-2"><Check className="w-4 h-4 text-stellar-teal shrink-0 mt-0.5" />{lang('All APIs', 'Todas las APIs', '所有 API')}</li>
+                                <li className="flex gap-2"><Check className="w-4 h-4 text-stellar-teal shrink-0 mt-0.5" />{lang('Unlimited requests', 'Sin límite de requests', '无限请求')}</li>
+                            </ul>
+                            <Link href="/dashboard">
+                                <Button variant="outline" className="w-full border-white/20 hover:bg-white/5">
+                                    {lang('Get started', 'Empezar', '开始使用')}
                                 </Button>
                             </Link>
                         </div>
 
-                        {/* Legal disclaimer */}
-                        <p className="mt-8 text-[9px] text-zinc-600 font-mono text-center max-w-3xl mx-auto leading-relaxed">
-                            {t.home.value_prop.disclaimer}
-                        </p>
-                    </motion.div>
-                </div>
-            </section>
-            )}
-
-            {/* ── PROTOCOL INTEGRATIONS ──────────────────────────────────────── */}
-            <section className="py-20 border-y border-white/5 bg-black/50">
-                <div className="container mx-auto px-4">
-                    <div className="flex flex-col items-center gap-6 mb-12">
-                        <motion.div
-                            initial={{ opacity: 0, scale: 0.8 }}
-                            whileInView={{ opacity: 1, scale: 1 }}
-                            transition={{ duration: 1 }}
-                            className="relative"
-                        >
-                            <img
-                                src="/brand/NiLo.png"
-                                alt="Nirium Logo"
-                                className="w-48 sm:w-64 h-auto object-contain drop-shadow-[0_0_40px_rgba(45,235,232,0.4)]"
-                            />
-                        </motion.div>
-                        <h3 className="text-center text-[10px] font-mono text-gray-500 tracking-[0.4em] uppercase font-bold">{t.home.built_for_stellar}</h3>
-                    </div>
-                    <div className="flex flex-wrap justify-center gap-6 sm:gap-12 md:gap-24 items-center grayscale opacity-50 hover:grayscale-0 hover:opacity-100 transition-all duration-700">
-                        <ProtocolItem icon={Landmark} name="BLEND Protocol" />
-                        <ProtocolItem icon={Zap} name="SOROSWAP" />
-                        <ProtocolItem icon={ChevronRight} name="PHOENIX DEX" />
-                        <ProtocolItem icon={Cpu} name="SOROBAN" />
-                        <ProtocolItem icon={Database} name="HORIZON" />
-                        <ProtocolItem icon={Zap} name="x402 STANDARD" />
-                        <ProtocolItem icon={Activity} name="MPP PROTOCOL" />
-                    </div>
-                </div>
-            </section>
-
-
-
-            {/* ── PRO FEATURES GRID ─────────────────────────────────────────── */}
-            <section className="py-24 bg-white/[0.02] border-y border-white/5">
-                <div className="container mx-auto px-4">
-                    <motion.div {...fadeUp()} className="text-center mb-16 space-y-4">
-                        <h2 className="text-4xl md:text-5xl font-black tracking-tighter uppercase italic">
-                            {t.home.pro_features_title} <span className="text-stellar-teal">{t.home.pro_features_span}</span>
-                        </h2>
-                        <p className="text-gray-400 max-w-xl mx-auto text-lg">{t.home.pro_features_subtitle}</p>
-                    </motion.div>
-
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6">
-                        {[
-                            { item: t.home.pro_features_list.plugins, icon: Puzzle },
-                            { item: t.home.pro_features_list.skills, icon: Brain },
-                            { item: t.home.pro_features_list.leaderboard, icon: Trophy },
-                            { item: t.home.pro_features_list.analytics, icon: LineChart },
-                            { item: t.home.pro_features_list.agents, icon: Cpu },
-                        ].map((f, i) => (
-                            <motion.div key={i} {...fadeUp(i * 0.1)} className="p-8 rounded-2xl bg-black/40 border border-white/10 hover:border-stellar-teal/30 transition-all group">
-                                <div className={`w-12 h-12 rounded-xl flex items-center justify-center mb-6 bg-stellar-teal/5 border border-stellar-teal/20 group-hover:scale-110 transition-transform`}>
-                                    <f.icon className="w-6 h-6 text-stellar-teal" />
-                                </div>
-                                <h3 className="text-xl font-black tracking-tight mb-3 uppercase italic">{f.item.title}</h3>
-                                <p className="text-gray-400 text-sm leading-relaxed">{f.item.desc}</p>
-                            </motion.div>
-                        ))}
-                    </div>
-                </div>
-            </section>
-
-            {/* ── DUAL SPECIES INTERFACE SECTION ──────────────────────────── */}
-            <section className="py-24 relative overflow-hidden">
-                <div className="container mx-auto px-4">
-                    <motion.div {...fadeUp()} className="text-center mb-16 space-y-4">
-                        <h2 className="text-4xl md:text-5xl font-black tracking-tighter uppercase italic leading-none">
-                            {t.home.dual_species_title} <span className="text-stellar-teal">{t.home.dual_species_span}</span>
-                        </h2>
-                        <p className="text-gray-400 max-w-xl mx-auto text-lg">{t.home.dual_species_subtitle}</p>
-                    </motion.div>
-
-                    <div className="grid md:grid-cols-2 gap-8 max-w-6xl mx-auto">
-                        {/* Human Operators Card */}
-                        <motion.div {...fadeUp(0.1)} className="group relative p-1 rounded-3xl bg-gradient-to-b from-white/10 to-transparent hover:from-stellar-teal/20 transition-all duration-500">
-                            <div className="bg-[#0A0A0A] rounded-[calc(1.5rem-4px)] p-10 h-full flex flex-col items-start text-left space-y-6 relative overflow-hidden">
-                                <div className="w-12 h-12 rounded-xl bg-white/5 flex items-center justify-center border border-white/10 group-hover:border-stellar-teal/40 transition-colors">
-                                    <User className="w-6 h-6 text-stellar-teal" />
-                                </div>
-                                <h3 className="text-3xl font-black tracking-tighter uppercase italic">{t.home.dual_species_human_title}</h3>
-                                <p className="text-gray-400 leading-relaxed grow">
-                                    {t.home.dual_species_human_desc}
-                                </p>
-                                <Link href="/dashboard" className="flex items-center gap-2 text-white font-bold group/btn hover:text-stellar-teal transition-colors">
-                                    {t.home.dual_species_human_cta} <ArrowRight className="w-5 h-5 group-hover/btn:translate-x-1 transition-transform" />
-                                </Link>
+                        {/* Growth */}
+                        <div className="relative p-6 rounded-xl border border-stellar-teal/40 bg-stellar-teal/[0.05]">
+                            <div className="absolute -top-2.5 left-1/2 -translate-x-1/2 px-2.5 py-0.5 rounded-full bg-stellar-teal text-black text-[10px] font-black uppercase tracking-widest">
+                                {lang('Recommended', 'Recomendado', '推荐')}
                             </div>
-                        </motion.div>
-
-                        {/* Autonomous Agents Card */}
-                        <motion.div {...fadeUp(0.2)} className="group relative p-1 rounded-3xl bg-gradient-to-b from-white/10 to-transparent hover:from-stellar-yellow/20 transition-all duration-500">
-                            <div className="bg-[#0A0A0A] rounded-[calc(1.5rem-4px)] p-10 h-full flex flex-col items-start text-left space-y-6 relative overflow-hidden">
-                                <div className="w-12 h-12 rounded-xl bg-white/5 flex items-center justify-center border border-white/10 group-hover:border-stellar-yellow/40 transition-colors">
-                                    <Bot className="w-6 h-6 text-stellar-yellow" />
-                                </div>
-                                <h3 className="text-3xl font-black tracking-tighter uppercase italic">{t.home.dual_species_agent_title}</h3>
-                                <p className="text-gray-400 leading-relaxed grow">
-                                    {t.home.dual_species_agent_desc}
-                                </p>
-                                <Link href="/agents" className="flex items-center gap-2 text-white font-bold group/btn hover:text-stellar-yellow transition-colors">
-                                    {t.home.dual_species_agent_cta} <ArrowRight className="w-5 h-5 group-hover/btn:translate-x-1 transition-transform" />
-                                </Link>
+                            <div className="text-xs uppercase tracking-widest text-stellar-teal mb-2">Growth</div>
+                            <div className="text-3xl font-black mb-1">$99<span className="text-base text-white/50">/mo</span></div>
+                            <div className="text-sm text-white/40 mb-6">
+                                {lang('+ 0.5% performance fee', '+ 0.5% comisión de desempeño', '+ 0.5% 绩效费')}
                             </div>
-                        </motion.div>
-                    </div>
-                </div>
-            </section>
-
-            {/* ── SETTLEMENT LAYER SECTION (x402 & MPP) ──────────────────── */}
-            <section className="py-24 bg-gradient-to-b from-black to-stellar-teal/5 border-y border-white/5 relative overflow-hidden">
-                <div className="absolute top-0 right-0 w-1/2 h-full bg-[radial-gradient(circle_at_100%_0%,rgba(45,235,232,0.05),transparent_70%)]" />
-                
-                <div className="container mx-auto px-4 relative z-10">
-                    <motion.div {...fadeUp()} className="text-center mb-20 space-y-4">
-                        <h2 className="text-4xl md:text-6xl font-black tracking-tighter uppercase italic leading-none">
-                            {t.home.settlement_layer.title} <span className="text-stellar-teal">{t.home.settlement_layer.span}</span>
-                        </h2>
-                        <p className="text-gray-400 max-w-2xl mx-auto text-lg">
-                            {t.home.settlement_layer.subtitle}
-                        </p>
-                    </motion.div>
-
-                    <div className="grid md:grid-cols-2 gap-8 max-w-6xl mx-auto">
-                        {/* x402 Card */}
-                        <motion.div {...fadeUp(0.1)} className="group relative p-8 rounded-3xl bg-black/60 border border-white/10 hover:border-stellar-teal/40 transition-all duration-500 shadow-2xl">
-                            <div className="absolute top-4 right-8 text-[40px] opacity-10 font-black italic tracking-tighter text-stellar-teal group-hover:opacity-20 transition-opacity">x402</div>
-                            <div className="space-y-6">
-                                <div className="w-16 h-16 rounded-2xl bg-stellar-teal/10 flex items-center justify-center border border-stellar-teal/30 group-hover:scale-110 transition-transform">
-                                    <Zap className="w-8 h-8 text-stellar-teal" />
-                                </div>
-                                <div>
-                                    <h3 className="text-2xl font-black tracking-tight mb-3 uppercase italic text-white flex items-center gap-2">
-                                        {t.home.settlement_layer.x402_title}
-                                    </h3>
-                                    <p className="text-gray-400 leading-relaxed text-sm md:text-base">
-                                        {t.home.settlement_layer.x402_desc}
-                                    </p>
-                                </div>
-                                <div className="flex items-center gap-4 py-4 border-t border-white/5">
-                                    <div className="text-[10px] font-mono text-stellar-teal uppercase tracking-[0.2em] font-bold italic">{t.home.institutional_use_cases.extra.soroban_verified}</div>
-                                    <div className="h-1 flex-1 bg-white/5 rounded-full overflow-hidden">
-                                        <motion.div 
-                                            initial={{ width: 0 }}
-                                            whileInView={{ width: "100%" }}
-                                            transition={{ duration: 1.5, ease: "easeOut" }}
-                                            className="h-full bg-stellar-teal"
-                                        />
-                                    </div>
-                                </div>
-                            </div>
-                        </motion.div>
-
-                        {/* MPP Card */}
-                        <motion.div {...fadeUp(0.2)} className="group relative p-8 rounded-3xl bg-black/60 border border-white/10 hover:border-stellar-yellow/40 transition-all duration-500 shadow-2xl">
-                            <div className="absolute top-4 right-8 text-[40px] opacity-10 font-black italic tracking-tighter text-stellar-yellow group-hover:opacity-20 transition-opacity">MPP</div>
-                            <div className="space-y-6">
-                                <div className="w-16 h-16 rounded-2xl bg-stellar-yellow/10 flex items-center justify-center border border-stellar-yellow/30 group-hover:scale-110 transition-transform">
-                                    <Layers className="w-8 h-8 text-stellar-yellow" />
-                                </div>
-                                <div>
-                                    <h3 className="text-2xl font-black tracking-tight mb-3 uppercase italic text-white">
-                                        {t.home.settlement_layer.mpp_title}
-                                    </h3>
-                                    <p className="text-gray-400 leading-relaxed text-sm md:text-base">
-                                        {t.home.settlement_layer.mpp_desc}
-                                    </p>
-                                </div>
-                                <div className="flex items-center gap-4 py-4 border-t border-white/5">
-                                    <div className="text-[10px] font-mono text-stellar-yellow uppercase tracking-[0.2em] font-bold italic">{t.home.institutional_use_cases.extra.freighter_ready}</div>
-                                    <div className="h-1 flex-1 bg-white/5 rounded-full overflow-hidden">
-                                        <motion.div 
-                                            initial={{ width: 0 }}
-                                            whileInView={{ width: "100%" }}
-                                            transition={{ duration: 1.5, ease: "easeOut", delay: 0.2 }}
-                                            className="h-full bg-stellar-yellow"
-                                        />
-                                    </div>
-                                </div>
-                            </div>
-                        </motion.div>
-                    </div>
-
-                    <div className="mt-16 flex justify-center">
-                        <Link href="/docs/settlement" className="group inline-flex items-center gap-3 px-6 py-3 bg-white/5 border border-white/10 rounded-full font-bold hover:bg-white/10 transition-all">
-                            <span>{t.home.institutional_use_cases.extra.explore_infra}</span>
-                            <ChevronRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-                        </Link>
-                    </div>
-                </div>
-            </section>
-
-            {/* ── INSTITUTIONAL USE CASES ──────────────────────────────── */}
-            <section className="py-24 bg-black border-y border-white/5 relative">
-                <div className="absolute top-0 right-0 w-1/3 h-[500px] bg-stellar-teal/5 blur-[120px] rounded-full pointer-events-none" />
-                <div className="container mx-auto px-4 relative z-10">
-                    <motion.div {...fadeUp()} className="text-center mb-16 space-y-4">
-                        <div className="inline-flex items-center gap-2 px-3 py-1 bg-stellar-yellow/10 border border-stellar-yellow/30 text-stellar-yellow text-[10px] font-black uppercase tracking-widest mb-4">
-                            <Zap className="w-3 h-3" />
-                            <span>{t.home.institutional_use_cases.badge}</span>
-                        </div>
-                        <h2 className="text-4xl md:text-5xl font-black tracking-tighter uppercase italic leading-none text-white">
-                            {t.home.institutional_use_cases.title} <span className="text-stellar-teal">{t.home.institutional_use_cases.title_span}</span>
-                        </h2>
-                        <p className="text-gray-400 max-w-2xl mx-auto text-lg leading-relaxed mt-4">
-                            {t.home.institutional_use_cases.description}
-                        </p>
-                    </motion.div>
-
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-6xl mx-auto">
-                        {[
-                            { id: "liquidity", tags: ["MXN", "USDC", "1.4%"] },
-                            { id: "b2b", tags: ["CETES", "Etherfuse"] },
-                            { id: "yield", tags: ["Blend", "USDC"] },
-                            { id: "audit", tags: ["IPFS", "RegTech"] },
-                            { id: "settlement", tags: ["x402", "MPP"] },
-                            { id: "vault", tags: ["Soroban", "Multisig"] }
-                        ].map((item, idx) => {
-                            const poc = t.home.institutional_use_cases.items[item.id as keyof typeof t.home.institutional_use_cases.items];
-                            return (
-                                <motion.div 
-                                    key={item.id}
-                                    {...fadeUp(idx * 0.1)}
-                                    className="bg-[#0A0A0A] border border-white/10 rounded-2xl p-8 hover:border-stellar-teal/20 transition-all group relative overflow-hidden"
-                                >
-                                    <div className="absolute top-0 right-0 w-32 h-32 blur-3xl rounded-full bg-stellar-teal/5 opacity-0 group-hover:opacity-40 transition-opacity" />
-                                    <div className="flex justify-between items-start mb-6">
-                                        <div className="p-3 rounded-xl bg-white/5 border border-white/10 text-gray-400 group-hover:text-stellar-teal transition-colors">
-                                            <Cpu size={24} />
-                                        </div>
-                                    </div>
-                                    <h3 className="text-xl font-black text-white mb-3 tracking-tighter uppercase">{poc.name}</h3>
-                                    <p className="text-xs text-gray-400 font-mono leading-relaxed mb-8">
-                                        {poc.desc}
-                                    </p>
-                                    <div className="flex flex-wrap gap-2 pt-6 border-t border-white/5">
-                                        {item.tags.map((tag: string) => (
-                                            <span key={tag} className="text-[9px] font-mono font-bold uppercase tracking-widest text-gray-600">
-                                                #{tag}
-                                            </span>
-                                        ))}
-                                    </div>
-                                </motion.div>
-                            );
-                        })}
-                    </div>
-                </div>
-            </section>
-
-
-
-            {/* ── VISUAL STRATEGY BUILDER SECTION ───────────────────────── */}
-            <section className="py-24 relative overflow-hidden">
-                <div className="container mx-auto px-4">
-                    <div className="grid lg:grid-cols-2 gap-16 items-center">
-                        <motion.div {...fadeUp()} className="space-y-8">
-                            <h2 className="text-4xl md:text-6xl font-black tracking-tighter uppercase leading-[0.9]">
-                                {t.home.builder_section_title} <br />
-                                <span className="text-transparent bg-clip-text bg-gradient-to-r from-stellar-teal to-purple-500">{t.home.builder_section_span}</span>
-                            </h2>
-                            <p className="text-gray-400 text-lg leading-relaxed max-w-xl">
-                                {t.home.builder_section_subtitle}
-                            </p>
-                            <ul className="space-y-4">
-                                {(t.home.builder_section_features as string[]).map((feature, i) => (
-                                    <li key={i} className="flex items-center gap-3 text-white/80 font-medium">
-                                        <div className="w-2 h-2 rounded-full bg-stellar-teal shadow-[0_0_10px_rgba(45,235,232,0.8)]" />
-                                        {feature}
-                                    </li>
-                                ))}
+                            <ul className="space-y-2.5 text-sm text-white/80 mb-8">
+                                <li className="flex gap-2"><Check className="w-4 h-4 text-stellar-teal shrink-0 mt-0.5" />{lang('Mainnet (when available)', 'Mainnet (cuando esté disponible)', '主网（可用时）')}</li>
+                                <li className="flex gap-2"><Check className="w-4 h-4 text-stellar-teal shrink-0 mt-0.5" />{lang('5 production wallets', '5 wallets de producción', '5 个生产钱包')}</li>
+                                <li className="flex gap-2"><Check className="w-4 h-4 text-stellar-teal shrink-0 mt-0.5" />{lang('Audit trail + IPFS', 'Audit trail + IPFS', '审计追踪 + IPFS')}</li>
+                                <li className="flex gap-2"><Check className="w-4 h-4 text-stellar-teal shrink-0 mt-0.5" />{lang('CNBV reports', 'Reportes CNBV', 'CNBV 报告')}</li>
+                                <li className="flex gap-2"><Check className="w-4 h-4 text-stellar-teal shrink-0 mt-0.5" />{lang('Email support', 'Email support', '邮件支持')}</li>
                             </ul>
-                        </motion.div>
+                            <Link href="/dashboard">
+                                <Button variant="premium" className="w-full">
+                                    {lang('Reserve access', 'Reservar acceso', '预约访问')}
+                                </Button>
+                            </Link>
+                        </div>
 
-                        <motion.div
-                            initial={{ opacity: 0, x: 50 }}
-                            whileInView={{ opacity: 1, x: 0 }}
-                            viewport={{ once: true }}
-                            className="relative group w-full"
-                        >
-                            {/* Mockup Browser Window */}
-                            <div className="relative bg-[#0A0A0A] rounded-2xl border border-white/10 shadow-2xl overflow-hidden aspect-video lg:aspect-[1.4/1]">
-                                {/* Header */}
-                                <div className="h-10 border-b border-white/5 bg-white/[0.02] flex items-center justify-between px-4">
-                                    <div className="flex gap-1.5">
-                                        <div className="w-2.5 h-2.5 rounded-full bg-red-500/50" />
-                                        <div className="w-2.5 h-2.5 rounded-full bg-yellow-500/50" />
-                                        <div className="w-2.5 h-2.5 rounded-full bg-green-500/50" />
-                                    </div>
-                                    <span className="text-[10px] font-mono text-gray-600 tracking-widest uppercase">{t.home.institutional_use_cases.extra.treasury_auto}</span>
-                                </div>
-
-                                {/* Builder Body */}
-                                <div className="flex h-full">
-                                    {/* Sidebar */}
-                                    <div className="w-1/3 border-r border-white/5 p-4 space-y-4 bg-black/20">
-                                        <div className="text-[10px] text-gray-600 font-bold uppercase tracking-wider mb-2">{t.home.institutional_use_cases.extra.rules}</div>
-                                        {[
-                                            t.home.institutional_use_cases.builder_data.rule_fx,
-                                            t.home.institutional_use_cases.builder_data.rule_spei,
-                                            t.home.institutional_use_cases.builder_data.rule_kyc
-                                        ].map((trigger, i) => (
-                                            <div key={i} className="bg-white/5 border border-white/10 rounded-lg p-3 text-[10px] text-gray-400 font-mono">
-                                                {trigger}
-                                            </div>
-                                        ))}
-                                    </div>
-
-                                    {/* Canvas Area */}
-                                    <div className="flex-1 relative p-8">
-                                        <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(45,235,232,0.05)_0%,transparent_100%)]" />
-
-                                        {/* Animated Nodes */}
-                                        <div className="relative flex items-center justify-around h-full">
-                                            {/* Node 1 */}
-                                            <motion.div
-                                                animate={{ y: [0, -5, 0] }}
-                                                transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
-                                                className="bg-stellar-yellow text-black p-3 rounded-lg flex items-center gap-2 shadow-lg z-10"
-                                            >
-                                                <Zap className="w-3 h-3 fill-black" />
-                                                <span className="text-[10px] font-bold uppercase">{t.home.institutional_use_cases.extra.fx_trigger}</span>
-                                            </motion.div>
-
-                                            {/* Pulsing Connector */}
-                                            <div className="absolute top-1/2 left-1/4 right-1/4 h-[2px] -translate-y-1/2">
-                                                <div className="w-full h-full bg-gradient-to-r from-stellar-yellow to-stellar-teal opacity-20" />
-                                                <motion.div
-                                                    animate={{ left: ["0%", "100%"] }}
-                                                    transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
-                                                    className="absolute top-0 w-8 h-full bg-stellar-teal blur-sm"
-                                                />
-                                            </div>
-
-                                            {/* Node 2 */}
-                                            <motion.div
-                                                animate={{ y: [0, 5, 0] }}
-                                                transition={{ duration: 4, repeat: Infinity, ease: "easeInOut", delay: 1 }}
-                                                className="bg-stellar-teal text-black p-3 rounded-lg flex items-center gap-2 shadow-lg z-10"
-                                            >
-                                                <Zap className="w-3 h-3 fill-black" />
-                                                <span className="text-[10px] font-bold uppercase">{t.home.institutional_use_cases.extra.settle_cetes}</span>
-                                            </motion.div>
-                                        </div>
-
-                                        <div className="absolute bottom-4 left-1/2 -translate-x-1/2 text-[9px] text-gray-600 font-mono tracking-wide">
-                                            {t.home.institutional_use_cases.extra.builder_hint}
-                                        </div>
-                                    </div>
-                                </div>
+                        {/* Enterprise */}
+                        <div className="p-6 rounded-xl border border-white/10 bg-white/[0.02]">
+                            <div className="text-xs uppercase tracking-widest text-white/40 mb-2">Enterprise</div>
+                            <div className="text-3xl font-black mb-1">Custom</div>
+                            <div className="text-sm text-white/40 mb-6">
+                                {lang('For CNBV-regulated fintechs', 'Para fintechs CNBV', '适用于 CNBV 监管金融科技')}
                             </div>
-
-                            {/* Decorative Background Elements */}
-                            <div className="absolute -top-10 -right-10 w-40 h-40 bg-purple-500/10 rounded-full blur-3xl" />
-                            <div className="absolute -bottom-10 -left-10 w-40 h-40 bg-stellar-teal/10 rounded-full blur-3xl" />
-                        </motion.div>
+                            <ul className="space-y-2.5 text-sm text-white/70 mb-8">
+                                <li className="flex gap-2"><Check className="w-4 h-4 text-stellar-teal shrink-0 mt-0.5" />{lang('Unlimited wallets', 'Wallets ilimitadas', '无限钱包')}</li>
+                                <li className="flex gap-2"><Check className="w-4 h-4 text-stellar-teal shrink-0 mt-0.5" />{lang('SLA guarantee', 'SLA garantizado', 'SLA 保障')}</li>
+                                <li className="flex gap-2"><Check className="w-4 h-4 text-stellar-teal shrink-0 mt-0.5" />{lang('Multi-tenant', 'Multi-tenant', '多租户')}</li>
+                                <li className="flex gap-2"><Check className="w-4 h-4 text-stellar-teal shrink-0 mt-0.5" />{lang('On-premise option', 'On-premise opcional', '本地部署选项')}</li>
+                                <li className="flex gap-2"><Check className="w-4 h-4 text-stellar-teal shrink-0 mt-0.5" />{lang('Dedicated support', 'Soporte dedicado', '专属支持')}</li>
+                            </ul>
+                            <a href="mailto:hello@nirium.xyz">
+                                <Button variant="outline" className="w-full border-white/20 hover:bg-white/5">
+                                    {lang('Contact us', 'Contactar', '联系我们')}
+                                </Button>
+                            </a>
+                        </div>
                     </div>
                 </div>
             </section>
 
-            <section className="py-24 container mx-auto px-4">
-                <motion.div {...fadeUp()} className="text-center mb-16 space-y-4">
-                    <h2 className="text-4xl md:text-6xl font-black tracking-tighter">
-                        {t.home.swarm_title} <span className="text-stellar-teal">{t.home.swarm_title_span}</span>
-                    </h2>
-                    <p className="text-gray-400 max-w-2xl mx-auto text-lg">{t.home.swarm_subtitle}</p>
-                </motion.div>
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
-                    {[
-                        { label: t.home.stat_agents, value: "1.4%", sub: t.home.stat_agents_sub, icon: Bot, color: "teal" },
-                        { label: t.home.stat_throughput_label, value: "~112", sub: t.home.stat_throughput_sub, icon: Repeat2, color: "yellow" },
-                        { label: t.home.stat_latency_label, value: "3-5s", sub: t.home.stat_latency_sub, icon: Activity, color: "purple" },
-                        { label: t.home.stat_capacity_label, value: "Institutional", sub: t.home.stat_capacity_sub, icon: BarChart3, color: "green" },
-                    ].map((s, i) => (
-                        <motion.div key={i} {...fadeUp(i * 0.1)} className={`p-6 rounded-2xl bg-white/[0.03] border border-white/10 group hover:border-${s.color === 'teal' ? 'stellar-teal' : s.color === 'yellow' ? 'stellar-yellow' : 'white'}/30 transition-all`}>
-                            <s.icon className={`w-6 h-6 mb-3 ${s.color === 'teal' ? 'text-stellar-teal' : s.color === 'yellow' ? 'text-stellar-yellow' : s.color === 'purple' ? 'text-purple-400' : 'text-green-400'}`} />
-                            <div className="text-3xl font-black tracking-tight">{s.value}</div>
-                            <div className="text-sm font-bold text-white/80 mt-1">{s.label}</div>
-                            <div className="text-xs text-gray-500 mt-0.5">{s.sub}</div>
-                        </motion.div>
-                    ))}
-                </div>
-            </section>
-
-
-
-            {/* ── ELO REPUTATION SECTION ────────────────────────────────────── */}
-            <section className="py-32 container mx-auto px-4">
-                <div className="grid lg:grid-cols-2 gap-16 items-center">
-                    <motion.div {...fadeUp()} className="space-y-6">
-                        <h2 className="text-4xl md:text-6xl font-black tracking-tighter">
-                            {t.home.elo_title_1} <br /><span className="text-stellar-yellow">{t.home.elo_title_2}</span>
-                        </h2>
-                        <p className="text-gray-400 text-lg leading-relaxed">{t.home.elo_subtitle}</p>
-                        <div className="space-y-4">
-                            {[
-                                { tier: 'Matrix', elo: '≥ 2000', color: '#2DEBE8', label: t.home.elo_tier_matrix },
-                                { tier: 'Gold', elo: '≥ 1500', color: '#FFD700', label: t.home.elo_tier_gold },
-                                { tier: 'Silver', elo: '≥ 1000', color: '#A78BFA', label: t.home.elo_tier_silver },
-                            ].map(t2 => (
-                                <div key={t2.tier} className="flex items-center gap-4 p-4 bg-white/[0.03] rounded-xl border border-white/10">
-                                    <Trophy className="w-5 h-5 shrink-0" style={{ color: t2.color }} />
-                                    <div>
-                                        <div className="font-bold" style={{ color: t2.color }}>{t2.tier} {t.home.institutional_use_cases.extra.elo_tier_suffix} {t2.elo}</div>
-                                        <div className="text-xs text-gray-500">{t2.label}</div>
-                                    </div>
-                                </div>
-                            ))}
-                        </div>
-                        <Link href="/leaderboard" className="inline-flex items-center gap-2 px-6 py-3 bg-white/5 border border-white/10 rounded-lg font-bold hover:bg-white/10 transition-all">
-                            {t.home.elo_cta} <ExternalLink className="w-4 h-4" />
-                        </Link>
-                    </motion.div>
-
-                    {/* Swarm Roster */}
-                    <motion.div {...fadeUp(0.2)}>
-                        <div className="grid grid-cols-3 gap-3">
-                            {getAgentData(t).map((agent, i) => (
-                                <motion.div
-                                    key={agent.name}
-                                    whileHover={{ scale: 1.05 }}
-                                    className="p-3 bg-white/[0.03] border border-white/10 rounded-xl text-center cursor-pointer hover:border-white/30 transition-all"
-                                >
-                                    <div className="w-8 h-8 rounded-full mx-auto mb-2 flex items-center justify-center text-[10px] font-black" style={{ background: `${agent.color}20`, color: agent.color, border: `1px solid ${agent.color}40` }}>
-                                        {agent.name.slice(0, 2)}
-                                    </div>
-                                    <div className="text-[10px] font-bold">{agent.name}</div>
-                                    <div className="text-[9px] text-gray-600 leading-tight">{agent.role}</div>
-                                </motion.div>
-                            ))}
-                        </div>
-                    </motion.div>
-                </div>
-            </section>
-
-
-            {/* ── LIVE CONTRACTS ────────────────────────────────────────────── */}
-            <section className="py-24 bg-black/40 border-t border-white/5">
-                <div className="container mx-auto px-4">
-                    <motion.div {...fadeUp()} className="text-center mb-16 space-y-4">
-                        <h2 className="text-4xl md:text-6xl font-black tracking-tighter">
-                            {t.home.contracts_title} <span className="text-stellar-teal">{t.home.contracts_span}</span>
-                        </h2>
-                        <p className="text-gray-400 max-w-2xl mx-auto">{t.home.contracts_subtitle}</p>
-                    </motion.div>
-                    <div className="grid md:grid-cols-2 gap-4 max-w-4xl mx-auto">
-                        {getContractData(t).map((c, i) => (
-                            <motion.a
-                                key={c.name}
-                                {...fadeUp(i * 0.1)}
-                                href={`https://stellar.expert/explorer/testnet/contract/${c.full}`}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                className="flex items-center gap-4 p-5 bg-white/[0.03] border border-white/10 rounded-xl hover:border-white/30 transition-all group"
-                            >
-                                <div className="w-10 h-10 rounded-lg flex items-center justify-center shrink-0" style={{ background: `${c.color}15`, border: `1px solid ${c.color}30` }}>
-                                    <Lock className="w-4 h-4" style={{ color: c.color }} />
-                                </div>
-                                <div className="min-w-0">
-                                    <div className="font-bold text-sm">{c.name}</div>
-                                    <div className="text-xs font-mono text-gray-500 truncate">{c.addr}</div>
-                                    <div className="text-[10px] text-gray-600 mt-0.5">{t.home[`contract_role_${c.role_key}` as keyof typeof t.home] as string}</div>
-                                </div>
-                                <ExternalLink className="w-4 h-4 text-gray-600 group-hover:text-white ml-auto shrink-0 transition-colors" />
-                            </motion.a>
+            {/* CREDIBILITY STRIP */}
+            <section className="py-16 border-t border-white/5">
+                <div className="max-w-5xl mx-auto px-6">
+                    <p className="text-center text-xs uppercase tracking-widest text-white/40 mb-8">
+                        {lang('Credentials and stack', 'Reconocimientos y stack', '资质与技术栈')}
+                    </p>
+                    <div className="flex flex-wrap items-center justify-center gap-6 sm:gap-10">
+                        {[
+                            'Stellar Scale Program',
+                            'SCF Ecosystem Alignment',
+                            'JARGUS Internal Test (78/78 Vectors)',
+                            'External Audit Pending',
+                            'Stellar Testnet',
+                            'Soroban',
+                            'Etherfuse',
+                        ].map((item) => (
+                            <div key={item} className="text-[10px] text-white/40 font-mono uppercase tracking-[0.2em]">
+                                {item}
+                            </div>
                         ))}
                     </div>
                 </div>
             </section>
 
-            {/* ── SDK SECTION ───────────────────────────────────────────────── */}
-            <section className="py-32 border-t border-white/5">
-                <div className="container mx-auto px-4 grid lg:grid-cols-2 gap-16 items-center">
-                    <div className="space-y-6">
-                        <h3 className="text-3xl md:text-5xl font-black leading-tight tracking-tighter">{t.home.sdk_title_1} <br /><span className="text-stellar-yellow">{t.home.sdk_span}</span></h3>
-                        <p className="text-gray-400 text-lg">{t.home.sdk_subtitle}</p>
-                        <div className="bg-[#0A0A0A] border border-white/10 rounded-xl p-6 font-mono text-sm group relative overflow-hidden">
-                            <div className="flex justify-between items-center mb-4">
-                                <div className="flex gap-2">
-                                    <span className="text-gray-500">npm</span>
-                                    <span className="text-gray-500">pnpm</span>
-                                    <span className="text-blue-400 font-bold border-b border-blue-400">sdk</span>
-                                </div>
-                                <Activity className="w-4 h-4 text-stellar-teal" />
+            {/* DASHBOARD PREVIEW */}
+            <section className="py-24 border-t border-white/5 overflow-hidden">
+                <div className="max-w-6xl mx-auto px-6">
+                    <div className="text-center mb-12">
+                        <div className="inline-flex items-center gap-2 px-3 py-1 bg-stellar-teal/10 border border-stellar-teal/20 rounded-full text-stellar-teal text-[10px] font-black uppercase tracking-widest mb-4">
+                            <span className="relative flex h-1.5 w-1.5">
+                                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-stellar-teal opacity-75" />
+                                <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-stellar-teal" />
+                            </span>
+                            {lang('Live on Testnet', 'En vivo en Testnet', '测试网实时运行')}
+                        </div>
+                        <h2 className="text-3xl sm:text-5xl font-black tracking-tight">
+                            {lang('The full product.', 'El producto completo.', '完整产品。')}{' '}
+                            <span className="text-stellar-teal">{lang('Behind one click.', 'Detrás de un clic.', '一键即达。')}</span>
+                        </h2>
+                        <p className="mt-4 text-white/50 max-w-xl mx-auto text-sm">
+                            {lang(
+                                'Connect your Freighter wallet and access the full institutional dashboard — agents, analytics, vault, x402, MPP, and IPFS audit trail.',
+                                'Conecta tu wallet Freighter y accede al dashboard institucional completo — agentes, analytics, vault, x402, MPP y rastro de auditoría IPFS.',
+                                '连接 Freighter 钱包，访问完整的机构级仪表板 — 代理、分析、金库、x402、MPP 和 IPFS 审计追踪。'
+                            )}
+                        </p>
+                    </div>
+
+                    {/* Dashboard mockup */}
+                    <div className="relative rounded-2xl overflow-hidden border border-white/10 shadow-[0_0_80px_rgba(45,235,232,0.08)]">
+                        {/* Browser chrome */}
+                        <div className="flex items-center gap-2 px-4 py-3 bg-[#0A0A0A] border-b border-white/[0.06]">
+                            <div className="flex gap-1.5">
+                                <div className="w-3 h-3 rounded-full bg-red-500/40" />
+                                <div className="w-3 h-3 rounded-full bg-yellow-500/40" />
+                                <div className="w-3 h-3 rounded-full bg-green-500/40" />
                             </div>
-                            <code className="text-white block overflow-x-auto whitespace-nowrap text-xs sm:text-sm custom-scrollbar pb-2">
-                                <span className="text-purple-400">import</span> {"{"}Agent{"}"} <span className="text-purple-400">from</span> <span className="text-green-400">&apos;@nirium/sdk&apos;</span>;<br />
-                                <span className="text-blue-400">const</span> bot = <span className="text-blue-400">new</span> Agent(<span className="text-yellow-300">&quot;sk_live_...&quot;</span>);<br />
-                                <span className="text-gray-500">{t.home.institutional_use_cases.builder_data.code_comment}</span><br />
-                                bot.bill(<span className="text-cyan-400">&apos;user_402&apos;</span>, {"{"} units: 1, trigger: <span className="text-green-400">&apos;inference&apos;</span> {"}"});
-                            </code>
-                            <div className="absolute top-0 right-0 w-full h-full bg-gradient-to-r from-transparent to-stellar-teal/5 opacity-0 group-hover:opacity-100 transition-opacity" />
+                            <div className="flex-1 mx-4">
+                                <div className="max-w-xs mx-auto bg-white/5 border border-white/[0.08] rounded-md px-3 py-1 text-[10px] font-mono text-white/30">
+                                    app.nirium.xyz/dashboard
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* Fake dashboard UI */}
+                        <div className="bg-[#050505] flex min-h-[420px]">
+                            {/* Sidebar */}
+                            <div className="w-44 shrink-0 border-r border-white/[0.05] p-3 space-y-1 hidden sm:block">
+                                {[
+                                    { category: 'CORE' },
+                                    { label: 'Dashboard',         active: true,  color: '#2DEBE8' },
+                                    { label: 'Nodos de Ejecución', active: false, color: '#FFD700' },
+                                    { label: 'Analytics',         active: false, color: '#34D399' },
+                                    { label: 'Compliance',        active: false, color: '#2DEBE8' },
+                                    { category: 'TREASURY', mt: true },
+                                    { label: 'Blueprints',        active: false, color: '#A78BFA' },
+                                    { label: 'Strategy Builder',  active: false, color: '#F97316' },
+                                    { label: 'Fiat Hub',          active: false, color: '#34D399' },
+                                    { category: 'DEVELOPER', mt: true },
+                                    { label: 'Docs',              active: false, color: '#FFFFFF' },
+                                    { label: 'Developers',        active: false, color: '#FFFFFF' },
+                                ].map((item, i) => (
+                                    item.category ? (
+                                        <div key={item.category} className={`text-[9px] font-black text-white/20 uppercase tracking-[0.2em] px-3 pb-1 ${item.mt ? 'pt-4' : 'pt-2'}`}>
+                                            {item.category}
+                                        </div>
+                                    ) : (
+                                        <div
+                                            key={item.label}
+                                            className={`flex items-center gap-2 px-2.5 py-1.5 rounded-lg text-[11px] font-medium ${
+                                                item.active ? 'bg-white/[0.08] text-white' : 'text-white/30'
+                                            }`}
+                                        >
+                                            {item.active && (
+                                                <span className="w-0.5 h-3.5 rounded-full absolute left-3" style={{ background: item.color }} />
+                                            )}
+                                            <span className="w-1.5 h-1.5 rounded-full shrink-0" style={{ background: item.active ? item.color : 'rgba(255,255,255,0.1)' }} />
+                                            {item.label}
+                                        </div>
+                                    )
+                                ))}
+                            </div>
+
+                            {/* Main content */}
+                            <div className="flex-1 p-5 space-y-4 overflow-hidden">
+                                {/* Stats row */}
+                                <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                                    {[
+                                        { label: 'Treasury Balance', value: '$127,430', sub: 'CETES 3.38% (gov. rate)', color: 'text-stellar-teal' },
+                                        { label: 'Active Agents',    value: '3 / 30',  sub: '24/7 Autonomous', color: 'text-stellar-yellow' },
+                                        { label: 'USDC → CETES',     value: '82%',     sub: 'Auto-rebalanced', color: 'text-purple-400' },
+                                        { label: 'Audit Entries',    value: '1,847',   sub: 'IPFS Immutable',  color: 'text-green-400' },
+                                    ].map(({ label, value, sub, color }) => (
+                                        <div key={label} className="bg-white/[0.03] border border-white/[0.06] rounded-xl p-3">
+                                            <div className="text-[9px] font-mono text-white/30 uppercase mb-1">{label}</div>
+                                            <div className={`text-lg font-black ${color}`}>{value}</div>
+                                            <div className="text-[9px] text-white/30 mt-0.5">{sub}</div>
+                                        </div>
+                                    ))}
+                                </div>
+
+                                {/* Agent feed */}
+                                <div className="bg-white/[0.02] border border-white/[0.06] rounded-xl p-4">
+                                    <div className="flex items-center justify-between mb-3">
+                                        <span className="text-[10px] font-black uppercase tracking-widest text-white/50">Agent Activity</span>
+                                        <span className="flex items-center gap-1 text-[9px] text-green-400 font-mono">
+                                            <span className="w-1 h-1 rounded-full bg-green-400 animate-pulse" />
+                                            LIVE
+                                        </span>
+                                    </div>
+                                    <div className="space-y-2">
+                                        {[
+                                            { time: '23:41:02', msg: '[AGENT-01] Rebalanced 2,400 USDC -> CETES via Etherfuse', type: 'success' },
+                                            { time: '23:40:47', msg: '[AGENT-02] x402 micropayment: 0.05 USDC - API call billed', type: 'info' },
+                                            { time: '23:40:31', msg: '[SENTINEL] Vault health check passed - all systems nominal', type: 'success' },
+                                        ].map(({ time, msg, type }) => (
+                                            <div key={time} className="flex items-start gap-2 text-[10px] font-mono">
+                                                <span className="text-white/20 shrink-0">{time}</span>
+                                                <span className={type === 'success' ? 'text-green-400/80' : 'text-stellar-teal/80'}>{msg}</span>
+                                            </div>
+                                        ))}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* Launch CTA overlay */}
+                        <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-t from-black/80 via-transparent to-transparent">
+                            <div className="absolute bottom-8 flex flex-col items-center gap-3">
+                                <Link href="/dashboard">
+                                    <Button size="lg" variant="premium" className="shadow-[0_0_40px_rgba(255,215,0,0.3)]">
+                                        {lang('Launch App — Free Testnet', 'Lanzar App — Testnet Gratis', '启动应用 — 免费测试网')}
+                                        <ArrowRight className="ml-2 w-4 h-4" />
+                                    </Button>
+                                </Link>
+                                <p className="text-[10px] text-white/30 font-mono">
+                                    {lang('No funds at risk · Non-custodial · Freighter wallet', 'Sin fondos en riesgo · No custodial · Freighter', '无资金风险 · 非托管 · Freighter 钱包')}
+                                </p>
+                            </div>
                         </div>
                     </div>
+                </div>
+            </section>
 
-                    <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-                        <SDKCard name="TypeScript SDK" lang="NPM package" command="npm install nirium" icon={TerminalIcon} href="https://www.npmjs.com/package/nirium" />
-                        <SDKCard name="Python SDK" lang="PyPI package" command="pip install nirium" icon={Shield} href="https://pypi.org/project/nirium/" />
-                        <SDKCard name="REST API" lang="API REST" command="api.nirium.xyz" icon={Cpu} href="https://api.nirium.xyz" />
-                        <SDKCard name="CLI" lang="npx" command="npx nirium create-unit" icon={TerminalIcon} comingSoon />
-                        <SDKCard name="Nirium MCP" lang="Claude & Grok" command="Model Context Protocol" icon={Bot} comingSoon />
-                        <SDKCard name="Desktop Studio" lang="Visual GUI" command="No Code Needed" icon={Layers} comingSoon />
-                        <SDKCard name="PWA" lang="Progressive Web App" command="Install from browser" icon={Smartphone} comingSoon />
-                        <SDKCard name="Android App" lang="Google Play" command="Android native" icon={Smartphone} comingSoon />
-                        <SDKCard name="iOS App" lang="App Store" command="Apple native" icon={Apple} comingSoon />
+            {/* FINAL CTA */}
+            <section className="py-24 border-t border-white/5">
+                <div className="max-w-3xl mx-auto px-6 text-center">
+                    <h2 className="text-3xl sm:text-5xl font-black tracking-tight">
+                        {lang(
+                            'Ready to automate your treasury?',
+                            '¿Listo para automatizar tu tesorería?',
+                            '准备好自动化您的财库了吗？'
+                        )}
+                    </h2>
+                    <p className="mt-4 text-white/60 max-w-xl mx-auto">
+                        {lang(
+                            'Five minutes setup. Zero sales calls. Free on testnet.',
+                            'Cinco minutos de setup. Cero llamadas de ventas. Testnet completamente gratis.',
+                            '五分钟设置。无销售电话。测试网完全免费。'
+                        )}
+                    </p>
+                    <div className="mt-10 flex flex-col sm:flex-row gap-3 justify-center">
+                        <Link href="/dashboard">
+                            <Button size="lg" variant="premium" className="w-full sm:w-auto">
+                                {lang('Get started free', 'Comenzar gratis', '免费开始')}
+                                <ArrowRight className="ml-2 w-4 h-4" />
+                            </Button>
+                        </Link>
+                        <a href="https://github.com/Eras256/Nirium" target="_blank" rel="noopener">
+                            <Button size="lg" variant="outline" className="w-full sm:w-auto border-white/20 hover:bg-white/5">
+                                GitHub
+                                <ExternalLink className="ml-2 w-4 h-4" />
+                            </Button>
+                        </a>
                     </div>
                 </div>
             </section>
 
-            {/* ── FINAL CTA ─────────────────────────────────────────────────── */}
-            <section className="py-24 sm:py-32 md:py-40 text-center relative px-4">
-                <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_100%,rgba(45,235,232,0.1),transparent_50%)]" />
-                <h2 className="text-4xl sm:text-6xl md:text-7xl lg:text-8xl font-black mb-8 sm:mb-12 tracking-tighter uppercase italic leading-[0.85]">
-                    {t.home.ignite_the_loop_part1} <br className="sm:hidden" />
-                    <span className="text-stellar-teal">{t.home.ignite_the_loop_part2}</span>
-                </h2>
-                <div className="flex flex-col sm:flex-row flex-wrap justify-center gap-4 sm:gap-6 relative z-10 w-full px-4 max-w-2xl mx-auto">
-                    <button
-                        onClick={handleLaunch}
-                        className="w-full sm:w-auto px-6 sm:px-12 py-4 sm:py-5 bg-gradient-to-r from-stellar-teal to-stellar-yellow text-black font-black text-base sm:text-xl rounded-full transition-all hover:scale-105 hover:shadow-[0_0_50px_rgba(255,200,0,0.4)] active:scale-95"
-                    >
-                        {t.home.enter_matrix}
-                    </button>
-                    <Link
-                        href="/sandbox"
-                        className="w-full sm:w-auto px-6 sm:px-12 py-4 sm:py-5 border border-white/20 text-white font-bold text-base sm:text-xl rounded-full hover:bg-white/5 transition-all text-center"
-                    >
-                        {t.home.browse_agents}
-                    </Link>
-                </div>
-            </section>
+            <Footer />
         </main>
-    );
-}
-
-function StatPill({ label, value, color }: { label: string, value: string, color: 'teal' | 'yellow' | 'purple' }) {
-    const colorMap = {
-        teal: 'bg-stellar-teal/10 text-stellar-teal border-stellar-teal/30',
-        yellow: 'bg-stellar-yellow/10 text-stellar-yellow border-stellar-yellow/30',
-        purple: 'bg-purple-400/10 text-purple-400 border-purple-400/30',
-    };
-    return (
-        <div className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-full border text-xs font-mono ${colorMap[color]}`}>
-            <span className="font-black">{value}</span>
-            <span className="opacity-70">{label}</span>
-        </div>
-    );
-}
-
-function ProtocolItem({ icon: Icon, name }: { icon: any, name: string }) {
-    return (
-        <div className="flex items-center gap-2 group cursor-pointer">
-            <Icon className="w-6 h-6 text-gray-400 group-hover:text-stellar-teal transition-colors" />
-            <span className="text-lg font-bold tracking-tight text-gray-300 group-hover:text-white transition-colors uppercase">{name}</span>
-        </div>
-    );
-}
-
-
-
-function SDKCard({ name, lang, command, icon: Icon, href, comingSoon }: { name: string, lang: string, command: string, icon: any, href?: string, comingSoon?: boolean }) {
-    const isLink = !!href && !comingSoon;
-    const Component: any = isLink ? 'a' : 'div';
-    return (
-        <Component
-            href={isLink ? href : undefined}
-            target={isLink ? "_blank" : undefined}
-            rel={isLink ? "noopener noreferrer" : undefined}
-            className={`relative block bg-[#0A0A0A] border border-white/10 rounded-xl p-6 group transition-all ${comingSoon ? 'opacity-70 cursor-default' : 'hover:border-white/30 cursor-pointer'}`}
-        >
-            {comingSoon && (
-                <span className="absolute top-2 right-2 px-1.5 py-0.5 bg-stellar-yellow/15 border border-stellar-yellow/30 rounded text-[8px] font-black text-stellar-yellow uppercase tracking-widest">
-                    Coming Soon
-                </span>
-            )}
-            <div className="flex justify-between items-start mb-4">
-                <div className={`p-2 rounded-lg transition-colors ${comingSoon ? 'bg-white/[0.03]' : 'bg-white/5 group-hover:bg-stellar-teal/10'}`}>
-                    <Icon className={`w-5 h-5 ${comingSoon ? 'text-gray-600' : 'text-gray-400 group-hover:text-stellar-teal'}`} />
-                </div>
-                <span className="text-[10px] font-mono text-gray-600">{lang}</span>
-            </div>
-            <div className="text-sm font-bold mb-1">{name}</div>
-            <div className="text-[10px] font-mono text-gray-500 overflow-hidden text-ellipsis whitespace-nowrap">{command}</div>
-        </Component>
     );
 }

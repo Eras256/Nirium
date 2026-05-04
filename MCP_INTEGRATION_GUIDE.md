@@ -160,7 +160,7 @@ Output: { stopped, message }
 ```
 
 #### `get_system_health`
-Full system health: Horizon, Soroban RPC, WebSocket, IPFS, LLM provider status.
+Full system health: Horizon, Soroban RPC, WebSocket, LLM provider status.
 
 ```
 Input: none
@@ -314,7 +314,7 @@ node dist/index.js
 
 ## Institutional Partner Integration Notes
 
-- Institutional Partner team installs MCP in their Claude Desktop using their `sk_inst_YOUR_API_KEY` key as `NIRIUM_API_KEY`
+- Institutional Partner team installs MCP in their Claude Desktop using their `sk_inst_partner_lead_investor_nirium_2026` key as `NIRIUM_API_KEY`
 - This gives them access to loop control and health monitoring without touching the Core Repo
 - Paid tools (x402/MPP) require a funded Stellar testnet wallet — Institutional Partner provides their own keypair
 - The MCP never exposes the Core Repo, secret keys, or admin credentials
@@ -322,4 +322,4 @@ node dist/index.js
 
 ---
 
-*Nirium MCP Integration Guide v0.4.0 — Tested 19 April 2026*
+*Nirium MCP Integration Guide v0.4.0 — Tested 19 April 2026 — Updated 26 April 2026*

@@ -11,7 +11,7 @@ export async function GET() {
 
     try {
         // We must encode % and the emoji correctly for the URL
-        const filter = encodeURIComponent('%🧠%');
+        const filter = encodeURIComponent('%⚙️%');
         const res = await fetch(
             `${SUPABASE_URL}/rest/v1/agent_logs?message=like.${filter}&select=*&order=created_at.desc&limit=10`,
             {
@@ -28,8 +28,8 @@ export async function GET() {
         return NextResponse.json(data.map((d: any) => ({
             id: d.id,
             agent: d.agent_id,
-            thought: d.message.replace('🧠 [THOUGHT] ', ''),
-            protocol: 'neural',
+            thought: d.message.replace('⚙️ [LOG] ', ''),
+            protocol: 'telemetry',
             timestamp: d.created_at || d.timestamp || new Date().toISOString()
         })));
     } catch (e) {
@@ -42,7 +42,7 @@ export async function POST(req: Request) {
 
     try {
         const { agent, thought, protocol } = await req.json();
-        console.log(`📡 [NeuralFeed] Attempting to save thought from ${agent}...`);
+        console.log(`📡 [TelemetryFeed] Attempting to save log from ${agent}...`);
 
         const res = await fetch(`${SUPABASE_URL}/rest/v1/agent_logs`, {
             method: 'POST',
@@ -54,20 +54,20 @@ export async function POST(req: Request) {
             },
             body: JSON.stringify({
                 agent_id: agent,
-                message: `🧠 [THOUGHT] ${thought}`,
+                message: `⚙️ [LOG] ${thought}`,
                 level: 'info',
             }),
         });
         
         if (res.ok) {
-            console.log(`✅ [NeuralFeed] Thought saved to Supabase.`);
+            console.log(`✅ [TelemetryFeed] Log saved to Supabase.`);
         } else {
-            console.warn(`❌ [NeuralFeed] Supabase rejected thought:`, res.status, await res.text());
+            console.warn(`❌ [TelemetryFeed] Supabase rejected log:`, res.status, await res.text());
         }
 
         return NextResponse.json({ success: res.ok });
     } catch (e: any) {
-        console.error(`🚨 [NeuralFeed] API Crash:`, e.message);
+        console.error(`🚨 [TelemetryFeed] API Crash:`, e.message);
         return NextResponse.json({ error: 'Invalid thought' }, { status: 400 });
     }
 }

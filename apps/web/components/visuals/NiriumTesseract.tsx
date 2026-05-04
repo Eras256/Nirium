@@ -3,6 +3,7 @@
 
 import React, { useRef, useMemo } from 'react';
 import { Canvas, useFrame } from '@react-three/fiber';
+import { CanvasErrorBoundary } from '@/components/3d/CanvasErrorBoundary';
 import { Float, Icosahedron, Dodecahedron, Octahedron, MeshTransmissionMaterial, Environment } from '@react-three/drei';
 
 import * as THREE from 'three';
@@ -171,19 +172,28 @@ export interface NiriumTesseractProps {
     className?: string;
 }
 
+function handleContextLoss({ gl }: { gl: any }) {
+    gl.domElement.addEventListener('webglcontextlost', (e: Event) => {
+        e.preventDefault();
+    }, false);
+}
+
 export function NiriumTesseract({ className }: NiriumTesseractProps) {
     return (
         <div className={`w-full h-full min-h-[600px] relative rounded-2xl overflow-hidden shadow-2xl ${className || ''}`}>
             {/* Inner ambient glow background layer behind the Canvas */}
             <div className="absolute inset-0 bg-gradient-to-tr from-[#00E5FF]/10 via-[#0A0515] to-[#B026FF]/10 z-0 pointer-events-none" />
 
-            <Canvas
-                camera={{ position: [0, 0, 8.5], fov: 45 }}
-                className="z-10 bg-transparent"
-                gl={{ antialias: true }}
-            >
-                <TesseractScene />
-            </Canvas>
+            <CanvasErrorBoundary>
+                <Canvas
+                    camera={{ position: [0, 0, 8.5], fov: 45 }}
+                    className="z-10 bg-transparent"
+                    gl={{ antialias: true }}
+                    onCreated={handleContextLoss}
+                >
+                    <TesseractScene />
+                </Canvas>
+            </CanvasErrorBoundary>
         </div>
     );
 }

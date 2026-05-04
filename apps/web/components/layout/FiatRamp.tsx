@@ -8,7 +8,12 @@ export default function FiatRamp() {
     const { t } = useLanguage();
     const [amount, setAmount] = useState<string>('500');
     const [walletAddress, setWalletAddress] = useState<string>('');
+    const [selectedBond, setSelectedBond] = useState<string>('CETES');
     const [status, setStatus] = useState<'idle' | 'onboarding' | 'kyc_pending' | 'quoting' | 'quoted' | 'ordering' | 'wiring' | 'success'>('idle');
+
+    const BONDS = [
+        { id: 'CETES', name: 'CETES', ref_rate: '3.38%', tvl: 'MX$476,145,215', cost: 'MX$1.13224', fiat: 'MXN' }
+    ];
     const [quote, setQuote] = useState<any>(null);
     const [order, setOrder] = useState<any>(null);
     const [error, setError] = useState<string>('');
@@ -31,10 +36,11 @@ export default function FiatRamp() {
         setError('');
         setStatus('quoting');
         try {
+            const bond = BONDS.find(b => b.id === selectedBond);
             const res = await fetch('/api/etherfuse', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ action: 'quote', amount, walletAddress })
+                body: JSON.stringify({ action: 'quote', amount, walletAddress, bondId: bond?.id, fiat: bond?.fiat })
             });
             const data = await res.json();
 
@@ -129,7 +135,7 @@ export default function FiatRamp() {
                             <p className="text-[10px] text-gray-500 font-mono uppercase tracking-widest">{t.ramp.component.powered_by}</p>
                             <div className="pl-2 border-l border-white/10 flex items-center gap-1.5">
                                 <Shield size={10} className="text-emerald-500/50" />
-                                <span className="text-[8px] font-mono text-emerald-500/50 uppercase tracking-widest">Ethics Aligned</span>
+                                <span className="text-[8px] font-mono text-emerald-500/50 uppercase tracking-widest">{t.ramp.component.legal.ethics_aligned}</span>
                             </div>
                         </div>
                     </div>
@@ -144,8 +150,29 @@ export default function FiatRamp() {
                 <AnimatePresence mode="wait">
                     {status === 'idle' && (
                         <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="space-y-4">
+                            <div className="mb-6">
+                                <label className="text-xs text-gray-400 font-semibold uppercase tracking-wider mb-2 block">{t.ramp.component.select_bond}</label>
+                                <div className="grid grid-cols-2 gap-2">
+                                    {BONDS.map(b => (
+                                        <button
+                                            key={b.id}
+                                            onClick={() => setSelectedBond(b.id)}
+                                            className={`p-3 rounded-xl border text-left transition-all ${selectedBond === b.id ? 'bg-emerald-500/10 border-emerald-500/50 shadow-[0_0_15px_rgba(16,185,129,0.15)]' : 'bg-white/5 border-white/10 hover:border-white/30'}`}
+                                        >
+                                            <div className="flex justify-between items-start mb-1">
+                                                <span className={`font-black text-sm ${selectedBond === b.id ? 'text-emerald-400' : 'text-white'}`}>{b.name}</span>
+                                                <span className="text-[10px] font-mono text-gray-400 bg-white/5 px-1.5 py-0.5 rounded">{b.ref_rate} Banxico</span>
+                                            </div>
+                                            <div className="text-[10px] text-gray-500 font-mono mb-1">TVL: {b.tvl}</div>
+                                            <div className="text-[10px] text-gray-400 font-mono">Cost: {b.cost}</div>
+                                        </button>
+                                    ))}
+                                </div>
+                            </div>
                             <div>
-                                <label className="text-xs text-gray-400 font-semibold uppercase tracking-wider mb-1 block">{t.ramp.component.form.amount_label}</label>
+                                <label className="text-xs text-gray-400 font-semibold uppercase tracking-wider mb-1 block">
+                                    {t.ramp.component.form.amount_label} ({BONDS.find(b => b.id === selectedBond)?.fiat})
+                                </label>
                                 <input
                                     type="number"
                                     value={amount}
@@ -218,17 +245,17 @@ export default function FiatRamp() {
                             <div className="bg-white/5 border border-white/10 rounded-lg p-4 space-y-3">
                                 <div className="flex justify-between items-center">
                                     <span className="text-gray-400 text-sm">{t.ramp.component.quote.source}</span>
-                                    <span className="text-white font-mono font-medium">{quote.sourceAmount || quote.fromAmount || amount} MXN</span>
+                                    <span className="text-white font-mono font-medium">{quote.sourceAmount || quote.fromAmount || amount} {BONDS.find(b => b.id === selectedBond)?.fiat}</span>
                                 </div>
                                 <div className="flex justify-center -my-1">
                                     <ArrowDown className="w-4 h-4 text-emerald-500/50" />
                                 </div>
                                 <div className="flex justify-between items-center">
                                     <span className="text-gray-400 text-sm">{t.ramp.component.quote.target}</span>
-                                    <span className="text-emerald-400 font-mono font-bold text-lg">{(quote.destinationAmount || quote.toAmount || quote.targetAmount || 0)} CETES</span>
+                                    <span className="text-emerald-400 font-mono font-bold text-lg">{(quote.destinationAmount || quote.toAmount || quote.targetAmount || 0)} {selectedBond}</span>
                                 </div>
                                 <div className="pt-2 mt-2 border-t border-white/10 flex justify-between">
-                                    <span className="text-xs text-gray-500">{t.ramp.component.quote.rate}: 1 CETES = {(parseFloat(quote.exchangeRate) || 1).toFixed(4)} MXN</span>
+                                    <span className="text-xs text-gray-500">{t.ramp.component.quote.rate}: 1 {selectedBond} = {(parseFloat(quote.exchangeRate) || 1).toFixed(4)} {BONDS.find(b => b.id === selectedBond)?.fiat}</span>
                                     <span className="text-xs text-gray-500">{t.ramp.component.quote.expires}</span>
                                 </div>
                             </div>
@@ -274,7 +301,7 @@ export default function FiatRamp() {
                                     </div>
                                     <div className="flex justify-between items-center pt-2 border-t border-white/10">
                                         <span className="text-xs text-gray-500">{t.ramp.component.wiring.amount}</span>
-                                        <span className="text-sm text-white font-mono font-medium">{amount} MXN</span>
+                                        <span className="text-sm text-white font-mono font-medium">{amount} {BONDS.find(b => b.id === selectedBond)?.fiat}</span>
                                     </div>
                                 </div>
                             </div>

@@ -51,9 +51,9 @@ export function middleware(request: NextRequest) {
 export const config = {
     matcher: [
         /*
-         * Optimización para Vercel Edge:
-         * Ignora rutas de la API, archivos estáticos de Next.js, 
-         * optimización de imágenes y cualquier archivo con extensión (imágenes, fuentes, etc.)
+         * Vercel Edge optimization:
+         * Skip API routes, Next.js static files,
+         * image optimization routes, and any file with a static extension (images, fonts, etc.)
          */
         '/((?!api|_next/static|_next/image|favicon.ico|sitemap.xml|robots.txt|.*\\.(?:svg|png|jpg|jpeg|gif|webp|ico|csv|txt|woff|woff2|css|js)$).*)',
     ],

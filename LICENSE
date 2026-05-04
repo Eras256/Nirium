@@ -1,3 +1,10 @@
+# NIRIUM PROTOCOL LICENSE
+# 
+# IMPORTANT: This repository uses a dual-licensing strategy.
+# - The Core Protocol (Contracts/Agent/Dashboard) is licensed under BSL 1.1 below.
+# - Integration SDKs and Tools (packages/sdk, packages/mcp, etc.) are licensed 
+#   under Apache 2.0. See LICENSING.md for details.
+#
 Business Source License 1.1
 
 Parameters:

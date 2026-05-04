@@ -1,14 +1,14 @@
 "use client";
 
 import { useState, useEffect, useRef, useCallback } from 'react';
-import { Terminal, Maximize2, Minimize2, Brain, CreditCard, Activity, Shield, Cpu, Database, Zap, ExternalLink } from 'lucide-react';
+import { Terminal, Maximize2, Brain, CreditCard, Shield, Cpu, Zap } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useLanguage } from '../../context/LanguageContext';
 
 const DEMO_LOGS = [
-    { agent_id: 'Matrix', message: 'Neural Matrix Uplink established. Swarm broadcasting on-chain...', level: 'system', created_at: new Date().toISOString() },
+    { agent_id: 'Protocol', message: 'System connection established. Execution network broadcasting on-chain...', level: 'system', created_at: new Date().toISOString() },
     { agent_id: 'Titan', message: 'Vault architecture synchronized — 3 asset classes active', level: 'info', created_at: new Date().toISOString() },
-    { agent_id: 'Astra', message: 'DeFindex USDC yield route optimized — APY 14.2%', level: 'success', created_at: new Date().toISOString() },
+    { agent_id: 'Astra', message: 'Liquidity route optimized for USDC — Spread minimized', level: 'success', created_at: new Date().toISOString() },
 ];
 
 function formatTime(ts: string) {
@@ -45,7 +45,7 @@ export default function OpsConsole({ isExpanded, onToggleExpand, walletAddress, 
                 }
             }
         } catch (e) {
-            console.warn('[Neural Feed] Fetch error:', e);
+            console.warn('[Telemetry Feed] Fetch error:', e);
             setStatus('unavailable');
         }
     }, [logs.length]);
@@ -59,7 +59,7 @@ export default function OpsConsole({ isExpanded, onToggleExpand, walletAddress, 
     useEffect(() => {
         const timeout = setTimeout(() => {
             setStatus(prev => prev === 'connecting' ? 'unavailable' : prev);
-        }, 8000);
+        }, 12000);
         return () => clearTimeout(timeout);
     }, []);
 
@@ -86,7 +86,7 @@ export default function OpsConsole({ isExpanded, onToggleExpand, walletAddress, 
             <div className="bg-white/5 border-b border-white/5 px-4 py-3 flex justify-between items-center shrink-0">
                 <div className="flex items-center gap-2">
                     <Terminal className="w-4 h-4 text-stellar-teal" />
-                    <span className="text-xs font-mono font-bold text-gray-300 uppercase tracking-widest">{t.dashboard.neural_feed.uplink}</span>
+                    <span className="text-xs font-mono font-bold text-gray-300 uppercase tracking-widest">{t.dashboard.telemetry_feed.uplink}</span>
                     <span className={`flex items-center gap-1.5 ml-2 px-1.5 py-0.5 rounded ${s.bg} text-[10px] ${s.text} border`}>
                         <span className={`w-1 h-1 rounded-full ${s.dot} ${status === 'online' ? 'animate-pulse' : ''}`}></span>
                         {s.label}
@@ -105,18 +105,14 @@ export default function OpsConsole({ isExpanded, onToggleExpand, walletAddress, 
                     <AnimatePresence mode="popLayout">
                     {logs.map((log, i) => {
                         const rawMsg = (log.message || '');
-                        const parts = rawMsg.split('|');
-                        // Strip any inline "IPFS: ..." fragments from the visible message (coming soon)
-                        const mainMsg = (parts[0] || '').replace(/IPFS:\s*\S+/gi, '').replace(/\s{2,}/g, ' ').trim();
-                        const isIpfsHash = (s?: string) => !!s && /IPFS:|^bafy|^Qm/i.test(s.trim());
-                        const hashPart = !isIpfsHash(parts[1]) ? parts[1] : undefined;
+                        const mainMsg = (rawMsg.split('|')[0] || '').replace(/IPFS:\s*\S+/gi, '').replace(/\s{2,}/g, ' ').trim();
 
                         // Detect agent type for branding
                         const isIntelligence = log.agent_id === 'INTELLIGENCE';
                         const isSettlement = log.agent_id === 'x402' || log.agent_id === 'MPP' || log.agent_id === 'SETTLEMENT' || log.source === 'horizon';
                         const isX402 = log.agent_id === 'x402';
                         const isMPP = log.agent_id === 'MPP';
-                        const isSystem = log.level === 'system' || log.agent_id === 'Matrix';
+                        const isSystem = log.level === 'system' || log.agent_id === 'Protocol';
                         const isPayment = log.agent_id?.includes('GATEWAY') || log.level === 'payment';
                         
                         return (
@@ -171,23 +167,6 @@ export default function OpsConsole({ isExpanded, onToggleExpand, walletAddress, 
                                     }`}>
                                         {mainMsg.replace(/Soroban Intelligence: /i, '')}
                                     </span>
-                                    
-                                    <div className="mt-1 flex flex-wrap gap-2">
-                                        {(hashPart || log.tx_hash) && (
-                                            <a 
-                                                href={`https://stellar.expert/explorer/testnet/tx/${(hashPart || log.tx_hash || '').trim().replace(/^tx=/, '')}`}
-                                                target="_blank"
-                                                className="flex items-center gap-1.5 px-2 py-0.5 bg-black/40 border border-white/5 rounded hover:border-stellar-yellow/50 transition-colors"
-                                            >
-                                                <Activity className="w-2.5 h-2.5 text-stellar-yellow/50" />
-                                                <span className="text-stellar-yellow/80 font-mono text-[8px] truncate max-w-[100px]">
-                                                    {(hashPart || log.tx_hash || '').trim().replace(/^tx=/, '')}
-                                                </span>
-                                                <ExternalLink size={8} className="text-white/20" />
-                                            </a>
-                                        )}
-                                        
-                                    </div>
                                 </div>
                             </motion.div>
                         );

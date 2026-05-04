@@ -29,12 +29,12 @@ The following components are in scope for security reports:
 
 | Component | Status | Notes |
 |-----------|--------|-------|
-| **NiriumVault** (Soroban) | ⚠️ Unaudited | Treasury & flash loan contract |
-| **ELO Registry** (Soroban) | ⚠️ Unaudited | Reputation scoring contract |
-| **Strategy Marketplace** (Soroban) | ⚠️ Unaudited | CID registry contract |
-| **Neural Sentinel** (Soroban) | ⚠️ Unaudited | Performance scoring contract |
-| **Settlement Hub** (Soroban) | ⚠️ Unaudited | x402 & MPP escrow contract |
-| **Skill Vault** (Soroban) | ⚠️ Unaudited | x402 payment gate contract |
+| **NiriumVault** (Soroban) | ✅ JARGUS PASS — formal audit pending | Treasury & flash loan contract |
+| **ELO Registry** (Soroban) | ✅ JARGUS PASS — formal audit pending | Reputation scoring contract |
+| **Strategy Marketplace** (Soroban) | ✅ JARGUS PASS — formal audit pending | CID registry contract |
+| **Neural Sentinel** (Soroban) | ✅ JARGUS PASS — formal audit pending | Performance scoring contract |
+| **Settlement Hub** (Soroban) | ✅ JARGUS PASS — formal audit pending | x402 & MPP escrow contract |
+| **Skill Vault** (Soroban) | ✅ JARGUS PASS — formal audit pending | x402 payment gate contract |
 | **Frontend** (Next.js) | In scope | Web application at nirium.xyz |
 | **API endpoints** | In scope | REST API and webhook handlers |
 | **Agent bots** | In scope | Autonomous agent scripts |
@@ -52,7 +52,7 @@ The following components are in scope for security reports:
 
 The protocol is currently deployed on **Stellar Testnet only** and uses test tokens with no monetary value. A formal third-party audit is planned for Month 3 of operations (Soroban layer via SCF Audit Bank; API/server layer independently funded).
 
-**JARGUS Internal Audit v2.0 (April 2026):** 78/78 vectors PASS, 0 critical, 0 high. This is a rigorous self-assessment, not a third-party certification.
+**JARGUS Internal Audit v2.0 (April 2026):** 78/78 vectors PASS, 0 critical, 0 high. This is a rigorous self-assessment, not a third-party certification. Full report: [SECURITY_AUDIT_V2.md](SECURITY_AUDIT_V2.md).
 
 ### Security Measures Currently in Place
 
@@ -67,7 +67,7 @@ The protocol is currently deployed on **Stellar Testnet only** and uses test tok
 - HMAC-SHA256 webhook signature validation
 - Row Level Security (RLS) on Supabase
 - Non-custodial architecture (users retain key control)
-- IPFS-backed immutable audit trails
+- HMAC-SHA256 signed immutable audit trail per agent action
 
 ## Responsible Disclosure
 
@@ -89,4 +89,4 @@ We appreciate the security research community's efforts. Reporters of valid secu
 
 ---
 
-*This security policy is effective as of April 22, 2026.*
+*This security policy is effective as of April 26, 2026.*

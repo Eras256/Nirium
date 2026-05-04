@@ -1,7 +1,7 @@
 # Nirium Protocol: Technical Whitepaper v2.1
 > Institutional DeFi Infrastructure Powered by Autonomous Agents on Stellar/Soroban
 
-**Version:** 2.1 — April 2026 (Updated April 22)
+**Version:** 2.1 — April 2026 (Updated April 26)
 **Author:** Nirium Protocol Team — Nirium Protocol
 **Network:** Stellar Testnet (Mainnet post-audit)
 **Contact:** xvaiosx7@gmail.com
@@ -10,7 +10,7 @@
 
 ## 1. Abstract
 
-Nirium is institutional DeFi infrastructure that enables fintechs and financial institutions to automate treasury operations, cross-border FX, and yield management using autonomous agents on the Stellar network. The protocol combines Soroban smart contracts with a multi-LLM execution layer, x402 micropayments, MPP session budgets, and a 44-endpoint institutional API — creating a full-stack platform where autonomous agents execute financial strategies on-chain with cryptographic accountability and boardroom-ready audit trails.
+Nirium is institutional DeFi infrastructure that enables fintechs and financial institutions to automate treasury operations, cross-border FX, and cash-flow management using autonomous agents on the Stellar network. The protocol combines Soroban smart contracts with a multi-LLM execution layer, x402 micropayments, MPP session budgets, and a 44-endpoint institutional API — creating a full-stack platform where autonomous agents execute financial strategies on-chain with cryptographic accountability and boardroom-ready audit trails.
 
 Nirium addresses two markets simultaneously: institutional clients (B2B/A2A) that need automated treasury infrastructure, and the emerging agentic economy where AI agents pay for intelligence and execution with USDC micropayments. Both markets are served by the same protocol layer.
 
@@ -30,13 +30,13 @@ Layer 1 — Interface
 Layer 2 — Intelligence & API
   Express API Server (api.nirium.xyz, 44 endpoints)
   Neural Reasoner (LLM, provider-agnostic)
-  30-Agent Swarm (racing mode, 3–12s intervals)
+  30-Agent Execution Cluster (racing mode, 3–12s intervals)
   Strategy Router (5 execution types)
 
 Layer 3 — Settlement
   Soroban Smart Contracts (6 deployed, Testnet)
   Stellar SDEX / Soroswap / Blend
-  IPFS / Pinata (audit trail)
+  Audit Storage (HMAC-SHA256 signed immutable records)
   Supabase (persistence layer)
 ```
 
@@ -157,7 +157,7 @@ No account required. Agent pays with any funded Stellar wallet. Facilitator (`x4
 
 Institution or treasury manager locks USDC in a Soroban escrow session via `open_session()`. Agent executes within the budget using `settle_intent()`. Unspent funds return on `close_session()`. The agent never touches funds outside the session boundary.
 
-**Use case:** Remittance operator delegates $10K USDC for nightly FX rebalancing. Agent executes cross-border swaps within budget, unspent funds auto-return at end of session.
+**Use case:** Treasury operator delegates $10K USDC for nightly FX rebalancing. Agent executes cross-border swaps within budget, unspent funds auto-return at end of session.
 
 **SDK:** `agent.initMpp(config); const data = await agent.mppFetch('/api/v1/mpp/signals');`
 
@@ -189,7 +189,7 @@ Nirium abstracts LLM interaction across 8 providers, configurable at deploy time
 
 **1. Unstructured Data Analysis:** Ingests news, macroeconomic releases (Banxico rate decisions, Fed minutes, peso/dollar alerts), on-chain governance — translates to structured trading signals before price ticks reflect the move.
 
-**2. Swarm Orchestration:** Dynamically activates or suppresses agent classes based on market regime (high volatility → risk protection agents active; deep liquidity → arbitrage agents racing; macro event pending → execution pause).
+**2. Execution Cluster Orchestration:** Dynamically activates or suppresses agent classes based on market regime (high volatility → risk protection agents active; deep liquidity → arbitrage agents racing; macro event pending → execution pause).
 
 **3. Audit Log Generation:** Translates raw XDR transactions to boardroom-readable summaries in real time. Compliance teams audit every agent action without blockchain expertise.
 
@@ -210,7 +210,7 @@ Every agent action follows this pipeline:
 2. HMAC-SHA256 signed (BlackBox Archive)
 3. Written to Supabase (`agent_logs`)
 4. LLM translates to human-readable summary
-5. IPFS CID generated via Pinata for immutable long-term storage
+5. Record committed to immutable audit storage (decentralized, planned for future release)
 6. Exportable as encrypted JSON
 
 This dual-format archive (machine-readable + human-readable) enables both technical auditors and institutional directors to independently verify any agent action. Designed specifically so compliance teams need zero blockchain expertise.
@@ -271,7 +271,7 @@ Internal security framework (Kali Linux). Result: **78/78 PASS, 0 critical, 0 hi
 Formal third-party audit planned for Month 3 of Institutional Partner JV (contracts signed April 20, 2026):
 - Soroban layer ($25K–$30K): SCF Audit Bank eligible (95% subsidy)
 - Server/API pen test ($10K–$15K): funded by Institutional Partner
-- SCF Round 43 Build Award application: deadline April 26, 2026 (up to $150K milestone-based)
+- SCF Round 43 Build Award application: deadline April 26, 2026 (up to $150K, milestone-based: 10% Approval, 20% MVP, 30% Testnet, 40% Mainnet).
 - Etherfuse partnership grant: ~$150K potential, technical call pending
 
 ### 9.5 Pending Pre-Mainnet (non-blocking for Testnet)
@@ -362,4 +362,4 @@ The protocol's deployment on Stellar Testnet — 44 API endpoints, 30 autonomous
 
 ---
 
-*Nirium Protocol — experimental software. Not financial advice. Not an investment product. Testnet operations only. Updated April 22, 2026.*
+*Nirium Protocol — experimental software. Not financial advice. Not an investment product. Stellar Testnet only. Updated April 26, 2026.*

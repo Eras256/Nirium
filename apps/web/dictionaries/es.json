@@ -2,53 +2,57 @@
     "nav": {
         "home": "Inicio",
         "dashboard": "Dashboard",
-        "strategies": "Marketplace",
+        "marketplace": "Blueprints",
         "treasury": "Tesorería",
         "sandbox": "Sandbox",
-        "leaderboard": "Performance",
         "analytics": "Analytics",
         "ramp": "Fiat Hub",
-        "agents": "Developers",
-        "build": "Build",
+        "agents": "Nodos de Ejecución",
+        "builder": "Strategy Builder",
         "docs": "Docs",
-        "auth_matrix": "Conectar Billetera",
+        "auth_session": "Conectar Billetera",
         "disconnect": "Desconectar",
         "stellar_connected": "Stellar Conectado",
-        "login_matrix": "Conectar Wallet",
-        "disconnect_matrix": "Desconectar Matrix",
+        "login_session": "Conectar Wallet",
+        "disconnect_session": "Desconectar Sesión",
         "status": "Estado",
         "select_language": "Seleccionar Idioma",
-        "uplink_ready": "ENLACE LISTO {v}"
+        "uplink_ready": "SISTEMA LISTO {v}",
+        "security": "Seguridad",
+        "compliance": "Compliance",
+        "developers": "Developers",
+        "pricing": "Precios",
+        "launch_app": "Launch app"
     },
     "footer": {
         "protocol": "Nirium",
         "intel_hub": "Guías y Manuales",
         "metrics": "Estadísticas de Red",
-        "neural_matrix": "Matriz Estratégica",
+        "protocol_hub": "Núcleo Estratégico",
         "market_analytics": "Datos de Mercado",
         "signal_pool": "Marketplace",
-        "matrix_builder": "Constructor de Estrategias",
-        "neural_plugins": "Capacidades de Red",
+        "strategy_builder": "Constructor de Estrategias",
+        "protocol_plugins": "Capacidades de Red",
         "agents_control": "Centro de Nodos",
         "protocol_manifesto": "La Visión",
         "mission_manual": "Manual de Operaciones",
         "developer_docs": "Documentación Técnica",
         "soroban_source": "Código Fuente Soroban",
         "active_nodes": "Nodos Activos",
-        "matrix_tier": "Nivel de Estatus",
+        "node_tier": "Estatus del Nodo",
         "net_health": "Salud del Sistema",
         "arb_vectors": "Eficiencia",
         "locked": "Protegido",
         "optimal": "Óptimo",
-        "ignite_matrix": "LANZAR INTERFAZ",
-        "uplink_established": "CONEXIÓN ESTABLE",
-        "uplink_connecting": "CONECTANDO...",
-        "kernel_version": "NIRIUM v0.5.0 (26 de Abril de 2026)",
+        "ignite_protocol": "LANZAR INTERFAZ",
+        "connection_established": "CONEXIÓN ESTABLE",
+        "connection_connecting": "CONECTANDO...",
+        "kernel_version": "NIRIUM v0.5.0 (30 de Abril de 2026)",
         "soroban_verified": "SOROBAN AUDITADO",
         "testnet_live": "STELLAR TESTNET ACTIVA",
         "powered_by": "Tecnología Stellar · Código Abierto",
         "stellar_native": "Stellar Nativo",
-        "brand_desc": "Automatización de Tesorería Corporativa para Latinoamérica. Proveemos infraestructura de software no custodial que conecta su banca con Stellar mediante protocolos institucionales.",
+        "brand_desc": "Protocolo de Tesorería Autónoma en Stellar. Software no custodial que rebalancea USDC inactivo en CETES tokenizados 24/7 vía Etherfuse — sin intervención humana.",
         "institutional_protocol": "INFRAESTRUCTURA EMPRESARIAL",
         "copyright": "© 2026 NIRIUM.XYZ",
         "risk_disclosure": "Aviso de Riesgo",
@@ -58,27 +62,27 @@
         "testnet_nodes": "Nodos Online",
         "jargus_link": "Seguridad Jargus (78/78 Vectores)",
         "rights": "TODOS LOS DERECHOS RESERVADOS",
-        "compliance_disclaimer": "Nirium proporciona infraestructura de software no custodial. No brindamos asesoría financiera, de inversión o legal. Las metas de rendimiento son estimaciones históricas y no están garantizadas. Los activos digitales conllevan riesgos. Nirium es independiente y no está respaldado por la Stellar Development Foundation. Operamos bajo las directrices del Stellar Community Fund (SCF 7.0) y, al participar en nuestra comunidad, aceptas actuar profesionalmente y seguir nuestro Código de Conducta. Nuestro proyecto está diseñado para cumplir con los rigurosos requisitos de los programas SCF Build Awards e Instaward.",
+        "compliance_disclaimer": "Nirium proporciona infraestructura de software no custodial. No brindamos asesoría financiera, legal o de inversión. Las métricas de ejecución de software son estimaciones históricas y no están garantizadas. Los activos digitales conllevan riesgos. Nirium es independiente y no está respaldado por la Stellar Development Foundation. Operamos bajo el marco del Stellar Community Fund (SCF 7.0). Al participar en nuestro ecosistema, aceptas el Código de Conducta de Stellar (actualizado el 30 de abril de 2026), priorizando el profesionalismo, la diversidad y el respeto mutuo.",
         "audit_title": "Auditoría de Seguridad y Cumplimiento",
         "audit_vectors": "Estándares del Ecosistema Stellar",
         "audit_result": "CUMPLIMIENTO SCF 7.0 & COC",
         "audit_status": "VERIFICADO",
         "scf_verified": "ALINEADO A SCF 7.0",
-        "instaward_supported": "SOPORTADO POR INSTAWARD",
-        "coc_aligned": "ÉTICA COC (ABRIL 2026)"
+        "ecosystem_ready": "LISTO PARA ECOSISTEMA SCF",
+        "coc_aligned": "CUMPLIMIENTO COC (30 ABRIL 2026)"
     },
     "leaderboard": {
         "header": {
             "badge": "Capa de Rendimiento e Integridad de Red",
             "title": "Leaderboard del Protocolo",
-            "subtitle": "Auditoría en tiempo real de kernels de tesorería autónomos operando dentro de la red Nirium. Ranking público y transparente alineado con SCF 7.0 Instaward.",
+            "subtitle": "Auditoría en tiempo real de kernels de tesorería autónomos operando dentro de la red Nirium. Ranking público y transparente alineado con SCF 7.0 y los estándares del Ecosistema Stellar.",
             "network_status": "Estado de la Red"
         },
         "sync": {
             "live": "EN VIVO — SINCRONIZANDO ON-CHAIN",
             "demo": "MODO DEMO — ARCHIVO LOCAL",
             "updated": "Actualizado",
-            "uplink": "UPLINK_STABLE_v0.5"
+            "uplink": "CONEXION_ESTABLE_v0.5"
         },
         "table": {
             "rank": "#",
@@ -100,7 +104,7 @@
         },
         "tiers": {
             "rank_label": "RANGO",
-            "matrix": "MATRIX",
+            "platinum": "PLATINO",
             "gold": "GOLD",
             "silver": "SILVER",
             "active": "ACTIVO"
@@ -126,27 +130,57 @@
             "col_cost": "Costo All-in",
             "col_speed": "Liquidación",
             "col_custody": "Self-Custody",
-            "col_yield": "Auto-Yield",
+            "col_yield": "Auditoría On-Chain",
             "competitors": [
-                { "name": "Bancos (SWIFT)", "cost": "$25–$45 + 3–5%", "speed": "2–5 días", "custody": "No", "yield": "No" },
-                { "name": "Western Union", "cost": "$4.99 + 2–4%", "speed": "1–3 días", "custody": "No", "yield": "No" },
-                { "name": "Arq (antes DolarApp)", "cost": "$3 fijo + ~1%", "speed": "1–2 horas", "custody": "No", "yield": "Sí (Limitado)" },
-                { "name": "Stripe Bridge", "cost": "1.5% fijo", "speed": "10–30 seg", "custody": "No", "yield": "No" },
-                { "name": "Bitso Alpha", "cost": "2–4% blended", "speed": "Variable", "custody": "No", "yield": "No" }
+                {
+                    "name": "Bancos (SWIFT)",
+                    "cost": "$25–$45 + 3–5%",
+                    "speed": "2–5 días",
+                    "custody": "No",
+                    "yield": "No"
+                },
+                {
+                    "name": "Western Union",
+                    "cost": "$4.99 + 2–4%",
+                    "speed": "1–3 días",
+                    "custody": "No",
+                    "yield": "No"
+                },
+                {
+                    "name": "Arq (antes DolarApp)",
+                    "cost": "$3 fijo + ~1%",
+                    "speed": "1–2 horas",
+                    "custody": "No",
+                    "yield": "Parcial"
+                },
+                {
+                    "name": "Stripe Bridge",
+                    "cost": "1.5% fijo",
+                    "speed": "10–30 seg",
+                    "custody": "No",
+                    "yield": "No"
+                },
+                {
+                    "name": "Bitso Alpha",
+                    "cost": "2–4% blended",
+                    "speed": "Variable",
+                    "custody": "No",
+                    "yield": "No"
+                }
             ],
             "nirium_name": "Nirium Protocol",
             "nirium_cost": "~1.4% all-in",
             "nirium_speed": "3–5 segundos",
             "nirium_custody": "Sí (Multifirma)",
-            "nirium_yield": "Sí (Blend Protocol)",
+            "nirium_yield": "Sí (Soroban)",
             "savings_title": "AHORRO VS MERCADO",
             "savings_value": "77%",
             "savings_desc": "menos que el promedio de la industria (6.2%)",
             "cta": "SOLICITAR DEMO"
         },
-        "swarm_title": "TELEMETRÍA",
-        "swarm_title_span": "DEL PROTOCOLO",
-        "swarm_subtitle": "Métricas de ejecución en tiempo real de la red institucional Nirium, operando 24/7 sobre la infraestructura de Stellar.",
+        "fleet_title": "RED",
+        "fleet_title_span": "DEL PROTOCOLO",
+        "fleet_subtitle": "Métricas de ejecución en tiempo real de la red institucional Nirium, operando 24/7 sobre la infraestructura de Stellar.",
         "stat_agents_sub": "fee total, spread del mercado incluido",
         "stat_throughput_label": "MOVIMIENTOS / MIN",
         "stat_throughput_sub": "cuántas transferencias manejamos",
@@ -178,7 +212,7 @@
         "elo_title_1": "AUDITORÍA DE AGENTES",
         "elo_title_2": "(SISTEMA ELO)",
         "elo_subtitle": "Modelo de reputación on-chain que califica el desempeño de cada agente financiero. Garantiza la mejor ejecución posible (Best Execution) y minimiza el riesgo de contraparte.",
-        "elo_tier_matrix": "Grado Institucional — autorizado para alto volumen y liquidación masiva",
+        "elo_tier_strategic": "Grado Institucional — autorizado para alto volumen y liquidación masiva",
         "elo_tier_gold": "Alto Rendimiento — validado estadísticamente en Mainnet",
         "elo_tier_silver": "Historial Estable — habilitado para flujos de tesorería estándar",
         "elo_cta": "VER LA TABLA",
@@ -188,14 +222,14 @@
         "contract_role_vault": "Custodia multifirma (Non-Custodial)",
         "contract_role_sentinel": "Motor de validación de invariantes",
         "contract_role_elo": "Registro inmutable de reputación",
-        "contract_role_marketplace": "Registro de estrategias de Yield",
+        "contract_role_marketplace": "Registro de estrategias de ejecución",
         "contract_role_settlement": "Motor de liquidación x402 y MPP",
         "sdk_title_1": "INTEGRACIÓN",
         "sdk_span": "NATIVA",
         "sdk_subtitle": "Kits de desarrollo en TypeScript y Python diseñados para despliegues empresariales. Abstrayendo la complejidad criptográfica del enrutamiento institucional y liquidación.",
         "ignite_the_loop_part1": "¿LISTO PARA",
         "ignite_the_loop_part2": "EMPEZAR?",
-        "enter_matrix": "ABRIR DASHBOARD",
+        "enter_protocol": "ABRIR DASHBOARD",
         "browse_agents": "PROBAR EL SANDBOX",
         "how_to_title": "COMIENZA EN",
         "how_to_span": "4 PASOS",
@@ -214,7 +248,7 @@
             {
                 "step": "03",
                 "title": "Configuración de Tesorería",
-                "desc": "Define reglas de enrutamiento FX, límites de exposición y estrategias de automatización de Yield."
+                "desc": "Define reglas de enrutamiento FX, límites de exposición y estrategias de automatización de tesorería."
             },
             {
                 "step": "04",
@@ -229,8 +263,8 @@
         "deploy_cta_card1_title": "Liquidación Cross-Border",
         "deploy_cta_card1_desc": "Enrutamiento FX institucional (MXN→USDC) y liquidación casi instantánea con costos estructuralmente inferiores.",
         "deploy_cta_card1_tag": "Pagos Globales",
-        "deploy_cta_card2_title": "Gestión de Yield",
-        "deploy_cta_card2_desc": "Asignación automatizada de liquidez inactiva en instrumentos de rendimiento estructurados y RWAs.",
+        "deploy_cta_card2_title": "Automatización de Tesorería",
+        "deploy_cta_card2_desc": "Asignación automatizada de liquidez inactiva en instrumentos de activos institucionales verificables y RWAs.",
         "deploy_cta_card2_tag": "Tesorería Activa",
         "deploy_cta_card3_title": "Compliance y Auditoría",
         "deploy_cta_card3_desc": "Registros inmutables en ledger descentralizado diseñados para satisfacer requerimientos RegTech y normativas KYC/AML.",
@@ -247,7 +281,7 @@
             },
             "skills": {
                 "title": "Tesorería Autónoma",
-                "desc": "Estrategias de Yield automatizadas y rebalanceo de posiciones entre USDC y activos del mundo real (RWA)."
+                "desc": "Estrategias de tesorería automatizadas y rebalanceo de posiciones entre USDC y activos del mundo real (RWA)."
             },
             "leaderboard": {
                 "title": "Monitor de Telemetría",
@@ -266,7 +300,7 @@
         "dual_species_span": "FLEXIBLE",
         "dual_species_subtitle": "Infraestructura diseñada tanto para operadores financieros como para equipos de ingeniería.",
         "dual_species_human_title": "Para Tesorería y Operaciones",
-        "dual_species_human_desc": "Panel de control institucional para gestionar liquidez cross-border, monitorear rendimientos (Yield) y aprobar transacciones multifirma. Sin curva de aprendizaje técnico.",
+        "dual_species_human_desc": "Panel de control institucional para gestionar liquidez cross-border, monitorear ejecución y aprobar transacciones multifirma. Sin curva de aprendizaje técnico.",
         "dual_species_human_cta": "Explorar Consola",
         "dual_species_agent_title": "Para Equipos de Ingeniería",
         "dual_species_agent_desc": "Integración nativa vía SDKs (TypeScript/Python) y APIs REST. Despliega infraestructura financiera global (MPP, x402) en tu propio stack en cuestión de horas.",
@@ -277,7 +311,7 @@
         "builder_section_features": [
             "Establece parámetros Target FX para ejecución de remesas corporativas",
             "Dispara liquidaciones vía SPEI cuando se alcancen condiciones de mercado óptimas",
-            "Automatiza el rebalanceo de capital inactivo hacia RWA (CETES)",
+            "Automatiza el rebalanceo de capital inactivo hacia CETES (vía Etherfuse)",
             "Genera y exporta especificaciones técnicas de tus flujos para auditoría"
         ],
         "stack_title": "TOOLKIT",
@@ -320,12 +354,30 @@
             "badge": "INFRAESTRUCTURA INSTITUCIONAL",
             "description": "Los seis motores principales que potencian la plataforma. Construidos para escalar operaciones financieras globales.",
             "items": {
-                "liquidity": { "name": "PAGOS CROSS-BORDER", "desc": "Motor FX institucional. MXN→USDC→destino al ~1.4% total con liquidación en 3–5 segundos en Stellar SDEX." },
-                "b2b": { "name": "RWA TOKENIZER", "desc": "CETES (bonos del gobierno) vía Etherfuse en Stellar. Widget white-label para que fintechs ofrezcan bonos tokenizados a sus usuarios." },
-                "yield": { "name": "AI-TREASURY", "desc": "Dashboard de optimización de rendimiento conectado a Blend Protocol. Rebalanceo automático con IA entre USDC y CETES. Precio SaaS." },
-                "audit": { "name": "AUDIT TRAIL ENGINE", "desc": "Registros inmutables en IPFS. Reportes exportables para entidades reguladas CNBV. RegTech SaaS para 67+ fintechs mexicanas activas." },
-                "settlement": { "name": "x402 + MPP PAGOS", "desc": "Ya en producción. Micropagos por llamada API (x402) y liquidaciones masivas institucionales (MPP). Revenue crece con tráfico de API." },
-                "vault": { "name": "CORPORATE VAULT", "desc": "Wallet multifirma non-custodial (2-de-3) en Soroban. El cliente controla todas las llaves. Fee de setup + mantenimiento anual. Cero riesgo de custodia." }
+                "liquidity": {
+                    "name": "PAGOS CROSS-BORDER",
+                    "desc": "Motor FX institucional. MXN→USDC→destino al ~1.4% total con liquidación en 3–5 segundos en Stellar SDEX."
+                },
+                "b2b": {
+                    "name": "RWA TOKENIZER",
+                    "desc": "CETES vía Etherfuse en Stellar. Widget white-label para que fintechs ofrezcan bonos tokenizados a sus usuarios."
+                },
+                "treasury": {
+                    "name": "AI-TREASURY",
+                    "desc": "Dashboard de optimización para eficiencia de capital. Rebalanceo automático con IA entre USDC y CETES. Precio SaaS."
+                },
+                "audit": {
+                    "name": "AUDIT TRAIL ENGINE",
+                    "desc": "Registros inmutables en IPFS. Reportes exportables para entidades reguladas CNBV. RegTech SaaS para 67+ fintechs mexicanas activas."
+                },
+                "settlement": {
+                    "name": "x402 + MPP PAGOS",
+                    "desc": "Ya en producción. Micropagos por llamada API (x402) y liquidaciones masivas institucionales (MPP). Revenue crece con tráfico de API."
+                },
+                "vault": {
+                    "name": "CORPORATE VAULT",
+                    "desc": "Wallet multifirma non-custodial (2-de-3) en Soroban. El cliente controla todas las llaves. Fee de setup + mantenimiento anual. Cero riesgo de custodia."
+                }
             },
             "startup_ideas": {
                 "badge": "FOUNDERS · PROYECTOS DE FIN DE SEMANA",
@@ -334,75 +386,123 @@
                 "subtitle": "Seis ideas de producto que puedes prototipar este fin de semana sobre nuestro stack (EN TESTNET · COMING SOON MAINNET) — cada pieza ya está en producción sobre Stellar.",
                 "items": {
                     "global_payroll": {
-                        "name": "Global Payroll Swarm",
+                        "name": "Flota de Nómina Global",
                         "tagline": "Nómina automatizada para equipos remotos. Convierte stablecoins a moneda local (MXN/BRL) instantáneamente vía MPP y SEP-24.",
-                        "stack": ["MPP", "Vault", "Fiat Ramp"],
+                        "stack": [
+                            "MPP",
+                            "Vault",
+                            "Fiat Ramp"
+                        ],
                         "time": "Listo para Auditoría"
                     },
                     "m2m_exchange": {
                         "name": "Mercado de Inferencia M2M",
                         "tagline": "Un mercado donde los agentes de IA compran/venden cómputo y datos por token usando micropagos x402 de menos de un centavo.",
-                        "stack": ["x402", "Skills", "mcp"],
+                        "stack": [
+                            "x402",
+                            "Skills",
+                            "mcp"
+                        ],
                         "time": "Escalable"
                     },
                     "forensic_treasury": {
                         "name": "Hub de Auditoría Forense",
-                        "tagline": "Monitoreo de tesorería corporativa inmutable en tiempo real. Usa Neural Archive (IPFS) para generar reportes exportables bajo demanda.",
-                        "stack": ["Webhooks", "ELO", "Neural Hub"],
+                        "tagline": "Monitoreo de tesorería corporativa inmutable en tiempo real. Usa Protocol Archive (IPFS) para generar reportes exportables bajo demanda.",
+                        "stack": [
+                            "Webhooks",
+                            "ELO",
+                            "Protocol Hub"
+                        ],
                         "time": "Institucional"
                     },
-                    "yield_neobank": {
+                    "savings_neobank": {
                         "name": "Neobanco No-Custodial",
-                        "tagline": "App de ahorros que usa agentes autónomos para mover capital (USDC/MXN) a los protocolos de Stellar/Soroban con mayor rendimiento.",
-                        "stack": ["Vault", "Execute", "Skills"],
+                        "tagline": "App de ahorros que usa agentes autónomos para mover capital (USDC/MXN) a los protocolos de Stellar/Soroban con mayor eficiencia.",
+                        "stack": [
+                            "Vault",
+                            "Execute",
+                            "Skills"
+                        ],
                         "time": "Alta Adopción"
                     },
                     "grant_distributor": {
                         "name": "Grants Autónomos",
                         "tagline": "Agentes de financiamiento para DAOs que verifican hitos on-chain y liberan fondos automáticamente desde bóvedas no custodiales.",
-                        "stack": ["Vault", "Execute", "ELO"],
+                        "stack": [
+                            "Vault",
+                            "Execute",
+                            "ELO"
+                        ],
                         "time": "Gobernanza"
                     },
                     "logistics_settle": {
                         "name": "Motor de Liquidación Inteligente",
                         "tagline": "Paga a proveedores logísticos al instante de verificar la entrega vía IoT. Usa x402 para liquidación inmediata en el SDEX de Stellar.",
-                        "stack": ["x402", "Webhooks", "Execute"],
+                        "stack": [
+                            "x402",
+                            "Webhooks",
+                            "Execute"
+                        ],
                         "time": "Híbrido B2B"
                     },
                     "energy_grid": {
-                        "name": "Red Energética Swarm",
+                        "name": "Red Energética Inteligente",
                         "tagline": "Micropagos M2M entre paneles solares y unidades de almacenamiento. Automatiza el comercio de energía con x402 y sensores IoT.",
-                        "stack": ["x402", "Webhooks", "mcp"],
+                        "stack": [
+                            "x402",
+                            "Webhooks",
+                            "mcp"
+                        ],
                         "time": "M2M Verde"
                     },
                     "rwa_market": {
                         "name": "Mercado RWA Institucional",
                         "tagline": "Marketplace fraccionado para bonos y bienes raíces tokenizados. Los agentes gestionan la liquidez secundaria en el SDEX 24/7.",
-                        "stack": ["Vault", "Execute", "ELO"],
+                        "stack": [
+                            "Vault",
+                            "Execute",
+                            "ELO"
+                        ],
                         "time": "WealthTech"
                     },
                     "defi_insurance": {
                         "name": "Bóvedas de Mitigación de Riesgo",
                         "tagline": "Agentes que monitorean la salud de los protocolos y cubren riesgos automáticamente moviendo fondos entre bóvedas seguras.",
-                        "stack": ["Skills", "Vault", "Webhooks"],
+                        "stack": [
+                            "Skills",
+                            "Vault",
+                            "Webhooks"
+                        ],
                         "time": "Seguros"
                     },
                     "content_license": {
                         "name": "Licenciamiento de Contenido IA",
                         "tagline": "Licenciamiento por uso de activos digitales. Los micropagos se envían al instante a los creadores vía x402 en cada llamada API.",
-                        "stack": ["x402", "Billing", "Skills"],
+                        "stack": [
+                            "x402",
+                            "Billing",
+                            "Skills"
+                        ],
                         "time": "MediaTech"
                     },
                     "oracle_bridge": {
                         "name": "Oráculos Autónomos",
                         "tagline": "Agentes que obtienen datos del mundo real y los envían a contratos de Soroban, monetizando su precisión con tarifas x402.",
-                        "stack": ["Skills", "Execute", "x402"],
+                        "stack": [
+                            "Skills",
+                            "Execute",
+                            "x402"
+                        ],
                         "time": "Infra de Datos"
                     },
-                    "escrow_swarm": {
+                    "escrow_fleet": {
                         "name": "Escrow Institucional",
                         "tagline": "Agentes de liquidación para comercio de alto valor. Los fondos permanecen en bóvedas hasta cumplir hitos legales e IoT.",
-                        "stack": ["Vault", "Execute", "ELO"],
+                        "stack": [
+                            "Vault",
+                            "Execute",
+                            "ELO"
+                        ],
                         "time": "Enterprise"
                     }
                 },
@@ -428,24 +528,84 @@
                 "pip": "Python SDK",
                 "tauri": "Desktop Studio v2",
                 "endpoints": {
-                    "auth": { "label": "Identidad & Firma", "desc": "Freighter, API keys, multifirma." },
-                    "market": { "label": "Datos de Mercado", "desc": "SDEX, XLM/USDC, order books." },
-                    "exec": { "label": "Soroban Execute", "desc": "Invoca contratos, simula txs." },
-                    "skills": { "label": "Ayudantes & Skills", "desc": "Despliega, configura y detén agentes." },
-                    "billing": { "label": "Cobros x402", "desc": "Micro-facturación por llamada." },
-                    "settle": { "label": "Liquidación MPP", "desc": "Pagos masivos institucionales." },
-                    "vault": { "label": "Bóvedas & Custodia", "desc": "Crea bóvedas, deposita, retira." },
-                    "elo": { "label": "Reputación ELO", "desc": "Consulta el score de cada agente." },
-                    "webhooks": { "label": "Webhooks", "desc": "Suscríbete a eventos on-chain." },
-                    "mcp": { "label": "Servidor MCP", "desc": "Conecta Claude, Grok o cualquier LLM." }
+                    "auth": {
+                        "label": "Identidad & Firma",
+                        "desc": "Freighter, API keys, multifirma."
+                    },
+                    "market": {
+                        "label": "Datos de Mercado",
+                        "desc": "SDEX, XLM/USDC, order books."
+                    },
+                    "exec": {
+                        "label": "Soroban Execute",
+                        "desc": "Invoca contratos, simula txs."
+                    },
+                    "skills": {
+                        "label": "Ayudantes & Skills",
+                        "desc": "Despliega, configura y detén agentes."
+                    },
+                    "billing": {
+                        "label": "Cobros x402",
+                        "desc": "Micro-facturación por llamada."
+                    },
+                    "settle": {
+                        "label": "Liquidación MPP",
+                        "desc": "Pagos masivos institucionales."
+                    },
+                    "vault": {
+                        "label": "Bóvedas & Custodia",
+                        "desc": "Crea bóvedas, deposita, retira."
+                    },
+                    "elo": {
+                        "label": "Reputación ELO",
+                        "desc": "Consulta el score de cada agente."
+                    },
+                    "webhooks": {
+                        "label": "Webhooks",
+                        "desc": "Suscríbete a eventos on-chain."
+                    },
+                    "mcp": {
+                        "label": "Servidor MCP",
+                        "desc": "Conecta Claude, Grok o cualquier LLM."
+                    }
                 },
                 "sdks": {
-                    "ts": { "name": "TypeScript SDK", "sub": "NPM · @nirium/sdk", "cmd": "npm install @nirium/sdk", "badge": "v0.5.0" },
-                    "py": { "name": "Python SDK", "sub": "PyPI · nirium", "cmd": "pip install nirium", "badge": "v0.5.0" },
-                    "mcp": { "name": "Servidor MCP", "sub": "Claude · Grok · Cualquier LLM", "cmd": "npx @nirium/mcp", "badge": "Live" },
-                    "rest": { "name": "REST API", "sub": "api.nirium.xyz", "cmd": "curl api.nirium.xyz/v1", "badge": "Público" },
-                    "tauri": { "name": "Desktop Studio", "sub": "Tauri v2 · macOS/Win/Linux", "cmd": "Descargar instalador", "badge": "Alpha" },
-                    "studio": { "name": "Studio Visual", "sub": "Sin código", "cmd": "Abrir en navegador", "badge": "Beta" }
+                    "ts": {
+                        "name": "TypeScript SDK",
+                        "sub": "NPM · @nirium/sdk",
+                        "cmd": "npm install @nirium/sdk",
+                        "badge": "v0.5.0"
+                    },
+                    "py": {
+                        "name": "Python SDK",
+                        "sub": "PyPI · nirium",
+                        "cmd": "pip install nirium",
+                        "badge": "v0.5.0"
+                    },
+                    "mcp": {
+                        "name": "Servidor MCP",
+                        "sub": "Claude · Grok · Cualquier LLM",
+                        "cmd": "npx @nirium/mcp",
+                        "badge": "Live"
+                    },
+                    "rest": {
+                        "name": "REST API",
+                        "sub": "api.nirium.xyz",
+                        "cmd": "curl api.nirium.xyz/v1",
+                        "badge": "Público"
+                    },
+                    "tauri": {
+                        "name": "Desktop Studio",
+                        "sub": "Tauri v2 · macOS/Win/Linux",
+                        "cmd": "Descargar instalador",
+                        "badge": "Alpha"
+                    },
+                    "studio": {
+                        "name": "Studio Visual",
+                        "sub": "Sin código",
+                        "cmd": "Abrir en navegador",
+                        "badge": "Beta"
+                    }
                 },
                 "code_tabs": {
                     "ts_label": "TypeScript",
@@ -468,24 +628,24 @@
                 "optimized_for": "Optimizado para",
                 "micro_billing": "Micro-Facturación",
                 "institutional_settlements": "Liquidaciones Globales",
-                "connecting_neural": "CONECTANDO CEREBRO...",
+                "connecting_core": "CONECTANDO NÚCLEO...",
                 "soroban_verified": "SOROBAN VERIFICADO",
                 "freighter_ready": "LISTO PARA FREIGHTER",
                 "explore_infra": "Explorar Infraestructura",
                 "treasury_auto": "Tesorería",
                 "rules": "REGLAS",
                 "fx_trigger": "Dólar a $19.50",
-                "settle_cetes": "Invertir en CETES",
+                "settle_cetes": "Invertir en Bonos",
                 "builder_hint": "// Mueve piezas para automatizar",
                 "elo_tier_suffix": "Puntaje ELO"
             },
             "agent_roles": {
-                "coordinator": "Coordinador de Enjambre",
+                "coordinator": "Coordinador del Sistema",
                 "sentiment": "Análisis de Sentimiento",
                 "liquidity": "Liquidez SDEX",
-                "arbitrage": "Arbitraje Temporal",
+                "arbitrage": "Ejecución Táctica",
                 "explorer": "Explorador de Pools",
-                "strategy": "Estrategia Dark Pool",
+                "strategy": "Estrategia de Liquidez",
                 "signals": "Señales Inter-Agente",
                 "optimizer": "Optimizador de Rutas",
                 "hunter": "Cazador de Micro-pares",
@@ -500,7 +660,7 @@
                 "vault": "Bóveda Nirium",
                 "elo": "Registro ELO",
                 "marketplace": "Marketplace",
-                "sentinel": "Centinela Neural",
+                "sentinel": "Centinela de Cumplimiento",
                 "settlement": "Hub de Liquidación"
             },
             "builder_data": {
@@ -512,80 +672,87 @@
         }
     },
     "dashboard": {
-            "title": "PANEL INSTITUCIONAL",
-            "version_live": "STELLAR TESTNET · v0.5.0",
-            "fleet_status": "Monitoreo de Infraestructura",
-            "active_agents": "Nodos Ejecutores",
-            "total_profit": "Ahorro Estructural (Spread)",
-            "ops_console": "Consola de Operaciones Institucional",
-            "stats": {
-                "reputation": "ELO DE EJECUCIÓN",
-                "wallets": "BÓVEDAS ACTIVAS",
-                "helpers": "AGENTES DESPLEGADOS",
-                "treasury": "Tesorería Global",
-                "secured_capital": "TVL (NO CUSTODIAL)",
-                "efficiency": "TASA DE EFICIENCIA (FX)",
-                "projected_accrual": "TASA DE RENDIMIENTO",
-                "status_active": "OPERATIVO",
-                "status_running": "PROCESANDO",
-                "trust_verified": "Auditable On-Chain (Stellar)"
-            },
-            "revenue_card": {
-                "title": "Flujo de Liquidación Institucional",
-                "fees": "COSTO DE EJECUCIÓN",
-                "settlements": "Volumen Liquidado",
-                "feed_title": "Telemetría de Protocolo",
-                "awaiting": "A la espera de enrutamiento FX...",
-                "powered_by": "Infraestructura MPP & x402",
-                "live_stream": "REAL-TIME",
-                "last_update": "Sync"
-            },
-            "vault_control": {
-                "title": "Bóveda Multisig",
-                "locked": "BLOQUEADO (EN YIELD)",
-                "unlocked": "LIQUIDEZ DISPONIBLE",
-                "create_vault": "+ ABRIR BÓVEDA INSTITUCIONAL",
-                "deposit": "Aportar Liquidez",
-                "withdraw": "Retirar Capital"
-            },
-            "modals": {
-                "deploy_title": "¿Desplegar {name}?",
-                "fee_label": "FEE DE RED (XLM)",
-                "fee_approved": "APROBADO",
-                "deploy_desc": "Desplegando agente financiero. Se aprovisionará un contrato no-custodial en Soroban.",
-                "confirm": "ACTIVAR EN STELLAR",
-                "cancel": "CANCELAR",
-                "stop_title": "¿Terminar Ejecución de Agente?",
-                "stop_desc": "La automatización FX y de Yield se suspenderá inmediatamente. La bóveda permanece segura.",
-                "stop_warning": "Alerta de Tesorería",
-                "stop_confirm": "TERMINAR EJECUCIÓN"
-            },
-            "toasts": {
-                "insufficient_balance": "Liquidez Insuficiente: Saldo mínimo {amount} XLM",
-                "deployment_failed": "Falla de Despliegue",
-                "check_freighter": "Verifica estado de firmas en Freighter.",
-                "deploying_vault": "Inicializando Soroban Multisig...",
-                "deposit_success": "Fondeo Confirmado",
-                "deposit_desc": "{amount} {asset} ruteados a la Bóveda Institucional.",
-                "view_tx": "Auditar Tx",
-                "withdrawal_success": "Retiro Liquidado",
-                "withdrawal_desc": "{amount} {asset} transferidos exitosamente.",
-                "stop_agent_success": "Ejecución Terminada",
-                "dismiss": "CERRAR"
-            },
-            "neural_feed": {
-                "title": "Telemetría de Agentes de Decisión",
-                "waiting": "MONITOREANDO PIPELINES INSTITUCIONALES...",
-                "uplink": "Neural Feed // Enlace"
-            },
-            "payment_streams": {
-                "title": "Liquidación en Tiempo Real",
-                "waiting": "A la espera de triggers de enrutamiento corporativo...",
-                "engine_active": "Motor Dual (x402/MPP) Operativo"
-            }
+        "title": "PANEL INSTITUCIONAL",
+        "version_live": "STELLAR TESTNET · v0.5.0",
+        "fleet_status": "Monitoreo de Infraestructura",
+        "active_agents": "Nodos Ejecutores",
+        "total_profit": "Ahorro Estructural (Spread)",
+        "ops_console": "Consola de Operaciones Institucional",
+        "loading_dashboard": "Cargando tu panel de control...",
+        "no_helpers": "No hay agentes ejecutándose.",
+        "onboarding_desc": "Crea tu bóveda y elige un agente para comenzar a automatizar.",
+        "stats": {
+            "reputation": "ELO DE EJECUCIÓN",
+            "wallets": "BÓVEDAS ACTIVAS",
+            "helpers": "AGENTES DESPLEGADOS",
+            "treasury": "Tesorería Global",
+            "secured_capital": "TVL (NO CUSTODIAL)",
+            "efficiency": "TASA DE EFICIENCIA (FX)",
+            "projected_accrual": "DELTA DIARIO",
+            "status_active": "OPERATIVO",
+            "status_running": "PROCESANDO",
+            "trust_verified": "Auditable On-Chain (Stellar)"
         },
+        "revenue_card": {
+            "title": "Flujo de Liquidación Institucional",
+            "fees": "COSTO DE EJECUCIÓN",
+            "settlements": "Volumen Liquidado",
+            "feed_title": "Telemetría de Protocolo",
+            "awaiting": "A la espera de enrutamiento FX...",
+            "powered_by": "Infraestructura MPP & x402",
+            "live_stream": "REAL-TIME",
+            "last_update": "Sync"
+        },
+        "vault_control": {
+            "title": "Bóveda Multisig",
+            "locked": "BLOQUEADO (ASIGNADO)",
+            "unlocked": "LIQUIDEZ DISPONIBLE",
+            "create_vault": "+ ABRIR BÓVEDA INSTITUCIONAL",
+            "deposit": "Aportar Liquidez",
+            "withdraw": "Retirar Capital"
+        },
+        "modals": {
+            "deploy_title": "¿Desplegar {name}?",
+            "fee_label": "FEE DE RED (XLM)",
+            "fee_approved": "APROBADO",
+            "deploy_desc": "Desplegando agente financiero. Se aprovisionará un contrato no-custodial en Soroban.",
+            "confirm": "ACTIVAR EN STELLAR",
+            "cancel": "CANCELAR",
+            "stop_title": "¿Terminar Ejecución de Agente?",
+            "stop_desc": "La automatización FX y de Tesorería se suspenderá inmediatamente. La bóveda permanece segura.",
+            "stop_warning": "Alerta de Tesorería",
+            "stop_confirm": "TERMINAR EJECUCIÓN"
+        },
+        "toasts": {
+            "insufficient_balance": "Liquidez Insuficiente: Saldo mínimo {amount} XLM",
+            "deployment_failed": "Falla de Despliegue",
+            "check_freighter": "Verifica estado de firmas en Freighter.",
+            "deploying_vault": "Inicializando Soroban Multisig...",
+            "deposit_success": "Fondeo Confirmado",
+            "deposit_desc": "{amount} {asset} ruteados a la Bóveda Institucional.",
+            "view_tx": "Auditar Tx",
+            "withdrawal_success": "Retiro Liquidado",
+            "withdrawal_desc": "{amount} {asset} transferidos exitosamente.",
+            "stop_agent_success": "Ejecución Terminada",
+            "dismiss": "CERRAR"
+        },
+        "telemetry_feed": {
+            "title": "Telemetría de Nodos de Decisión",
+            "waiting": "MONITOREANDO PIPELINES INSTITUCIONALES...",
+            "uplink": "Feed de Telemetría // Conexión"
+        },
+        "payment_streams": {
+            "title": "Liquidación en Tiempo Real",
+            "waiting": "A la espera de triggers de enrutamiento corporativo...",
+            "engine_active": "Motor Dual (x402/MPP) Operativo",
+            "market_rates": "Tasas de Mercado Actuales",
+            "supply": "Aporte",
+            "borrow": "Préstamo",
+            "target_yield": "TASA FX EJECUTADA"
+        }
+    },
     "common": {
-        "neural_matrix": "Matriz Neural",
+        "protocol_hub": "Protocol Hub",
         "atomic_execution": "Ejecución Atómica",
         "liquidity_sentinel": "Centinela de Liquidez",
         "path_payment_vector": "Vector de Pago de Ruta",
@@ -601,7 +768,7 @@
         "description": "Descripción",
         "latency": "Latencia",
         "load": "Carga",
-        "sync": "Sincronización Matrix Neural",
+        "sync": "Sincronización de Protocolo",
         "seconds_ago": "s atrás",
         "minutes_ago": "m atrás",
         "hours_ago": "h atrás",
@@ -609,31 +776,37 @@
         "tickers": {
             "live_feed": "LIVE",
             "sdex_spread": "SPREAD SDEX",
-            "blend_apy": "BLEND APY (EST)",
-            "etherfuse_apy": "ETHERFUSE APY (EST)",
+            "blend_apy": "BLEND RATE (EST)",
+            "etherfuse_apy": "ETHERFUSE RATE (EST)",
             "base_fee": "COMISIÓN BASE (STROOPS)",
             "thin": "ajustado",
             "xlm_usdc": "XLM/USDC"
-        }
+        },
+        "non_custodial": "No Custodial",
+        "institutional_grade": "Grado Institucional",
+        "audit_ready": "Listo para Auditoría",
+        "protocol_26": "Protocolo 26 Verificado",
+        "scf_7": "ALINEADO A SCF 7.0",
+        "coc_compliant": "CUMPLIMIENTO COC"
     },
     "builder": {
-        "drag_n_drop": "Arrastra Nodos a la Matriz",
+        "drag_n_drop": "Arrastra Nodos al Diseñador",
         "simulate": "Simular Huella de Recursos",
         "publish": "Desplegar en Stellar Testnet",
         "categories": {
             "atomic_engine": "Motor Atómico",
             "signal_inputs": "Entradas de Señal",
-            "ai_intelligence": "Inteligencia IA",
+            "ai_intelligence": "Lógica de Automatización",
             "trading_swaps": "Trading & Swaps",
             "settlements": "Liquidaciones"
         },
-        "search_placeholder": "Buscar componentes neurales...",
+        "search_placeholder": "Buscar componentes de sistema...",
         "asset_selector": "Seleccionar Activo Base",
         "collapse": "Colapsar Interfaz"
     },
     "settings": {
         "ai_providers": {
-            "title": "Proveedores de Inteligencia Neural",
+            "title": "Proveedores de Inteligencia Estratégica Estratégica",
             "gemini": "Google Gemini",
             "grok": "xAI Grok",
             "minimax": "MiniMax (China)",
@@ -642,26 +815,26 @@
         }
     },
     "toasts": {
-        "compiling": "Compilando Lógica Neural...",
-        "archiving": "Archivando en Archivo Neural (IPFS)...",
+        "compiling": "Compilando Lógica de Protocolo...",
+        "archiving": "Archivando en Protocol Archive (IPFS)...",
         "broadcast_success": "Transmisión Exitosa",
         "broadcast_failed": "Error de Enlace"
     },
     "terms": {
         "title": "Términos de Servicio y Licencia Enterprise",
-        "last_updated": "Actualización Normativa: 26 de Abril de 2026",
+        "last_updated": "Actualización Normativa: 30 de Abril de 2026",
         "sections": {
             "nature": {
                 "title": "1. Naturaleza del Servicio y Marco Legal (México)",
-                "content": "Nirium es una plataforma de infraestructura tecnológica (IaaS) diseñada bajo los estándares de 'Modelos Novedosos' conforme al Artículo 80 de la Ley para Regular las Instituciones de Tecnología Financiera (México). Nirium opera estrictamente como un proveedor de software que facilita la automatización de flujos de tesorería y no como una Institución de Tecnología Financiera (ITF) o entidad bancaria. La plataforma proporciona rastro forense inmutable (Neural Archive) y protocolos de seguridad Soroban para la experimentación con activos digitales en entornos controlados. Los servicios de custodia, liquidación y emisión de Cetes (RWA) son responsabilidad exclusiva de proveedores terceros regulados (Etherfuse/Indeval) bajo sus propias licencias y términos."
+                "content": "Nirium es una plataforma de infraestructura tecnológica (IaaS) diseñada bajo los estándares de 'Modelos Novedosos' conforme al Artículo 80 de la Ley para Regular las Instituciones de Tecnología Financiera (México). Nirium opera estrictamente como un proveedor de software que facilita la automatización de flujos de tesorería y no como una Institución de Tecnología Financiera (ITF) o entidad bancaria. La plataforma proporciona rastro forense inmutable (Protocol Archive) y protocolos de seguridad Soroban para la experimentación con activos digitales en entornos controlados. Los servicios de custodia, liquidación y emisión de Cetes (RWA) son responsabilidad exclusiva de proveedores terceros regulados (Etherfuse/Indeval) bajo sus propias licencias y términos."
             },
             "no_guarantees": {
                 "title": "2. Sin Garantías — No es un Producto de Inversión",
-                "content": "Nirium no garantiza rendimientos de ningún tipo. El sistema de reputación ELO es estrictamente informativo y refleja el rendimiento histórico algorítmico en Stellar Testnet — no constituye una promesa de ganancias futuras.\n\nNirium no es un producto de inversión, valor, fondo ni instrumento financiero. El capital permanece bajo el control soberano de las llaves privadas del usuario en todo momento. Nirium es un protocolo de infraestructura tecnológica con el que los usuarios interactúan bajo su propio riesgo."
+                "content": "Nirium no garantiza rendimientos de ningún tipo. El sistema de reputación ELO es estrictamente informativo y refleja el historial de ejecución algorítmico en Stellar Testnet — no constituye una promesa de ganancias futuras.\n\nNirium no es un producto de inversión, valor, fondo ni instrumento financiero. El capital permanece bajo el control soberano de las llaves privadas del usuario en todo momento. Nirium es un protocolo de infraestructura tecnológica con el que los usuarios interactúan bajo su propio riesgo."
             },
             "ai_liability": {
                 "title": "3. Responsabilidad de Agentes Autónomos e IA",
-                "content": "Al activar el 'Swarm' o 'Loop' de agentes, el usuario otorga un mandato técnico limitado para que el código (LLM/Agente) construya y proponga transacciones basadas en parámetros preconfigurados. El usuario reconoce que los modelos de lenguaje (OpenAI, Anthropic, Ollama) pueden presentar 'alucinaciones algorítmicas', sesgos de datos o latencia crítica. Nirium actúa como una interfaz de transmisión y no asume responsabilidad por las decisiones autónomas tomadas por el kernel de IA ni por fallos sistémicos en los oráculos de precios descentralizados o la red pública Stellar."
+                "content": "Al activar el 'Flota' o 'Loop' de agentes, el usuario otorga un mandato técnico limitado para que el código (LLM/Agente) construya y proponga transacciones basadas en parámetros preconfigurados. El usuario reconoce que los modelos de lenguaje (OpenAI, Anthropic, Ollama) pueden presentar 'alucinaciones algorítmicas', sesgos de datos o latencia crítica. Nirium actúa como una interfaz de transmisión y no asume responsabilidad por las decisiones autónomas tomadas por el kernel de IA ni por fallos sistémicos en los oráculos de precios descentralizados o la red pública Stellar."
             },
             "rwa_disclaimer": {
                 "title": "4. Riesgos de Activos del Mundo Real (RWA)",
@@ -681,24 +854,24 @@
             },
             "intellectual_property": {
                 "title": "8. Propiedad Intelectual Algorítmica",
-                "content": "Todos los algoritmos, lógica de agentes ('Swarm'), arquitecturas de red y visualizaciones propietarias son propiedad intelectual exclusiva de Nirium. El uso de la plataforma otorga una licencia de uso limitada, no exclusiva y revocable. El uso de la interfaz no otorga derechos de propiedad, modificación o ingeniería inversa sobre el motor de inteligencia artificial core."
+                "content": "Todos los algoritmos, lógica de agentes ('Flota'), arquitecturas de red y visualizaciones propietarias son propiedad intelectual exclusiva de Nirium. El uso de la plataforma otorga una licencia de uso limitada, no exclusiva y revocable. El uso de la interfaz no otorga derechos de propiedad, modificación o ingeniería inversa sobre el motor de inteligencia artificial core."
             },
             "stellar_code": {
                 "title": "9. Alineación con el Código de Conducta de Stellar y SCF 7.0",
-                "content": "Nirium se adhiere estrictamente a los principios de la Stellar Development Foundation (SDF) y las directrices de la Stellar Community Fund (SCF) versión 7.0 (Actualizada Abril 2026), promoviendo un ecosistema de innovación abierta, respeto mutuo y transparencia técnica. Los usuarios se comprometen a seguir el Código de Conducta oficial de Stellar, prohibiendo comportamientos maliciosos que comprometan la integridad de la red o la comunidad."
+                "content": "Nirium se adhiere estrictamente a los principios de la Stellar Development Foundation (SDF) y las directrices de la Stellar Community Fund (SCF) versión 7.0 (Actualizada 30 de Abril de 2026), promoviendo un ecosistema de innovación abierta, respeto mutuo y transparencia técnica. Los usuarios se comprometen a seguir el Código de Conducta oficial de Stellar, prohibiendo comportamientos maliciosos que comprometan la integridad de la red o la comunidad."
             }
         }
     },
     "legal_modal": {
-        "title": "Acceso a la Matriz: Protocolo de Consentimiento",
+        "title": "Acceso a la Núcleo: Protocolo de Consentimiento",
         "consent_required": "FIRMA DE CONSENTIMIENTO CRIPTOGRÁFICO:",
         "acknowledge_prefix": "Al firmar este payload, usted declara bajo protesta de decir verdad que:",
         "item_non_custodial": "Entiende que Nirium es un software no-custodial and experimental; sus llaves son su responsabilidad.",
-        "item_elo_historical": "Reconoce que los retornos históricos (ELO) no implican rendimientos futuros garantizados.",
+        "item_elo_historical": "Reconoce que los retornos históricos (ELO) no implican tasas de ejecución futuras garantizadas.",
         "item_systemic_risk": "Acepta el riesgo sistémico de la IA y reconoce que las 'alucinaciones' del modelo son un vector de riesgo operacional.",
         "item_liability": "Libera a los desarrolladores de Nirium de toda responsabilidad por pérdidas de capital derivadas de volatilidad o fallos de red.",
         "item_scf_coc": "Usted acepta seguir el Código de Conducta de Stellar y reconoce nuestra alineación con los estándares de transparencia de SCF 7.0.",
-        "button_sign": "FIRMAR Y ESTABLECER ENLACE NEURAL",
+        "button_sign": "FIRMAR Y ESTABLECER ENLACE ESTRATÉGICO",
         "button_signing": "ESPERANDO FIRMA DE FREIGHTER...",
         "governing_law": "Regido por la Ley Fintech (México) y Estándares Globales 2026.",
         "read_more_prefix": "Consulte nuestros ",
@@ -707,7 +880,7 @@
     },
     "risk_disclosure": {
         "title": "Aviso de Riesgo Algorítmico",
-        "last_updated": "26 de Abril de 2026",
+        "last_updated": "30 de Abril de 2026",
         "mandatory": "RECONOCIMIENTO OBLIGATORIO: Usted está utilizando software de código abierto algorítmico y altamente experimental.",
         "sections": {
             "execution": {
@@ -723,7 +896,7 @@
     },
     "privacy_policy": {
         "title": "Protocolo de Privacidad y Soberanía de Datos",
-        "last_updated": "26 de Abril de 2026",
+        "last_updated": "30 de Abril de 2026",
         "sections": {
             "sovereignty": {
                 "title": "1. Arquitectura No Custodial",
@@ -745,12 +918,12 @@
     },
     "disclaimers": {
         "title": "Avisos Legales y Descargos de Responsabilidad",
-        "last_updated": "26 de Abril de 2026",
+        "last_updated": "30 de Abril de 2026",
         "mandatory": "LECTURA OBLIGATORIA: El Protocolo Nirium es software experimental y no auditado.",
         "sections": {
             "general": {
                 "title": "1. Descargo de Responsabilidad General",
-                "content": "Nirium Protocol es un software experimental, no auditado, desplegado exclusivamente en Stellar Testnet. Todas las interacciones involucran tokens de prueba sin valor monetario. Nirium no gestiona, controla ni custodia activos financieros reales en esta etapa.\n\nEl rendimiento pasado de cualquier algoritmo, estrategia o agente —incluyendo puntajes ELO y métricas simuladas— NO garantiza ni implica resultados futuros. La volatilidad es inherente a los protocolos DeFi y los usuarios deben esperar la posibilidad de pérdida total."
+                "content": "Nirium Protocol es un software experimental, no auditado, desplegado exclusivamente en Stellar Testnet. Todas las interacciones involucran tokens de prueba sin valor monetario. Nirium no gestiona, controla ni custodia activos financieros reales en esta etapa.\n\nEl desempeño pasado de cualquier algoritmo, estrategia o agente —incluyendo puntajes ELO y métricas simuladas— NO garantiza ni implica resultados futuros. La volatilidad es inherente a los protocolos DeFi y los usuarios deben esperar la posibilidad de pérdida total."
             },
             "no_advice": {
                 "title": "2. No es Asesoría Financiera",
@@ -805,9 +978,9 @@
                 "fee": "Comisión de Ejecución",
                 "coins": "Activos Soportados"
             },
-            "testnet_notice": "Entorno Testnet. Todos los contratos, bóvedas y nodos operan exclusivamente en Stellar Testnet. No hay capital real en riesgo. Los rendimientos mostrados son proyecciones simuladas, no garantías.",
+            "testnet_notice": "Entorno Testnet. Todos los contratos, bóvedas y nodos operan exclusivamente en Stellar Testnet. No hay capital real en riesgo. Los indicadores de ejecución son proyecciones simuladas, no garantías.",
             "summary_title": "Resumen Ejecutivo",
-            "summary_p1": "Nirium es una infraestructura de automatización de tesorería no custodial construida sobre Stellar. Permite el despliegue autónomo de capital — acumulación de rendimientos, liquidación cross-border y facturación a nivel de protocolo — sin riesgo custodial.",
+            "summary_p1": "Nirium es una infraestructura de automatización de tesorería no custodial construida sobre Stellar. Permite el despliegue autónomo de capital — asignación de CETES, liquidación cross-border y facturación a nivel de protocolo — sin riesgo custodial.",
             "summary_p2": "Componentes core: 6 contratos Soroban que gestionan bóvedas no custodiales, un sistema de reputación ELO para nodos, y micro-facturación x402 por llamada para consumidores institucionales de API.",
             "summary_who": "¿Para quién es? Integradores de protocolo — sin necesidad de Rust, use el Constructor Visual de Esquemas. Desarrolladores — cada componente expone una API REST documentada.",
             "summary_warning": "Software experimental en Testnet. Contratos inteligentes no auditados. No constituye asesoría financiera.",
@@ -829,12 +1002,30 @@
             },
             "features_title": "Capacidades del Protocolo (v0.5.0)",
             "features": {
-                "builder": { "title": "Constructor Visual de Esquemas", "desc": "Compose esquemas de automatización mediante editor de nodos drag-and-drop." },
-                "guides": { "title": "Guías de Integración", "desc": "Walkthroughs técnicos paso a paso para todas las funciones del protocolo." },
-                "marketplace": { "title": "Marketplace de Estrategias", "desc": "Esquemas institucionales prediseñados instalables en una sola operación." },
-                "dashboard": { "title": "Dashboard Institucional", "desc": "Telemetría en tiempo real: despliegue de capital, nodos y flujos de liquidación." },
-                "wallets": { "title": "Bóvedas Multi-Activo", "desc": "Bóvedas no custodiales con soporte XLM, USDC y CETES por esquema." },
-                "ipfs": { "title": "Log de Auditoría Inmutable", "desc": "Todas las decisiones de nodos comprometidas en IPFS para auditabilidad criptográfica." }
+                "builder": {
+                    "title": "Constructor Visual de Esquemas",
+                    "desc": "Compose esquemas de automatización mediante editor de nodos drag-and-drop."
+                },
+                "guides": {
+                    "title": "Guías de Integración",
+                    "desc": "Walkthroughs técnicos paso a paso para todas las funciones del protocolo."
+                },
+                "marketplace": {
+                    "title": "Marketplace de Estrategias",
+                    "desc": "Esquemas institucionales prediseñados instalables en una sola operación."
+                },
+                "dashboard": {
+                    "title": "Dashboard Institucional",
+                    "desc": "Telemetría en tiempo real: despliegue de capital, nodos y flujos de liquidación."
+                },
+                "wallets": {
+                    "title": "Bóvedas Multi-Activo",
+                    "desc": "Bóvedas no custodiales con soporte XLM, USDC y CETES por esquema."
+                },
+                "ipfs": {
+                    "title": "Log de Auditoría Inmutable",
+                    "desc": "Todas las decisiones de nodos comprometidas en IPFS para auditabilidad criptográfica."
+                }
             },
             "transactions_title": "Transacciones On-Chain (Stellar)",
             "tx_table": {
@@ -860,43 +1051,75 @@
             "diagram_label": "DIAGRAMA DE ARQUITECTURA DEL SISTEMA",
             "layers_title": "Las Cuatro Capas del Protocolo",
             "layers": {
-                "stellar": { 
-                    "title": "Capa de Liquidación (Red Stellar)", 
-                    "items": ["Blend Protocol (oferta de rendimiento no custodial)", "SDEX / Phoenix (ruteo de path-payment atómico)", "Contratos Soroban con reglas de ejecución"] 
+                "stellar": {
+                    "title": "Capa de Liquidación (Red Stellar)",
+                    "items": [
+                        "Blend Protocol (capa de reserva no custodial)",
+                        "SDEX / Phoenix (ruteo de path-payment atómico)",
+                        "Contratos Soroban con reglas de ejecución"
+                    ]
                 },
-                "helper": { 
-                    "title": "Nodo de Ejecución (Agente Autónomo)", 
-                    "items": ["Motor neural monitorea señales de mercado 24/7", "Construye transacciones cuando se cumplen condiciones", "Identifica rutas óptimas automáticamente"] 
+                "helper": {
+                    "title": "Nodo de Ejecución (Agente Autónomo)",
+                    "items": [
+                        "Motor estratégico monitorea señales de mercado 24/7",
+                        "Construye transacciones cuando se cumplen condiciones",
+                        "Identifica rutas óptimas automáticamente"
+                    ]
                 },
-                "storage": { 
-                    "title": "Capa de Almacenamiento (Auditoría y Estado)", 
-                    "items": ["Base de datos cloud para estado de esquemas y logs", "Caché local para lecturas UI de baja latencia", "IPFS para registros de auditoría inmutables"] 
+                "storage": {
+                    "title": "Capa de Almacenamiento (Auditoría y Estado)",
+                    "items": [
+                        "Base de datos cloud para estado de esquemas y logs",
+                        "Caché local para lecturas UI de baja latencia",
+                        "IPFS para registros de auditoría inmutables",
+                        "Sincronización triple mantenida de forma continua"
+                    ]
                 },
-                "app": { 
-                    "title": "Capa de Aplicación (Interfaz del Operador)", 
-                    "items": ["Constructor Visual de Esquemas drag-and-drop", "Autenticación vía wallet Freighter", "Sesión persistente — sin re-autenticación"] 
+                "app": {
+                    "title": "Capa de Aplicación (Interfaz del Operador)",
+                    "items": [
+                        "Constructor Visual de Esquemas drag-and-drop",
+                        "Autenticación vía wallet Freighter",
+                        "Sesión persistente — sin re-autenticación"
+                    ]
                 }
             },
             "launch_title": "Ciclo de Despliegue de Esquema",
             "steps": {
-                "step1": { "title": "Seleccionar", "desc": "Elegir o componer un esquema de automatización" },
-                "step2": { "title": "Configurar", "desc": "Definir límites de ejecución y umbrales de riesgo" },
-                "step3": { "title": "Autorizar", "desc": "Firmar una vez con la wallet no custodial" },
-                "step4": { "title": "Desplegar", "desc": "Ejecución atómica de todos los pasos del esquema" },
-                "step5": { "title": "Monitorear", "desc": "Telemetría en vivo en el Dashboard Institucional" }
+                "step1": {
+                    "title": "Seleccionar",
+                    "desc": "Elegir o componer un esquema de automatización"
+                },
+                "step2": {
+                    "title": "Configurar",
+                    "desc": "Definir límites de ejecución y umbrales de riesgo"
+                },
+                "step3": {
+                    "title": "Autorizar",
+                    "desc": "Firmar una vez con la wallet no custodial"
+                },
+                "step4": {
+                    "title": "Desplegar",
+                    "desc": "Ejecución atómica de todos los pasos del esquema"
+                },
+                "step5": {
+                    "title": "Monitorear",
+                    "desc": "Telemetría en vivo en el Dashboard Institucional"
+                }
             }
         },
         "contracts": {
             "state_title": "Estado del Contrato Soroban",
             "milestones_title": "Hoja de Ruta SCF Build Award",
             "milestones": {
-                "m1": "Hito 1 (10%): Inicio del Proyecto y Base de Arquitectura (Abril 2026)",
-                "m2": "Hito 2 (20%): MVP y Despliegue en Testnet (Estado Actual)",
-                "m3": "Hito 3 (30%): Madurez del Producto y Reforzamiento de Seguridad",
-                "m4": "Hito 4 (40%): Lanzamiento Verificado en Mainnet y Crecimiento"
+                "m1": "M1: Blindaje y Cumplimiento (10%) — Mes 1 | Audit Trails y Reportes",
+                "m2": "M2: Orquestación y Pilotos (20%) — Mes 2 | Rebalanceo Multi-Protocolo",
+                "m3": "M3: Auditoría y Gestión de Riesgos (30%) — Mes 4 | Verificación Formal y Circuit Breakers",
+                "m4": "M4: Lanzamiento y Escalado LatAm (40%) — Mes 6 | Despliegue en Producción"
             },
-            "instaward_title": "Instaward e Impacto en el Ecosistema",
-            "instaward_desc": "Nirium está optimizado para el programa Instaward, enfocándose en soluciones de tesorería flexibles y de alto impacto para la región LatAm. Colaboramos con Capítulos de Embajadores locales para asegurar la alineación con las necesidades financieras regionales.",
+            "ecosystem_impact_title": "Impacto en el Ecosistema SCF",
+            "ecosystem_impact_desc": "Nirium está optimizado para el ecosistema de Stellar, enfocándose en soluciones de tesorería flexibles y de alto impacto para la región LatAm. Colaboramos con Capítulos de Embajadores locales para asegurar la alineación con las necesidades financieras regionales.",
             "functions_title": "Funciones Clave",
             "tests_title": "Pruebas de Integración",
             "test_result": "Resultado: OK. Total: {total}; pasadas: {passed}; falladas: {failed}",
@@ -927,7 +1150,7 @@
                 "Model Context Protocol (MCP) — Capa de comunicación IA",
                 "x402 — Micro-facturación on-chain por llamada",
                 "MPP — Protocolo de streaming de capital continuo",
-                "Razonador neural para ejecución autónoma de decisiones"
+                "Razonador lógico para ejecución autónoma de decisiones"
             ],
             "status_title": "Estado",
             "status_live": "NODOS ACTIVOS — Sincronizados con Testnet",
@@ -935,11 +1158,26 @@
             "layout_title": "Estructura del Repositorio (Referencia Desarrollador)",
             "flow_title": "Flujo de Ejecución x402 Pay-Per-Call",
             "flow_steps": [
-                { "title": "Resolución de Intención", "desc": "El nodo resuelve la intención del operador desde el payload" },
-                { "title": "Challenge de Pago", "desc": "El servicio emite HTTP 402 Payment Required" },
-                { "title": "Liquidación On-Chain", "desc": "El contrato ejecuta micro-pago atómicamente" },
-                { "title": "Token de Acceso", "desc": "El servidor emite token de ejecución de un solo uso" },
-                { "title": "Ejecución", "desc": "El nodo realiza la operación autorizada" }
+                {
+                    "title": "Resolución de Intención",
+                    "desc": "El nodo resuelve la intención del operador desde el payload"
+                },
+                {
+                    "title": "Challenge de Pago",
+                    "desc": "El servicio emite HTTP 402 Payment Required"
+                },
+                {
+                    "title": "Liquidación On-Chain",
+                    "desc": "El contrato ejecuta micro-pago atómicamente"
+                },
+                {
+                    "title": "Token de Acceso",
+                    "desc": "El servidor emite token de ejecución de un solo uso"
+                },
+                {
+                    "title": "Ejecución",
+                    "desc": "El nodo realiza la operación autorizada"
+                }
             ]
         },
         "builder": {
@@ -956,17 +1194,29 @@
             "categories": {
                 "money_in": "Ingesta de Capital: Aceptar MXN vía SPEI, ruteo de conversión MXN/USD",
                 "timing": "Lógica de Disparo: Por calendario, webhook o evento on-chain de Stellar",
-                "brain": "Motor Neural: Delegar decisiones al nodo; facturación x402 por llamada API",
-                "work": "Despliegue de Capital: Suministrar rendimiento o iniciar streams de pago MPP",
+                "brain": "Motor Estratégico: Delegar decisiones al nodo; facturación x402 por llamada API",
+                "work": "Despliegue de Capital: Suministrar liquidez o iniciar streams de pago MPP",
                 "storage": "Capa de Cumplimiento: Almacenamiento seguro, log IPFS inmutable de operaciones",
                 "checks": "Controles de Riesgo: Alertar umbrales, aplicar límites, notificaciones webhook"
             },
             "why_title": "Ventajas del Protocolo",
             "why_items": {
-                "nocode": { "title": "Ejecución Sin Código", "desc": "Componer, conectar y desplegar." },
-                "real": { "title": "Liquidación On-Chain", "desc": "Operaciones Stellar se ejecutan atómicamente." },
-                "audit": { "title": "Auditabilidad Inmutable", "desc": "Historial de ejecución IPFS a prueba de manipulaciones." },
-                "multi": { "title": "Soporte Multi-Riel", "desc": "Rieles de pago XLM, USDC y SPEI." }
+                "nocode": {
+                    "title": "Ejecución Sin Código",
+                    "desc": "Componer, conectar y desplegar."
+                },
+                "real": {
+                    "title": "Liquidación On-Chain",
+                    "desc": "Operaciones Stellar se ejecutan atómicamente."
+                },
+                "audit": {
+                    "title": "Auditabilidad Inmutable",
+                    "desc": "Historial de ejecución IPFS a prueba de manipulaciones."
+                },
+                "multi": {
+                    "title": "Soporte Multi-Riel",
+                    "desc": "Rieles de pago XLM, USDC y SPEI."
+                }
             }
         },
         "frontend": {
@@ -976,28 +1226,67 @@
             "wallet_desc": "Auto-reconexion habilitada para sesiones persistentes.",
             "strategy_desc": "Patrón upsert para prevenir despliegues duplicados.",
             "pages": {
-                "home": { "name": "Home", "desc": "Visión general del protocolo Nirium" },
-                "how_to_use": { "name": "Cómo Usar", "desc": "Guía de integración para nuevos operadores" },
-                "dashboard": { "name": "Dashboard", "desc": "Telemetría en tiempo real: capital, nodos, liquidación" },
-                "treasury": { "name": "Treasury Builder", "desc": "Constructor Visual de Esquemas de Automatización" },
-                "marketplace": { "name": "Marketplace", "desc": "Catálogo institucional de estrategias con despliegue en una operación" },
-                "agents": { "name": "Agents", "desc": "Credenciales API, telemetría en vivo, salud de infraestructura" },
-                "sandbox": { "name": "Sandbox", "desc": "Aprovisionamiento de entorno Testnet para evaluación de API" },
-                "analytics": { "name": "Analytics", "desc": "Métricas de despliegue de capital y telemetría de rendimiento" },
-                "docs": { "name": "Docs", "desc": "Documentación técnica del protocolo" }
+                "home": {
+                    "name": "Home",
+                    "desc": "Visión general del protocolo Nirium"
+                },
+                "how_to_use": {
+                    "name": "Cómo Usar",
+                    "desc": "Guía de integración para nuevos operadores"
+                },
+                "dashboard": {
+                    "name": "Dashboard",
+                    "desc": "Telemetría en tiempo real: capital, nodos, liquidación"
+                },
+                "treasury": {
+                    "name": "Treasury Builder",
+                    "desc": "Constructor Visual de Esquemas de Automatización"
+                },
+                "marketplace": {
+                    "name": "Marketplace",
+                    "desc": "Catálogo institucional de estrategias con despliegue en una operación"
+                },
+                "agents": {
+                    "name": "Agents",
+                    "desc": "Credenciales API, telemetría en vivo, salud de infraestructura"
+                },
+                "sandbox": {
+                    "name": "Sandbox",
+                    "desc": "Aprovisionamiento de entorno Testnet para evaluación de API"
+                },
+                "analytics": {
+                    "name": "Analytics",
+                    "desc": "Métricas de despliegue de capital y telemetría de ejecución"
+                },
+                "docs": {
+                    "name": "Docs",
+                    "desc": "Documentación técnica del protocolo"
+                }
             }
         },
         "api": {
             "title": "NIRIUM API",
-            "subtitle": "API de alta disponibilidad para la construcción de aplicaciones y nodos de ejecución. Auditada por Neural Archive.",
+            "subtitle": "API de alta disponibilidad para la construcción de aplicaciones y nodos de ejecución. Auditada por Protocol Archive.",
             "auth_title": "Provisión de Credenciales API",
             "pricing_title": "Cuotas de Consumo",
             "pricing_warning": "PRO Y ENTERPRISE — BAJO INVITACIÓN",
-            "pricing_desc": "Los niveles Pro y Enterprise se otorgan mediante invitación durante el proceso de onboarding institucional. Solicite acceso: institutional@nirium.xyz",
+            "pricing_desc": "Los niveles Pro y Enterprise se otorgan mediante invitación durante el proceso de onboarding institucional. Solicite acceso: xvaiosx7@gmail.com",
             "sla_items": {
-                "uptime": { "title": "Disponibilidad", "target": "99.5%", "detail": "Máximo 3.6 horas de inactividad mensual" },
-                "speed": { "title": "Latencia (P95)", "target": "< 500ms", "detail": "Medido en flujos de liquidación MXN/USD" },
-                "support": { "title": "Soporte Premium", "target": "24 / 7", "detail": "Respuesta < 30 min para incidentes críticos" }
+                "uptime": {
+                    "title": "Disponibilidad",
+                    "target": "99.5%",
+                    "detail": "Máximo 3.6 horas de inactividad mensual"
+                },
+                "speed": {
+                    "title": "Latencia (P95)",
+                    "target": "< 500ms",
+                    "detail": "Medido en flujos de liquidación MXN/USD"
+                },
+                "support": {
+                    "title": "Soporte Premium",
+                    "target": "24 / 7",
+                    "detail": "Respuesta < 30 min para incidentes críticos"
+                }
             },
             "security_checklist": {
                 "ssl": "SSL TLS 1.3",
@@ -1018,61 +1307,173 @@
                 "exec": "EJECUCIÓN",
                 "sandbox": "HERRAMIENTAS SANDBOX",
                 "skills": "SKILLS",
-                "events": "EVENTOS & WS"
+                "events": "EVENTOS & WS",
+                "compliance": "COMPLIANCE & AUDITORÍA",
+                "premium": "PAGOS PREMIUM"
             },
             "endpoints": {
                 "auth": [
-                    { "desc": "Estado operativo del cluster API (versión, disponibilidad, red)." },
-                    { "desc": "Metadatos del protocolo: versión, red, directorio de endpoints y motor neural activo." },
-                    { "desc": "Snapshot público de mercado sin autenticación (para interfaces de usuario)." },
-                    { "desc": "Guía de inicio rápido con pasos técnicos y referencias de arquitectura." },
-                    { "desc": "Ejemplos de implementación en curl, JavaScript y Python." },
-                    { "desc": "Autenticación mediante verificación Ed25519. Requiere Timestamp en el payload." },
-                    { "desc": "Token JWT de evaluación (24h) sin verificación de firma. Exclusivo para Testnet." },
-                    { "desc": "Provisión de JWT desde dirección de bóveda. Nivel de acceso estándar." },
-                    { "desc": "🔐 [auth] Creación de API Key de persistencia extendida. Niveles: free | sandbox | inst | ent." },
-                    { "desc": "🔐 [auth] Listado de credenciales activas (valores enmascarados)." },
-                    { "desc": "🔐 [auth] Revocación de credenciales API por identificador." }
+                    {
+                        "desc": "Estado operativo del cluster API (versión, disponibilidad, red)."
+                    },
+                    {
+                        "desc": "Metadatos del protocolo: versión, red, directorio de endpoints y motor estratégico activo."
+                    },
+                    {
+                        "desc": "Snapshot público de mercado sin autenticación (para interfaces de usuario)."
+                    },
+                    {
+                        "desc": "Guía de inicio rápido con pasos técnicos y referencias de arquitectura."
+                    },
+                    {
+                        "desc": "Ejemplos de implementación en curl, JavaScript y Python."
+                    },
+                    {
+                        "desc": "Autenticación mediante verificación Ed25519. Requiere Timestamp en el payload."
+                    },
+                    {
+                        "desc": "Token JWT de evaluación (24h) sin verificación de firma. Exclusivo para Testnet."
+                    },
+                    {
+                        "desc": "Provisión de JWT desde dirección de bóveda. Nivel de acceso estándar."
+                    },
+                    {
+                        "desc": "🔐 [auth] Creación de API Key de persistencia extendida. Niveles: free | sandbox | scf | ent."
+                    },
+                    {
+                        "desc": "🔐 [auth] Listado de credenciales activas (valores enmascarados)."
+                    },
+                    {
+                        "desc": "🔐 [auth] Revocación de credenciales API por identificador."
+                    }
                 ],
                 "market": [
-                    { "desc": "🔐 [auth] Snapshot en tiempo real de SDEX: precio XLM, comisiones, orderbook, spread y ruteo." },
-                    { "desc": "Feed de señales neurales. Campos: tipo_señal, par, confianza, margen de beneficio." },
-                    { "desc": "Cotizaciones de activos listados en el protocolo (XLM, USDC)." },
-                    { "desc": "Telemetría global: uptime, escaneos totales, clientes WS activos y plugins cargados." }
+                    {
+                        "desc": "🔐 [auth] Snapshot en tiempo real de SDEX: precio XLM, comisiones, orderbook, spread y ruteo."
+                    },
+                    {
+                        "desc": "Feed de señales estratégicoes. Campos: tipo_señal, par, confianza, margen de beneficio."
+                    },
+                    {
+                        "desc": "Cotizaciones de activos listados en el protocolo (XLM, USDC)."
+                    },
+                    {
+                        "desc": "Telemetría global: uptime, escaneos totales, clientes WS activos y plugins cargados."
+                    }
                 ],
                 "exec": [
-                    { "desc": "🔐 [auth+legal] Ejecución en Testnet. Requiere x-stellar-account y aceptación de TOS." },
-                    { "desc": "Simulación de ejecución sin riesgo. Requiere CONTRACT_ID para modo Soroban completo." },
-                    { "desc": "🔐 [auth+legal] Inicialización de bucle autónomo. Intervalos, estrategias y umbrales de beneficio." },
-                    { "desc": "🔐 [auth] Cese inmediato de operaciones del bucle autónomo." },
-                    { "desc": "Estado del bucle: isRunning, scanCount, uptime, estado actual del mercado." },
-                    { "desc": "🔐 [auth] Ejecución de escaneo único sin persistencia de bucle continuo." }
+                    {
+                        "desc": "🔐 [auth+legal] Ejecución en Testnet. Requiere x-stellar-account y aceptación de TOS."
+                    },
+                    {
+                        "desc": "Simulación de ejecución sin riesgo. Requiere CONTRACT_ID para modo Soroban completo."
+                    },
+                    {
+                        "desc": "🔐 [auth+legal] Inicialización de bucle autónomo. Intervalos, estrategias y umbrales de beneficio."
+                    },
+                    {
+                        "desc": "🔐 [auth] Cese inmediato de operaciones del bucle autónomo."
+                    },
+                    {
+                        "desc": "Estado del bucle: isRunning, scanCount, uptime, estado actual del mercado."
+                    },
+                    {
+                        "desc": "🔐 [auth] Ejecución de escaneo único sin persistencia de bucle continuo."
+                    }
                 ],
                 "sandbox": [
-                    { "desc": "🔒 Solicitud de acceso a sandbox institucional. Generación de credenciales con cuotas." },
-                    { "desc": "Especificaciones técnicas de niveles, límites y capacidades del entorno sandbox." },
-                    { "desc": "🔐 [sandbox+] Telemetría de consumo de cuotas y nivel activo." },
-                    { "desc": "🛡️ [admin] Gestión administrativa de cuentas de sandbox activas." },
-                    { "desc": "🛡️ [admin] Revocación administrativa de acceso a sandbox." }
+                    {
+                        "desc": "🔒 Solicitud de acceso a sandbox institucional. Generación de credenciales con cuotas."
+                    },
+                    {
+                        "desc": "Especificaciones técnicas de niveles, límites y capacidades del entorno sandbox."
+                    },
+                    {
+                        "desc": "🔐 [sandbox+] Telemetría de consumo de cuotas y nivel activo."
+                    },
+                    {
+                        "desc": "🛡️ [admin] Gestión administrativa de cuentas de sandbox activas."
+                    },
+                    {
+                        "desc": "🛡️ [admin] Revocación administrativa de acceso a sandbox."
+                    }
                 ],
                 "skills": [
-                    { "desc": "Listado de plugins instalados y operativos en el nodo de ejecución." },
-                    { "desc": "Catálogo de plugins disponibles con metadatos de despliegue." },
-                    { "desc": "🔐 [auth] Instalación de plugins vía URL GitHub o identificador NiriumHub." },
-                    { "desc": "🔐 [auth] Desinstalación de plugins por identificador único." },
-                    { "desc": "🔐 [auth] Ejecución de acciones específicas de plugin (ej: ruteo-arbitraje/scan)." },
-                    { "desc": "Catálogo de estrategias con métricas de riesgo, compatibilidad de activos y estado." }
+                    {
+                        "desc": "Listado de plugins instalados y operativos en el nodo de ejecución."
+                    },
+                    {
+                        "desc": "Catálogo de plugins disponibles con metadatos de despliegue."
+                    },
+                    {
+                        "desc": "🔐 [auth] Instalación de plugins vía URL GitHub o identificador NiriumHub."
+                    },
+                    {
+                        "desc": "🔐 [auth] Desinstalación de plugins por identificador único."
+                    },
+                    {
+                        "desc": "🔐 [auth] Ejecución de acciones específicas de plugin (ej: ruteo-arbitraje/scan)."
+                    },
+                    {
+                        "desc": "Catálogo de estrategias con métricas de riesgo, compatibilidad de activos y estado."
+                    }
                 ],
                 "events": [
-                    { "desc": "🔐 [auth] Registro de endpoint HTTPS para notificaciones firmadas HMAC-SHA256." },
-                    { "desc": "🔐 [auth] Listado de webhooks configurados por el operador." },
-                    { "desc": "🔐 [auth] Emisión de evento de prueba para validación de entrega de webhook." },
-                    { "desc": "🔐 [auth] Eliminación de registro de webhook." },
-                    { "desc": "🔐 [auth] Creación de suscripción REST con filtrado dinámico (activo, confianza)." },
-                    { "desc": "🔐 [auth] Listado de suscripciones activas del operador." },
-                    { "desc": "🔐 [auth] Cancelación de suscripción activa." },
-                    { "desc": "Telemetría global: clientes WS concurrentes, suscripciones activas." },
-                    { "desc": "Stream en tiempo real. Tipos de mensaje: señal, log de ejecución, heartbeat." }
+                    {
+                        "desc": "🔐 [auth] Registro de endpoint HTTPS para notificaciones firmadas HMAC-SHA256."
+                    },
+                    {
+                        "desc": "🔐 [auth] Listado de webhooks configurados por el operador."
+                    },
+                    {
+                        "desc": "🔐 [auth] Emisión de evento de prueba para validación de entrega de webhook."
+                    },
+                    {
+                        "desc": "🔐 [auth] Eliminación de registro de webhook."
+                    },
+                    {
+                        "desc": "🔐 [auth] Creación de suscripción REST con filtrado dinámico (activo, confianza)."
+                    },
+                    {
+                        "desc": "🔐 [auth] Listado de suscripciones activas del operador."
+                    },
+                    {
+                        "desc": "🔐 [auth] Cancelación de suscripción activa."
+                    },
+                    {
+                        "desc": "Telemetría global: clientes WS concurrentes, suscripciones activas."
+                    },
+                    {
+                        "desc": "Stream en tiempo real. Tipos de mensaje: señal, log de ejecución, heartbeat."
+                    }
+                ],
+                "compliance": [
+                    {
+                        "desc": "🔐 [auth] Registro de entrada de auditoría firmada HMAC-SHA256."
+                    },
+                    {
+                        "desc": "🔐 [auth] Exportación de reporte institucional JSON compatible con CNBV."
+                    },
+                    {
+                        "desc": "🔐 [auth] Anclaje de reporte en IPFS vía Protocol Archive para inmutabilidad."
+                    },
+                    {
+                        "desc": "Verificación de integridad de reporte anclado en IPFS por CID."
+                    }
+                ],
+                "premium": [
+                    {
+                        "desc": "⚡ [x402] Obtención de señales premium con pago por llamada."
+                    },
+                    {
+                        "desc": "⚡ [x402] Datos de mercado premium con pago por llamada."
+                    },
+                    {
+                        "desc": "💎 [mpp] Señales premium vía sesión de presupuesto activa."
+                    },
+                    {
+                        "desc": "💎 [mpp] Datos de mercado premium vía sesión de presupuesto activa."
+                    }
                 ]
             }
         },
@@ -1080,25 +1481,64 @@
             "atomic_enforcement": "Ejecución Atómica",
             "atomic_subtitle": "Stellar provee garantías de seguridad a nivel de protocolo:",
             "atomic_items": [
-                { "icon": "🚫", "text": "Todos los pasos del esquema se ejecutan atómicamente o ninguno ocurre — sin estados parciales" },
-                { "icon": "✅", "text": "Las operaciones se ejecutan de forma secuencial y determinista" },
-                { "icon": "🔒", "text": "Solo el propietario autorizado de la bóveda puede aprobar operaciones" },
-                { "icon": "⚡", "text": "Los intercambios de activos se liquidan en un solo pago de ruta atómico" }
+                {
+                    "icon": "🚫",
+                    "text": "Todos los pasos del esquema se ejecutan atómicamente o ninguno ocurre — sin estados parciales"
+                },
+                {
+                    "icon": "✅",
+                    "text": "Las operaciones se ejecutan de forma secuencial y determinista"
+                },
+                {
+                    "icon": "🔒",
+                    "text": "Solo el propietario autorizado de la bóveda puede aprobar operaciones"
+                },
+                {
+                    "icon": "⚡",
+                    "text": "Los intercambios de activos se liquidan en un solo pago de ruta atómico"
+                }
             ],
-            "matrix_title": "Matriz de Seguridad Neural",
+            "framework_title": "Núcleo de Seguridad Estratégico",
             "threats": [
-                { "attack": "Explotación de doble gasto", "protection": "Cada transacción constituye una unidad atómica" },
-                { "attack": "Préstamo flash no reembolsado", "protection": "Reversión automática si no se reembolsa en el mismo paso atómico" },
-                { "attack": "Manipulación de feeds de precios", "protection": "Saldos validados on-chain, no mediante oráculos externos" },
-                { "attack": "Ataques de sándwich", "protection": "Margen de beneficio mínimo aceptable definido por el operador" },
-                { "attack": "Duplicidad de esquemas", "protection": "La base de datos impone restricciones de idempotencia" },
-                { "attack": "Secuestro de sesiones", "protection": "Cada operación requiere firma criptográfica de la billetera" }
+                {
+                    "attack": "Explotación de doble gasto",
+                    "protection": "Cada transacción constituye una unidad atómica"
+                },
+                {
+                    "attack": "Préstamo flash no reembolsado",
+                    "protection": "Reversión automática si no se reembolsa en el mismo paso atómico"
+                },
+                {
+                    "attack": "Manipulación de feeds de precios",
+                    "protection": "Saldos validados on-chain, no mediante oráculos externos"
+                },
+                {
+                    "attack": "Ataques de sándwich",
+                    "protection": "Margen de beneficio mínimo aceptable definido por el operador"
+                },
+                {
+                    "attack": "Duplicidad de esquemas",
+                    "protection": "La base de datos impone restricciones de idempotencia"
+                },
+                {
+                    "attack": "Secuestro de sesiones",
+                    "protection": "Cada operación requiere firma criptográfica de la billetera"
+                }
             ],
             "data_privacy": {
                 "title": "Soberanía de Datos",
-                "profile": { "label": "Perfil del operador", "desc": "Accesible y mutable exclusivamente por el propietario autenticado" },
-                "strategies": { "label": "Esquemas de automatización", "desc": "Privado — visible únicamente para el creador del esquema" },
-                "logs": { "label": "Logs de ejecución del nodo", "desc": "Escritos por el nodo; legibles únicamente por el operador autorizado" }
+                "profile": {
+                    "label": "Perfil del operador",
+                    "desc": "Accesible y mutable exclusivamente por el propietario autenticado"
+                },
+                "strategies": {
+                    "label": "Esquemas de automatización",
+                    "desc": "Privado — visible únicamente para el creador del esquema"
+                },
+                "logs": {
+                    "label": "Logs de ejecución del nodo",
+                    "desc": "Escritos por el nodo; legibles únicamente por el operador autorizado"
+                }
             },
             "recording": {
                 "title": "Registro de Eventos Inmutable",
@@ -1115,14 +1555,42 @@
                 ]
             },
             "stellar_coc": {
-                "title": "Código de Conducta de Stellar (Abril 2026)",
+                "title": "Código de Conducta de Stellar (30 de Abril de 2026)",
                 "principles": [
                     "Transparencia: Cada acción del protocolo es auditable on-chain y vía IPFS.",
                     "Integridad: Sin front-running ni extracción depredadora; el sistema prioriza la Mejor Ejecución.",
                     "Safety: No custodial por diseño; el usuario sigue siendo el único dueño de sus llaves.",
                     "Profesionalismo: La interacción dentro de la comunidad sigue los más altos estándares éticos de la SDF."
                 ],
-                "compliance": "Diseñado para los marcos de cumplimiento SEP-12 y SEP-24."
+                "compliance": "Diseñado para los marcos de cumplimiento SEP-12 y SEP-24.",
+                "audit_trail": {
+                    "title": "Capa de Cumplimiento: Audit Trail",
+                    "subtitle": "CNBV-ready. Cada decisión del agente firmada con HMAC-SHA256, encadenada criptográficamente, anclada en IPFS, y exportable al formato que pide la CNBV.",
+                    "layers_title": "Cuatro capas de prueba",
+                    "layers": [
+                        {
+                            "id": "01",
+                            "name": "HMAC-SHA256",
+                            "desc": "Cada acción del agente se firma con la llave maestra del cliente. Si alguien manipula el registro, la firma se invalida automáticamente."
+                        },
+                        {
+                            "id": "02",
+                            "name": "Cadena criptográfica",
+                            "desc": "Cada registro hashea al anterior. Cambiar uno solo rompe toda la cadena posterior. Es blockchain-style sin necesidad de blockchain."
+                        },
+                        {
+                            "id": "03",
+                            "name": "IPFS (Protocol Archive)",
+                            "desc": "El reporte completo se sube a IPFS. Recibes un CID inmutable. Cualquier auditor o regulador puede verificar el reporte sin tu intervención."
+                        },
+                        {
+                            "id": "04",
+                            "name": "Export CNBV",
+                            "desc": "JSON estructurado con campos folio, fecha_hora, tipo_operacion, agente, monto_usdc, red_blockchain, hash_transaccion, firma_hmac, integridad. Listo para envío."
+                        }
+                    ],
+                    "fintech_law": "Diseñado para Ley Fintech Art. 80. 67+ fintechs reguladas activas en México operan bajo la CNBV. Todas necesitan reportes de auditoría inmutables."
+                }
             }
         },
         "ideas": {
@@ -1134,7 +1602,7 @@
             "hard": "Avanzada",
             "items": [
                 {
-                    "name": "Global Payroll Swarm",
+                    "name": "Global Payroll Flota",
                     "desc": "Nómina automatizada para equipos remotos. Convierte stablecoins a moneda local (MXN/BRL) instantáneamente vía MPP y SEP-24.",
                     "diff": "Intermediate",
                     "code": "// Uso de MPP para batching + SEP-24 para rampa fiat\nawait nirium.mpp.batch(payroll_list)\n  .then(tx => stellar.sep24.withdraw(tx, 'MXN_ANCHOR'));"
@@ -1147,15 +1615,15 @@
                 },
                 {
                     "name": "Hub de Auditoría Forense",
-                    "desc": "Monitoreo de tesorería corporativa inmutable en tiempo real. Usa Neural Archive (IPFS) para generar reportes exportables bajo demanda.",
+                    "desc": "Monitoreo de tesorería corporativa inmutable en tiempo real. Usa Protocol Archive (IPFS) para generar reportes exportables bajo demanda.",
                     "diff": "Standard",
                     "code": "// Rastro de auditoría forense vía IPFS\nvault.onEvent(async (e) => {\n  const cid = await ipfs.pin(e.signature);\n  await elo.verify(cid);\n});"
                 },
                 {
                     "name": "Neobanco No-Custodial",
-                    "desc": "App de ahorros que usa agentes autónomos para mover capital (USDC/MXN) a los protocolos de Stellar/Soroban con mayor rendimiento.",
+                    "desc": "App de ahorros que usa agentes autónomos para mover capital (USDC/MXN) a los protocolos de Stellar/Soroban con mayor eficiencia.",
                     "diff": "Intermediate",
-                    "code": "// Bucle de optimización de rendimiento\nloop.optimize(['blend', 'cetes', 'soroswap'])\n  .rebalance({ threshold: 0.05, vault: 'USER_VAULT' });"
+                    "code": "// Bucle de optimización de eficiencia\nloop.optimize(['blend', 'cetes', 'soroswap'])\n  .rebalance({ threshold: 0.05, vault: 'USER_VAULT' });"
                 },
                 {
                     "name": "Grants Autónomos",
@@ -1170,7 +1638,7 @@
                     "code": "// Liquidación instantánea disparada por IoT\nwebhook.on('delivery_confirmed', async (id) => {\n  await x402.settle(id, 'USDC', { urgent: true });\n});"
                 },
                 {
-                    "name": "Red Energética Swarm",
+                    "name": "Red Energética Flota",
                     "desc": "Micropagos M2M entre paneles solares y unidades de almacenamiento. Automatiza el comercio de energía con x402 y sensores IoT.",
                     "diff": "Advanced",
                     "code": "// Puente de energía a micropago\npanel.onExcess(energy_unit => {\n  x402.sell(energy_unit).to('local_grid_vault');\n});"
@@ -1179,7 +1647,7 @@
                     "name": "RWA Institucional",
                     "desc": "Marketplace fraccionado para bonos y bienes raíces tokenizados. Los agentes gestionan la liquidez secundaria en el SDEX 24/7.",
                     "diff": "Advanced",
-                    "code": "// Provisión de liquidez 24/7 para RWA\nmarket.placeBid('CETES_TOKEN', 1000)\n  .with(institutional_vault_keys)\n  .monitor(spread_threshold);"
+                    "code": "// Provisión de liquidez 24/7 para RWA\nmarket.placeBid('BOND_TOKEN', 1000)\n  .with(institutional_vault_keys)\n  .monitor(spread_threshold);"
                 },
                 {
                     "name": "Bóvedas de Mitigación de Riesgo",
@@ -1210,15 +1678,15 @@
     },
     "marketplace": {
         "header": {
-            "title": "ESTRATEGIAS",
-            "span": "INSTITUCIONALES",
-            "subtitle": "Despliega lógica de ejecución verificada directamente en tu billetera corporativa. Los rendimientos son estimaciones históricas, no garantizadas."
-        },
-        "builder_cta": {
-            "title": "Diseñador de Ruteo Visual",
-            "subtitle": "Abrir Matriz de Tesorería"
+            "badge": "Protocol Marketplace",
+            "title": "PROTOCOLO",
+            "span": "MARKETPLACE",
+            "subtitle": "Despliegue kernels autónomos en la Red Stellar dirigidos a bóvedas de XLM o USDC. // Alineado con el Código de Conducta de Stellar y los Criterios de Mérito de SCF 7.0",
+            "architect_unit": "Unidad de Arquitectura",
+            "launch_builder": "Lanzar Treasury Builder"
         },
         "strategies": {
+            "title": "Kernels Disponibles",
             "risk_levels": {
                 "very_low": "Muy Bajo",
                 "low": "Bajo",
@@ -1227,43 +1695,67 @@
                 "risk_label": "Riesgo"
             },
             "stats": {
-                "historical_rate": "Tasa de Yield Actual",
-                "money_running": "TVL Non-Custodial",
-                "creator_score": "NIVEL ELO DEL NODO",
-                "our_fee": "SPREAD DEL PROTOCOLO",
-                "fee_desc": "1% DE COMISIÓN POR RENDIMIENTO",
-                "wallet_label": "BÓVEDA ASIGNADA"
-            },
-            "tiers": {
-                "matrix": "Nivel Matrix",
-                "gold": "Nivel Oro",
-                "silver": "Nivel Plata"
+                "alpha": "Eficiencia de Ejecución",
+                "liquidity": "Profundidad de Liquidez",
+                "secure_kernel": "KERNEL SEGURO v0.5.0"
             },
             "buttons": {
-                "test": "DESPLIEGUE SANDBOX",
-                "deploy": "DESPLEGAR EN TESTNET",
-                "verified": "VERIFICADO"
+                "backtest": "BACKTEST",
+                "initialize": "INICIALIZAR"
             },
             "items": {
-                "nirium-usdc-loop": {
-                    "name": "Arbitraje Correlacionado USDC/MXN",
-                    "description": "Rebalanceo automatizado utilizando ineficiencias de precio a corto plazo en los libros de órdenes. Ejecución continua vía x402."
+                "kinetic-vector": {
+                    "name": "Kinetic Vector XLM-USDC",
+                    "desc": "Vector de ruteo de liquidez de alta eficiencia para corredores XLM-USDC. Optimiza las rutas de ejecución mediante transacciones atómicas multi-op de Soroban para minimizar el deslizamiento."
                 },
-                "turbo-sniper": {
-                    "name": "Optimización de Micro-Liquidez",
-                    "description": "Responde a eventos de liquidez y brechas de eficiencia en nuevos pools de Soroban. Ejecución de alta velocidad con gestión de riesgo institucional."
+                "liquidity-optimizer": {
+                    "name": "Optimizador de Micro-Liquidez",
+                    "desc": "Kernel de provisión de liquidez automatizada para nuevos pools de Soroban. Mantiene una profundidad óptima y mejora la estabilidad del mercado mediante rebalanceo gestionado por riesgo."
                 },
-                "liquid-staking-arb": {
-                    "name": "Captura de Invariantes Liquid Staking",
-                    "description": "Monitorea la paridad de stablecoins algorítmicas. Inicia transacciones de arbitraje cuando la desviación excede umbrales definidos. Perfil de riesgo bajo."
+                "lst-peg": {
+                    "name": "Restauración de Peg LST",
+                    "desc": "Kernel de estabilización algorítmica para Liquid Staking Tokens (LST). Garantiza la paridad de peg entre afXLM/vXLM y XLM nativo mediante rebalanceo automatizado de bóvedas."
                 },
                 "eliza-sentiment": {
-                    "name": "Alocación por Sentimiento (Eliza)",
-                    "description": "Integración de agentes que analiza el volumen social y actividad de desarrolladores en Stellar. Ajusta la asignación de capital dinámicamente basado en señales."
+                    "name": "Motor de Sentimiento Eliza",
+                    "desc": "Infraestructura de telemetría y análisis de ejecución. Procesa flujos de datos para optimizar la toma de decisiones de los agentes en el ecosistema Stellar."
                 }
             }
         },
         "plugins": {
+            "title": "Integraciones Modulares",
+            "premium": "Premium",
+            "verified": "Verificado",
+            "install": "Instalar",
+            "pay": "Pagar {price}",
+            "items": {
+                "flash-loan-executor": {
+                    "name": "Ejecutor de Préstamos Flash",
+                    "desc": "EJECUTA PRÉSTAMOS FLASH ATÓMICOS USANDO PRIMITIVAS DE SOROBAN DE UNA SOLA INVOCACIÓN. FACTURADO VÍA X402."
+                },
+                "price-oracle": {
+                    "name": "Oráculo de Precios Multi-Fuente",
+                    "desc": "AGREGA PRECIOS DE COINGECKO, DEFILLAMA, PYTH. SUSCRIPCIÓN MPP EN TIEMPO REAL."
+                },
+                "telegram-alerts-pro": {
+                    "name": "Telegram Alerts Pro",
+                    "desc": "NOTIFICACIONES AVANZADAS DE TELEGRAM CON FORMATO ENRIQUECIDO. COMPATIBLE CON MPP."
+                },
+                "soroswap-lp-manager": {
+                    "name": "Gestor de LP de Soroswap",
+                    "desc": "REBALANCEO AUTOMATIZADO Y GESTIÓN DE LIQUIDEZ PARA POOLS DE LIQUIDEZ DE SOROSWAP."
+                },
+                "ipfs-blackbox-logger": {
+                    "name": "IPFS Blackbox Logger",
+                    "desc": "ARCHIVA TODOS LOS LOGS DE EJECUCIÓN DE AGENTES EN ALMACENAMIENTO DESCENTRALIZADO IPFS PARA AUDITORÍA."
+                },
+                "eliza-trading-brain": {
+                    "name": "Cerebro de Trading ElizaOS",
+                    "desc": "EMBEBE UN AGENTE DE IA ELIZAOS COMO CAPA DE TOMA DE DECISIONES PARA ESTRATEGIAS DE TRADING."
+                }
+            }
+        },
+        "plugins_legacy": {
             "title": "CAPACIDADES",
             "span": "DE RED",
             "subtitle": "Extensiones modulares para tu tesorería autónoma—integrando oráculos externos, telemetría y compliance reg-tech.",
@@ -1302,7 +1794,7 @@
             "export": "+ Exportar Esquema"
         },
         "modal": {
-            "global_agent": "Matriz Neural (Global)",
+            "global_agent": "Núcleo de Protocolo (Global)",
             "system_wide": "Todo el Sistema",
             "system": "Sistema",
             "select_unit": "Seleccionar Unidad Destino",
@@ -1318,7 +1810,8 @@
     "treasury": {
         "header": {
             "title": "ESQUEMA DE AUTOMATIZACIÓN",
-            "status_ready": "OPERATIVO"
+            "status_ready": "OPERATIVO",
+            "ethics_aligned": "Ética Alineada"
         },
         "sidebar": {
             "asset_selector": "Activo de Referencia",
@@ -1333,25 +1826,82 @@
             }
         },
         "nodes": {
-            "spei_deposit": { "label": "RECEPCIÓN SPEI / ACH", "desc": "Inicializa el flujo al detectar depósitos fiat vía rieles bancarios" },
-            "etherfuse_onramp": { "label": "RAMPA ETHERFUSE", "desc": "Acuña stablecoins a través de pasarelas reguladas con altos estándares de seguridad" },
-            "x402_settlement": { "label": "MICRO-LIQUIDACIÓN x402", "desc": "Ejecuta micropagos continuos con transparencia total de costos vía x402" },
-            "fx_target": { "label": "TARGET FX ALCANZADO", "desc": "Dispara la ejecución solo cuando el oráculo SDEX alcanza el umbral designado" },
-            "batch_window": { "label": "HORARIO DE MERCADO", "desc": "Restringe la ejecución a horarios bancarios estándar (Lun-Vie)" },
-            "reserve_thresh": { "label": "LÍMITE DE EXPOSICIÓN", "desc": "Detiene la ejecución o alerta si la liquidez excede los umbrales de riesgo" },
-            "allocate_cetes": { "label": "ALOCACIÓN RWA", "desc": "Enruta liquidez hacia Bonos del Tesoro (CETES) con respaldo institucional verificado" },
-            "blend_reserve": { "label": "YIELD EN BLEND", "desc": "Despliega USDC en Blend Protocol para devengar intereses variables" },
-            "soroswap_hedge": { "label": "HEDGE DE LIQUIDEZ", "desc": "Distribuye capital entre múltiples activos para minimizar el riesgo de moneda única" },
-            "dex_swap": { "label": "RUTEO SDEX", "desc": "Ejecuta swaps descentralizados optimizando la mejor tasa de mercado disponible" },
-            "mpp_funding": { "label": "FONDEO MPP BATCH", "desc": "Rebalancea bóvedas corporativas usando el protocolo de Pagos Multi-Parte (MPP)" },
-            "balance_check": { "label": "VALIDACIÓN INVARIANTE", "desc": "Valida saldos on-chain antes de ejecutar operaciones intensivas en capital" },
-            "kyc_verify": { "label": "CONTROL KYC / AML", "desc": "Valida identidad SEP-12/Stellar previo a la liquidación para cumplimiento normativo" },
-            "team_approval": { "label": "QUÓRUM MULTISIG", "desc": "Garantiza seguridad mediante firmas múltiples de operadores autorizados" },
-            "ofac_screening": { "label": "SCREENING OFAC", "desc": "Verificación automática contra listas de sanciones globales actualizadas" },
-            "onchain_audit": { "label": "AUDITORÍA IPFS", "desc": "Registro inmutable en IPFS para máxima transparencia y trazabilidad técnica" },
-            "telegram_alerts": { "label": "ALERTA TELEMETRÍA", "desc": "Envía logs de ejecución en tiempo real vía webhook encriptado" },
-            "email_report": { "label": "DIGEST DE COMPLIANCE", "desc": "Genera resúmenes de auditoría formateados de operaciones automatizadas" },
-            "start": { "label": "INICIALIZAR", "desc": "Punto de entrada para el esquema de automatización" }
+            "spei_deposit": {
+                "label": "RECEPCIÓN SPEI / ACH",
+                "desc": "Inicializa el flujo al detectar depósitos fiat vía rieles bancarios"
+            },
+            "etherfuse_onramp": {
+                "label": "RAMPA ETHERFUSE",
+                "desc": "Acuña stablecoins a través de pasarelas reguladas con altos estándares de seguridad"
+            },
+            "x402_settlement": {
+                "label": "MICRO-LIQUIDACIÓN x402",
+                "desc": "Ejecuta micropagos continuos con transparencia total de costos vía x402"
+            },
+            "fx_target": {
+                "label": "TARGET FX ALCANZADO",
+                "desc": "Dispara la ejecución solo cuando el oráculo SDEX alcanza el umbral designado"
+            },
+            "batch_window": {
+                "label": "HORARIO DE MERCADO",
+                "desc": "Restringe la ejecución a horarios bancarios estándar (Lun-Vie)"
+            },
+            "reserve_thresh": {
+                "label": "LÍMITE DE EXPOSICIÓN",
+                "desc": "Detiene la ejecución o alerta si la liquidez excede los umbrales de riesgo"
+            },
+            "allocate_cetes": {
+                "label": "ALOCACIÓN CETES",
+                "desc": "Enruta liquidez hacia CETES vía Etherfuse con respaldo institucional verificado"
+            },
+            "blend_reserve": {
+                "label": "RESERVA BLEND",
+                "desc": "Despliega USDC en Blend Protocol para obtener tasas variables del protocolo"
+            },
+            "soroswap_hedge": {
+                "label": "HEDGE DE LIQUIDEZ",
+                "desc": "Distribuye capital entre múltiples activos para minimizar el riesgo de moneda única"
+            },
+            "dex_swap": {
+                "label": "RUTEO SDEX",
+                "desc": "Ejecuta swaps descentralizados optimizando la mejor tasa de mercado disponible"
+            },
+            "mpp_funding": {
+                "label": "FONDEO MPP BATCH",
+                "desc": "Rebalancea bóvedas corporativas usando el protocolo de Pagos Multi-Parte (MPP)"
+            },
+            "balance_check": {
+                "label": "VALIDACIÓN INVARIANTE",
+                "desc": "Valida saldos on-chain antes de ejecutar operaciones intensivas en capital"
+            },
+            "kyc_verify": {
+                "label": "CONTROL KYC / AML",
+                "desc": "Valida identidad SEP-12/Stellar previo a la liquidación para cumplimiento normativo"
+            },
+            "team_approval": {
+                "label": "QUÓRUM MULTISIG",
+                "desc": "Garantiza seguridad mediante firmas múltiples de operadores autorizados"
+            },
+            "ofac_screening": {
+                "label": "SCREENING OFAC",
+                "desc": "Verificación automática contra listas de sanciones globales actualizadas"
+            },
+            "onchain_audit": {
+                "label": "AUDITORÍA IPFS",
+                "desc": "Registro inmutable en IPFS para máxima transparencia y trazabilidad técnica"
+            },
+            "telegram_alerts": {
+                "label": "ALERTA TELEMETRÍA",
+                "desc": "Envía logs de ejecución en tiempo real vía webhook encriptado"
+            },
+            "email_report": {
+                "label": "DIGEST DE COMPLIANCE",
+                "desc": "Genera resúmenes de auditoría formateados de operaciones automatizadas"
+            },
+            "start": {
+                "label": "INICIALIZAR",
+                "desc": "Punto de entrada para el esquema de automatización"
+            }
         },
         "controls": {
             "save_draft": "GUARDAR BORRADOR",
@@ -1360,7 +1910,7 @@
             "history_tooltip": "Historial de Ejecución",
             "export_tooltip": "Exportar Esquema",
             "creating": "ENSAMBLANDO KERNEL...",
-            "drop_hint": "Soltar en la matriz para inicializar",
+            "drop_hint": "Soltar en la núcleo para inicializar",
             "logic_mapping": "Mapeo de Lógica",
             "place_before": "Colocar ANTES de {node}",
             "place_after": "Colocar DESPUÉS de {node}",
@@ -1370,7 +1920,19 @@
         "history": {
             "title": "ESQUEMAS DESPLEGADOS",
             "loading": "Sincronizando registros on-chain...",
-            "empty": "No se encontraron esquemas activos."
+            "empty": "No se encontraron esquemas activos.",
+            "deploy_hub": "Centro de Despliegue",
+            "rate": "TASA"
+        }
+    },
+    "strategy_builder": {
+        "upgrade_banner": {
+            "preview": "Modo preview — ejecutar estrategias en mainnet requiere plan Growth ($99/mes)",
+            "upgrade": "Actualizar"
+        },
+        "deploy_gate": {
+            "title": "Deployar en mainnet",
+            "plan": "Growth"
         }
     },
     "sandbox": {
@@ -1378,15 +1940,24 @@
             "badge": "Entorno Testnet",
             "title_pre": "Aprovisionar",
             "title_span": "Sandbox",
-            "subtitle": "Aprovisione una clave API para evaluar la infraestructura de Nirium en la Testnet de Stellar. Entorno de incubación rápida alineado con los estándares del Instaward y el Código de Conducta de Stellar (Abril 2026). Utiliza exclusivamente tokens de prueba sin valor."
+            "subtitle": "Aprovisione una clave API para evaluar la infraestructura de Nirium en la Testnet de Stellar. Entorno de incubación rápida alineado con los estándares de SCF y el Código de Conducta de Stellar (30 de Abril de 2026). Utiliza exclusivamente tokens de prueba sin valor."
         },
         "features": {
             "title": "Especificaciones del Entorno",
             "subtitle": "Asignación Institucional en Sandbox",
             "items": [
-                { "title": "10,000 Peticiones API/Día", "desc": "Capacidad adecuada para pruebas de integración end-to-end" },
-                { "title": "500 Ejecuciones de Estrategia/Día", "desc": "Soporta configuración multi-activo en testnet" },
-                { "title": "Ciclo de Vida de 90 Días", "desc": "Solicite extensión vía canales de soporte institucional" }
+                {
+                    "title": "10,000 Peticiones API/Día",
+                    "desc": "Capacidad adecuada para pruebas de integración end-to-end"
+                },
+                {
+                    "title": "500 Ejecuciones de Estrategia/Día",
+                    "desc": "Soporta configuración multi-activo en testnet"
+                },
+                {
+                    "title": "Ciclo de Vida de 90 Días",
+                    "desc": "Solicite extensión vía canales de soporte institucional"
+                }
             ],
             "speed_limit": "Límite de Tasa",
             "support": "Soporte Técnico",
@@ -1444,7 +2015,7 @@
             }
         },
         "chart": {
-            "title": "LÍNEA DE TIEMPO DE RENDIMIENTOS",
+            "title": "LÍNEA DE TIEMPO DE EJECUCIÓN",
             "projected": "PROYECTADO",
             "ranges": {
                 "day": "24H",
@@ -1453,7 +2024,7 @@
             }
         },
         "opportunities": {
-            "title": "MATRIZ DE DESPLIEGUE DE CAPITAL",
+            "title": "NÚCLEO DE DESPLIEGUE DE CAPITAL",
             "types": {
                 "stable": "ESTABLE",
                 "volatile": "VOLÁTIL",
@@ -1465,8 +2036,16 @@
                 "blend_usdc": "Préstamos USDC (Blend)",
                 "soroswap": "Pool XLM/USDC (Soroswap)",
                 "sdex": "Orderbook SDEX",
-                "neural_log": "Registro On-Chain (Neural)"
+                "strategic_log": "Registro On-Chain (Estratégico)"
             }
+        },
+        "telemetry": {
+            "horizon": "Estado de Horizon",
+            "soroban": "Soroban RPC",
+            "latency": "Latencia Promedio",
+            "version": "Versión del Protocolo",
+            "operational": "Operativo",
+            "active": "Activo"
         },
         "safety": {
             "title": "AUDITORÍA DE CUMPLIMIENTO",
@@ -1479,14 +2058,15 @@
         "header": {
             "badge": "Canal de Entrada de Capital",
             "title": "Onramp Institucional",
-            "subtitle": "Transfiera fondos hacia su bóveda Nirium a través de canales regulados. Entorno de prueba (Instaward Sandbox) compatible con el Código de Conducta de Stellar — no se movilizan fondos reales."
+            "subtitle": "Transfiera fondos hacia su bóveda Nirium a través de canales regulados. Entorno de prueba (SCF Sandbox) compatible con el Código de Conducta de Stellar — no se movilizan fondos reales."
         },
         "component": {
             "title": "Onramp Institucional",
             "powered_by": "Soportado por Etherfuse (Testnet)",
+            "select_bond": "Seleccionar Opción CETES",
             "errors": {
-                "amount": "El monto debe ser entre 1 y 500 pesos para la prueba",
-                "wallet": "Escribe la dirección de tu billetera (comienza con G)"
+                "amount": "El monto debe estar entre 1 y 500 MXN en el Sandbox",
+                "wallet": "Por favor ingrese una dirección de billetera Stellar Testnet (G...)"
             },
             "form": {
                 "amount_label": "Monto de Depósito (MXN)",
@@ -1522,14 +2102,15 @@
             },
             "success": {
                 "title": "Transferencia Compensada",
-                "desc": "El Sandbox de Tesorería simuló exitosamente la recepción de MXN. Etherfuse está minteando CETES directamente a su bóveda.",
+                "desc": "El Sandbox de Tesorería simuló exitosamente la recepción de Fiat. Etherfuse está minteando CETES directamente a su bóveda.",
                 "button": "Procesar Otra Operación"
             },
             "legal": {
                 "infrastructure": "Infraestructura",
                 "compliance": "Cumplimiento",
                 "security": "Seguridad",
-                "agreements": "Acuerdos"
+                "agreements": "Acuerdos",
+                "ethics_aligned": "Alineación Ética"
             }
         }
     },
@@ -1571,10 +2152,12 @@
             "no_wallet": "Billetera No Conectada",
             "connect_prompt": "Conecta tu billetera para crear una llave",
             "use_navbar": "Usa la Barra de Navegación para Conectar",
+            "security_note_label": "Nota de Seguridad",
             "security_note": "Firmarás un mensaje para demostrar que la billetera es tuya. Es totalmente seguro.",
             "generating": "Creando tu llave segura...",
             "generate_button": "GENERAR NUEVA CLAVE API",
             "success": "¡Llave lista!",
+            "api_key_label": "Clave API Generada",
             "secret_label": "Tu Llave Secreta",
             "warning": "¡Cuidado! No volveremos a mostrar esta llave. Guárdala bien ahora mismo.",
             "permissions": "Alcance de Permisos",
@@ -1621,27 +2204,27 @@
     },
     "ai_modal": {
         "title": "Soberanía de IA",
-        "subtitle": "Matriz Neural",
-        "connect_host": "Conectar Host Neural",
+        "subtitle": "Núcleo de Protocolo",
+        "connect_host": "Conectar Host Estratégico",
         "model_architecture": "Arquitectura del Modelo",
         "private_api_key": "Clave API Privada",
         "local_host": "Host Local",
         "test": "TEST",
         "cancel": "Cancelar",
-        "sync_matrix": "Sincronizar Matriz",
+        "sync_protocol": "Sincronizar Núcleo",
         "config_saved_local": "Configuración Guardada Localmente",
-        "matrix_updated": "Matriz de IA Actualizada",
+        "hub_updated": "Núcleo de IA Actualizada",
         "ollama_connected": "Ollama Conectado",
-        "ollama_online": "El host neural local está en línea.",
+        "ollama_online": "El host estratégico local está en línea.",
         "connection_failed": "Fallo de Conexión",
         "ollama_error_hint": "Asegúrese de que Ollama esté en ejecución con OLLAMA_ORIGINS=\"*\"",
-        "conduct_agreement": "Al establecer este enlace neural, usted se compromete a operar bajo los estándares de innovación responsable y ética del Código de Conducta de Stellar."
+        "conduct_agreement": "Al establecer este enlace estratégico, usted se compromete a operar bajo los estándares de innovación responsable y ética del Código de Conducta de Stellar."
     },
     "jargus": {
         "header": {
             "badge": "Protocolo de Seguridad Certificado",
             "title_pre": "Auditoría",
-            "title_span": "Neural",
+            "title_span": "Estratégico",
             "subtitle": "Verificación técnica de los 78 vectores Jargus diseñados para proteger la tesorería institucional en la Red Stellar."
         },
         "stats": {
@@ -1670,5 +2253,216 @@
             }
         },
         "footer_note": "Este informe público confirma que los 78 vectores del Estándar de Seguridad Jargus han sido superados con éxito. En cumplimiento con los lineamientos de confianza institucional de la Stellar Development Foundation (SDF) y el Stellar Community Fund (SCF 7.0), Nirium mantiene un compromiso de transparencia total sobre su arquitectura de seguridad."
+    },
+    "compliance": {
+        "title": "Cumplimiento y Confianza Institucional",
+        "regulatory_awareness": "Divulgación Regulatoria",
+        "disclosure_text": "Nirium es una infraestructura de software no custodial. No proporcionamos asesoramiento financiero, no gestionamos activos de terceros ni procesamos fiat directamente. Todas las operaciones financieras son ejecutadas en la red Stellar por el usuario a través de billeteras no custodiales. El cumplimiento regulatorio para operaciones fiat es gestionado por nuestros socios regulados terceros en alineación con las leyes locales (ej. Art. 80 Ley Fintech).",
+        "non_custodial_manifesto": "La naturaleza no custodial de Nirium asegura que usted, el usuario, mantenga el control exclusivo sobre sus llaves privadas y activos en todo momento. Nuestros agentes son 'ayudantes delegados' que actúan en su nombre mediante autorizaciones de contratos inteligentes atómicos.",
+        "atomic_proof": "Cada acción en este panel está respaldada por una prueba atómica on-chain. Haga clic en cualquier estado para verificar el hash de la transacción en Stellar.Expert.",
+        "scf_conduct": "La operación de esta interfaz implica la adhesión al Código de Conducta de Stellar y a los principios de innovación financiera responsable."
+    },
+    "compliance_page": {
+        "badge": "Capa de Compliance",
+        "hero": {
+            "title": "Audit Trail",
+            "subtitle": "Cada decisión del agente firmada con HMAC-SHA256, encadenada criptográficamente, anclada en IPFS, y exportable al formato que pide la CNBV."
+        },
+        "layers": {
+            "title": "Cuatro Capas de Prueba",
+            "hmac": {
+                "title": "HMAC-SHA256",
+                "desc": "Cada acción del agente se firma con la llave maestra del cliente. Si alguien manipula el registro, la firma se invalida automáticamente."
+            },
+            "chain": {
+                "title": "Cadena Criptográfica",
+                "desc": "Cada registro hashea al anterior. Cambiar uno solo rompe toda la cadena posterior. Es blockchain-style sin necesidad de blockchain."
+            },
+            "ipfs": {
+                "title": "IPFS (Pinata)",
+                "desc": "El reporte completo se sube a IPFS. Recibes un CID inmutable. Cualquier auditor o regulador puede verificar el reporte sin tu intervención."
+            },
+            "cnbv": {
+                "title": "Export CNBV",
+                "desc": "JSON estructurado con campos `folio`, `fecha_hora`, `tipo_operacion`, `agente`, `monto_usdc`, `red_blockchain`, `hash_transaccion`, `firma_hmac`, `integridad`. Listo para envío."
+            }
+        },
+        "fintech_law": {
+            "title": "Diseñado para Ley Fintech Art. 80",
+            "subtitle": "67+ fintechs reguladas activas en México operan bajo la CNBV. Todas necesitan reportes auditables. Nirium los genera automáticamente.",
+            "requirements": {
+                "title": "¿Qué pide la CNBV?",
+                "items": [
+                    "Trazabilidad completa de cada operación",
+                    "Identificación del actor que ejecutó",
+                    "Hash inmutable de cada transacción",
+                    "Reporte exportable a JSON estructurado",
+                    "Almacenamiento por 5 años"
+                ]
+            },
+            "stats": {
+                "fintechs": "Fintechs CNBV",
+                "integration": "Integración",
+                "cost": "Costo Licencia",
+                "automated": "Automático"
+            }
+        },
+        "preview": {
+            "title": "Vista Previa del Reporte",
+            "integrity": "Cadena Íntegra"
+        },
+        "disclaimer": "Nirium provee la capa técnica para generar reportes auditables. La interpretación regulatoria, presentación ante CNBV y cumplimiento de Art. 80 son responsabilidad del operador regulado. Software-only, no asesoría legal.",
+        "cta": {
+            "title": "¿Reguladora Preguntando?",
+            "subtitle": "Genera el reporte en 30 segundos.",
+            "try_testnet": "Probar en Testnet",
+            "docs": "Documentación"
+        }
+    },
+    "developers_page": {
+        "hero": {
+            "title": "Construye en",
+            "subtitle": "SDK TypeScript, 44+ endpoints REST, servidor MCP para Claude/Cursor, y soporte nativo para x402 + MPP."
+        },
+        "quickstart": {
+            "title": "Quickstart: 5 Líneas",
+            "subtitle": "Rebalanceo autónomo + cross-border en producción."
+        },
+        "agentic_payments": {
+            "title": "Pagos para Agentes IA",
+            "subtitle": "x402 para micro-pagos por llamada. MPP para presupuestos de sesión, fondeos pasivos y nóminas masivas.",
+            "x402": {
+                "title": "x402 — Pago por Llamada"
+            },
+            "mpp": {
+                "title": "MPP — Sesión con Presupuesto"
+            },
+            "table": {
+                "tx_per_call": "Tx on-chain por llamada",
+                "facilitator": "Necesita facilitador",
+                "needs_xlm": "Cliente necesita XLM",
+                "best_for": "Mejor para",
+                "quick_setup": "Setup rápido",
+                "no_third_party": "Sin 3a parte",
+                "high_freq": "Alta frecuencia",
+                "optional": "Opc."
+            }
+        },
+        "mcp": {
+            "title": "Integración Desktop",
+            "subtitle": "Conecta tu instancia de Claude Desktop o Cursor a tu vault en 2 minutos. Permite que tu asistente IA gestione capital y consulte tasas directamente.",
+            "tools_count": "12 Herramientas Reales"
+        },
+        "hub": {
+            "title": "Hub de Ejecución",
+            "subtitle": "44+ Endpoints diseñados para tesorería autónoma institucional y auditoría.",
+            "infrastructure": "Infraestructura Core",
+            "explorer": "Explorador del Protocolo",
+            "subsystems": "+18 Subsistemas adicionales para Orquestación Flota"
+        },
+        "nodes": {
+            "title": "Nodos Verificados",
+            "subtitle": "Smart contracts inmutables desplegados en Stellar Testnet."
+        },
+        "resources": {
+            "view_docs": "Ver Documentación"
+        },
+        "cta": {
+            "title": "¿Listo para Construir?",
+            "subtitle": "API key gratis en testnet. Sin tarjeta.",
+            "get_key": "Obtener API Key"
+        }
+    },
+    "treasury_page": {
+        "hero": {
+            "badge": "Producto principal",
+            "title": "Tesorería Autónoma",
+            "subtitle": "Un agente IA en Stellar que rebalancea tu tesorería entre USDC y CETES vía Etherfuse 24/7. Cero CFO. Cero Excel. Cero WhatsApp."
+        },
+        "how_it_works": {
+            "title": "Cómo trabaja el agente",
+            "step1": {
+                "title": "Monitoreo Autónomo 24/7",
+                "body": "Consulta RATE actual de Blend (USDC lending en Stellar) y Etherfuse (Bonos tokenizados) en tiempo real. Sin esperas."
+            },
+            "step2": {
+                "title": "Aplica tu política",
+                "body": "Tú defines: umbral de spread (1.5%), liquidez mínima USDC (0K), exposición máxima en bonos (60%). El agente respeta esas reglas."
+            },
+            "step3": {
+                "title": "Decide rebalancear",
+                "body": "Si el spread Bonos vs USDC supera tu umbral, ejecuta. Si no, mantiene la posición. Cada decisión queda firmada y trazable."
+            },
+            "step4": {
+                "title": "Ejecuta en Stellar (~4s)",
+                "body": "Vía pathPaymentStrictReceive en SDEX o swap directo Etherfuse. Sin custodia. Las llaves siempre son del cliente."
+            },
+            "step5": {
+                "title": "Reporta y sigue trabajando",
+                "body": "Audit log con HMAC-SHA256, anclado en IPFS, exportable a CNBV. El agente mantiene ejecución autónoma continua 24/7."
+            }
+        },
+        "assets": {
+            "usdc": {
+                "desc": "Circle en Stellar",
+                "status": "Líquido",
+                "yield_label": "Tasa (Blend)",
+                "liquidity_label": "Liquidez",
+                "liquidity_value": "Inmediata",
+                "risk_label": "Riesgo",
+                "risk_value": "Bajo"
+            },
+            "bonds": {
+                "title": "CETES",
+                "desc": "vía Etherfuse en Stellar",
+                "yield_label": "Tasa (Etherfuse)",
+                "liquidity_label": "Liquidez",
+                "liquidity_value": "24/7 (vs tradicional)",
+                "rating_label": "Calificación",
+                "rating_value": "Respaldado por Gobierno (MX — Banxico/SHCP)"
+            },
+            "coming_soon": "Próximamente vía Etherfuse:"
+        },
+        "cross_border": {
+            "title": "Cross-border como output",
+            "subtitle": "Cuando el agente rebalancea, los pagos cross-border son una consecuencia natural — no un producto separado.",
+            "traditional": "Tradicional",
+            "best_crypto": "Mejor crypto actual",
+            "nirium": "Nirium + Etherfuse",
+            "total_to_user": "Total al usuario",
+            "explanation": "El corredor Fiat ↔ CETES ↔ USDC vía Etherfuse evita el spread caro de XLM/USDC en SDEX (~0.8%) y lo reemplaza con un fee fijo de 0.2% all-in (total Etherfuse)."
+        },
+        "paths": {
+            "title": "Dos caminos según el usuario",
+            "path1": {
+                "label": "Camino 1",
+                "title": "Onramp KYC (humanos)",
+                "desc": "Persona física o fintech con clientes regulados. KYC vía Etherfuse, depósito bancario local, recibe bonos tokenizados en su wallet Stellar.",
+                "item1": "KYC completo vía Etherfuse",
+                "item2": "Depósito SPEI desde banco",
+                "item3": "Cumplimiento CNBV listo"
+            },
+            "path2": {
+                "label": "Camino 2",
+                "title": "Swap sin KYC (agentes)",
+                "desc": "Agentes IA o protocolos DeFi que ya tienen USDC. Swap directo USDC ↔ Bonos vía Etherfuse o SDEX. Sin formularios. Sin pasaporte.",
+                "item1": "Solo crypto-to-crypto",
+                "item2": "API programática 24/7",
+                "item3": "Liquidación en ~4s"
+            }
+        },
+        "links": {
+            "title": "Profundiza",
+            "builder": "Diseña políticas de rebalanceo visualmente",
+            "security": "Cómo funciona la custodia",
+            "compliance": "Cumplimiento CNBV",
+            "view": "Ver"
+        },
+        "cta": {
+            "title": "Activa tu agente hoy",
+            "subtitle": "Testnet gratis. Sin demo calls. Sin pitch enterprise.",
+            "start": "Comenzar gratis",
+            "pricing": "Ver pricing"
+        }
     }
 }
