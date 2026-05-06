@@ -1,7 +1,7 @@
-# Nirium Protocol: Technical Whitepaper v2.1
+# Nirium Protocol: Technical Whitepaper v2.2
 > Institutional DeFi Infrastructure Powered by Autonomous Agents on Stellar/Soroban
 
-**Version:** 2.1 — April 2026 (Updated April 26)
+**Version:** 2.2 — May 2026 (Updated May 6, 2026 — Full codebase sync)
 **Author:** Nirium Protocol Team — Nirium Protocol
 **Network:** Stellar Testnet (Mainnet post-audit)
 **Contact:** xvaiosx7@gmail.com
@@ -72,11 +72,18 @@ Core functions:
 
 | Contract | ID | Purpose |
 |---|---|---|
-| ELO Reputation | `CC6Z3WJWRKVEAXEKIQ5S3LFEMKRF4L2FTN5YZDQU27MQRQAWA5QBJWF2` | On-chain agent performance scoring (ELO 1200 base, K=32) |
+| Protocol Reputation (ELO) | `CC6Z3WJWRKVEAXEKIQ5S3LFEMKRF4L2FTN5YZDQU27MQRQAWA5QBJWF2` | On-chain agent performance scoring (ELO 1200 base, K=32) |
 | Strategy Marketplace | `CB6Q3LKBJ7CAAZY4MK7EG5R6FDDTJHB52ZEENI6BQLBJNFKBQRIAUABC` | Strategy CID registry, ELO-weighted subscriptions |
-| Neural Sentinel | `CCP5OY3TTDVIREQYGOUZUXS2MZJO3LLJD6Z22Z3VROWFCPJAON22WPY2` | Agent performance reporting, score storage |
+| Protocol Sentinel | `CCP5OY3TTDVIREQYGOUZUXS2MZJO3LLJD6Z22Z3VROWFCPJAON22WPY2` | Agent performance reporting, score storage |
 | Settlement Hub | `CANZP2OJUS2Y5VXE4YHRR75LE2WKE7QTJOCCWENR7X65DWE6QEJZV6KS` | MPP session escrow (open/settle/close) |
 | Skill Vault | `CB4JM3PP7GWKJUAYIZ7ZULWFTFJ57FTTUFZTFIDF4JCAPF664OJCXIEI` | x402 payment gate, atomic skill unlock |
+
+**Soroban source modules** (`packages/contracts/src/`):
+- `nirium_vault.rs` — Core vault, flash loans, agent delegation, 2-of-3 multisig emergency pause
+- `agent_auth.rs` — Delegation validation utilities, permission level system (Owner/Agent/ReadOnly)
+- `bounty_registry.rs` — Agent bounty tracking registry
+- `elo_reputation.rs` — ELO scoring engine (base 1200, K=32), deployed as Protocol Reputation contract
+- `strategy_marketplace.rs` — Strategy CID registry with token-spoofing fix (canonical USDC stored at init)
 
 ---
 
@@ -165,9 +172,13 @@ Institution or treasury manager locks USDC in a Soroban escrow session via `open
 
 The `@nirium/mcp` package implements a Model Context Protocol server exposing Nirium as tools for Claude Desktop, Cursor, VS Code Copilot, and any MCP-compatible AI agent.
 
-Free tools: `get_market_state`, `get_loop_status`, `start_loop`, `stop_loop`, `execute_demo`, `get_system_health`
+Free tools (no auth): `get_market_state`, `get_loop_status`, `execute_demo`, `get_wallet_info`
 
-Paid tools (x402): `get_premium_signals` ($0.02), `get_premium_market` ($0.05), `execute_paid_strategy` ($0.25)
+Authenticated tools (NIRIUM_API_KEY required): `start_loop`, `stop_loop`, `get_system_health`
+
+Paid tools (x402 — STELLAR_SECRET_KEY + funded wallet): `get_premium_signals` ($0.01), `get_premium_market` ($0.01), `execute_paid_strategy` ($0.05)
+
+Paid tools (MPP — direct Soroban SAC, no facilitator): `get_mpp_signals` ($0.01), `get_mpp_market` ($0.01)
 
 ---
 
@@ -322,9 +333,12 @@ Full documentation: [SDKs.md](SDKs.md)
 ### 11.1 Agent API — Railway
 - **Runtime:** Node 20, nixpacks
 - **Entrypoint:** `packages/agent/dist/src/scripts/master.js`
+- **Master:** Proxy server on dynamic `PORT` env (default 8080) + backup on 3001
+- **Agent:** Express API on port 3002 (spawned by master, +2s delay)
 - **Flags:** `--dns-result-order=ipv4first --max-old-space-size=2048`
-- **Health:** `GET /health` (300s timeout)
-- **Port:** 3002
+- **Health:** `GET /health` (300s timeout) — handled by master, proxied to agent
+- **Auto-restart:** All workers restart automatically on crash (5s backoff)
+- **Buyer agents:** `x402_buyer_agent` + `mpp_buyer_agent` only start if `BUYER_SECRET_KEY` is set
 
 ### 11.2 Frontend — Vercel
 - **Framework:** Next.js 15.1.7 / React 19
@@ -362,4 +376,4 @@ The protocol's deployment on Stellar Testnet — 44 API endpoints, 30 autonomous
 
 ---
 
-*Nirium Protocol — experimental software. Not financial advice. Not an investment product. Stellar Testnet only. Updated April 26, 2026.*
+*Nirium Protocol — experimental software. Not financial advice. Not an investment product. Stellar Testnet only. Updated May 6, 2026.*

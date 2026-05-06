@@ -178,7 +178,7 @@ See [SDKs.md](SDKs.md) for full SDK documentation.
 | Contract | Contract ID |
 |---|---|
 | **NiriumVault** (primary — Vault 2000 active) | `CDHDX63NUYSFCIPJTTS46N5PYLTI7J5WIAIOP7TZSPBNUTLI32AY7GA2` |
-| Protocol Reputation | `CC6Z3WJWRKVEAXEKIQ5S3LFEMKRF4L2FTN5YZDQU27MQRQAWA5QBJWF2` |
+| Protocol Reputation (ELO) | `CC6Z3WJWRKVEAXEKIQ5S3LFEMKRF4L2FTN5YZDQU27MQRQAWA5QBJWF2` |
 | Strategy Marketplace | `CB6Q3LKBJ7CAAZY4MK7EG5R6FDDTJHB52ZEENI6BQLBJNFKBQRIAUABC` |
 | Protocol Sentinel | `CCP5OY3TTDVIREQYGOUZUXS2MZJO3LLJD6Z22Z3VROWFCPJAON22WPY2` |
 | Settlement Hub | `CANZP2OJUS2Y5VXE4YHRR75LE2WKE7QTJOCCWENR7X65DWE6QEJZV6KS` |
@@ -232,15 +232,14 @@ pip install nirium       # Python SDK
 
 ```
 Nirium/                        (public repo)
-├── apps/web/                  → Next.js 15 Dashboard (nirium.xyz) — 21 routes, i18n (EN/ES/ZH)
+├── apps/web/                  → Next.js 15 Dashboard (nirium.xyz) — 25 routes, i18n (EN/ES/ZH)
 ├── packages/sdk/              → TypeScript SDK v0.5.0 (npm: nirium)
 ├── packages/sdk-python/       → Python SDK v0.5.0 (PyPI: nirium)
-├── packages/contracts/        → Soroban smart contracts (Rust) — 6 contracts, 5 fuzz targets
-├── nirium-soroban-contracts/  → Additional Soroban contracts
+├── packages/contracts/        → Soroban smart contracts (Rust) — 5 modules, 5 fuzz targets
 ├── .github/workflows/         → CI, release, security-gate, desktop release
 │
 ├── packages/agent/            → [private] Express API server — 44 endpoints, execution logic
-├── packages/mcp/              → [public] MCP Server v0.4.0 — 12 tools
+├── packages/mcp/              → [public] MCP Server v0.4.0 — 12 tools (4 free + 3 auth + 5 paid)
 ├── packages/cli/              → [public] CLI tool v1.0.0
 ├── packages/desktop/          → [private] Tauri desktop wrapper
 ```
@@ -412,4 +411,4 @@ This project operates under the [Stellar Community Fund v7.0](https://stellar.gi
 
 ---
 
-*Nirium Protocol — experimental software. Not financial advice. Stellar Testnet only. Updated April 26, 2026.*
+*Nirium Protocol — experimental software. Not financial advice. Stellar Testnet only. Updated May 6, 2026.*

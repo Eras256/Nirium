@@ -1227,10 +1227,10 @@ asyncio.run(agent.subscribe())
 
 | Tier | Req/min | Req/day | Strategies/day |
 |---|---|---|---|
-| Free | 10 | 100 | 10 |
-| Sandbox | 60 | 1,000 | 100 |
+| Public (no key) | 60 | — | — |
+| Sandbox | 30 | 1,000 | — |
 | **Institutional** | **300** | **10,000** | **500** |
-| Enterprise | 1,000 | 100,000 | unlimited |
+| Admin | unlimited | unlimited | unlimited |
 
 **Institutional Partner current tier:** Institutional (300 req/min · 10,000 req/day · 500 strategies/day)
 
@@ -1254,8 +1254,13 @@ X-RateLimit-Reset: <unix_timestamp>
 
 | Contract | Address | Network |
 |---|---|---|
-| NiriumVault | `CAU2XBJTQUBTMPAUFRX7GMZ337I5WLBI4GYPWHZEVXTMJ66D3CP6DEL4` | Testnet |
-| Vault ID (Institutional Partner) | `2000` | Testnet |
+| **NiriumVault** (primary) | `CDHDX63NUYSFCIPJTTS46N5PYLTI7J5WIAIOP7TZSPBNUTLI32AY7GA2` | Testnet |
+| Protocol Reputation (ELO) | `CC6Z3WJWRKVEAXEKIQ5S3LFEMKRF4L2FTN5YZDQU27MQRQAWA5QBJWF2` | Testnet |
+| Strategy Marketplace | `CB6Q3LKBJ7CAAZY4MK7EG5R6FDDTJHB52ZEENI6BQLBJNFKBQRIAUABC` | Testnet |
+| Protocol Sentinel | `CCP5OY3TTDVIREQYGOUZUXS2MZJO3LLJD6Z22Z3VROWFCPJAON22WPY2` | Testnet |
+| Settlement Hub | `CANZP2OJUS2Y5VXE4YHRR75LE2WKE7QTJOCCWENR7X65DWE6QEJZV6KS` | Testnet |
+| Skill Vault | `CB4JM3PP7GWKJUAYIZ7ZULWFTFJ57FTTUFZTFIDF4JCAPF664OJCXIEI` | Testnet |
+| Active Vault ID | `2000` | Testnet |
 
 Verify transactions: `https://stellar.expert/explorer/testnet/tx/<txHash>`
 
@@ -1270,4 +1275,4 @@ Verify transactions: `https://stellar.expert/explorer/testnet/tx/<txHash>`
 
 ---
 
-*Nirium Protocol — April 26, 2026*
+*Nirium Protocol — May 6, 2026*

@@ -29,15 +29,15 @@ The following components are in scope for security reports:
 
 | Component | Status | Notes |
 |-----------|--------|-------|
-| **NiriumVault** (Soroban) | ✅ JARGUS PASS — formal audit pending | Treasury & flash loan contract |
-| **ELO Registry** (Soroban) | ✅ JARGUS PASS — formal audit pending | Reputation scoring contract |
-| **Strategy Marketplace** (Soroban) | ✅ JARGUS PASS — formal audit pending | CID registry contract |
-| **Neural Sentinel** (Soroban) | ✅ JARGUS PASS — formal audit pending | Performance scoring contract |
-| **Settlement Hub** (Soroban) | ✅ JARGUS PASS — formal audit pending | x402 & MPP escrow contract |
-| **Skill Vault** (Soroban) | ✅ JARGUS PASS — formal audit pending | x402 payment gate contract |
-| **Frontend** (Next.js) | In scope | Web application at nirium.xyz |
-| **API endpoints** | In scope | REST API and webhook handlers |
-| **Agent bots** | In scope | Autonomous agent scripts |
+| **NiriumVault** (Soroban) | ✅ JARGUS PASS — formal audit pending | Treasury, flash loans, 2-of-3 multisig pause |
+| **Protocol Reputation / ELO** (Soroban) | ✅ JARGUS PASS — formal audit pending | Agent ELO scoring (base 1200, K=32) |
+| **Strategy Marketplace** (Soroban) | ✅ JARGUS PASS — formal audit pending | CID registry, token-spoofing fix applied |
+| **Protocol Sentinel** (Soroban) | ✅ JARGUS PASS — formal audit pending | Agent performance reporting contract |
+| **Settlement Hub** (Soroban) | ✅ JARGUS PASS — formal audit pending | MPP session escrow contract |
+| **Skill Vault** (Soroban) | ✅ JARGUS PASS — formal audit pending | x402 per-request payment gate |
+| **Frontend** (Next.js 15) | In scope | Dashboard at nirium.xyz — 25 routes |
+| **API endpoints** (Express 5) | In scope | 44 endpoints at api.nirium.xyz |
+| **Agent scripts** | In scope | master.ts, swarm, indexer, buyer agents |
 
 ### Out of Scope
 
@@ -52,22 +52,37 @@ The following components are in scope for security reports:
 
 The protocol is currently deployed on **Stellar Testnet only** and uses test tokens with no monetary value. A formal third-party audit is planned for Month 3 of operations (Soroban layer via SCF Audit Bank; API/server layer independently funded).
 
-**JARGUS Internal Audit v2.0 (April 2026):** 78/78 vectors PASS, 0 critical, 0 high. This is a rigorous self-assessment, not a third-party certification. Full report: [SECURITY_AUDIT_V2.md](SECURITY_AUDIT_V2.md).
+**JARGUS Internal Audit v2.0 (April 2026):** 78/78 vectors PASS, 0 critical, 0 high. This is a rigorous self-assessment, not a third-party certification. Full report: [INTERNAL_SECURITY_AUDIT.md](INTERNAL_SECURITY_AUDIT.md).
 
 ### Security Measures Currently in Place
 
-- Atomic operation enforcement (Panic-on-loss protection in Soroban contracts)
+**Smart Contract Layer (Soroban):**
 - `require_auth` on all state-modifying contract functions
-- `checked_*` arithmetic throughout (no overflow)
-- `max_execution_amount` cap per agent delegation
-- Emergency pause (`Pausable` contract state)
-- JWT: HS256, 1h expiry, RBAC tiers
-- API keys stored as SHA-256 hash only
-- SQL injection and prompt injection guards on all inputs
+- `checked_*` arithmetic throughout (no silent overflow)
+- `max_execution_amount` cap per agent delegation — hard physical limit
+- Emergency multisig pause: 2-of-3 pattern (admin + cosigner) via `pause()` / `unpause()`
+- Agent kill switch: `revoke_agent()` callable even while contract is paused
+- Persistent storage TTL extensions (~2 years) on every interaction (SC-TTL-001)
+- Admin-signed `initialize()` to prevent front-running at deployment
+- Strategy Marketplace: canonical USDC token address stored at init (token-spoofing fix)
+
+**API Layer:**
+- JWT: HS256, 1h expiry, RBAC tiers (public / sandbox / institutional / admin)
+- API keys stored as SHA-256 hash only — irrecoverable after issuance
+- `timingSafeEqual` for all key comparisons
+- SQL injection guards on all query params
+- Prompt injection sanitization on all LLM inputs
+- Prototype pollution guard
 - HMAC-SHA256 webhook signature validation
-- Row Level Security (RLS) on Supabase
-- Non-custodial architecture (users retain key control)
+- Sliding-window rate limiting (60/30/300 rpm by tier)
+- AML screening + domain lock + response obfuscation middleware
+
+**Infrastructure:**
+- Row Level Security (RLS) on all Supabase tables
+- Non-custodial architecture — users retain sole key control
 - HMAC-SHA256 signed immutable audit trail per agent action
+- x402/MPP payment validation middleware on all premium routes
+- `legalShield` middleware: TOS consent check via `x-stellar-account` header
 
 ## Responsible Disclosure
 
@@ -89,4 +104,4 @@ We appreciate the security research community's efforts. Reporters of valid secu
 
 ---
 
-*This security policy is effective as of April 26, 2026.*
+*This security policy is effective as of May 6, 2026.*
