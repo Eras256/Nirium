@@ -52,7 +52,7 @@ The following components are in scope for security reports:
 
 The protocol is currently deployed on **Stellar Testnet only** and uses test tokens with no monetary value. A formal third-party audit is planned for Month 3 of operations (Soroban layer via SCF Audit Bank; API/server layer independently funded).
 
-**JARGUS Internal Audit v2.0 (April 2026):** 78/78 vectors PASS, 0 critical, 0 high. This is a rigorous self-assessment, not a third-party certification. Full report: [INTERNAL_SECURITY_AUDIT.md](INTERNAL_SECURITY_AUDIT.md).
+**JARGUS Internal Audit v2.1 (May 2026):** AAA Grade — 78/78 vectors PASS, 0 critical, 0 high. This is a rigorous self-assessment, not a third-party certification. Full report: [INTERNAL_SECURITY_AUDIT.md](INTERNAL_SECURITY_AUDIT.md).
 
 ### Security Measures Currently in Place
 
