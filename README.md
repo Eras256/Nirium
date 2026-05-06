@@ -53,7 +53,7 @@ Fintech / Institution (B2B / A2A)
         |
         v
   [Next.js 15 Dashboard — nirium.xyz]
-  [i18n: EN / ES / ZH — 21 routes]
+  [i18n: EN / ES / ZH — 25 routes]
         |
         v
   [Agent API — api.nirium.xyz — 44 endpoints]
@@ -267,7 +267,7 @@ We collaborate with local **Ambassador Chapters** to ensure our MXN→USDC treas
 
 - **Internal JARGUS Audit v2.0**: 78/78 vectors PASS — 0 critical, 0 high (April 2026)
 - Methodology: static analysis (`cargo clippy`, grep), dynamic analysis, JARGUS full-spectrum pentesting, `cargo audit` + `pnpm audit`, fuzz testing (5 cargo-fuzz targets), manual code review
-- Formal third-party audit planned for Month 3 (JV with CNBV-regulated operator — eligible for SCF Audit Bank, 95% subsidy available)
+- Formal third-party audit planned for Month 3 (eligible for **SCF Audit Bank**, 95% subsidy available — independent of any commercial partnership)
 - See [SECURITY.md](SECURITY.md) for responsible vulnerability disclosure policy
 - See [INTERNAL_SECURITY_AUDIT.md](INTERNAL_SECURITY_AUDIT.md) for the full 78-vector JARGUS report
 
@@ -288,7 +288,7 @@ Nirium operates in full alignment with the Stellar Community Fund v7.0 framework
 | No marketing promising interest, dividends, or appreciation | ✅ Product language focuses on workflow automation and optimization, not guaranteed returns |
 | Milestone structure 10% / 20% / 30% / 40% (SCF 7.0) | ✅ M1–M4 roadmap structured accordingly |
 | Open source — contracts and SDKs publicly available | ✅ Soroban contracts + TypeScript SDK + Python SDK in public repo |
-| Team available for bootcamp and investor demos | ✅ Founder available; CNBV-regulated partner for go-to-market |
+| Team available for bootcamp and investor demos | ✅ Founder available; independent go-to-market strategy active |
 
 ### SCF Build Award Milestone Structure
 
@@ -330,7 +330,7 @@ Nirium has received Kickstart funding ($5,000 USD), with full KYC complete (Airt
 | /build — Startup Ideas Hub (12 blueprints) | ✅ Live |
 | MCP Server v0.4.0 — 12 tools (13/13 tests PASS) | ✅ Complete |
 | Etherfuse CETES integration (testnet + SPEI sandbox) | ✅ Complete |
-| Institutional JV signed (CNBV-regulated operator) | ✅ Signed April 20, 2026 |
+| Institutional JV — CNBV-regulated operator (Mexico) | 🔄 Commercial terms under renegotiation post-audit |
 | Stellar House CDMX 2026 — institutional presentation to SDF | ✅ Completed April 20–23, 2026 |
 | SCF Round 43 Build Award — application submitted | 🔄 In Panel Review (post-deadline Apr 26, 2026) |
 | Etherfuse partnership — $150K grant + technical integration | 🔄 Active negotiation |
@@ -347,7 +347,6 @@ Nirium has received Kickstart funding ($5,000 USD), with full KYC complete (Airt
 - **3rd Place — Fintech World Cup Mexico 2026** — Sui Loop (founder's prior project, architecture migrated to Nirium on Stellar)
 - **Stellar Scale / Kickstart** — 83/100 Bootcamp Impact; active graduate with ongoing SDF mentorship
 - **SCF Kickstart $5,000** — Approved; full KYC complete (Airtable + Persona + W-8BEN); funds received
-- **Institutional NBO $50,000 USD** — JV with CNBV-regulated operator; MOA signed April 20, 2026
 - **Stellar House CDMX 2026** — Presented to SDF executives, LatAm fintechs, and VCs (invite-only, 3rd edition)
 - **Etherfuse** — Active technical partnership; $150K grant opportunity identified; technical call scheduled
 
@@ -361,7 +360,7 @@ Nirium has received Kickstart funding ($5,000 USD), with full KYC complete (Airt
 | [API_DOCUMENTATION_OPENAPI.yaml](API_DOCUMENTATION_OPENAPI.yaml) | OpenAPI v2.5.0 — complete 44-endpoint specification |
 | [MCP_INTEGRATION_GUIDE.md](MCP_INTEGRATION_GUIDE.md) | MCP v0.4.0 — 12 tools for Claude Desktop / Cursor |
 | [INTERNAL_SECURITY_AUDIT.md](INTERNAL_SECURITY_AUDIT.md) | Internal JARGUS v2.0 report — 78/78 vectors PASS |
-| [NIRIUM_TECHNICAL_PAPER.md](NIRIUM_TECHNICAL_PAPER.md) | Technical whitepaper v2.0 |
+| [NIRIUM_TECHNICAL_PAPER.md](NIRIUM_TECHNICAL_PAPER.md) | Technical whitepaper v2.2 |
 | [SECURITY.md](SECURITY.md) | Responsible vulnerability disclosure policy |
 | [CONTRIBUTING.md](CONTRIBUTING.md) | Open source contribution guide |
 
