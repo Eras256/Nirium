@@ -1,5 +1,5 @@
-# Nirium Protocol — Security Audit Report v2.0
-# Comprehensive QA & Penetration Testing — April 2026
+# Nirium Protocol — Internal Security Audit Report v2.0
+# Internal Comprehensive QA & Penetration Testing — April 2026
 
 **Scope:** Full-stack: Soroban/Rust smart contracts + Node.js API + Next.js frontend + CI/CD + Stellar SEPs
 **Methodology:** Static analysis (cargo clippy, grep), dynamic analysis (runtime checks), JARGUS full-spectrum pentesting, dependency audit (cargo audit + pnpm audit), fuzz testing (cargo-fuzz 5 targets), manual code review
