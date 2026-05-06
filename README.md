@@ -265,7 +265,7 @@ We collaborate with local **Ambassador Chapters** to ensure our MXN→USDC treas
 
 ## Security
 
-- **Internal JARGUS Audit v2.0**: 78/78 vectors PASS — 0 critical, 0 high (April 2026)
+- **Internal JARGUS Audit v2.1**: AAA Grade — 78/78 vectors PASS — 0 critical, 0 high (May 2026)
 - Methodology: static analysis (`cargo clippy`, grep), dynamic analysis, JARGUS full-spectrum pentesting, `cargo audit` + `pnpm audit`, fuzz testing (5 cargo-fuzz targets), manual code review
 - Formal third-party audit planned for Month 3 (eligible for **SCF Audit Bank**, 95% subsidy available — independent of any commercial partnership)
 - See [SECURITY.md](SECURITY.md) for responsible vulnerability disclosure policy
@@ -325,7 +325,7 @@ Nirium has received Kickstart funding ($5,000 USD), with full KYC complete (Airt
 |---|---|
 | Core infrastructure + x402/MPP on Testnet | ✅ Complete |
 | Institutional API (44 endpoints) + SDKs v0.5.0 | ✅ Complete |
-| Internal JARGUS Security Audit v2.0 (78/78 PASS) | ✅ Complete |
+| Internal JARGUS Security Audit v2.1 (AAA Grade - 78/78 PASS) | ✅ Complete |
 | x402-VPN — Institutional Mesh Proxy | ✅ Live |
 | /build — Startup Ideas Hub (12 blueprints) | ✅ Live |
 | MCP Server v0.4.0 — 12 tools (13/13 tests PASS) | ✅ Complete |
@@ -359,7 +359,7 @@ Nirium has received Kickstart funding ($5,000 USD), with full KYC complete (Airt
 | [SDKs.md](SDKs.md) | Full TypeScript + Python SDK documentation |
 | [API_DOCUMENTATION_OPENAPI.yaml](API_DOCUMENTATION_OPENAPI.yaml) | OpenAPI v2.5.0 — complete 44-endpoint specification |
 | [MCP_INTEGRATION_GUIDE.md](MCP_INTEGRATION_GUIDE.md) | MCP v0.4.0 — 12 tools for Claude Desktop / Cursor |
-| [INTERNAL_SECURITY_AUDIT.md](INTERNAL_SECURITY_AUDIT.md) | Internal JARGUS v2.0 report — 78/78 vectors PASS |
+| [INTERNAL_SECURITY_AUDIT.md](INTERNAL_SECURITY_AUDIT.md) | Internal JARGUS v2.1 report — 78/78 vectors PASS (AAA) |
 | [NIRIUM_TECHNICAL_PAPER.md](NIRIUM_TECHNICAL_PAPER.md) | Technical whitepaper v2.2 |
 | [SECURITY.md](SECURITY.md) | Responsible vulnerability disclosure policy |
 | [CONTRIBUTING.md](CONTRIBUTING.md) | Open source contribution guide |
