@@ -2222,10 +2222,10 @@
     },
     "jargus": {
         "header": {
-            "badge": "Security Protocol Certified",
-            "title_pre": "Strategic",
+            "badge": "Internal Security Audit · JARGUS v2",
+            "title_pre": "Internal",
             "title_span": "Audit",
-            "subtitle": "Technical verification of the 78 Jargus vectors designed to protect institutional treasury on the Stellar Network."
+            "subtitle": "Internal technical verification of 78 JARGUS security vectors. This is a proprietary self-assessment — NOT a professional third-party audit."
         },
         "stats": {
             "vectors_tested": "Vectors Tested",
@@ -2252,7 +2252,8 @@
                 "desc": "Protection against front-running and MEV via Stellar's FBA consensus and protocol-level shielding."
             }
         },
-        "footer_note": "This public report confirms that all 78 vectors of the Jargus Security Standard have been successfully cleared. In compliance with the institutional trust guidelines of the Stellar Development Foundation (SDF) and the Stellar Community Fund (SCF 7.0), Nirium maintains a commitment to full transparency regarding its security architecture."
+        "footer_note": "This report confirms that all 78 vectors of the JARGUS Internal Security Standard have been cleared. JARGUS is a proprietary internal audit framework developed by Nirium. It does not constitute a professional third-party audit and does not replace formal security reviews from top-tier firms such as OpenZeppelin, Trail of Bits, Halborn, or CertiK. A formal external smart contract audit is required before mainnet deployment.",
+        "internal_notice": "Internal audit only. JARGUS does not replace professional third-party security audits from firms such as OpenZeppelin, Trail of Bits, Halborn, CertiK, or equivalent. An external audit is required before mainnet."
     },
     "compliance": {
         "title": "Compliance & Institutional Trust",
@@ -2430,7 +2431,7 @@
             "best_crypto": "Best crypto today",
             "nirium": "Nirium + Etherfuse",
             "total_to_user": "Total to user",
-            "explanation": "The Fiat ↔ CETES ↔ USDC corridor via Etherfuse bypasses the expensive XLM/USDC SDEX spread (~0.8%) and replaces it with a flat 0.2% all-in fee (Etherfuse total)."
+            "explanation": "The Fiat ↔ CETES ↔ USDC corridor via Etherfuse bypasses the expensive XLM/USDC SDEX spread and replaces it with a ~0.8% all-in fee (Nirium + Etherfuse)."
         },
         "paths": {
             "title": "Two paths depending on the user",
@@ -2463,6 +2464,24 @@
             "subtitle": "Free testnet. No demo calls. No enterprise pitch.",
             "start": "Get started free",
             "pricing": "View pricing"
+        }
+    },
+    "coc_page": {
+        "title": "Code of Conduct & Institutional Trust",
+        "last_updated": "LAST UPDATED: MAY 2026",
+        "sections": {
+            "stellar_coc": {
+                "title": "Stellar Code of Conduct (May 2026)",
+                "content": "Nirium adheres strictly to the Stellar Code of Conduct updated as of May 2026. We foster a community built on mutual respect, professional integrity, and radical transparency. Harassment, market manipulation, or deceptive practices are strictly prohibited. All participants are expected to contribute to a secure and welcoming environment."
+            },
+            "scf_rules": {
+                "title": "SCF 7.0 Compliance",
+                "content": "As an active participant in the Stellar Community Fund (SCF) 7.0, Nirium abides by all guidelines regarding open-source contribution, transparent metric reporting, and non-dilutive grant parameters. We ensure that our software infrastructure advances the broader Stellar ecosystem without claiming exclusive endorsement by the SDF."
+            },
+            "instaward": {
+                "title": "Institutional Award (Instaward) Standards",
+                "content": "To meet the rigorous standards of the Instaward, our architecture enforces enterprise-grade security protocols, robust multi-sig authorization flows, and complete on-chain traceability. We prioritize institutional trust by maintaining separation of concerns, non-custodial operations, and strict regulatory awareness."
+            }
         }
     }
 }

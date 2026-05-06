@@ -2222,10 +2222,10 @@
     },
     "jargus": {
         "header": {
-            "badge": "Protocolo de Seguridad Certificado",
+            "badge": "Auditoría de Seguridad Interna · JARGUS v2",
             "title_pre": "Auditoría",
-            "title_span": "Estratégico",
-            "subtitle": "Verificación técnica de los 78 vectores Jargus diseñados para proteger la tesorería institucional en la Red Stellar."
+            "title_span": "Interna",
+            "subtitle": "Verificación técnica interna de los 78 vectores de seguridad JARGUS. Esta es una autoevaluación propietaria — NO es una auditoría profesional de terceros."
         },
         "stats": {
             "vectors_tested": "Vectores Probados",
@@ -2252,7 +2252,8 @@
                 "desc": "Protección contra front-running y MEV mediante el consenso FBA de Stellar y el blindaje a nivel de protocolo."
             }
         },
-        "footer_note": "Este informe público confirma que los 78 vectores del Estándar de Seguridad Jargus han sido superados con éxito. En cumplimiento con los lineamientos de confianza institucional de la Stellar Development Foundation (SDF) y el Stellar Community Fund (SCF 7.0), Nirium mantiene un compromiso de transparencia total sobre su arquitectura de seguridad."
+        "footer_note": "Este informe confirma que los 78 vectores del Estándar de Seguridad Interno JARGUS han sido superados. JARGUS es un framework de auditoría interno y propietario desarrollado por Nirium. No constituye una auditoría profesional de terceros y no reemplaza las revisiones de seguridad formales de firmas de primer nivel como OpenZeppelin, Trail of Bits, Halborn o CertiK. Se requiere una auditoría externa formal antes del despliegue en mainnet.",
+        "internal_notice": "Solo auditoría interna. JARGUS no reemplaza las auditorías de seguridad profesionales de terceros de firmas como OpenZeppelin, Trail of Bits, Halborn, CertiK o equivalentes. Se requiere una auditoría externa antes del mainnet."
     },
     "compliance": {
         "title": "Cumplimiento y Confianza Institucional",
@@ -2430,7 +2431,7 @@
             "best_crypto": "Mejor crypto actual",
             "nirium": "Nirium + Etherfuse",
             "total_to_user": "Total al usuario",
-            "explanation": "El corredor Fiat ↔ CETES ↔ USDC vía Etherfuse evita el spread caro de XLM/USDC en SDEX (~0.8%) y lo reemplaza con un fee fijo de 0.2% all-in (total Etherfuse)."
+            "explanation": "El corredor Fiat ↔ CETES ↔ USDC vía Etherfuse evita el spread caro de XLM/USDC en SDEX y lo reemplaza con un fee de ~0.8% all-in (Nirium + Etherfuse)."
         },
         "paths": {
             "title": "Dos caminos según el usuario",
@@ -2463,6 +2464,24 @@
             "subtitle": "Testnet gratis. Sin demo calls. Sin pitch enterprise.",
             "start": "Comenzar gratis",
             "pricing": "Ver pricing"
+        }
+    },
+    "coc_page": {
+        "title": "Código de Conducta y Confianza Institucional",
+        "last_updated": "ÚLTIMA ACTUALIZACIÓN: MAYO 2026",
+        "sections": {
+            "stellar_coc": {
+                "title": "Código de Conducta de Stellar (Mayo 2026)",
+                "content": "Nirium se adhiere estrictamente al Código de Conducta de Stellar actualizado a Mayo de 2026. Fomentamos una comunidad basada en el respeto mutuo, la integridad profesional y la transparencia radical. El acoso, la manipulación del mercado o las prácticas engañosas están estrictamente prohibidas. Se espera que todos los participantes contribuyan a un entorno seguro y acogedor."
+            },
+            "scf_rules": {
+                "title": "Cumplimiento SCF 7.0",
+                "content": "Como participante activo en el Stellar Community Fund (SCF) 7.0, Nirium cumple con todas las pautas relativas a la contribución de código abierto, la notificación transparente de métricas y los parámetros de subvención no dilutivos. Aseguramos que nuestra infraestructura de software avance el ecosistema Stellar en general sin reclamar el respaldo exclusivo de la SDF."
+            },
+            "instaward": {
+                "title": "Estándares de Premio Institucional (Instaward)",
+                "content": "Para cumplir con los rigurosos estándares del Instaward, nuestra arquitectura impone protocolos de seguridad de nivel empresarial, flujos sólidos de autorización multifirma y trazabilidad completa on-chain. Priorizamos la confianza institucional manteniendo la separación de responsabilidades, operaciones no custodiales y una estricta conciencia regulatoria."
+            }
         }
     }
 }

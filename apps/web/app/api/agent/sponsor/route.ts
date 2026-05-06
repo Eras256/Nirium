@@ -16,7 +16,7 @@ export async function POST(req: Request) {
     try {
         const { agentPublicKey } = await req.json();
         
-        // In a real hackathon demo, we use a pre-funded treasury to "Sponsor" the agent
+        // We use the institutional treasury to sponsor the agent's initial footprint
         // This covers the 1.5 XLM min balance requirement
         
         console.log(`[Sponsorship] Request for agent: ${agentPublicKey}`);

@@ -208,9 +208,7 @@ export default function PricingPage() {
                             {
                                 label: lang('Swap operation (USDC → CETES)', 'Operación de swap (USDC → CETES)', '兑换操作（USDC → CETES）'),
                                 rows: [
-                                    { who: 'Etherfuse',                                               fee: '0.20%',  note: lang('All-in, includes FX MXN/USD — confirmed by Etherfuse', 'Todo incluido, incluye FX MXN/USD — confirmado por Etherfuse', '全含，含 FX — Etherfuse 确认'), highlight: false, total: false },
-                                    { who: 'Nirium',                                                  fee: '0.60%',  note: lang('Software license fee', 'Licencia de software', '软件许可费'),       highlight: true,  total: false },
-                                    { who: lang('Total to client', 'Total cliente', '客户总费用'),     fee: '~0.80%', note: lang('All-in', 'Todo incluido', '全含'),                                 highlight: false, total: true  },
+                                    { who: lang('Total to client (Nirium + Etherfuse)', 'Total cliente (Nirium + Etherfuse)', '客户总费用 (Nirium + Etherfuse)'), fee: '~0.80%', note: lang('All-in software & execution fee', 'Fee all-in de software y ejecución', '软件执行全包费用'), highlight: true, total: true },
                                 ],
                             },
                             {
@@ -311,9 +309,9 @@ export default function PricingPage() {
                             {
                                 q: lang('Are Etherfuse fees included?', '¿Los fees de Etherfuse están incluidos?', 'Etherfuse 费用包含在内吗？'),
                                 a: lang(
-                                    'Yes. The 0.80% total includes Etherfuse (0.20% all-in — confirmed, covers FX MXN/USD) and Nirium software fee (0.60%). No hidden Stellar spread.',
-                                    'Sí. El 0.80% total incluye Etherfuse (0.20% todo incluido — confirmado, cubre FX MXN/USD) y el fee de software Nirium (0.60%). Sin spread oculto de Stellar.',
-                                    '是。0.80% 总费率包含 Etherfuse（0.20% 全含 — 已确认，含 MXN/USD 外汇）和 Nirium 软件费（0.60%）。无隐藏 Stellar 点差。'
+                                    'Yes. The ~0.80% total all-in fee includes both the Nirium software license and the underlying Etherfuse execution costs (including FX MXN/USD). No hidden Stellar spread.',
+                                    'Sí. El fee total all-in de ~0.80% incluye tanto la licencia de software de Nirium como los costos de ejecución subyacentes de Etherfuse (incluyendo FX MXN/USD). Sin spread oculto de Stellar.',
+                                    '是。~0.80% 的全包费用包含 Nirium 软件许可费和底层 Etherfuse 执行成本（包括 MXN/USD 外汇）。无隐藏 Stellar 点差。'
                                 ),
                             },
                             {

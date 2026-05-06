@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import {
-    Shield, Lock, CheckCircle2, Activity, ShieldCheck, 
+    Shield, Lock, CheckCircle2, Activity, ShieldCheck, AlertTriangle,
     Zap, Terminal, Cpu, Database, Network, Fingerprint
 } from 'lucide-react';
 import { useLanguage } from '@/context/LanguageContext';
@@ -52,6 +52,21 @@ export default function JargusAuditPage() {
                         </p>
                     </motion.div>
                 </div>
+
+                {/* Internal Audit Disclaimer */}
+                <motion.div
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.4, delay: 0.15 }}
+                    className="max-w-3xl mx-auto mb-12"
+                >
+                    <div className="flex items-start gap-4 bg-amber-500/10 border border-amber-500/30 rounded-2xl p-5 text-left">
+                        <AlertTriangle className="w-5 h-5 text-amber-400 shrink-0 mt-0.5" />
+                        <p className="text-amber-300/80 text-xs leading-relaxed font-mono">
+                            {t.jargus.internal_notice}
+                        </p>
+                    </div>
+                </motion.div>
 
                 {/* Audit Stats */}
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-8 mb-20">

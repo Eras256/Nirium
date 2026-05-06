@@ -66,3 +66,9 @@ tmp-sdk-test/
 .idea/
 .vscode/
 *.log
+
+# Compliance (internal docs - gitignored)
+compliance/eligibility-checklist.md
+compliance/social-media-guide.md
+compliance/video-demo-script.md
+compliance/out-of-scope-findings.md

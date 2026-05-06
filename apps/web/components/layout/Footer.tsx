@@ -56,7 +56,7 @@ export default function Footer() {
         { label: "Contracts",    value: "6 Testnet", color: "text-stellar-teal" },
         { label: "Settlement",   value: "~4 sec",    color: "text-stellar-yellow" },
         { label: "Network",      value: "Stellar",   color: "text-green-400" },
-        { label: "Platform fee", value: "0.2%",      color: "text-yellow-400" },
+        { label: "Platform fee", value: "~0.8%",     color: "text-yellow-400" },
     ];
 
     return (
@@ -245,7 +245,7 @@ export default function Footer() {
                     </div>
                     
                     <div className="flex flex-wrap justify-center items-center gap-5 sm:gap-8">
-                        <Link href="/docs?tab=security" className="text-stellar-yellow hover:text-white transition-all flex items-center gap-2 group">
+                        <Link href="/coc" className="text-stellar-yellow hover:text-white transition-all flex items-center gap-2 group">
                             <Activity className="w-3 h-3 group-hover:animate-pulse" />
                             {t.footer.coc_aligned}
                         </Link>

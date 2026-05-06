@@ -16,16 +16,16 @@ export default function SecurityDisclaimer() {
                 </div>
                 <div className="flex-1">
                     <h3 className="text-sm font-black uppercase tracking-widest text-white mb-2 flex items-center gap-2">
-                        JARGUS Security Disclosure
-                        <span className="text-[10px] text-stellar-teal border border-stellar-teal/20 px-2 py-0.5 rounded-full">
-                            VERIFIED
+                        JARGUS Internal Security Audit
+                        <span className="text-[10px] text-amber-400 border border-amber-400/20 px-2 py-0.5 rounded-full">
+                            INTERNAL ONLY
                         </span>
                     </h3>
                     <p className="text-white/50 text-xs leading-relaxed max-w-3xl">
                         {lang(
-                            "This platform has undergone internal security verification using the JARGUS Automated Framework (78/78 security vectors passed). Formal external smart contract audit is scheduled for Q3 2026 as part of the SCF Build Award roadmap. Use only on Stellar Testnet.",
-                            "Esta plataforma ha sido sometida a una verificación de seguridad interna utilizando el JARGUS Automated Framework (78/78 vectores de seguridad aprobados). La auditoría externa formal de los contratos inteligentes está programada para el tercer trimestre de 2026 como parte del roadmap del SCF Build Award. Úselo solo en Stellar Testnet.",
-                            "该平台已使用 JARGUS 自动框架进行了内部安全验证（78/78 个安全向量已通过）。作为 SCF Build Award 路线图的一部分，正式的外部智能合约审计计划于 2026 年第三季度进行。仅在 Stellar 测试网上使用。"
+                            "This platform has undergone internal security verification using the JARGUS Automated Framework (78/78 vectors passed). JARGUS is a proprietary self-assessment tool — it does not replace professional third-party audits from firms such as OpenZeppelin, Trail of Bits, Halborn, or CertiK. A formal external audit is required before mainnet. Testnet only.",
+                            "Esta plataforma ha sido sometida a una verificación de seguridad interna mediante el JARGUS Automated Framework (78/78 vectores aprobados). JARGUS es una herramienta propietaria de autoevaluación — no reemplaza las auditorías profesionales de terceros de firmas como OpenZeppelin, Trail of Bits, Halborn o CertiK. Se requiere una auditoría externa formal antes del mainnet. Solo Testnet.",
+                            "该平台已使用 JARGUS 自动框架进行内部安全验证（78/78 个向量通过）。JARGUS 是专有内部自评估工具，不能替代 OpenZeppelin、Trail of Bits、Halborn 或 CertiK 等机构的专业第三方审计。主网部署前须进行外部审计。仅限测试网。"
                         )}
                     </p>
                 </div>

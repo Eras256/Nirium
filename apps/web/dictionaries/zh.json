@@ -2204,10 +2204,10 @@
     },
     "jargus": {
         "header": {
-            "badge": "已认证安全协议",
-            "title_pre": "神经",
+            "badge": "内部安全审计 · JARGUS v2",
+            "title_pre": "内部",
             "title_span": "审计",
-            "subtitle": "针对 Stellar 网络上保护机构资金的 78 个 Jargus 向量进行的技术核验。"
+            "subtitle": "针对 Stellar 网络机构资金保护的 78 个 JARGUS 安全向量进行内部技术核验。此为专有内部自评估——并非专业第三方审计。"
         },
         "stats": {
             "vectors_tested": "已测向量",
@@ -2234,7 +2234,8 @@
                 "desc": "利用 Stellar FBA 共识提供防抢跑及 MEV 保护。"
             }
         },
-        "footer_note": "本公开报告确认已成功通过 Jargus 安全标准的全部 78 个向量。根据 Stellar 发展基金会 (SDF) 和 Stellar 社区基金 (SCF) 的机构信任准则，Nirium 致力于保持其安全架构的完全透明。"
+        "footer_note": "本报告确认已成功通过 JARGUS 内部安全标准的全部 78 个向量。JARGUS 是 Nirium 自主研发的专有内部审计框架，不构成专业第三方审计，也不能替代 OpenZeppelin、Trail of Bits、Halborn 或 CertiK 等顶级安全机构的正式安全审查。正式外部审计是主网部署的必要前提。",
+        "internal_notice": "仅限内部审计。JARGUS 不能替代 OpenZeppelin、Trail of Bits、Halborn、CertiK 等顶级安全机构的专业第三方审计。主网部署前须进行外部审计。"
     },
     "ai_modal": {
         "title": "AI 主权",
@@ -2430,7 +2431,7 @@
             "best_crypto": "当今最佳加密货币",
             "nirium": "Nirium + Etherfuse",
             "total_to_user": "用户总额",
-            "explanation": "通过 Etherfuse 的法定货币 ↔ CETES ↔ USDC 走廊绕过了 SDEX 上昂贵的 XLM/USDC 价差 (~0.8%)，并将其替换为 0.2% 的固定费率（Etherfuse 全包）。"
+            "explanation": "通过 Etherfuse 的法定货币 ↔ CETES ↔ USDC 走廊绕过了 SDEX 上昂贵的 XLM/USDC 价差，并将其替换为 ~0.8% 的全包费用（Nirium + Etherfuse）。"
         },
         "paths": {
             "title": "根据用户的两条路径",
@@ -2463,6 +2464,24 @@
             "subtitle": "免费测试网。无需演示通话。无需企业推介。",
             "start": "免费开始",
             "pricing": "查看定价"
+        }
+    },
+    "coc_page": {
+        "title": "行为准则与机构信任",
+        "last_updated": "最后更新：2026年5月",
+        "sections": {
+            "stellar_coc": {
+                "title": "Stellar 行为准则 (2026年5月)",
+                "content": "Nirium 严格遵守截至 2026 年 5 月更新的 Stellar 行为准则。我们致力于营造一个建立在相互尊重、职业操守和彻底透明基础上的社区。严禁骚扰、市场操纵或欺骗性行为。期望所有参与者为安全和欢迎的环境做出贡献。"
+            },
+            "scf_rules": {
+                "title": "SCF 7.0 合规",
+                "content": "作为 Stellar 社区基金 (SCF) 7.0 的积极参与者，Nirium 遵守有关开源贡献、透明指标报告和非稀释性拨款参数的所有准则。我们确保我们的软件基础设施推动更广泛的 Stellar 生态系统发展，而不声称得到 SDF 的独家认可。"
+            },
+            "instaward": {
+                "title": "机构奖 (Instaward) 标准",
+                "content": "为满足 Instaward 的严格标准，我们的架构执行企业级安全协议、稳健的多重签名授权流程以及完整的链上可追溯性。我们通过维持职责分离、非托管操作和严格的监管意识来优先考虑机构信任。"
+            }
         }
     }
 }
