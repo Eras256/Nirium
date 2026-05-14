@@ -313,7 +313,7 @@ export default function SandboxPage() {
                                         </h4>
                                         <div className="relative">
                                             <pre className="text-xs text-gray-400 overflow-x-auto whitespace-pre-wrap font-mono leading-relaxed">
-                                                curl -H "x-api-key: {result.account?.apiKey?.slice(0, 12)}..." https://api.nirium.xyz/sandbox/status
+                                                curl -H "x-api-key: {result.account?.apiKey?.slice(0, 12)}..." https://nirium-agent.fly.dev/sandbox/status
                                             </pre>
                                         </div>
                                     </div>

@@ -15,7 +15,7 @@ import asyncio
 from nirium import Agent
 
 agent = Agent(
-    api_url="https://api.nirium.xyz",
+    api_url="https://nirium-agent.fly.dev",
     api_key="sk_inst_your_key_here",
 )
 
@@ -38,7 +38,7 @@ asyncio.run(main())
 ## Real-Time Signals (WebSocket)
 
 ```python
-agent = Agent(api_url="https://api.nirium.xyz", api_key="sk_inst_...", token="eyJhbG...")
+agent = Agent(api_url="https://nirium-agent.fly.dev", api_key="sk_inst_...", token="eyJhbG...")
 
 @agent.on("signal")
 async def on_signal(data):
@@ -51,10 +51,10 @@ asyncio.run(agent.subscribe())
 
 ```python
 # API Key for REST endpoints
-agent = Agent(api_url="https://api.nirium.xyz", api_key="sk_inst_...")
+agent = Agent(api_url="https://nirium-agent.fly.dev", api_key="sk_inst_...")
 
 # With JWT token for WebSocket
-agent = Agent(api_url="https://api.nirium.xyz", api_key="sk_inst_...", token="eyJhbG...")
+agent = Agent(api_url="https://nirium-agent.fly.dev", api_key="sk_inst_...", token="eyJhbG...")
 ```
 
 ## Payment Protocols
@@ -66,7 +66,7 @@ agent.init_x402(
     network="stellar:testnet"
 )
 
-response = await agent.x402_fetch("https://api.nirium.xyz/api/v1/premium/signals")
+response = await agent.x402_fetch("https://nirium-agent.fly.dev/api/v1/premium/signals")
 data = await response.json()
 ```
 
@@ -78,7 +78,7 @@ agent.init_mpp(
     mode="pull"
 )
 
-response = await agent.mpp_fetch("https://api.nirium.xyz/api/v1/mpp/signals")
+response = await agent.mpp_fetch("https://nirium-agent.fly.dev/api/v1/mpp/signals")
 data = await response.json()
 ```
 

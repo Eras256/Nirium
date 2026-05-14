@@ -8,7 +8,7 @@
 **Chain:** Stellar Network / Soroban Smart Contracts
 **Focus:** Institutional DeFi infrastructure + autonomous agent orchestration
 **Website:** https://nirium.xyz
-**API:** https://api.nirium.xyz
+**API:** https://nirium-agent.fly.dev
 **GitHub (public):** https://github.com/Eras256/Nirium
 
 ## Key Capabilities

@@ -45,4 +45,4 @@ Project maintainers who do not follow or enforce the Code of Conduct in good fai
 This Code of Conduct is adapted from the [Contributor Covenant](https://www.contributor-covenant.org), version 1.4, available at [https://www.contributor-covenant.org/version/1/4/code-of-conduct.html](https://www.contributor-covenant.org/version/1/4/code-of-conduct.html), and aligned with the updated **Stellar Code of Conduct (May 2026)**.
 
 ---
-*Effective as of May 6, 2026.*
+*Effective as of May 12, 2026.*

@@ -47,7 +47,7 @@
         "ignite_protocol": "LANZAR INTERFAZ",
         "connection_established": "CONEXIÓN ESTABLE",
         "connection_connecting": "CONECTANDO...",
-        "kernel_version": "NIRIUM v0.5.0 (30 de Abril de 2026)",
+        "kernel_version": "NIRIUM v0.6.1 (Mayo 2026)",
         "soroban_verified": "SOROBAN AUDITADO",
         "testnet_live": "STELLAR TESTNET ACTIVA",
         "powered_by": "Tecnología Stellar · Código Abierto",
@@ -82,7 +82,7 @@
             "live": "EN VIVO — SINCRONIZANDO ON-CHAIN",
             "demo": "MODO DEMO — ARCHIVO LOCAL",
             "updated": "Actualizado",
-            "uplink": "CONEXION_ESTABLE_v0.5"
+            "uplink": "CONEXION_ESTABLE_v0.6"
         },
         "table": {
             "rank": "#",
@@ -572,15 +572,15 @@
                 "sdks": {
                     "ts": {
                         "name": "TypeScript SDK",
-                        "sub": "NPM · @nirium/sdk",
-                        "cmd": "npm install @nirium/sdk",
-                        "badge": "v0.5.0"
+                        "sub": "NPM · nirium",
+                        "cmd": "npm install nirium",
+                        "badge": "v0.6.1"
                     },
                     "py": {
                         "name": "Python SDK",
                         "sub": "PyPI · nirium",
                         "cmd": "pip install nirium",
-                        "badge": "v0.5.0"
+                        "badge": "v0.6.1"
                     },
                     "mcp": {
                         "name": "Servidor MCP",
@@ -590,8 +590,8 @@
                     },
                     "rest": {
                         "name": "REST API",
-                        "sub": "api.nirium.xyz",
-                        "cmd": "curl api.nirium.xyz/v1",
+                        "sub": "nirium-agent.fly.dev",
+                        "cmd": "curl nirium-agent.fly.dev/v1",
                         "badge": "Público"
                     },
                     "tauri": {
@@ -673,7 +673,7 @@
     },
     "dashboard": {
         "title": "PANEL INSTITUCIONAL",
-        "version_live": "STELLAR TESTNET · v0.5.0",
+        "version_live": "STELLAR TESTNET · v0.6.1",
         "fleet_status": "Monitoreo de Infraestructura",
         "active_agents": "Nodos Ejecutores",
         "total_profit": "Ahorro Estructural (Spread)",
@@ -1000,7 +1000,7 @@
                 "item3": "Delegación completamente no custodial",
                 "item4": "Óptimo para estrategias de tesorería de alta frecuencia"
             },
-            "features_title": "Capacidades del Protocolo (v0.5.0)",
+            "features_title": "Capacidades del Protocolo (v0.6.1)",
             "features": {
                 "builder": {
                     "title": "Constructor Visual de Esquemas",
@@ -1697,7 +1697,7 @@
             "stats": {
                 "alpha": "Eficiencia de Ejecución",
                 "liquidity": "Profundidad de Liquidez",
-                "secure_kernel": "KERNEL SEGURO v0.5.0"
+                "secure_kernel": "KERNEL SEGURO v0.6.1"
             },
             "buttons": {
                 "backtest": "BACKTEST",

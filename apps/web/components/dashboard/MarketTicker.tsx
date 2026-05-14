@@ -3,7 +3,7 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { motion } from 'framer-motion';
 
-const API_URL = process.env.NEXT_PUBLIC_AGENT_API_URL || 'https://api.nirium.xyz';
+const API_URL = process.env.NEXT_PUBLIC_AGENT_API_URL || 'https://nirium-agent.fly.dev';
 const POLL_INTERVAL = 4_000;
 
 interface TickerItem {

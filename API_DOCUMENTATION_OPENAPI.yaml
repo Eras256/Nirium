@@ -31,7 +31,7 @@ info:
     1. **JWT Tokens** (short-lived, 1h — HS256 algorithm locked)
        - Obtain via `/api/public/demo-auth` or `/api/auth/token`
        - Use header: `Authorization: Bearer <token>`
-       - WebSocket: pass as query param `wss://api.nirium.xyz/ws/signals?token=<jwt>`
+       - WebSocket: pass as query param `wss://nirium-agent.fly.dev/ws/signals?token=<jwt>`
 
     2. **API Keys** (long-lived, institutional)
        - Request via `/api/sandbox/request` or `/api/auth/keys`
@@ -50,7 +50,7 @@ info:
 
     ## Base URLs
 
-    - **Production:** `https://api.nirium.xyz`
+    - **Production:** `https://nirium-agent.fly.dev`
     - **Staging:** `https://api-staging.nirium.xyz`
     - **Local Dev:** `http://localhost:3001`
 
@@ -68,7 +68,7 @@ info:
     url: https://github.com/Eras256/Nirium/blob/main/LICENSE
 
 servers:
-  - url: https://api.nirium.xyz
+  - url: https://nirium-agent.fly.dev
     description: Production Server
   - url: https://api-staging.nirium.xyz
     description: Staging Server

@@ -36,7 +36,7 @@ The following components are in scope for security reports:
 | **Settlement Hub** (Soroban) | ✅ JARGUS PASS — formal audit pending | MPP session escrow contract |
 | **Skill Vault** (Soroban) | ✅ JARGUS PASS — formal audit pending | x402 per-request payment gate |
 | **Frontend** (Next.js 15) | ✅ JARGUS PASS — Pillar 4 (FE01-FE12) | Dashboard at nirium.xyz — 25 routes |
-| **API endpoints** (Express 5) | ✅ JARGUS PASS — Pillars 2 & 3 | 44 endpoints at api.nirium.xyz |
+| **API endpoints** (Express 5) | ✅ JARGUS PASS — Pillars 2 & 3 | 55 endpoints at nirium-agent.fly.dev |
 | **Agent scripts** | ✅ JARGUS PASS — Pillars 3 & 5 | master.ts, swarm, indexer, buyer agents |
 
 ### Out of Scope
@@ -104,4 +104,4 @@ We appreciate the security research community's efforts. Reporters of valid secu
 
 ---
 
-*This security policy is effective as of May 6, 2026.*
+*This security policy is effective as of May 12, 2026.*

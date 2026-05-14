@@ -37,7 +37,7 @@ info:
 
     ## Base URLs
 
-    - **Production:** `https://api.nirium.xyz`
+    - **Production:** `https://nirium-agent.fly.dev`
     - **Staging:** `https://api-staging.nirium.xyz`
     - **Local Dev:** `http://localhost:3001`
 
@@ -55,7 +55,7 @@ info:
     url: https://github.com/Eras256/Nirium/blob/main/LICENSE
 
 servers:
-  - url: https://api.nirium.xyz
+  - url: https://nirium-agent.fly.dev
     description: Production Server
   - url: https://api-staging.nirium.xyz
     description: Staging Server

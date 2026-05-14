@@ -15,7 +15,7 @@ import { Agent } from 'nirium';
 
 const agent = new Agent({
   apiKey: 'sk_inst_your_key_here',
-  baseUrl: 'https://api.nirium.xyz',
+  baseUrl: 'https://nirium-agent.fly.dev',
 });
 
 // Health check
@@ -56,13 +56,13 @@ agent.subscribe((signal) => {
 // API Key for REST endpoints
 const agent = new Agent({
   apiKey: 'sk_inst_...',
-  baseUrl: 'https://api.nirium.xyz',
+  baseUrl: 'https://nirium-agent.fly.dev',
 });
 
 // With JWT token for WebSocket (optional)
 const agent = new Agent({
   apiKey: 'sk_inst_...',
-  baseUrl: 'https://api.nirium.xyz',
+  baseUrl: 'https://nirium-agent.fly.dev',
   token: 'eyJhbG...', // JWT from /api/auth/token
 });
 ```
@@ -76,7 +76,7 @@ agent.initX402({
   network: 'stellar:testnet',
 });
 
-const response = await agent.x402Fetch('https://api.nirium.xyz/api/v1/premium/signals');
+const response = await agent.x402Fetch('https://nirium-agent.fly.dev/api/v1/premium/signals');
 const data = await response.json();
 ```
 
@@ -88,7 +88,7 @@ agent.initMpp({
   mode: 'pull',
 });
 
-const response = await agent.mppFetch('https://api.nirium.xyz/api/v1/mpp/signals');
+const response = await agent.mppFetch('https://nirium-agent.fly.dev/api/v1/mpp/signals');
 const data = await response.json();
 ```
 

@@ -2,7 +2,7 @@
 
 **Version:** 0.5.0  
 **Packages:** `nirium` on npm · `nirium` on PyPI  
-**API Base:** `https://api.nirium.xyz`  
+**API Base:** `https://nirium-agent.fly.dev`  
 **Network:** Stellar Testnet
 
 ---
@@ -58,7 +58,7 @@ import { Agent } from 'nirium';
 
 const agent = new Agent({
   apiKey: 'sk_inst_partner_lead_investor_nirium_2026',
-  baseUrl: 'https://api.nirium.xyz',
+  baseUrl: 'https://nirium-agent.fly.dev',
   // token: 'eyJhbG...'  // Optional JWT for WebSocket auth
 });
 ```
@@ -325,7 +325,7 @@ const { token } = await agent.request('POST', '/api/auth/token', {
 
 const agentWithToken = new Agent({
   apiKey: 'sk_inst_partner_lead_investor_nirium_2026',
-  baseUrl: 'https://api.nirium.xyz',
+  baseUrl: 'https://nirium-agent.fly.dev',
   token,
 });
 
@@ -372,7 +372,7 @@ agent.initX402({
 });
 
 // Automatically handles 402 negotiation, auth-entry signing, and payment
-const response = await agent.x402Fetch('https://api.nirium.xyz/skills/whale-tracker');
+const response = await agent.x402Fetch('https://nirium-agent.fly.dev/skills/whale-tracker');
 const data = await response.json();
 ```
 
@@ -385,7 +385,7 @@ agent.initMpp({
   mode: 'pull',  // 'pull' = server assembles+broadcasts | 'push' = client broadcasts
 });
 
-const response = await agent.mppFetch('https://api.nirium.xyz/signals/premium');
+const response = await agent.mppFetch('https://nirium-agent.fly.dev/signals/premium');
 const data = await response.json();
 ```
 
@@ -526,7 +526,7 @@ pip install nirium
 from nirium import Agent
 
 agent = Agent(
-    api_url="https://api.nirium.xyz",
+    api_url="https://nirium-agent.fly.dev",
     api_key="sk_inst_partner_lead_investor_nirium_2026",
     # token="eyJhbG..."  # Optional JWT for WebSocket auth
 )
@@ -752,7 +752,7 @@ import asyncio
 from nirium import Agent
 
 agent = Agent(
-    api_url="https://api.nirium.xyz",
+    api_url="https://nirium-agent.fly.dev",
     api_key="sk_inst_partner_lead_investor_nirium_2026",
     token="eyJhbG...",  # JWT from /api/auth/token
 )
@@ -799,7 +799,7 @@ agent.init_x402(
 )
 
 # Automatically handles 402 negotiation and USDC payment
-data = await agent.x402_fetch("https://api.nirium.xyz/skills/whale-tracker")
+data = await agent.x402_fetch("https://nirium-agent.fly.dev/skills/whale-tracker")
 print(data)
 ```
 
@@ -811,7 +811,7 @@ agent.init_mpp(
     network="stellar:testnet"
 )
 
-data = await agent.mpp_fetch("https://api.nirium.xyz/signals/premium")
+data = await agent.mpp_fetch("https://nirium-agent.fly.dev/signals/premium")
 print(data)
 ```
 
@@ -859,7 +859,7 @@ Poll prices and alert when spread exceeds a threshold.
 ```typescript
 import { Agent } from 'nirium';
 
-const agent = new Agent({ apiKey: 'sk_inst_...', baseUrl: 'https://api.nirium.xyz' });
+const agent = new Agent({ apiKey: 'sk_inst_...', baseUrl: 'https://nirium-agent.fly.dev' });
 
 async function monitorSpread(thresholdBps: number) {
   while (true) {
@@ -883,7 +883,7 @@ monitorSpread(50);
 import asyncio
 from nirium import Agent
 
-agent = Agent(api_url="https://api.nirium.xyz", api_key="sk_inst_...")
+agent = Agent(api_url="https://nirium-agent.fly.dev", api_key="sk_inst_...")
 
 async def monitor_spread(threshold_bps: int):
     while True:
@@ -943,7 +943,7 @@ await executeWithRetry('path-arbitrage', 'XLM', 1000, wallet);
 import asyncio, aiohttp
 from nirium import Agent
 
-agent = Agent(api_url="https://api.nirium.xyz", api_key="sk_inst_...")
+agent = Agent(api_url="https://nirium-agent.fly.dev", api_key="sk_inst_...")
 
 async def execute_with_retry(strategy, asset, amount, wallet, max_attempts=3):
     for attempt in range(1, max_attempts + 1):
@@ -1054,7 +1054,7 @@ Scan market conditions and select the best strategy, then execute.
 ```typescript
 import { Agent, MarketState } from 'nirium';
 
-const agent = new Agent({ apiKey: 'sk_inst_...', baseUrl: 'https://api.nirium.xyz' });
+const agent = new Agent({ apiKey: 'sk_inst_...', baseUrl: 'https://nirium-agent.fly.dev' });
 const WALLET = 'GCVVQ...';
 
 function selectStrategy(market: MarketState): string | null {
@@ -1104,7 +1104,7 @@ run();
 import asyncio
 from nirium import Agent
 
-agent = Agent(api_url="https://api.nirium.xyz", api_key="sk_inst_...")
+agent = Agent(api_url="https://nirium-agent.fly.dev", api_key="sk_inst_...")
 WALLET = "GCVVQ..."
 
 def select_strategy(market: dict) -> str | None:
@@ -1155,7 +1155,7 @@ import { Agent, Signal } from 'nirium';
 
 const agent = new Agent({
   apiKey: 'sk_inst_...',
-  baseUrl: 'https://api.nirium.xyz',
+  baseUrl: 'https://nirium-agent.fly.dev',
   token: 'eyJhbG...',
 });
 const WALLET = 'GCVVQ...';
@@ -1194,7 +1194,7 @@ import asyncio
 from nirium import Agent
 
 agent = Agent(
-    api_url="https://api.nirium.xyz",
+    api_url="https://nirium-agent.fly.dev",
     api_key="sk_inst_...",
     token="eyJhbG...",
 )
@@ -1275,4 +1275,4 @@ Verify transactions: `https://stellar.expert/explorer/testnet/tx/<txHash>`
 
 ---
 
-*Nirium Protocol — May 6, 2026*
+*Nirium Protocol — May 12, 2026*

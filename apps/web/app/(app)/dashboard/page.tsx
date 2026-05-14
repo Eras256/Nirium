@@ -455,7 +455,7 @@ function DashboardContent() {
     useEffect(() => {
         const fetchMeta = async () => {
             try {
-                const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'https://api.nirium.xyz'}/api/public/protocol-meta`);
+                const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'https://nirium-agent.fly.dev'}/api/public/protocol-meta`);
                 const data = await res.json();
                 if (data.success) {
                     setProtocolMeta(data);

@@ -13,7 +13,7 @@
 
 export * from './types/database.types.js';
 
-export const startLoop = () => { throw new Error('Institutional logic protected. Use the hosted API at api.nirium.xyz'); };
+export const startLoop = () => { throw new Error('Institutional logic protected. Use the hosted API at nirium-agent.fly.dev'); };
 export const stopLoop = () => { throw new Error('Institutional logic protected.'); };
 
 console.log('Nirium Institutional Agent — Proprietary Component');

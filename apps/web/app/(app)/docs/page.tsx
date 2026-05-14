@@ -977,7 +977,7 @@ function ApiSection() {
                             <p className="text-sm text-gray-400 mb-4">Use this for servers, bots, or any app that needs steady access. Send the key in a header on every request.</p>
                             <div className="bg-black/50 p-4 rounded-lg font-mono text-xs text-stellar-teal border border-stellar-teal/20 mb-4">
                                 curl -H "x-api-key: sk_inst_[TU_KEY]" \ <br />
-                                &nbsp;&nbsp;https://api.nirium.xyz/api/market
+                                &nbsp;&nbsp;https://nirium-agent.fly.dev/api/market
                             </div>
                             <p className="text-[10px] text-gray-500">Your key starts with one of these: <span className="text-gray-400 font-mono">sk_free_</span> · <span className="text-gray-400 font-mono">sk_sbox_</span> · <span className="text-gray-400 font-mono">sk_inst_</span> · <span className="text-gray-400 font-mono">sk_ent_</span></p>
                         </div>
@@ -1099,7 +1099,7 @@ import requests
 
 # Inicialización institucional
 API_KEY = os.getenv("NIRIUM_API_KEY")
-URL = "https://api.nirium.xyz/api/sandbox/status"
+URL = "https://nirium-agent.fly.dev/api/sandbox/status"
 
 headers = {
     "x-api-key": API_KEY,
@@ -1136,7 +1136,7 @@ get_compliance_status()`}
                             {`const WebSocket = require('ws');
 const API_KEY = process.env.NIRIUM_API_KEY;
 
-const ws = new WebSocket('wss://api.nirium.xyz/ws/signals', {
+const ws = new WebSocket('wss://nirium-agent.fly.dev/ws/signals', {
   headers: { 'x-api-key': API_KEY }
 });
 
@@ -1276,7 +1276,7 @@ function EndpointExplorer() {
         })),
         events: t.docs.api.endpoints.events.map((e: any, i: number) => ({
             method: ['POST', 'GET', 'POST', 'DELETE', 'POST', 'GET', 'DELETE', 'GET', 'WS'][i],
-            path: ['/api/webhooks', '/api/webhooks', '/api/webhooks/:id/test', '/api/webhooks/:id', '/api/subscriptions', '/api/subscriptions', '/api/subscriptions/:id', '/api/subscriptions/stats', 'wss://api.nirium.xyz/ws/signals'][i],
+            path: ['/api/webhooks', '/api/webhooks', '/api/webhooks/:id/test', '/api/webhooks/:id', '/api/subscriptions', '/api/subscriptions', '/api/subscriptions/:id', '/api/subscriptions/stats', 'wss://nirium-agent.fly.dev/ws/signals'][i],
             desc: e.desc,
             isPremium: false
         })),

@@ -47,7 +47,7 @@
         "ignite_protocol": "LAUNCH INTERFACE",
         "connection_established": "CONNECTION STABLE",
         "connection_connecting": "CONNECTING...",
-        "kernel_version": "NIRIUM v0.5.0 (April 30, 2026)",
+        "kernel_version": "NIRIUM v0.6.1 (May 2026)",
         "soroban_verified": "SOROBAN AUDITED",
         "testnet_live": "STELLAR TESTNET ACTIVE",
         "powered_by": "Powered by Stellar · Secured by Open Source",
@@ -82,7 +82,7 @@
             "live": "LIVE — SYNCING FROM CHAIN",
             "demo": "DEMO MODE — LOCAL ARCHIVE",
             "updated": "Updated",
-            "uplink": "CONNECTION_STABLE_v0.5"
+            "uplink": "CONNECTION_STABLE_v0.6"
         },
         "table": {
             "rank": "#",
@@ -572,15 +572,15 @@
                 "sdks": {
                     "ts": {
                         "name": "TypeScript SDK",
-                        "sub": "NPM · @nirium/sdk",
-                        "cmd": "npm install @nirium/sdk",
-                        "badge": "v0.5.0"
+                        "sub": "NPM · nirium",
+                        "cmd": "npm install nirium",
+                        "badge": "v0.6.1"
                     },
                     "py": {
                         "name": "Python SDK",
                         "sub": "PyPI · nirium",
                         "cmd": "pip install nirium",
-                        "badge": "v0.5.0"
+                        "badge": "v0.6.1"
                     },
                     "mcp": {
                         "name": "MCP Server",
@@ -590,8 +590,8 @@
                     },
                     "rest": {
                         "name": "REST API",
-                        "sub": "api.nirium.xyz",
-                        "cmd": "curl api.nirium.xyz/v1",
+                        "sub": "nirium-agent.fly.dev",
+                        "cmd": "curl nirium-agent.fly.dev/v1",
                         "badge": "Public"
                     },
                     "tauri": {
@@ -673,7 +673,7 @@
     },
     "dashboard": {
         "title": "INSTITUTIONAL DASHBOARD",
-        "version_live": "STELLAR TESTNET · v0.5.0",
+        "version_live": "STELLAR TESTNET · v0.6.1",
         "fleet_status": "Infrastructure Monitoring",
         "active_agents": "Execution Nodes",
         "total_profit": "Structural Savings (Spread)",
@@ -1000,7 +1000,7 @@
                 "item3": "Fully non-custodial delegation",
                 "item4": "Optimal for high-frequency treasury strategies"
             },
-            "features_title": "Protocol Capabilities (v0.5.0)",
+            "features_title": "Protocol Capabilities (v0.6.1)",
             "features": {
                 "builder": {
                     "title": "Visual Schema Builder",
@@ -1697,7 +1697,7 @@
             "stats": {
                 "alpha": "Execution Efficiency",
                 "liquidity": "Liquidity Depth",
-                "secure_kernel": "SECURE KERNEL v0.5.0"
+                "secure_kernel": "SECURE KERNEL v0.6.1"
             },
             "buttons": {
                 "backtest": "BACKTEST",

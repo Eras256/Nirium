@@ -823,7 +823,7 @@ export default function Home() {
                     <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
                         <SDKCard name="TypeScript SDK" lang="NPM package" command="npm install nirium" icon={TerminalIcon} href="https://www.npmjs.com/package/nirium" />
                         <SDKCard name="Python SDK" lang="PyPI package" command="pip install nirium" icon={Shield} href="https://pypi.org/project/nirium/" />
-                        <SDKCard name="REST API" lang="API REST" command="api.nirium.xyz" icon={Cpu} href="https://api.nirium.xyz" />
+                        <SDKCard name="REST API" lang="API REST" command="nirium-agent.fly.dev" icon={Cpu} href="https://nirium-agent.fly.dev" />
                         <SDKCard name="CLI" lang="npx" command="npx nirium create-unit" icon={TerminalIcon} comingSoon />
                         <SDKCard name="Nirium MCP" lang="Claude & Grok" command="Model Context Protocol" icon={Bot} comingSoon />
                         <SDKCard name="Desktop Studio" lang="Visual GUI" command="No Code Needed" icon={Layers} comingSoon />

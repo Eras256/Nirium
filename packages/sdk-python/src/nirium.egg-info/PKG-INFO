@@ -32,7 +32,7 @@ import asyncio
 from nirium import Agent
 
 agent = Agent(
-    api_url="https://api.nirium.xyz",
+    api_url="https://nirium-agent.fly.dev",
     api_key="sk_inst_your_key_here",
 )
 
@@ -55,7 +55,7 @@ asyncio.run(main())
 ## Real-Time Signals (WebSocket)
 
 ```python
-agent = Agent(api_url="https://api.nirium.xyz", api_key="sk_inst_...", token="eyJhbG...")
+agent = Agent(api_url="https://nirium-agent.fly.dev", api_key="sk_inst_...", token="eyJhbG...")
 
 @agent.on("signal")
 async def on_signal(data):
@@ -68,10 +68,10 @@ asyncio.run(agent.subscribe())
 
 ```python
 # API Key for REST endpoints
-agent = Agent(api_url="https://api.nirium.xyz", api_key="sk_inst_...")
+agent = Agent(api_url="https://nirium-agent.fly.dev", api_key="sk_inst_...")
 
 # With JWT token for WebSocket
-agent = Agent(api_url="https://api.nirium.xyz", api_key="sk_inst_...", token="eyJhbG...")
+agent = Agent(api_url="https://nirium-agent.fly.dev", api_key="sk_inst_...", token="eyJhbG...")
 ```
 
 ### Endpoint Access Model

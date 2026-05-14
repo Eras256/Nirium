@@ -1,7 +1,7 @@
-# Nirium Protocol: Technical Whitepaper v2.2
+# Nirium Protocol: Technical Whitepaper v2.3
 > Institutional DeFi Infrastructure Powered by Autonomous Agents on Stellar/Soroban
 
-**Version:** 2.2 — May 2026 (Updated May 6, 2026 — Full codebase sync)
+**Version:** 2.3 — May 2026 (Updated May 12, 2026 — Full codebase sync)
 **Author:** Nirium Protocol Team — Nirium Protocol
 **Network:** Stellar Testnet (Mainnet post-audit)
 **Contact:** xvaiosx7@gmail.com
@@ -10,7 +10,7 @@
 
 ## 1. Abstract
 
-Nirium is institutional DeFi infrastructure that enables fintechs and financial institutions to automate treasury operations, cross-border FX, and cash-flow management using autonomous agents on the Stellar network. The protocol combines Soroban smart contracts with a multi-LLM execution layer, x402 micropayments, MPP session budgets, and a 44-endpoint institutional API — creating a full-stack platform where autonomous agents execute financial strategies on-chain with cryptographic accountability and boardroom-ready audit trails.
+Nirium is institutional DeFi infrastructure that enables fintechs and financial institutions to automate treasury operations, cross-border FX, and cash-flow management using autonomous agents on the Stellar network. The protocol combines Soroban smart contracts with a multi-LLM execution layer, x402 micropayments, MPP session budgets, and a 55-endpoint institutional API — creating a full-stack platform where autonomous agents execute financial strategies on-chain with cryptographic accountability and boardroom-ready audit trails.
 
 Nirium addresses two markets simultaneously: institutional clients (B2B/A2A) that need automated treasury infrastructure, and the emerging agentic economy where AI agents pay for intelligence and execution with USDC micropayments. Both markets are served by the same protocol layer.
 
@@ -28,7 +28,7 @@ Layer 1 — Interface
   MCP Server (Claude Desktop / Cursor)
 
 Layer 2 — Intelligence & API
-  Express API Server (api.nirium.xyz, 44 endpoints)
+  Express API Server (nirium-agent.fly.dev, 55 endpoints)
   Neural Reasoner (LLM, provider-agnostic)
   30-Agent Execution Cluster (racing mode, 3–12s intervals)
   Strategy Router (5 execution types)
@@ -91,7 +91,7 @@ Core functions:
 
 ### 4.1 Overview
 
-The Nirium API (`api.nirium.xyz`) exposes 44 endpoints across 11 categories, deployed on Railway with Express 5 and Node 20.
+The Nirium API (`nirium-agent.fly.dev`) exposes 55 endpoints across 11 categories, deployed on Railway with Express 5 and Node 20.
 
 **Authentication tiers:**
 
@@ -131,7 +131,7 @@ The Nirium API (`api.nirium.xyz`) exposes 44 endpoints across 11 categories, dep
 
 **Skills:** `/api/skills` (GET), `/api/skills/marketplace`, `/api/skills/install`, `/api/skills/:slug` (DELETE), `/api/skills/:slug/actions/:action`
 
-**WebSocket:** `wss://api.nirium.xyz/ws/signals?token=JWT`
+**WebSocket:** `wss://nirium-agent.fly.dev/ws/signals?token=JWT`
 
 **Admin:** `/api/system/health`, `/api/config/llm`
 
@@ -249,8 +249,8 @@ For institutional clients: fee structure is 0.5% B2B (Regulated Operator rate) t
 
 ## 9. Security
 
-### 9.1 JARGUS Audit v2.0 (April 2026)
-Internal security framework (Kali Linux). Result: **78/78 PASS, 0 critical, 0 high.**
+### 9.1 JARGUS Audit v3.0 (April 2026)
+Internal security framework (Kali Linux). Result: **83/83 PASS, 0 critical, 0 high.**
 
 | Pillar | Score |
 |---|---|
@@ -300,7 +300,7 @@ npm install nirium
 ```
 ```typescript
 import { Agent } from 'nirium';
-const agent = new Agent({ apiKey: 'sk_inst_...', baseUrl: 'https://api.nirium.xyz' });
+const agent = new Agent({ apiKey: 'sk_inst_...', baseUrl: 'https://nirium-agent.fly.dev' });
 
 await agent.ping();
 await agent.getMarket();
@@ -314,7 +314,7 @@ pip install nirium
 ```
 ```python
 from nirium import Agent
-agent = Agent(api_url="https://api.nirium.xyz", api_key="sk_inst_...")
+agent = Agent(api_url="https://nirium-agent.fly.dev", api_key="sk_inst_...")
 
 await agent.get_market()
 await agent.execute("path-arb", "XLM-USDC", {"amount": 5000}, stellar_account="G...")
@@ -372,8 +372,8 @@ All revenue streams classified as software licensing under LRITF Art. 22, LMV Ar
 
 Nirium is the infrastructure layer where institutional DeFi and the agentic economy converge on Stellar. Institutions get automated treasury operations with full auditability and compliance-ready output. AI agents get a protocol they can pay into and execute against without human intermediation.
 
-The protocol's deployment on Stellar Testnet — 44 API endpoints, 30 autonomous agents, 6 Soroban contracts, x402/MPP payment protocols, multi-LLM support, MCP server (12 tools, 13/13 PASS), published SDKs (npm + PyPI), JARGUS-verified security (78/78 PASS), and a signed institutional partnership with a CNBV-regulated operator — establishes the architectural foundation for mainnet readiness pending formal third-party audit.
+The protocol's deployment on Stellar Testnet — 55 API endpoints, 30 autonomous agents, 6 Soroban contracts, x402/MPP payment protocols, multi-LLM support, MCP server (12 tools, 13/13 PASS), published SDKs (npm + PyPI), JARGUS-verified security (83/83 PASS), — establishes the architectural foundation for mainnet readiness pending formal third-party audit.
 
 ---
 
-*Nirium Protocol — experimental software. Not financial advice. Not an investment product. Stellar Testnet only. Updated May 6, 2026.*
+*Nirium Protocol — experimental software. Not financial advice. Not an investment product. Stellar Testnet only. Updated May 12, 2026.*

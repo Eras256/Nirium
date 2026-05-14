@@ -22,7 +22,7 @@
 //         "args": ["/path/to/nirium/packages/mcp/dist/index.js"],
 //         "env": {
 //           "STELLAR_SECRET_KEY": "S...",
-//           "AGENT_API_URL": "https://api.nirium.xyz"
+//           "AGENT_API_URL": "https://nirium-agent.fly.dev"
 //         }
 //       }
 //     }

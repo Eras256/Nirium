@@ -2,7 +2,7 @@
 // Nirium — RPC Proxy Edge Function
 // ═══════════════════════════════════════════════════════════════
 //
-// Transparent proxy between the frontend and api.nirium.xyz.
+// Transparent proxy between the frontend and nirium-agent.fly.dev.
 // Provides:
 //  - Domain lock: only accept requests from nirium.xyz origins
 //  - Per-IP rate limiting (sliding window via KV-style Map)
@@ -17,7 +17,7 @@ export const runtime = 'edge';
 
 // ─── Configuration ──────────────────────────────────────────────
 
-const UPSTREAM_URL = process.env.AGENT_INTERNAL_URL ?? 'https://api.nirium.xyz';
+const UPSTREAM_URL = process.env.AGENT_INTERNAL_URL ?? 'https://nirium-agent.fly.dev';
 
 const ALLOWED_ORIGINS = new Set([
     'https://nirium.xyz',

@@ -47,7 +47,7 @@
         "ignite_protocol": "启动界面",
         "connection_established": "连接稳定",
         "connection_connecting": "正在连接...",
-        "kernel_version": "NIRIUM KERNEL v0.5.0",
+        "kernel_version": "NIRIUM KERNEL v0.6.1",
         "soroban_verified": "SOROBAN 已审计",
         "testnet_live": "STELLAR TESTNET 活跃",
         "powered_by": "Powered by Stellar · Secured by Open Source",
@@ -82,7 +82,7 @@
             "live": "实时 — 同步中",
             "demo": "演示模式 — 本地档案",
             "updated": "最近更新",
-            "uplink": "连接稳定_v0.5"
+            "uplink": "连接稳定_v0.6"
         },
         "table": {
             "rank": "#",
@@ -572,15 +572,15 @@
                 "sdks": {
                     "ts": {
                         "name": "TypeScript SDK",
-                        "sub": "NPM · @nirium/sdk",
-                        "cmd": "npm install @nirium/sdk",
-                        "badge": "v0.5.0"
+                        "sub": "NPM · nirium",
+                        "cmd": "npm install nirium",
+                        "badge": "v0.6.1"
                     },
                     "py": {
                         "name": "Python SDK",
                         "sub": "PyPI · nirium",
                         "cmd": "pip install nirium",
-                        "badge": "v0.5.0"
+                        "badge": "v0.6.1"
                     },
                     "mcp": {
                         "name": "MCP 服务器",
@@ -590,8 +590,8 @@
                     },
                     "rest": {
                         "name": "REST API",
-                        "sub": "api.nirium.xyz",
-                        "cmd": "curl api.nirium.xyz/v1",
+                        "sub": "nirium-agent.fly.dev",
+                        "cmd": "curl nirium-agent.fly.dev/v1",
                         "badge": "公开"
                     },
                     "tauri": {
@@ -673,7 +673,7 @@
     },
     "dashboard": {
         "title": "机构仪表盘",
-        "version_live": "在线 · v0.5.0",
+        "version_live": "在线 · v0.6.1",
         "fleet_status": "基础设施运行状态",
         "active_agents": "活跃执行节点",
         "total_profit": "结构性节省 (价差)",
@@ -1000,7 +1000,7 @@
                 "item3": "完全自主运行",
                 "item4": "高频策略的理想选择"
             },
-            "features_title": "功能列表 (v0.5.0)",
+            "features_title": "功能列表 (v0.6.1)",
             "features": {
                 "builder": {
                     "title": "拖拽式规则",
@@ -1697,7 +1697,7 @@
             "stats": {
                 "alpha": "执行效率",
                 "liquidity": "流动性深度",
-                "secure_kernel": "安全内核 v0.5.0"
+                "secure_kernel": "安全内核 v0.6.1"
             },
             "buttons": {
                 "backtest": "回测",

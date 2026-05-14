@@ -12,7 +12,7 @@
             "headers": [
                 {
                     "key": "Content-Security-Policy",
-                    "value": "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; connect-src 'self' https://api.nirium.xyz wss://api.nirium.xyz https://horizon-testnet.stellar.org https://soroban-testnet.stellar.org https://*.supabase.co wss://*.supabase.co https://api.sand.etherfuse.com https://pulse.walletconnect.org https://api.web3modal.com https://api.web3modal.org wss://relay.walletconnect.com wss://relay.walletconnect.org https://rpc.walletconnect.com https://api.coingecko.com; img-src 'self' data: https: blob:; frame-ancestors 'none';"
+                    "value": "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; connect-src 'self' https://nirium-agent.fly.dev wss://nirium-agent.fly.dev https://horizon-testnet.stellar.org https://soroban-testnet.stellar.org https://*.supabase.co wss://*.supabase.co https://api.sand.etherfuse.com https://pulse.walletconnect.org https://api.web3modal.com https://api.web3modal.org wss://relay.walletconnect.com wss://relay.walletconnect.org https://rpc.walletconnect.com https://api.coingecko.com; img-src 'self' data: https: blob:; frame-ancestors 'none';"
                 },
                 {
                     "key": "X-Frame-Options",

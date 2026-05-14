@@ -6,8 +6,8 @@
 VERSION = "2.6.0"
 NETWORK_PASSPHRASE = "Test SDF Network ; September 2015"
 FEDERATION_SERVER = "https://nirium.xyz/federation"
-TRANSFER_SERVER = "https://api.nirium.xyz/sep24"
-WEB_AUTH_ENDPOINT = "https://api.nirium.xyz/auth"
+TRANSFER_SERVER = "https://nirium-agent.fly.dev/sep24"
+WEB_AUTH_ENDPOINT = "https://nirium-agent.fly.dev/auth"
 HORIZON_URL = "https://horizon-testnet.stellar.org"
 ACCOUNTS = []
 

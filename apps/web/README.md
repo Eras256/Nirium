@@ -39,7 +39,7 @@ NEXT_PUBLIC_CONTRACT_VAULT=CAU2XBJTQUBTMPAUFRX7GMZ337I5WLBI4GYPWHZEVXTMJ66D3CP6D
 NEXT_PUBLIC_HORIZON_URL=https://horizon-testnet.stellar.org
 ```
 
-The agent API URL defaults to `https://api.nirium.xyz`. For local dev set `NEXT_PUBLIC_AGENT_API_URL=http://localhost:3001`.
+The agent API URL defaults to `https://nirium-agent.fly.dev`. For local dev set `NEXT_PUBLIC_AGENT_API_URL=http://localhost:3001`.
 
 ## Pages
 
@@ -56,7 +56,7 @@ The agent API URL defaults to `https://api.nirium.xyz`. For local dev set `NEXT_
 | `/docs` | API documentation and guides |
 | `/leaderboard` | Agent leaderboard with ELO ranking |
 | `/build` | Startup Ideas Hub — developer toolkit, code examples (TS/Py/cURL/MCP) |
-| `/jargus-audit` | JARGUS security audit dashboard (78/78 PASS) |
+| `/jargus-audit` | JARGUS security audit dashboard (83/83 PASS) |
 | `/ramp` | Fiat on-ramp (MXN → CETES → USDC via Etherfuse) |
 | `/how-to-use` | Getting started guide |
 | `/manifesto` | Protocol manifesto |

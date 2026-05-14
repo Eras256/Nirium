@@ -38,7 +38,7 @@ Nirium solves the **manual treasury bottleneck**: fintechs moving cross-border c
 - **Execution Nodes** — software units with their own Stellar wallets, operating 24/7 against live liquidity on SDEX, Soroswap, and Blend Protocol
 - **x402 Micropayments** — agents pay for premium intelligence per-request in USDC on Stellar, no account or subscription required
 - **MPP Session Budgets** — Optimized for **passive funding** (fondeos pasivos) and **mass payroll execution** (pagos de nómina masivos). Institutions delegate a USDC budget to an agent via Soroban escrow; the agent executes within limits, unused funds are refundable
-- **Institutional API** — 44 endpoints with multi-tier auth (sandbox, API key, JWT), webhooks, real-time signal subscriptions, and a skill marketplace
+- **Institutional API** — 55 endpoints with multi-tier auth (sandbox, API key, JWT), webhooks, real-time signal subscriptions, and a skill marketplace
 - **Protocol Archive** — every agent decision is HMAC-SHA256 signed, immutably recorded, and translated into human-readable compliance summaries — no blockchain expertise required
 - **Multi-LLM** — provider-agnostic (OpenAI, Anthropic, Gemini, Grok, Ollama, and more) with hot-swap via API, no redeployment needed
 - **Etherfuse CETES** — MXN → tokenized CETES → USDC corridor via SPEI on testnet (displayed rate is a protocol reference only, not a guaranteed return)
@@ -56,7 +56,7 @@ Fintech / Institution (B2B / A2A)
   [i18n: EN / ES / ZH — 25 routes]
         |
         v
-  [Agent API — api.nirium.xyz — 44 endpoints]
+  [Agent API — nirium-agent.fly.dev — 55 endpoints]
         |-- Auth (JWT / API Key / Sandbox tiers)
         |-- legalShield middleware (SCF CoC compliance)
         |-- x402 + MPP payment middleware
@@ -87,7 +87,7 @@ Fintech / Institution (B2B / A2A)
 
 ## Core Features
 
-### Institutional API (44 endpoints, OpenAPI v2.5.0)
+### Institutional API (55 endpoints, OpenAPI v2.5.0)
 
 Multi-tier authentication with sandbox accounts, API key tiers (free/institutional), and JWT for WebSocket. Full RBAC, sliding-window rate limiting, AML checks, and domain lock.
 
@@ -152,7 +152,7 @@ Designed for regulatory compliance without requiring blockchain expertise from t
 
 ```typescript
 import { Agent } from 'nirium';
-const agent = new Agent({ apiKey: 'sk_inst_...', baseUrl: 'https://api.nirium.xyz' });
+const agent = new Agent({ apiKey: 'sk_inst_...', baseUrl: 'https://nirium-agent.fly.dev' });
 
 const market = await agent.getMarket();
 const result = await agent.execute('path-arb', 'XLM-USDC', { amount: 5000 }, 'G...');
@@ -161,7 +161,7 @@ agent.subscribe(signal => console.log(signal));
 
 ```python
 from nirium import Agent
-agent = Agent(api_url="https://api.nirium.xyz", api_key="sk_inst_...")
+agent = Agent(api_url="https://nirium-agent.fly.dev", api_key="sk_inst_...")
 
 market = await agent.get_market()
 result = await agent.execute("routing-optimization", "XLM-USDC", {"amount": 5000}, stellar_account="G...")
@@ -238,7 +238,7 @@ Nirium/                        (public repo)
 ├── packages/contracts/        → Soroban smart contracts (Rust) — 5 modules, 5 fuzz targets
 ├── .github/workflows/         → CI, release, security-gate, desktop release
 │
-├── packages/agent/            → [private] Express API server — 44 endpoints, execution logic
+├── packages/agent/            → [private] Express API server — 55 endpoints, execution logic
 ├── packages/mcp/              → [public] MCP Server v0.4.0 — 12 tools (4 free + 3 auth + 5 paid)
 ├── packages/cli/              → [public] CLI tool v1.0.0
 ├── packages/desktop/          → [private] Tauri desktop wrapper
@@ -324,7 +324,7 @@ Nirium has received Kickstart funding ($5,000 USD), with full KYC complete (Airt
 | Milestone | Status |
 |---|---|
 | Core infrastructure + x402/MPP on Testnet | ✅ Complete |
-| Institutional API (44 endpoints) + SDKs v0.5.0 | ✅ Complete |
+| Institutional API (55 endpoints) + SDKs v0.5.0 | ✅ Complete |
 | Internal JARGUS Security Audit v3.0 (AAA Grade - 83/83 PASS) | ✅ Complete |
 | x402-VPN — Institutional Mesh Proxy | ✅ Live |
 | /build — Startup Ideas Hub (12 blueprints) | ✅ Live |
@@ -357,10 +357,10 @@ Nirium has received Kickstart funding ($5,000 USD), with full KYC complete (Airt
 | Document | Description |
 |---|---|
 | [SDKs.md](SDKs.md) | Full TypeScript + Python SDK documentation |
-| [API_DOCUMENTATION_OPENAPI.yaml](API_DOCUMENTATION_OPENAPI.yaml) | OpenAPI v2.5.0 — complete 44-endpoint specification |
+| [API_DOCUMENTATION_OPENAPI.yaml](API_DOCUMENTATION_OPENAPI.yaml) | OpenAPI v2.5.0 — complete 55-endpoint specification |
 | [MCP_INTEGRATION_GUIDE.md](MCP_INTEGRATION_GUIDE.md) | MCP v0.4.0 — 12 tools for Claude Desktop / Cursor |
 | [INTERNAL_SECURITY_AUDIT.md](INTERNAL_SECURITY_AUDIT.md) | Internal JARGUS v3.0 report — 83/83 vectors PASS (AAA) |
-| [NIRIUM_TECHNICAL_PAPER.md](NIRIUM_TECHNICAL_PAPER.md) | Technical whitepaper v2.2 |
+| [NIRIUM_TECHNICAL_PAPER.md](NIRIUM_TECHNICAL_PAPER.md) | Technical whitepaper v2.3 |
 | [SECURITY.md](SECURITY.md) | Responsible vulnerability disclosure policy |
 | [CONTRIBUTING.md](CONTRIBUTING.md) | Open source contribution guide |
 
@@ -370,14 +370,14 @@ Nirium has received Kickstart funding ($5,000 USD), with full KYC complete (Airt
 
 ```bash
 # Testnet — no real funds required
-curl https://api.nirium.xyz/api/health
+curl https://nirium-agent.fly.dev/api/health
 
 # Sandbox API Key (free)
-curl https://api.nirium.xyz/api/sandbox/status \
+curl https://nirium-agent.fly.dev/api/sandbox/status \
   -H "x-api-key: YOUR_SANDBOX_KEY"
 
 # WebSocket — real-time signals
-wscat -c "wss://api.nirium.xyz/ws/signals" \
+wscat -c "wss://nirium-agent.fly.dev/ws/signals" \
   -H "Authorization: Bearer YOUR_JWT"
 ```
 
@@ -388,7 +388,7 @@ wscat -c "wss://api.nirium.xyz/ws/signals" \
 | Channel | Link |
 |---|---|
 | **Website** | [nirium.xyz](https://nirium.xyz) |
-| **API** | [api.nirium.xyz](https://api.nirium.xyz) |
+| **API** | [nirium-agent.fly.dev](https://nirium-agent.fly.dev) |
 | **Build Hub** | [nirium.xyz/build](https://nirium.xyz/build) |
 | **x402-VPN** | [x402-vpn.vercel.app](https://x402-vpn.vercel.app) |
 | **X / Twitter** | [@NiriumXYZ](https://x.com/Niriumstellar) |
@@ -410,4 +410,4 @@ This project operates under the [Stellar Community Fund v7.0](https://stellar.gi
 
 ---
 
-*Nirium Protocol — experimental software. Not financial advice. Stellar Testnet only. Updated May 6, 2026.*
+*Nirium Protocol — experimental software. Not financial advice. Stellar Testnet only. Updated May 12, 2026.*

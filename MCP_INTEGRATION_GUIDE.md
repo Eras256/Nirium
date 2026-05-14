@@ -17,7 +17,7 @@ Add to `claude_desktop_config.json`:
       "command": "node",
       "args": ["/path/to/nirium/packages/mcp/dist/index.js"],
       "env": {
-        "AGENT_API_URL": "https://api.nirium.xyz",
+        "AGENT_API_URL": "https://nirium-agent.fly.dev",
         "NIRIUM_API_KEY": "sk_inst_...",
         "STELLAR_SECRET_KEY": "S...",
         "STELLAR_PUBLIC_KEY": "G...",
@@ -40,7 +40,7 @@ Add to `claude_desktop_config.json`:
 
 | Variable | Required | Purpose |
 |----------|----------|---------|
-| `AGENT_API_URL` | Yes | Nirium agent API URL. Default: `http://127.0.0.1:3001`. Production: `https://api.nirium.xyz` |
+| `AGENT_API_URL` | Yes | Nirium agent API URL. Default: `http://127.0.0.1:3001`. Production: `https://nirium-agent.fly.dev` |
 | `NIRIUM_API_KEY` | For auth tools | API key from `/api/auth/keys`. Unlocks loop control, system health |
 | `STELLAR_SECRET_KEY` | For paid tools | Stellar testnet keypair. Funds x402 + MPP payments |
 | `STELLAR_NETWORK` | No | `testnet` (default) or `mainnet` |
@@ -297,13 +297,13 @@ pnpm build        # → dist/index.js
 ## Run (dev, no auth)
 
 ```bash
-AGENT_API_URL=https://api.nirium.xyz node dist/index.js
+AGENT_API_URL=https://nirium-agent.fly.dev node dist/index.js
 ```
 
 ## Run (full config)
 
 ```bash
-AGENT_API_URL=https://api.nirium.xyz \
+AGENT_API_URL=https://nirium-agent.fly.dev \
 NIRIUM_API_KEY=sk_inst_... \
 STELLAR_SECRET_KEY=S... \
 STELLAR_NETWORK=testnet \
