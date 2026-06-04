@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: Apache-2.0
+// Copyright 2026 Nirium Protocol Contributors
+
 #![no_std]
 
 use soroban_sdk::{

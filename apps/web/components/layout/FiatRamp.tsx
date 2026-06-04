@@ -24,7 +24,7 @@ export default function FiatRamp() {
     const [depositAccountHolder, setDepositAccountHolder] = useState<string>('');
 
     const handleGetQuote = async (_overrideCustomerId?: string) => {
-        if (!amount || isNaN(Number(amount)) || Number(amount) > 500) {
+        if (!amount || isNaN(Number(amount)) || Number(amount) > 10000) {
             setError(t.ramp.component.errors.amount);
             return;
         }

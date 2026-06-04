@@ -792,35 +792,7 @@ dependencies = [
 ]
 
 [[package]]
-name = "nirium-elo"
-version = "0.1.0"
-dependencies = [
- "soroban-sdk",
-]
-
-[[package]]
-name = "nirium-hub"
-version = "0.1.0"
-dependencies = [
- "soroban-sdk",
-]
-
-[[package]]
-name = "nirium-marketplace"
-version = "0.1.0"
-dependencies = [
- "soroban-sdk",
-]
-
-[[package]]
-name = "nirium-sentinel"
-version = "0.1.0"
-dependencies = [
- "soroban-sdk",
-]
-
-[[package]]
-name = "nirium-skill-vault"
+name = "nirium-protocol"
 version = "0.1.0"
 dependencies = [
  "soroban-sdk",

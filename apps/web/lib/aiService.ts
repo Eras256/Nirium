@@ -1,8 +1,3 @@
-/**
- * Nirium AI Service Helper
- * Manages LLM provider configuration and synchronization with the agent backend.
- */
-
 export interface LLMConfig {
     provider: 'nirium' | 'openai' | 'anthropic' | 'ollama' | 'minimax' | 'gemini' | 'grok' | 'bedrock' | 'openrouter';
     model: string;
@@ -11,72 +6,67 @@ export interface LLMConfig {
 }
 
 const STORAGE_KEY = 'nirium_ai_config';
+const DEFAULT_CONFIG: LLMConfig = { provider: 'nirium', model: 'nirium-core-v1' };
 
 export const aiService = {
-    /**
-     * Save AI configuration to local storage and sync with backend
-     */
     async saveConfig(config: LLMConfig): Promise<{ success: boolean; message: string }> {
+        // Always persist locally first so the UI stays responsive
         localStorage.setItem(STORAGE_KEY, JSON.stringify(config));
 
         try {
-            const response = await fetch('/api/config/llm', {
+            const res = await fetch('/api/config/llm', {
                 method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
+                headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(config),
             });
 
-            const data = await response.json();
+            const data = await res.json();
+            if (!res.ok) {
+                return { success: false, message: data.message || 'Sync rejected by server' };
+            }
             return {
                 success: data.success,
-                message: data.message || (data.success ? 'Configuration synced' : 'Sync failed')
+                message: data.message || (data.success ? 'Protocol synced' : 'Sync failed'),
             };
-        } catch (error) {
-            console.error('[AI Service] Failed to sync config:', error);
-            // Even if sync fails, we keep it in local storage for the UI
-            return { success: false, message: 'Backend sync failed. Config saved locally.' };
+        } catch (err) {
+            console.error('[AI Service] Sync failed:', err);
+            return { success: false, message: 'Config saved locally — server unreachable' };
         }
     },
 
-    /**
-     * Get current AI configuration
-     */
     getConfig(): LLMConfig {
-        if (typeof window === 'undefined') {
-            return {
-                provider: 'nirium',
-                model: 'nirium-matrix-v1',
-            };
-        }
+        if (typeof window === 'undefined') return DEFAULT_CONFIG;
 
         const saved = localStorage.getItem(STORAGE_KEY);
         if (saved) {
             try {
-                return JSON.parse(saved);
-            } catch (e) {
-                console.error('[AI Service] Invalid config record:', e);
+                return JSON.parse(saved) as LLMConfig;
+            } catch {
+                localStorage.removeItem(STORAGE_KEY);
             }
         }
-        return {
-            provider: 'nirium',
-            model: 'nirium-matrix-v1',
-        };
+        return DEFAULT_CONFIG;
     },
 
-    /**
-     * Test connection to a local Ollama instance
-     */
+    async disconnect(): Promise<{ success: boolean; message: string }> {
+        localStorage.removeItem(STORAGE_KEY);
+        try {
+            const res = await fetch('/api/config/llm', { method: 'DELETE' });
+            const data = await res.json();
+            return { success: true, message: data.message || 'Disconnected' };
+        } catch {
+            return { success: true, message: 'Disconnected locally' };
+        }
+    },
+
+    // Tests reachability of a local Ollama instance directly from the browser.
+    // The server cannot proxy this because Ollama runs on the user's machine.
     async testOllama(url: string): Promise<boolean> {
         try {
-            const response = await fetch(`${url}/api/tags`, {
-                method: 'GET',
-            });
-            return response.ok;
-        } catch (error) {
-            console.error('[AI Service] Ollama connection failed:', error);
+            const res = await fetch(`${url}/api/tags`, { method: 'GET' });
+            return res.ok;
+        } catch {
             return false;
         }
-    }
+    },
 };

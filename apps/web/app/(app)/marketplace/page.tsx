@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import {
     Clock, Building2, Bot, Layers, ArrowRight,
@@ -8,6 +8,7 @@ import {
 } from "lucide-react";
 import { useLanguage } from "@/context/LanguageContext";
 import SecurityDisclaimer from "@/components/shared/SecurityDisclaimer";
+import { marketplaceGetStrategyCount } from "@/lib/sorobanContracts";
 
 export default function MarketplacePage() {
     const { language } = useLanguage();
@@ -16,6 +17,11 @@ export default function MarketplacePage() {
 
     const [email, setEmail] = useState("");
     const [submitted, setSubmitted] = useState(false);
+    const [strategyCount, setStrategyCount] = useState<number | null>(null);
+
+    useEffect(() => {
+        marketplaceGetStrategyCount().then(n => setStrategyCount(Number(n))).catch(() => {});
+    }, []);
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
@@ -148,12 +154,20 @@ export default function MarketplacePage() {
                     transition={{ duration: 0.6 }}
                     className="text-center mb-20"
                 >
-                    <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-stellar-yellow/10 border border-stellar-yellow/20 rounded-full text-stellar-yellow text-[10px] font-black uppercase tracking-widest mb-6">
-                        <Clock className="w-3 h-3" />
-                        {lang(
-                            "COMING SOON · POST-MAINNET Q4 2026",
-                            "PRÓXIMAMENTE · POST-MAINNET Q4 2026",
-                            "即将推出 · 主网后 Q4 2026"
+                    <div className="flex items-center justify-center gap-3 mb-6 flex-wrap">
+                        <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-stellar-yellow/10 border border-stellar-yellow/20 rounded-full text-stellar-yellow text-[10px] font-black uppercase tracking-widest">
+                            <Clock className="w-3 h-3" />
+                            {lang(
+                                "COMING SOON · POST-MAINNET Q4 2026",
+                                "PRÓXIMAMENTE · POST-MAINNET Q4 2026",
+                                "即将推出 · 主网后 Q4 2026"
+                            )}
+                        </div>
+                        {strategyCount !== null && (
+                            <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-stellar-teal/10 border border-stellar-teal/20 rounded-full text-stellar-teal text-[10px] font-black uppercase tracking-widest">
+                                <Activity className="w-3 h-3" />
+                                {strategyCount} {lang("strategies on-chain", "estrategias on-chain", "链上策略")}
+                            </div>
                         )}
                     </div>
 

@@ -11,6 +11,9 @@ import { useFreighter } from "@/hooks/useFreighter";
 import OpsConsole from "@/components/layout/OpsConsole";
 import Link from "next/link";
 import SecurityDisclaimer from "@/components/shared/SecurityDisclaimer";
+import { useEffect, useState } from "react";
+import { useEloReputation } from "@/hooks/useNiriumContracts";
+import { eloGetTotalSentinels } from "@/lib/sorobanContracts";
 
 export default function AgentsPage() {
     const { language } = useLanguage();
@@ -18,6 +21,16 @@ export default function AgentsPage() {
         language === "zh" ? zh : language === "es" ? es : en;
 
     const { address: walletAddress, isConnected } = useFreighter();
+    const elo = useEloReputation();
+    const [eloScore, setEloScore] = useState<number | null>(null);
+    const [totalSentinels, setTotalSentinels] = useState<number | null>(null);
+
+    useEffect(() => {
+        eloGetTotalSentinels().then(n => setTotalSentinels(Number(n))).catch(() => {});
+        if (walletAddress) {
+            elo.getScore(walletAddress).then(s => setEloScore(s)).catch(() => {});
+        }
+    }, [walletAddress]);
 
     const nodes = [
         {
@@ -274,6 +287,20 @@ export default function AgentsPage() {
                         <span className="text-white/40">{lang("Network", "Red", "网络")}</span>
                         <span className="text-white/80 ml-1">Horizon API</span>
                     </div>
+                    {eloScore !== null && (
+                        <div className="flex items-center gap-1.5">
+                            <Activity className="w-3 h-3 text-stellar-teal/60" />
+                            <span className="text-white/40">ELO</span>
+                            <span className="text-stellar-teal ml-1 font-bold">{eloScore}</span>
+                        </div>
+                    )}
+                    {totalSentinels !== null && (
+                        <div className="flex items-center gap-1.5">
+                            <Shield className="w-3 h-3 text-green-400/60" />
+                            <span className="text-white/40">{lang("Sentinels", "Centinelas", "哨兵")}</span>
+                            <span className="text-green-400 ml-1 font-bold">{totalSentinels}</span>
+                        </div>
+                    )}
                 </motion.div>
 
                 {/* ── NODE CARDS ─────────────────────────────────────────── */}

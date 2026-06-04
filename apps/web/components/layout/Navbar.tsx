@@ -261,7 +261,7 @@ export default function Navbar() {
 
                             {/* Status strip */}
                             <div className="mt-3 pt-4 border-t border-white/5 flex items-center justify-between text-[9px] font-mono text-white/20 uppercase tracking-widest">
-                                <span>{t.nav.uplink_ready.replace('{v}', 'v0.5.0')}</span>
+                                <span>{t.nav.uplink_ready.replace('{v}', 'v0.6.1')}</span>
                                 <div className="flex items-center gap-1 text-stellar-teal/60">
                                     <Shield className="w-2.5 h-2.5" />
                                     {t.footer.scf_verified}

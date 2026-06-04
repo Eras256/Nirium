@@ -146,12 +146,57 @@ export interface SubscriptionOptions {
     min_profit_percentage?: number;
     pairs?: string[];
 }
+export interface Subscription {
+    id: string;
+    userId: string;
+    filters: SubscriptionOptions;
+    createdAt: string;
+}
+export interface SubscriptionStats {
+    totalSubscriptions: number;
+    connectedClients: number;
+    recentSignals: number;
+}
+export interface Strategy {
+    id: string;
+    name: string;
+    description?: string;
+    category: string;
+    assets: string[];
+    riskLevel: string;
+    isBuiltIn: boolean;
+    enabled: boolean;
+}
+export interface AuthKey {
+    id: string;
+    name: string;
+    tier: string;
+    createdAt: string;
+    lastUsedAt?: string;
+    isActive: boolean;
+}
+export interface RevenueStats {
+    total: string;
+    currency: string;
+    count: number;
+    feed: Array<{
+        id: string;
+        message: string;
+        created_at: string;
+    }>;
+}
+export interface LLMConfig {
+    provider: 'openai' | 'anthropic' | 'ollama' | 'minimax' | 'gemini' | 'grok' | 'bedrock' | 'openrouter';
+    model?: string;
+    apiKey?: string;
+    ollamaUrl?: string;
+}
 /**
  * NiriumClient — Full API + WebSocket wrapper for the Nirium Agent.
  *
  * @example
  * ```typescript
- * import { Agent } from '@nirium/sdk';
+ * import { Agent } from 'nirium';
  *
  * const agent = new Agent({
  *   apiKey: 'nrm_your_key_here',
@@ -243,6 +288,16 @@ export declare class Agent {
     getRecentSignals(count?: number): Promise<{
         signals: Signal[];
     }>;
+    /** List all active subscriptions for the current user. */
+    getSubscriptions(): Promise<{
+        subscriptions: Subscription[];
+    }>;
+    /** Delete a subscription by ID. */
+    deleteSubscription(id: string): Promise<{
+        message: string;
+    }>;
+    /** Get subscription stats (total, connected clients, recent signals). */
+    getSubscriptionStats(): Promise<SubscriptionStats>;
     /** List all loaded skills (built-in + user-installed). */
     getSkills(): Promise<{
         skills: Skill[];
@@ -254,6 +309,19 @@ export declare class Agent {
     uninstallSkill(slug: string): Promise<{
         success: boolean;
     }>;
+    /** List skills available in the marketplace. */
+    getSkillMarketplace(): Promise<{
+        skills: Skill[];
+        total: number;
+    }>;
+    /** Execute a custom action on an installed skill. */
+    executeSkillAction(slug: string, action: string, params?: Record<string, unknown>, context?: Record<string, unknown>): Promise<Record<string, unknown>>;
+    /** List available strategies (from loaded skills). */
+    getStrategies(): Promise<{
+        strategies: Strategy[];
+        total: number;
+        network: string;
+    }>;
     /** Register a webhook endpoint. */
     registerWebhook(url: string, events: string[], secret?: string): Promise<Webhook>;
     /** List all registered webhooks. */
@@ -264,6 +332,35 @@ export declare class Agent {
     }>;
     /** Test a webhook (sends a test event). */
     testWebhook(id: string): Promise<{
+        success: boolean;
+        message: string;
+    }>;
+    /** Get a JWT token for a Stellar wallet address. */
+    getAuthToken(walletAddress: string): Promise<{
+        token: string;
+        expiresIn: string;
+        userId: string;
+    }>;
+    /** Create a new API key. Requires auth. */
+    createAuthKey(name: string, tier?: string): Promise<{
+        apiKey: string;
+        name: string;
+        tier: string;
+    }>;
+    /** List API keys for the current user. Requires auth. */
+    getAuthKeys(): Promise<{
+        keys: AuthKey[];
+    }>;
+    /** Revoke an API key by ID. Requires auth. */
+    revokeAuthKey(id: string): Promise<{
+        message: string;
+    }>;
+    /** Get x402/MPP revenue stats and payment feed. */
+    getRevenue(): Promise<RevenueStats>;
+    /** Get protocol info (endpoints, LLM, version). */
+    getInfo(): Promise<Record<string, unknown>>;
+    /** Update the active LLM provider (admin only). */
+    configureLLM(config: LLMConfig): Promise<{
         success: boolean;
         message: string;
     }>;

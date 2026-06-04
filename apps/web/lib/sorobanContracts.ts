@@ -3,19 +3,18 @@
  * Nirium — Soroban Contract Layer (Freighter-signed)
  * ═══════════════════════════════════════════════════════
  *
- * This module provides typed wrappers for calling all 3
- * deployed Nirium Soroban contracts on Stellar Testnet.
+ * Two-contract architecture (simplified for auditing):
+ *
+ *  - NiriumVault:    CBTWMZCG3P72EHFAQ4ZLSEBIOFYJC244H5J6DHZIJ56FHFWJ2CFAWSZU
+ *    Core treasury: vault CRUD, agent delegation, strategy execution,
+ *    flash loans, 2-of-3 cosigner multisig, emergency pause.
+ *
+ *  - NiriumProtocol: CC2TU5BDTKTPRRRQPEF77I54XYHFQ25XGIRO2TCWKSR7NRJDFR5L5NR5
+ *    Unified registry: ELO reputation, strategy marketplace,
+ *    agent performance scoring, skill gate (x402 proof-of-payment).
  *
  * All mutative calls are signed via Freighter wallet.
  * Read-only calls go directly to the Soroban RPC.
- *
- * Contracts:
- *  - NiriumVault:     CAU2XBJTQUBTMPAUFRX7GMZ337I5WLBI4GYPWHZEVXTMJ66D3CP6DEL4
- *  - ELO Registry:    CC6Z3WJWRKVEAXEKIQ5S3LFEMKRF4L2FTN5YZDQU27MQRQAWA5QBJWF2
- *  - Marketplace:     CB6Q3LKBJ7CAAZY4MK7EG5R6FDDTJHB52ZEENI6BQLBJNFKBQRIAUABC
- *  - Compliance Sentinel: CCP5OY3TTDVIREQYGOUZUXS2MZJO3LLJD6Z22Z3VROWFCPJAON22WPY2
- *  - Settlement Hub:  CANZP2OJUS2Y5VXE4YHRR75LE2WKE7QTJOCCWENR7X65DWE6QEJZV6KS
- *  - Skill Vault:     CB4JM3PP7GWKJUAYIZ7ZULWFTFJ57FTTUFZTFIDF4JCAPF664OJCXIEI
  */
 
 import {
@@ -38,12 +37,10 @@ const NETWORK_PASSPHRASE = Networks.TESTNET;
 const HORIZON_URL = process.env.NEXT_PUBLIC_HORIZON_URL || 'https://horizon-testnet.stellar.org';
 
 export const CONTRACT_IDS = {
-    VAULT: process.env.NEXT_PUBLIC_CONTRACT_VAULT || 'CAU2XBJTQUBTMPAUFRX7GMZ337I5WLBI4GYPWHZEVXTMJ66D3CP6DEL4',
-    ELO: process.env.NEXT_PUBLIC_CONTRACT_ELO || 'CC6Z3WJWRKVEAXEKIQ5S3LFEMKRF4L2FTN5YZDQU27MQRQAWA5QBJWF2',
-    MARKETPLACE: process.env.NEXT_PUBLIC_CONTRACT_MARKETPLACE || 'CB6Q3LKBJ7CAAZY4MK7EG5R6FDDTJHB52ZEENI6BQLBJNFKBQRIAUABC',
-    SENTINEL: process.env.NEXT_PUBLIC_CONTRACT_SENTINEL || 'CCP5OY3TTDVIREQYGOUZUXS2MZJO3LLJD6Z22Z3VROWFCPJAON22WPY2',
-    HUB: process.env.NEXT_PUBLIC_CONTRACT_HUB || 'CANZP2OJUS2Y5VXE4YHRR75LE2WKE7QTJOCCWENR7X65DWE6QEJZV6KS',
-    SKILL_VAULT: process.env.NEXT_PUBLIC_CONTRACT_SKILL_VAULT || 'CB4JM3PP7GWKJUAYIZ7ZULWFTFJ57FTTUFZTFIDF4JCAPF664OJCXIEI',
+    // Core treasury: vaults, agent delegation, strategy execution, multisig
+    VAULT: process.env.NEXT_PUBLIC_CONTRACT_VAULT || 'CBTWMZCG3P72EHFAQ4ZLSEBIOFYJC244H5J6DHZIJ56FHFWJ2CFAWSZU',
+    // Unified registry: ELO, strategy marketplace, agent scoring, skill gate
+    PROTOCOL: process.env.NEXT_PUBLIC_CONTRACT_PROTOCOL || 'CC2TU5BDTKTPRRRQPEF77I54XYHFQ25XGIRO2TCWKSR7NRJDFR5L5NR5',
 } as const;
 
 // Soroban Native Token Address (XLM) on Stellar Testnet
@@ -351,7 +348,7 @@ export async function vaultClose(callerAddress: string, vaultId: number) {
  */
 export async function eloGetScore(sentinelAddress: string): Promise<number> {
     const result = await simulateContractRead({
-        contractId: CONTRACT_IDS.ELO,
+        contractId: CONTRACT_IDS.PROTOCOL,
         method: 'get_elo',
         args: [Address.fromString(sentinelAddress).toScVal()],
     });
@@ -363,8 +360,8 @@ export async function eloGetScore(sentinelAddress: string): Promise<number> {
  */
 export async function eloGetTotalSentinels(): Promise<number> {
     const result = await simulateContractRead({
-        contractId: CONTRACT_IDS.ELO,
-        method: 'get_total_sentinels',
+        contractId: CONTRACT_IDS.PROTOCOL,
+        method: 'get_total_agents',
         args: [],
     });
     return Number(result ?? 0);
@@ -381,8 +378,8 @@ export async function eloGetProfile(sentinelAddress: string): Promise<{
     tier: string;
 } | null> {
     const result = await simulateContractRead({
-        contractId: CONTRACT_IDS.ELO,
-        method: 'get_profile',
+        contractId: CONTRACT_IDS.PROTOCOL,
+        method: 'get_agent_profile',
         args: [Address.fromString(sentinelAddress).toScVal()],
     }) as Record<string, unknown> | null;
 
@@ -401,8 +398,8 @@ export async function eloGetProfile(sentinelAddress: string): Promise<{
  */
 export async function eloRegisterSentinel(callerAddress: string) {
     return invokeContract({
-        contractId: CONTRACT_IDS.ELO,
-        method: 'register_sentinel',
+        contractId: CONTRACT_IDS.PROTOCOL,
+        method: 'register_agent',
         args: [Address.fromString(callerAddress).toScVal()],
         callerAddress,
     });
@@ -427,7 +424,7 @@ export async function marketplaceGetStrategy(strategyId: number): Promise<{
     is_active: boolean;
 } | null> {
     const result = await simulateContractRead({
-        contractId: CONTRACT_IDS.MARKETPLACE,
+        contractId: CONTRACT_IDS.PROTOCOL,
         method: 'get_strategy',
         args: [nativeToScVal(strategyId, { type: 'u64' })],
     }) as Record<string, unknown> | null;
@@ -451,7 +448,7 @@ export async function marketplaceGetStrategy(strategyId: number): Promise<{
  */
 export async function marketplaceGetStrategyCount(): Promise<number> {
     const result = await simulateContractRead({
-        contractId: CONTRACT_IDS.MARKETPLACE,
+        contractId: CONTRACT_IDS.PROTOCOL,
         method: 'get_strategy_count',
         args: [],
     });
@@ -468,7 +465,7 @@ export async function marketplacePublishStrategy(
     subscriptionFeeUsdc: bigint,
 ) {
     return invokeContract({
-        contractId: CONTRACT_IDS.MARKETPLACE,
+        contractId: CONTRACT_IDS.PROTOCOL,
         method: 'publish_strategy',
         args: [
             Address.fromString(callerAddress).toScVal(),
@@ -486,15 +483,13 @@ export async function marketplacePublishStrategy(
 export async function marketplaceSubscribe(
     callerAddress: string,
     strategyId: number,
-    usdcTokenAddress: string,
 ) {
     return invokeContract({
-        contractId: CONTRACT_IDS.MARKETPLACE,
+        contractId: CONTRACT_IDS.PROTOCOL,
         method: 'subscribe',
         args: [
             Address.fromString(callerAddress).toScVal(),
             nativeToScVal(strategyId, { type: 'u64' }),
-            Address.fromString(usdcTokenAddress).toScVal(),
         ],
         callerAddress,
     });
@@ -559,7 +554,7 @@ export async function hasCETESTrustline(walletAddress: string): Promise<boolean>
  */
 export async function sentinelGetScore(agentAddress: string): Promise<number> {
     const result = await simulateContractRead({
-        contractId: CONTRACT_IDS.SENTINEL,
+        contractId: CONTRACT_IDS.PROTOCOL,
         method: 'get_score',
         args: [Address.fromString(agentAddress).toScVal()],
     });
@@ -571,8 +566,8 @@ export async function sentinelGetScore(agentAddress: string): Promise<number> {
  */
 export async function sentinelGetRecord(agentAddress: string): Promise<any> {
     const result = await simulateContractRead({
-        contractId: CONTRACT_IDS.SENTINEL,
-        method: 'get_record',
+        contractId: CONTRACT_IDS.PROTOCOL,
+        method: 'get_score_record',
         args: [Address.fromString(agentAddress).toScVal()],
     });
     return result;
@@ -587,7 +582,7 @@ export async function sentinelGetRecord(agentAddress: string): Promise<any> {
  */
 export async function hubOpenSession(callerAddress: string, agentAddress: string, budget: bigint, duration: bigint) {
     return invokeContract({
-        contractId: CONTRACT_IDS.HUB,
+        contractId: CONTRACT_IDS.PROTOCOL,
         method: 'open_session',
         args: [
             Address.fromString(callerAddress).toScVal(),
@@ -604,7 +599,7 @@ export async function hubOpenSession(callerAddress: string, agentAddress: string
  */
 export async function hubSettleIntent(callerAddress: string, userAddress: string, amount: bigint, memo: string) {
     return invokeContract({
-        contractId: CONTRACT_IDS.HUB,
+        contractId: CONTRACT_IDS.PROTOCOL,
         method: 'settle_intent',
         args: [
             Address.fromString(userAddress).toScVal(),
@@ -620,7 +615,7 @@ export async function hubSettleIntent(callerAddress: string, userAddress: string
  */
 export async function hubCloseSession(callerAddress: string) {
     return invokeContract({
-        contractId: CONTRACT_IDS.HUB,
+        contractId: CONTRACT_IDS.PROTOCOL,
         method: 'close_session',
         args: [Address.fromString(callerAddress).toScVal()],
         callerAddress,
@@ -637,7 +632,7 @@ export async function hubCloseSession(callerAddress: string) {
  */
 export async function skillVaultUnlock(callerAddress: string, skillId: string) {
     return invokeContract({
-        contractId: CONTRACT_IDS.SKILL_VAULT,
+        contractId: CONTRACT_IDS.PROTOCOL,
         method: 'unlock_skill',
         args: [
             Address.fromString(callerAddress).toScVal(),
@@ -652,8 +647,8 @@ export async function skillVaultUnlock(callerAddress: string, skillId: string) {
  */
 export async function skillVaultGetPrice(skillId: string): Promise<number> {
     const result = await simulateContractRead({
-        contractId: CONTRACT_IDS.SKILL_VAULT,
-        method: 'get_price',
+        contractId: CONTRACT_IDS.PROTOCOL,
+        method: 'get_skill_price',
         args: [nativeToScVal(skillId, { type: 'string' })],
     });
     return Number(result ?? 0);

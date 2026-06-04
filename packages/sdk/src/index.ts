@@ -1,5 +1,5 @@
 // ═══════════════════════════════════════════════════════════════
-// nirium v0.4.0 — Official TypeScript SDK (x402 + MPP)
+// nirium v0.6.1 — Official TypeScript SDK (x402 + MPP)
 // ═══════════════════════════════════════════════════════════════
 
 import WebSocket from 'ws';
@@ -152,12 +152,59 @@ export interface SubscriptionOptions {
     pairs?: string[];
 }
 
+export interface Subscription {
+    id: string;
+    userId: string;
+    filters: SubscriptionOptions;
+    createdAt: string;
+}
+
+export interface SubscriptionStats {
+    totalSubscriptions: number;
+    connectedClients: number;
+    recentSignals: number;
+}
+
+export interface Strategy {
+    id: string;
+    name: string;
+    description?: string;
+    category: string;
+    assets: string[];
+    riskLevel: string;
+    isBuiltIn: boolean;
+    enabled: boolean;
+}
+
+export interface AuthKey {
+    id: string;
+    name: string;
+    tier: string;
+    createdAt: string;
+    lastUsedAt?: string;
+    isActive: boolean;
+}
+
+export interface RevenueStats {
+    total: string;
+    currency: string;
+    count: number;
+    feed: Array<{ id: string; message: string; created_at: string }>;
+}
+
+export interface LLMConfig {
+    provider: 'openai' | 'anthropic' | 'ollama' | 'minimax' | 'gemini' | 'grok' | 'bedrock' | 'openrouter';
+    model?: string;
+    apiKey?: string;
+    ollamaUrl?: string;
+}
+
 /**
  * NiriumClient — Full API + WebSocket wrapper for the Nirium Agent.
  *
  * @example
  * ```typescript
- * import { Agent } from '@nirium/sdk';
+ * import { Agent } from 'nirium';
  *
  * const agent = new Agent({
  *   apiKey: 'nrm_your_key_here',
@@ -349,6 +396,21 @@ export class Agent {
         return this.request('GET', `/api/signals/recent?count=${count}`);
     }
 
+    /** List all active subscriptions for the current user. */
+    async getSubscriptions(): Promise<{ subscriptions: Subscription[] }> {
+        return this.request('GET', '/api/subscriptions');
+    }
+
+    /** Delete a subscription by ID. */
+    async deleteSubscription(id: string): Promise<{ message: string }> {
+        return this.request('DELETE', `/api/subscriptions/${id}`);
+    }
+
+    /** Get subscription stats (total, connected clients, recent signals). */
+    async getSubscriptionStats(): Promise<SubscriptionStats> {
+        return this.request('GET', '/api/subscriptions/stats');
+    }
+
     // ─── Skills ──────────────────────────────────────────────
 
     /** List all loaded skills (built-in + user-installed). */
@@ -364,6 +426,26 @@ export class Agent {
     /** Uninstall a user-installed skill by slug. */
     async uninstallSkill(slug: string): Promise<{ success: boolean }> {
         return this.request('DELETE', `/api/skills/${slug}`);
+    }
+
+    /** List skills available in the marketplace. */
+    async getSkillMarketplace(): Promise<{ skills: Skill[]; total: number }> {
+        return this.request('GET', '/api/skills/marketplace');
+    }
+
+    /** Execute a custom action on an installed skill. */
+    async executeSkillAction(
+        slug: string,
+        action: string,
+        params?: Record<string, unknown>,
+        context?: Record<string, unknown>
+    ): Promise<Record<string, unknown>> {
+        return this.request('POST', `/api/skills/${slug}/actions/${action}`, { params, context });
+    }
+
+    /** List available strategies (from loaded skills). */
+    async getStrategies(): Promise<{ strategies: Strategy[]; total: number; network: string }> {
+        return this.request('GET', '/api/strategies');
     }
 
     // ─── Webhooks ────────────────────────────────────────────
@@ -390,6 +472,47 @@ export class Agent {
     /** Test a webhook (sends a test event). */
     async testWebhook(id: string): Promise<{ success: boolean; message: string }> {
         return this.request('POST', `/api/webhooks/${id}/test`);
+    }
+
+    // ─── Auth Management ─────────────────────────────────────
+
+    /** Get a JWT token for a Stellar wallet address. */
+    async getAuthToken(walletAddress: string): Promise<{ token: string; expiresIn: string; userId: string }> {
+        return this.request('POST', '/api/auth/token', { walletAddress });
+    }
+
+    /** Create a new API key. Requires auth. */
+    async createAuthKey(name: string, tier?: string): Promise<{ apiKey: string; name: string; tier: string }> {
+        return this.request('POST', '/api/auth/keys', { name, tier });
+    }
+
+    /** List API keys for the current user. Requires auth. */
+    async getAuthKeys(): Promise<{ keys: AuthKey[] }> {
+        return this.request('GET', '/api/auth/keys');
+    }
+
+    /** Revoke an API key by ID. Requires auth. */
+    async revokeAuthKey(id: string): Promise<{ message: string }> {
+        return this.request('DELETE', `/api/auth/keys/${id}`);
+    }
+
+    // ─── Revenue & Info ──────────────────────────────────────
+
+    /** Get x402/MPP revenue stats and payment feed. */
+    async getRevenue(): Promise<RevenueStats> {
+        return this.request('GET', '/api/revenue');
+    }
+
+    /** Get protocol info (endpoints, LLM, version). */
+    async getInfo(): Promise<Record<string, unknown>> {
+        return this.request('GET', '/api/info');
+    }
+
+    // ─── Admin ───────────────────────────────────────────────
+
+    /** Update the active LLM provider (admin only). */
+    async configureLLM(config: LLMConfig): Promise<{ success: boolean; message: string }> {
+        return this.request('POST', '/api/config/llm', config as unknown as Record<string, unknown>);
     }
 
     // ─── WebSocket ───────────────────────────────────────────

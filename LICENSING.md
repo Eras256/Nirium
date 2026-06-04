@@ -1,55 +1,43 @@
-# Nirium Protocol — Licensing Strategy
+# Licensing
 
-Nirium Protocol employs a dual-licensing strategy designed to protect our core intellectual property and protocol integrity while maximizing ecosystem adoption and developer freedom.
-
----
-
-## 1. Core Infrastructure (BSL 1.1)
-
-The following components are licensed under the **Business Source License 1.1 (BSL)**:
-
-- **Smart Contracts** (`packages/contracts/`)
-- **Execution Node Orchestration** (`packages/agent/`)
-- **Institutional Dashboard** (`apps/web/`)
-
-**What this means:**
-- **Source Available:** The code is 100% public and auditable.
-- **Non-Commercial Use:** You are free to copy, modify, and run the code for personal, experimental, or academic purposes.
-- **Commercial Restriction:** Any use of this code for commercial purposes (e.g., running a competing treasury service) requires a separate agreement from the Nirium Protocol developers until the **Change Date (April 2, 2028)**.
-- **Future Open Source:** On April 2, 2028, these components will automatically transition to **GPL-2.0-or-later**.
+Nirium is **100% Open Source Software**.
 
 ---
 
-## 2. Developer Tools & SDKs (Apache 2.0)
+## Unified License — Apache License 2.0
 
-To encourage the growth of the autonomous finance ecosystem on Stellar, the following integration tools are licensed under the **Apache License 2.0**:
+The entire Nirium Protocol ecosystem, including the core protocol and the commercial interface, is licensed under the [Apache License 2.0](http://www.apache.org/licenses/LICENSE-2.0):
 
-- **TypeScript SDK** (`packages/sdk/`)
-- **Python SDK** (`packages/sdk-python/`)
-- **MCP Server** (`packages/mcp/`)
-- **Nirium CLI** (`packages/cli/`)
+| Package | Description |
+|---------|-------------|
+| `apps/web/` | nirium.xyz SaaS dashboard & Interface |
+| `packages/contracts/` | Soroban smart contracts (NiriumVault, NiriumProtocol) |
+| `packages/agent/` | Agent API — 55 endpoints, autonomous execution logic |
+| `packages/mcp/` | MCP Server — 12 tools for Claude, GPT, Cursor integration |
+| `packages/sdk/` | TypeScript SDK (`npm install nirium`) |
+| `packages/sdk-python/` | Python SDK (`pip install nirium`) |
+| `packages/cli/` | CLI tooling |
 
-**What this means:**
-- **Permissive Use:** You are free to use these tools in any project, commercial or otherwise, without restriction.
-- **Integration Friendly:** Financial institutions and fintechs can integrate Nirium capabilities into their proprietary stacks using these SDKs without legal friction.
-
----
-
-## 3. Rationale
-
-This strategy aligns with the **Stellar Community Fund (SCF 7.0)** principles:
-
-1. **Transparency:** By making the core protocol source-available, we ensure that every transaction and yield optimization is verifiable by the community.
-2. **Sustainability:** BSL 1.1 prevents "vampire attacks" and predatory forks, ensuring that the Nirium team can continue to innovate and maintain the infrastructure.
-3. **Ecosystem Growth:** Permissive licensing for SDKs ensures that Nirium becomes a foundational layer for other builders in the Stellar network.
+You may freely use, modify, and distribute these packages in commercial and non-commercial projects, subject to the Apache License 2.0. See the root `LICENSE` file for details.
 
 ---
 
-## 4. Contact
+## Why This Model
 
-For commercial licensing inquiries or partnership opportunities, please contact:
-**legal@nirium.xyz**
+To ensure full compliance with the **Stellar Community Fund (SCF) v7.0** open-source requirements, we have eliminated all restrictive BSL licensing.
+
+The protocol layer and the interface layer are shared infrastructure. Apache 2.0 allows any developer to build on Nirium's treasury primitives, integrate the SDKs, deploy autonomous agents, and contribute back to the ecosystem without restriction.
 
 ---
 
-*Nirium Protocol — Institutional Infrastructure on Stellar. April 2026.*
+## Attribution
+
+This software includes components licensed under Apache 2.0. See the `NOTICE` file at the repository root for attribution requirements (Apache 2.0 §4(d)).
+
+---
+
+## Contact
+
+For commercial licensing inquiries: **legal@nirium.xyz**
+
+*Nirium Protocol — May 2026.*

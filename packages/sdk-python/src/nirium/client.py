@@ -1,5 +1,5 @@
 # ═══════════════════════════════════════════════════════════════
-# Nirium Python SDK v0.4.0 — Official Client (x402 + MPP)
+# Nirium Python SDK v0.6.1 — Official Client (x402 + MPP)
 # Synced with backend API (real Horizon data, Soroban execution)
 # ═══════════════════════════════════════════════════════════════
 import asyncio
@@ -172,6 +172,26 @@ class Agent:
         """Get recent market signals."""
         return await self._get(f"/api/signals/recent?count={count}")
 
+    async def create_subscription(self, filters: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
+        """Create a signal subscription with optional filters."""
+        return await self._post("/api/subscriptions", {"filters": filters or {}})
+
+    async def get_subscriptions(self) -> Dict[str, Any]:
+        """List all active subscriptions for the current user."""
+        return await self._get("/api/subscriptions")
+
+    async def delete_subscription(self, subscription_id: str) -> Dict[str, Any]:
+        """Delete a subscription by ID."""
+        return await self._delete(f"/api/subscriptions/{subscription_id}")
+
+    async def get_subscription_stats(self) -> Dict[str, Any]:
+        """Get subscription stats (total, connected clients, recent signals)."""
+        return await self._get("/api/subscriptions/stats")
+
+    async def get_strategies(self) -> Dict[str, Any]:
+        """List available strategies from loaded skills."""
+        return await self._get("/api/strategies")
+
     # ─── Skills ──────────────────────────────────────────────
 
     async def get_skills(self) -> Any:
@@ -185,6 +205,70 @@ class Agent:
     async def uninstall_skill(self, slug: str) -> Dict[str, Any]:
         """Uninstall a user-installed skill by slug."""
         return await self._delete(f"/api/skills/{slug}")
+
+    async def get_skill_marketplace(self) -> Dict[str, Any]:
+        """List skills available in the marketplace."""
+        return await self._get("/api/skills/marketplace")
+
+    async def execute_skill_action(
+        self,
+        slug: str,
+        action: str,
+        params: Optional[Dict[str, Any]] = None,
+        context: Optional[Dict[str, Any]] = None,
+    ) -> Dict[str, Any]:
+        """Execute a custom action on an installed skill."""
+        return await self._post(f"/api/skills/{slug}/actions/{action}", {"params": params or {}, "context": context or {}})
+
+    # ─── Auth Management ─────────────────────────────────────
+
+    async def get_auth_token(self, wallet_address: str) -> Dict[str, Any]:
+        """Get a JWT token for a Stellar wallet address."""
+        return await self._post("/api/auth/token", {"walletAddress": wallet_address})
+
+    async def create_auth_key(self, name: str, tier: Optional[str] = None) -> Dict[str, Any]:
+        """Create a new API key. Requires auth."""
+        payload: Dict[str, Any] = {"name": name}
+        if tier:
+            payload["tier"] = tier
+        return await self._post("/api/auth/keys", payload)
+
+    async def get_auth_keys(self) -> Dict[str, Any]:
+        """List API keys for the current user. Requires auth."""
+        return await self._get("/api/auth/keys")
+
+    async def revoke_auth_key(self, key_id: str) -> Dict[str, Any]:
+        """Revoke an API key by ID. Requires auth."""
+        return await self._delete(f"/api/auth/keys/{key_id}")
+
+    # ─── Revenue & Info ──────────────────────────────────────
+
+    async def get_revenue(self) -> Dict[str, Any]:
+        """Get x402/MPP revenue stats and payment feed."""
+        return await self._get("/api/revenue")
+
+    async def get_info(self) -> Dict[str, Any]:
+        """Get protocol info (endpoints, LLM provider, version)."""
+        return await self._get("/api/info")
+
+    # ─── Admin ───────────────────────────────────────────────
+
+    async def configure_llm(
+        self,
+        provider: str,
+        model: Optional[str] = None,
+        api_key: Optional[str] = None,
+        ollama_url: Optional[str] = None,
+    ) -> Dict[str, Any]:
+        """Update the active LLM provider (admin only)."""
+        payload: Dict[str, Any] = {"provider": provider}
+        if model:
+            payload["model"] = model
+        if api_key:
+            payload["apiKey"] = api_key
+        if ollama_url:
+            payload["ollamaUrl"] = ollama_url
+        return await self._post("/api/config/llm", payload)
 
     # ─── Webhooks ────────────────────────────────────────────
 

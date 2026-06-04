@@ -1,6 +1,8 @@
 # nirium
 
-Official Python SDK for the **Nirium Protocol** — autonomous DeFi agent infrastructure on Stellar/Soroban.
+Official Python SDK for the **Nirium Protocol** — autonomous AI treasury infrastructure on Stellar/Soroban.
+
+Nirium agents rebalance USDC ↔ CETES (tokenized Mexican T-bills via Etherfuse) 24/7 without human intervention. Built for developers who want to integrate autonomous treasury management, agentic payments (x402 + MPP), and real-time market signals into their applications.
 
 ## Install
 
@@ -28,9 +30,9 @@ async def main():
     market = await agent.get_market()
     print(f"XLM Price: ${market['xlmPrice']:.4f}")
 
-    # Execute a strategy
-    result = await agent.execute("flash-loan-arb", "XLM-USDC", {"amount": 5000})
-    print(f"Profit: {result['profit']}")
+    # Execute a treasury rebalance strategy
+    result = await agent.execute("blend-yield", "USDC", {"amount": 5000})
+    print(f"Success: {result['success']} | TX: {result.get('txHash')}")
 
 asyncio.run(main())
 ```
@@ -67,7 +69,6 @@ agent.init_x402(
 )
 
 response = await agent.x402_fetch("https://nirium-agent.fly.dev/api/v1/premium/signals")
-data = await response.json()
 ```
 
 ### MPP — Session-Based Budget Delegation
@@ -75,11 +76,9 @@ data = await response.json()
 agent.init_mpp(
     secret_key="S...",
     network="stellar:testnet",
-    mode="pull"
 )
 
 response = await agent.mpp_fetch("https://nirium-agent.fly.dev/api/v1/mpp/signals")
-data = await response.json()
 ```
 
 ### Endpoint Access Model
@@ -89,7 +88,8 @@ data = await response.json()
 | **Public** (no key) | `health`, `loop/status`, `execute-demo`, `signals/recent`, `skills` list |
 | **Protected** (API key) | `execute`, `market`, `loop/start\|stop\|scan`, `subscriptions`, `skills/install`, `webhooks` |
 | **WebSocket** (JWT) | `/ws/signals` — real-time signal stream |
-| **x402 Premium** | `/api/v1/premium/signals` ($0.02), `/api/v1/premium/market` ($0.05) |
+| **x402 Premium** | `/api/v1/premium/signals` ($0.02 USDC), `/api/v1/premium/market` ($0.05 USDC) |
+| **MPP** | `/api/v1/mpp/signals`, `/api/v1/mpp/market` |
 
 ## API Coverage
 
@@ -98,9 +98,13 @@ data = await response.json()
 | Health | `ping()`, `health()`, `system_health()` |
 | Execution | `execute()`, `execute_demo()` |
 | Market | `get_tickers()`, `get_market()`, `get_stats()`, `get_loop_status()`, `start_loop()`, `stop_loop()`, `trigger_scan()` |
-| Signals | `get_recent_signals()` |
-| Skills | `get_skills()`, `install_skill()`, `uninstall_skill()` |
+| Signals | `create_subscription()`, `get_subscriptions()`, `delete_subscription()`, `get_subscription_stats()`, `get_recent_signals()` |
+| Skills | `get_skills()`, `install_skill()`, `uninstall_skill()`, `get_skill_marketplace()`, `execute_skill_action()` |
+| Strategies | `get_strategies()` |
 | Webhooks | `register_webhook()`, `get_webhooks()`, `delete_webhook()`, `test_webhook()` |
+| Auth | `get_auth_token()`, `create_auth_key()`, `get_auth_keys()`, `revoke_auth_key()` |
+| Revenue | `get_revenue()`, `get_info()` |
+| Admin | `configure_llm()` |
 | WebSocket | `subscribe()`, `on()` decorator |
 | x402 Payments | `init_x402()`, `x402_fetch()` |
 | MPP Payments | `init_mpp()`, `mpp_fetch()` |
@@ -113,10 +117,12 @@ data = await response.json()
 
 ## Links
 
-- [Full SDK Documentation](../../SDKs.md)
-- [API Documentation](../../API_DOCUMENTATION_OPENAPI.yaml)
-- [MCP Integration Guide](../../MCP_INTEGRATION_GUIDE.md)
+- [Documentation](https://nirium.xyz/docs)
+- [Developer Sandbox](https://nirium.xyz/sandbox)
+- [API Reference](https://nirium.xyz/docs/api)
+- [MCP Server Integration](https://nirium.xyz/docs/mcp)
+- [GitHub](https://github.com/nirium/nirium)
 
 ## License
 
-MIT — Nirium Protocol
+Apache 2.0 — Nirium Protocol

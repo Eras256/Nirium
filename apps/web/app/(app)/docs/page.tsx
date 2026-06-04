@@ -74,7 +74,7 @@ function DocsContent() {
                                     <div className="flex items-center gap-3">
                                         <h1 className="text-3xl sm:text-5xl md:text-7xl font-black font-mono tracking-tighter uppercase leading-none">{t.docs.overview.title}</h1>
                                         <span className="px-2 py-0.5 bg-green-500/20 text-green-400 text-xs font-mono rounded-full border border-green-500/30 animate-pulse">
-                                            v0.5.0
+                                            v0.6.1
                                         </span>
                                     </div>
                                 </div>
@@ -219,10 +219,10 @@ function OverviewSection() {
             {/* Hero Stats */}
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-5 gap-4">
                 {[
-                    { label: t.docs.overview.hero.version, value: 'v0.5.0', color: 'text-stellar-teal' },
-                    { label: t.docs.overview.hero.contracts, value: '6 Testnet', color: 'text-green-400' },
+                    { label: t.docs.overview.hero.version, value: 'v0.6.1', color: 'text-stellar-teal' },
+                    { label: t.docs.overview.hero.contracts, value: '2 Testnet', color: 'text-green-400' },
                     { label: t.docs.overview.hero.helpers, value: '30+', color: 'text-purple-400' },
-                    { label: t.docs.overview.hero.fee, value: '0.5%', color: 'text-amber-400' },
+                    { label: t.docs.overview.hero.fee, value: '$0.01/call', color: 'text-amber-400' },
                     { label: t.docs.overview.hero.coins, value: 'XLM · USDC · CETES', color: 'text-blue-400' },
                 ].map((stat) => (
                     <div key={stat.label} className="bg-white/5 border border-white/10 rounded-xl p-4">
@@ -527,7 +527,7 @@ function ContractsSection() {
         <div className="space-y-12">
             {/* Deployed Contracts */}
             <section>
-                <h2 className="text-2xl font-bold mb-6">{t.docs.api.contracts_title} (Testnet v0.5.0)</h2>
+                <h2 className="text-2xl font-bold mb-6">{t.docs.api.contracts_title} (Testnet v0.6.1)</h2>
                 <div className="overflow-x-auto">
                     <table className="w-full text-left border-collapse">
                         <thead>
@@ -539,12 +539,8 @@ function ContractsSection() {
                         </thead>
                         <tbody className="text-sm font-mono">
                             {[
-                                { name: 'NiriumVault', id: 'CAU2XBJTQUBTMPAUFRX7GMZ337I5WLBI4GYPWHZEVXTMJ66D3CP6DEL4', color: 'text-stellar-teal', desc: t.docs.contracts.items.vault },
-                                { name: 'ELO Registry', id: 'CC6Z3WJWRKVEAXEKIQ5S3LFEMKRF4L2FTN5YZDQU27MQRQAWA5QBJWF2', color: 'text-purple-400', desc: t.docs.contracts.items.elo },
-                                { name: 'Marketplace', id: 'CB6Q3LKBJ7CAAZY4MK7EG5R6FDDTJHB52ZEENI6BQLBJNFKBQRIAUABC', color: 'text-blue-400', desc: t.docs.contracts.items.marketplace },
-                                { name: 'Protocol Sentinel', id: 'CCP5OY3TTDVIREQYGOUZUXS2MZJO3LLJD6Z22Z3VROWFCPJAON22WPY2', color: 'text-amber-400', desc: t.docs.contracts.items.sentinel },
-                                { name: 'Settlement Hub', id: 'CANZP2OJUS2Y5VXE4YHRR75LE2WKE7QTJOCCWENR7X65DWE6QEJZV6KS', color: 'text-green-400', desc: t.docs.contracts.items.settlement },
-                                { name: 'Skill Vault', id: 'CB4JM3PP7GWKJUAYIZ7ZULWFTFJ57FTTUFZTFIDF4JCAPF664OJCXIEI', color: 'text-pink-400', desc: t.docs.contracts.items.skill },
+                                { name: 'NiriumVault', id: 'CBTWMZCG3P72EHFAQ4ZLSEBIOFYJC244H5J6DHZIJ56FHFWJ2CFAWSZU', color: 'text-stellar-teal', desc: t.docs.contracts.items.vault },
+                                { name: 'NiriumProtocol', id: 'CC2TU5BDTKTPRRRQPEF77I54XYHFQ25XGIRO2TCWKSR7NRJDFR5L5NR5', color: 'text-purple-400', desc: t.docs.contracts.items.elo },
                             ].map((c) => (
                                 <tr key={c.name} className="border-b border-white/5 hover:bg-white/5">
                                     <td className="py-4 px-4 text-white font-bold font-sans">{c.name}</td>
@@ -1040,13 +1036,9 @@ function ApiSection() {
                         </thead>
                         <tbody className="text-sm">
                             {[
-                                { name: 'Main Vault (Core)', id: 'CAU2XBJTQUBTMPAUFRX7GMZ337I5WLBI4GYPWHZEVXTMJ66D3CP6DEL4', short: 'CAU2XBJ...EL4', type: 'Treasury' },
-                                { name: 'ELO Reputation', id: 'CC6Z3WJWRKVEAXEKIQ5S3LFEMKRF4L2FTN5YZDQU27MQRQAWA5QBJWF2', short: 'CC6Z3W...JWF2', type: 'Reputation' },
-                                { name: 'Strategy Marketplace', id: 'CB6Q3LKBJ7CAAZY4MK7EG5R6FDDTJHB52ZEENI6BQLBJNFKBQRIAUABC', short: 'CB6Q3L...UABC', type: 'Market' },
-                                { name: 'Neural Sentinel', id: 'CCP5OY3TTDVIREQYGOUZUXS2MZJO3LLJD6Z22Z3VROWFCPJAON22WPY2', short: 'CCP5OY...PY2', type: 'Security' },
-                                { name: 'Settlement Hub (x402/MPP)', id: 'CANZP2OJUS2Y5VXE4YHRR75LE2WKE7QTJOCCWENR7X65DWE6QEJZV6KS', short: 'CANZP2...KS', type: 'Settlement' },
-                                { name: 'Skill Vault', id: 'CB4JM3PP7GWKJUAYIZ7ZULWFTFJ57FTTUFZTFIDF4JCAPF664OJCXIEI', short: 'CB4JM3...XIEI', type: 'Skills' },
-                                { name: 'CETES (Mexican Bonds)', id: 'CC72F57YTPX76HAA64JQOEGHQAPSADQWSY5DWVBR66JINPFDLNCQYHIC', short: 'CC72F5...CQYHIC', type: 'Asset SAC' },
+                                { name: 'NiriumVault', id: 'CBTWMZCG3P72EHFAQ4ZLSEBIOFYJC244H5J6DHZIJ56FHFWJ2CFAWSZU', short: 'CBTWMZ...WSZU', type: 'Treasury' },
+                                { name: 'NiriumProtocol', id: 'CC2TU5BDTKTPRRRQPEF77I54XYHFQ25XGIRO2TCWKSR7NRJDFR5L5NR5', short: 'CC2TU5...NR5', type: 'Registry' },
+                                { name: 'CETES (Mexican Bonds)', id: 'CC72F57YTPX76HAA64JQOEGHQAPSADQWSY5DWVBR66JINPFDLNCQYHIC', short: 'CC72F5...YHIC', type: 'Asset SAC' },
                             ].map((c) => (
                                 <tr key={c.name} className="border-b border-white/5 hover:bg-white/5 transition-colors group">
                                     <td className="py-4 px-6">

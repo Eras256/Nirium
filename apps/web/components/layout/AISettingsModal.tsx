@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, Brain, Cpu, Key, Globe, Check, AlertCircle, Loader2, Shield } from 'lucide-react';
+import { X, Brain, Cpu, Key, Globe, Check, AlertCircle, Loader2, Shield, Unplug } from 'lucide-react';
 import { aiService, LLMConfig } from '@/lib/aiService';
 import { toast } from 'sonner';
 import { useLanguage } from '@/context/LanguageContext';
@@ -15,11 +15,11 @@ interface AISettingsModalProps {
 
 const PROVIDERS = [
     { id: 'nirium', name: 'Nirium Cloud', icon: Globe, description: 'Proprietary institutional core' },
-    { id: 'openai', name: 'OpenAI', icon: Cpu, description: 'GPT-4o / GPT-4 Turbo' },
-    { id: 'anthropic', name: 'Anthropic', icon: Brain, description: 'Claude 3.5 Sonnet' },
+    { id: 'openai', name: 'OpenAI', icon: Cpu, description: 'GPT-5.5 / GPT-5.4 / o3-mini' },
+    { id: 'anthropic', name: 'Anthropic', icon: Brain, description: 'Claude Opus 4.7 / Sonnet 4.6' },
     { id: 'minimax', name: 'MiniMax', icon: Cpu, description: 'Abab 6.5 / Video-01' },
-    { id: 'gemini', name: 'Gemini', icon: Globe, description: 'Google Flash 1.5' },
-    { id: 'grok', name: 'Grok', icon: Cpu, description: 'xAI Grok-1' },
+    { id: 'gemini', name: 'Gemini', icon: Globe, description: 'Gemini 2.5 Pro / 3.1 Pro' },
+    { id: 'grok', name: 'Grok', icon: Cpu, description: 'xAI Grok-4.3 / Grok-4 Heavy' },
     { id: 'bedrock', name: 'AWS Bedrock', icon: Key, description: 'Amazon Institutional LLMs' },
     { id: 'openrouter', name: 'OpenRouter', icon: Globe, description: 'Unified API Gateway' },
     { id: 'ollama', name: 'Ollama (Local)', icon: Key, description: 'Privacy-focused local inference' },
@@ -27,30 +27,33 @@ const PROVIDERS = [
 
 const MODELS: Record<string, string[]> = {
     nirium: ['nirium-core-v1', 'stellar-quantum-alpha'],
-    openai: ['gpt-4o', 'gpt-4-turbo', 'gpt-3.5-turbo'],
-    anthropic: ['claude-3-5-sonnet-20240620', 'claude-3-opus-20240229'],
+    openai: ['gpt-5.5', 'gpt-5.4', 'gpt-5.4-mini', 'o3-mini'],
+    anthropic: ['claude-opus-4-7', 'claude-sonnet-4-6', 'claude-haiku-4-5-20251001'],
     minimax: ['abab6.5-chat', 'abab6.5s-chat'],
-    gemini: ['gemini-1.5-pro', 'gemini-1.5-flash'],
-    grok: ['grok-1', 'grok-beta'],
-    bedrock: ['anthropic.claude-3-sonnet-20240229-v1:0', 'amazon.titan-text-express-v1'],
-    openrouter: ['meta-llama/llama-3-70b-instruct', 'mistralai/mistral-7b-instruct'],
-    ollama: ['llama3', 'mistral', 'codellama', 'phi3'],
+    gemini: ['gemini-2.5-pro', 'gemini-2.5-flash', 'gemini-3.1-pro', 'gemini-3.1-pro-preview', 'gemini-3-flash'],
+    grok: ['grok-4.3', 'grok-4', 'grok-4.1-fast', 'grok-3'],
+    bedrock: ['anthropic.claude-opus-4-7-v1:0', 'anthropic.claude-sonnet-4-6-v1:0', 'amazon.titan-text-premier-v1:0'],
+    openrouter: ['meta-llama/llama-4-maverick', 'mistralai/mistral-large-2', 'deepseek/deepseek-r2'],
+    ollama: ['llama3.3', 'phi4', 'mistral', 'codellama', 'deepseek-r2'],
 };
 
 export default function AISettingsModal({ isOpen, onClose }: AISettingsModalProps) {
     const { t } = useLanguage();
     const [config, setConfig] = useState<LLMConfig>({ provider: 'nirium', model: 'nirium-core-v1' });
+    const [savedProvider, setSavedProvider] = useState<string>('nirium');
     const [isTesting, setIsTesting] = useState(false);
     const [testResult, setTestResult] = useState<'success' | 'error' | null>(null);
     const [mounted, setMounted] = useState(false);
     const [isSaving, setIsSaving] = useState(false);
+    const [isDisconnecting, setIsDisconnecting] = useState(false);
 
     useEffect(() => {
         setMounted(true);
         if (isOpen) {
-            setConfig(aiService.getConfig());
+            const cfg = aiService.getConfig();
+            setConfig(cfg);
+            setSavedProvider(cfg.provider);
             setTestResult(null);
-            // Prevent body scroll when modal is open
             document.body.style.overflow = 'hidden';
         } else {
             document.body.style.overflow = 'unset';
@@ -74,6 +77,22 @@ export default function AISettingsModal({ isOpen, onClose }: AISettingsModalProp
         }
     };
 
+    const handleDisconnect = async () => {
+        setIsDisconnecting(true);
+        const result = await aiService.disconnect();
+        setIsDisconnecting(false);
+
+        if (result.success) {
+            toast.success('Protocol disconnected', { description: 'Reverted to Nirium Cloud' });
+            const defaultCfg: LLMConfig = { provider: 'nirium', model: 'nirium-core-v1' };
+            setConfig(defaultCfg);
+            setSavedProvider('nirium');
+            onClose();
+        } else {
+            toast.error('Disconnect failed', { description: result.message });
+        }
+    };
+
     const handleTestOllama = async () => {
         if (!config.ollamaUrl) return;
         setIsTesting(true);
@@ -90,6 +109,8 @@ export default function AISettingsModal({ isOpen, onClose }: AISettingsModalProp
     };
 
     if (!mounted) return null;
+
+    const isExternalConnected = savedProvider !== 'nirium';
 
     const modalContent = (
         <AnimatePresence>
@@ -120,9 +141,17 @@ export default function AISettingsModal({ isOpen, onClose }: AISettingsModalProp
                                     <p className="text-[9px] text-gray-500 uppercase tracking-widest font-black opacity-60">{t.ai_modal.subtitle}</p>
                                 </div>
                             </div>
-                            <button onClick={onClose} className="p-2 text-gray-500 hover:text-white transition-all rounded-lg hover:bg-white/5">
-                                <X size={20} />
-                            </button>
+                            <div className="flex items-center gap-2">
+                                {isExternalConnected && (
+                                    <div className="flex items-center gap-1.5 px-2 py-1 rounded-lg bg-green-500/10 border border-green-500/20">
+                                        <span className="w-1.5 h-1.5 rounded-full bg-green-400 animate-pulse" />
+                                        <span className="text-[8px] font-black text-green-400 uppercase tracking-widest">Live</span>
+                                    </div>
+                                )}
+                                <button onClick={onClose} className="p-2 text-gray-500 hover:text-white transition-all rounded-lg hover:bg-white/5">
+                                    <X size={20} />
+                                </button>
+                            </div>
                         </div>
 
                         {/* Content area with internal scroll */}
@@ -134,15 +163,19 @@ export default function AISettingsModal({ isOpen, onClose }: AISettingsModalProp
                                     {PROVIDERS.map((p) => {
                                         const Icon = p.icon;
                                         const isActive = config.provider === p.id;
+                                        const isSynced = savedProvider === p.id && p.id !== 'nirium';
                                         return (
                                             <button
                                                 key={p.id}
-                                                onClick={() => setConfig({ ...config, provider: p.id as any, model: MODELS[p.id][0] })}
-                                                className={`p-2.5 rounded-xl border text-left transition-all group flex flex-col gap-2 ${isActive
+                                                onClick={() => setConfig({ ...config, provider: p.id as LLMConfig['provider'], model: MODELS[p.id][0] })}
+                                                className={`p-2.5 rounded-xl border text-left transition-all group flex flex-col gap-2 relative ${isActive
                                                     ? 'bg-pulse-violet/15 border-pulse-violet/50 shadow-[0_0_15px_rgba(112,0,255,0.2)]'
                                                     : 'bg-white/[0.02] border-white/5 hover:border-white/15'
                                                     }`}
                                             >
+                                                {isSynced && (
+                                                    <span className="absolute top-1.5 right-1.5 w-1.5 h-1.5 rounded-full bg-green-400 animate-pulse" />
+                                                )}
                                                 <div className={`w-7 h-7 sm:w-8 sm:h-8 rounded-lg flex items-center justify-center transition-colors ${isActive ? 'bg-pulse-violet/20' : 'bg-white/5 group-hover:bg-white/10'}`}>
                                                     <Icon className={`w-3.5 h-3.5 sm:w-4 sm:h-4 ${isActive ? 'text-pulse-violet' : 'text-gray-500 group-hover:text-white'}`} />
                                                 </div>
@@ -239,12 +272,26 @@ export default function AISettingsModal({ isOpen, onClose }: AISettingsModalProp
 
                         {/* Footer */}
                         <div className="p-4 sm:p-5 border-t border-white/5 bg-black/60 flex gap-2 shrink-0">
-                            <button
-                                onClick={onClose}
-                                className="flex-1 py-2.5 rounded-xl bg-white/5 border border-white/10 text-[9px] sm:text-[10px] font-bold text-gray-400 hover:text-white transition-all uppercase tracking-widest"
-                            >
-                                {t.ai_modal.cancel}
-                            </button>
+                            {isExternalConnected ? (
+                                <button
+                                    onClick={handleDisconnect}
+                                    disabled={isDisconnecting}
+                                    className="flex-1 py-2.5 rounded-xl bg-red-950/30 border border-red-500/30 text-[9px] sm:text-[10px] font-bold text-red-400 hover:bg-red-950/50 hover:border-red-500/50 transition-all uppercase tracking-widest flex items-center justify-center gap-2"
+                                >
+                                    {isDisconnecting
+                                        ? <Loader2 size={12} className="animate-spin" />
+                                        : <Unplug size={12} />
+                                    }
+                                    Disconnect
+                                </button>
+                            ) : (
+                                <button
+                                    onClick={onClose}
+                                    className="flex-1 py-2.5 rounded-xl bg-white/5 border border-white/10 text-[9px] sm:text-[10px] font-bold text-gray-400 hover:text-white transition-all uppercase tracking-widest"
+                                >
+                                    {t.ai_modal.cancel}
+                                </button>
+                            )}
                             <button
                                 onClick={handleSave}
                                 disabled={isSaving}

@@ -142,7 +142,7 @@ export default function ManifestoPage() {
                                     <Database className="text-violet-400 mt-1" />
                                     <div>
                                         <strong className="text-white block">USDC Vault Manager</strong>
-                                        <span className="text-gray-500 text-sm">Full lifecycle management for USDC vaults — deposit, yield routing, and auto-rotation across Phoenix and Blend USDC pools.</span>
+                                        <span className="text-gray-500 text-sm">Full lifecycle management for USDC vaults — deposit, rate-optimized routing, and auto-rebalancing across Phoenix and Blend USDC pools.</span>
                                     </div>
                                 </li>
                                 <li className="flex items-start gap-3">

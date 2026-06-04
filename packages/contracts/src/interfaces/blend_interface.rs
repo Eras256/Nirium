@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: Apache-2.0
+// Copyright 2026 Nirium Protocol Contributors
+
 //! Blend Protocol Interface — Lending pool trait definitions.
 //!
 //! Defines the interface for interacting with Blend Protocol on Stellar,

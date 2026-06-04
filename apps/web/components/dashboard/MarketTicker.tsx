@@ -33,7 +33,7 @@ function buildTickers(market: any, prev: any, t: any): TickerItem[] {
     const baseFee = market?.baseFee ?? null;
     const blendApy = market?.blendSupplyApy ?? null;
     const prevBlend = prev?.blendSupplyApy ?? null;
-    const cetesApy = market?.cetesApy ?? 3.38;
+    const cetesApy = market?.cetesRate ?? market?.cetesApy ?? 3.38;
     const prevCetes = prev?.cetesApy ?? 3.38;
 
     return [

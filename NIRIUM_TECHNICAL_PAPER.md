@@ -1,7 +1,7 @@
-# Nirium Protocol: Technical Whitepaper v2.3
+# Nirium Protocol: Technical Whitepaper v2.4
 > Institutional DeFi Infrastructure Powered by Autonomous Agents on Stellar/Soroban
 
-**Version:** 2.3 — May 2026 (Updated May 12, 2026 — Full codebase sync)
+**Version:** 2.4 — June 2026 (Updated Jun 4, 2026 — LLM-driven on-chain execution + clean Supabase sync)
 **Author:** Nirium Protocol Team — Nirium Protocol
 **Network:** Stellar Testnet (Mainnet post-audit)
 **Contact:** xvaiosx7@gmail.com
@@ -10,7 +10,7 @@
 
 ## 1. Abstract
 
-Nirium is institutional DeFi infrastructure that enables fintechs and financial institutions to automate treasury operations, cross-border FX, and cash-flow management using autonomous agents on the Stellar network. The protocol combines Soroban smart contracts with a multi-LLM execution layer, x402 micropayments, MPP session budgets, and a 55-endpoint institutional API — creating a full-stack platform where autonomous agents execute financial strategies on-chain with cryptographic accountability and boardroom-ready audit trails.
+Nirium is institutional DeFi infrastructure that enables fintechs and financial institutions to automate treasury operations, cross-border FX, and cash-flow management using autonomous agents on the Stellar network. The protocol combines Soroban smart contracts with a multi-LLM execution layer, x402 micropayments, MPP session budgets, and a 55-endpoint institutional API (54 HTTP + 1 WebSocket) — creating a full-stack platform where autonomous agents execute financial strategies on-chain with cryptographic accountability and boardroom-ready audit trails.
 
 Nirium addresses two markets simultaneously: institutional clients (B2B/A2A) that need automated treasury infrastructure, and the emerging agentic economy where AI agents pay for intelligence and execution with USDC micropayments. Both markets are served by the same protocol layer.
 
@@ -23,8 +23,8 @@ Nirium addresses two markets simultaneously: institutional clients (B2B/A2A) tha
 ```
 Layer 1 — Interface
   Next.js 15 Dashboard (nirium.xyz)
-  TypeScript SDK v0.5.0 (npm: nirium)
-  Python SDK v0.5.0 (pypi: nirium)
+  TypeScript SDK v0.6.1 (npm: nirium)
+  Python SDK v0.6.1 (pypi: nirium)
   MCP Server (Claude Desktop / Cursor)
 
 Layer 2 — Intelligence & API
@@ -52,7 +52,7 @@ The LLM layer advises. The contract decides. A compromised LLM cannot drain fund
 
 ### 3.1 NiriumVault — Primary Execution Contract
 
-**Contract ID:** `CDHDX63NUYSFCIPJTTS46N5PYLTI7J5WIAIOP7TZSPBNUTLI32AY7GA2`
+**Contract ID:** `CBTWMZCG3P72EHFAQ4ZLSEBIOFYJC244H5J6DHZIJ56FHFWJ2CFAWSZU`
 **Active Vault:** ID 2000 (production, agent delegated)
 
 Core functions:
@@ -72,18 +72,19 @@ Core functions:
 
 | Contract | ID | Purpose |
 |---|---|---|
-| Protocol Reputation (ELO) | `CC6Z3WJWRKVEAXEKIQ5S3LFEMKRF4L2FTN5YZDQU27MQRQAWA5QBJWF2` | On-chain agent performance scoring (ELO 1200 base, K=32) |
-| Strategy Marketplace | `CB6Q3LKBJ7CAAZY4MK7EG5R6FDDTJHB52ZEENI6BQLBJNFKBQRIAUABC` | Strategy CID registry, ELO-weighted subscriptions |
-| Protocol Sentinel | `CCP5OY3TTDVIREQYGOUZUXS2MZJO3LLJD6Z22Z3VROWFCPJAON22WPY2` | Agent performance reporting, score storage |
-| Settlement Hub | `CANZP2OJUS2Y5VXE4YHRR75LE2WKE7QTJOCCWENR7X65DWE6QEJZV6KS` | MPP session escrow (open/settle/close) |
-| Skill Vault | `CB4JM3PP7GWKJUAYIZ7ZULWFTFJ57FTTUFZTFIDF4JCAPF664OJCXIEI` | x402 payment gate, atomic skill unlock |
+| Protocol Reputation (ELO) | `CC2TU5BDTKTPRRRQPEF77I54XYHFQ25XGIRO2TCWKSR7NRJDFR5L5NR5` | On-chain agent performance scoring (ELO 1200 base, K=32) |
+| Strategy Marketplace | `CC2TU5BDTKTPRRRQPEF77I54XYHFQ25XGIRO2TCWKSR7NRJDFR5L5NR5` | Strategy CID registry, ELO-weighted subscriptions |
+| Protocol Sentinel | `CC2TU5BDTKTPRRRQPEF77I54XYHFQ25XGIRO2TCWKSR7NRJDFR5L5NR5` | Agent performance reporting, score storage |
+| Settlement Hub | `CC2TU5BDTKTPRRRQPEF77I54XYHFQ25XGIRO2TCWKSR7NRJDFR5L5NR5` | MPP session escrow (open/settle/close) |
+| Skill Vault | `CC2TU5BDTKTPRRRQPEF77I54XYHFQ25XGIRO2TCWKSR7NRJDFR5L5NR5` | x402 payment gate, atomic skill unlock |
 
-**Soroban source modules** (`packages/contracts/src/`):
+**Soroban source modules** (`packages/contracts/src/` + independent sub-crates):
 - `nirium_vault.rs` — Core vault, flash loans, agent delegation, 2-of-3 multisig emergency pause
 - `agent_auth.rs` — Delegation validation utilities, permission level system (Owner/Agent/ReadOnly)
 - `bounty_registry.rs` — Agent bounty tracking registry
 - `elo_reputation.rs` — ELO scoring engine (base 1200, K=32), deployed as Protocol Reputation contract
 - `strategy_marketplace.rs` — Strategy CID registry with token-spoofing fix (canonical USDC stored at init)
+- Sub-crates: `hub/` (nirium-hub), `elo/` (nirium-elo), `marketplace/` (nirium-marketplace), `sentinel/` (nirium-sentinel), `skill-vault/` (nirium-skill-vault)
 
 ---
 
@@ -91,7 +92,7 @@ Core functions:
 
 ### 4.1 Overview
 
-The Nirium API (`nirium-agent.fly.dev`) exposes 55 endpoints across 11 categories, deployed on Railway with Express 5 and Node 20.
+The Nirium API (`nirium-agent.fly.dev`) exposes 55 endpoints (54 HTTP + 1 WebSocket) across 11 categories, deployed on Railway with Express 5 and Node 20.
 
 **Authentication tiers:**
 
@@ -172,7 +173,9 @@ Institution or treasury manager locks USDC in a Soroban escrow session via `open
 
 The `@nirium/mcp` package implements a Model Context Protocol server exposing Nirium as tools for Claude Desktop, Cursor, VS Code Copilot, and any MCP-compatible AI agent.
 
-Free tools (no auth): `get_market_state`, `get_loop_status`, `execute_demo`, `get_wallet_info`
+Free tools (no auth): `get_market_state`, `get_loop_status`, `execute_demo`
+
+Info tools (no auth): `get_wallet_info` — shows x402/MPP session configuration
 
 Authenticated tools (NIRIUM_API_KEY required): `start_loop`, `stop_loop`, `get_system_health`
 
@@ -203,6 +206,10 @@ Nirium abstracts LLM interaction across 8 providers, configurable at deploy time
 **2. Execution Cluster Orchestration:** Dynamically activates or suppresses agent classes based on market regime (high volatility → risk protection agents active; deep liquidity → arbitrage agents racing; macro event pending → execution pause).
 
 **3. Audit Log Generation:** Translates raw XDR transactions to boardroom-readable summaries in real time. Compliance teams audit every agent action without blockchain expertise.
+
+### 6.2.1 LLM-Gated Treasury Execution
+
+The autonomous loop's rebalance decision is gated by the LLM, not a hardcoded rule. Each throttled cycle, the agent presents the live treasury context to the reasoner — CETES sovereign yield via Etherfuse versus the rebalance threshold, idle-USDC opportunity cost, network base fee — and the LLM returns a structured `{action, confidence, reasoning}`. The on-chain `execute_soroswap_swap` is submitted only when the LLM returns `rebalance` above a configurable confidence floor (`AGENT_LLM_MIN_CONFIDENCE`, default 0.75); otherwise the agent holds and records its reasoning. The decision, confidence, and reasoning are persisted alongside the resulting transaction hash and IPFS audit CID — so every autonomous execution is traceable back to the exact reasoning that authorized it.
 
 ### 6.3 LLM Privacy Boundary (Non-Negotiable)
 
@@ -249,8 +256,8 @@ For institutional clients: fee structure is 0.5% B2B (Regulated Operator rate) t
 
 ## 9. Security
 
-### 9.1 JARGUS Audit v3.0 (April 2026)
-Internal security framework (Kali Linux). Result: **83/83 PASS, 0 critical, 0 high.**
+### 9.1 JARGUS Audit v3.0 (May 2026)
+Internal security framework (Kali Linux, 7-pillar methodology). Result: **83/83 PASS, 0 critical, 0 high.**
 
 | Pillar | Score |
 |---|---|
@@ -259,6 +266,7 @@ Internal security framework (Kali Linux). Result: **83/83 PASS, 0 critical, 0 hi
 | Frontend & obfuscation | 12/12 |
 | Supply chain & CI/CD | 8/8 |
 | Regulatory compliance (MX/US) | 6/6 |
+| Pentesting (network/infra) | 5/5 |
 | JARGUS full-spectrum | 22/22 |
 
 ### 9.2 Smart Contract Security
@@ -292,7 +300,7 @@ SEP-10, SEP-24, SEP-31, SEP-12/Travel Rule, Bug Bounty, Proof of Reserves, Sanct
 
 ## 10. SDKs
 
-Both SDKs verified 33/33 endpoints against live API (April 2026, v0.5.0).
+Both SDKs verified against live API (May 2026, v0.6.1).
 
 ### TypeScript (Node.js ≥ 18)
 ```bash
@@ -372,7 +380,7 @@ All revenue streams classified as software licensing under LRITF Art. 22, LMV Ar
 
 Nirium is the infrastructure layer where institutional DeFi and the agentic economy converge on Stellar. Institutions get automated treasury operations with full auditability and compliance-ready output. AI agents get a protocol they can pay into and execute against without human intermediation.
 
-The protocol's deployment on Stellar Testnet — 55 API endpoints, 30 autonomous agents, 6 Soroban contracts, x402/MPP payment protocols, multi-LLM support, MCP server (12 tools, 13/13 PASS), published SDKs (npm + PyPI), JARGUS-verified security (83/83 PASS), — establishes the architectural foundation for mainnet readiness pending formal third-party audit.
+The protocol's deployment on Stellar Testnet — 55 API endpoints (54 HTTP + 1 WebSocket), 30 autonomous agents, 6 Soroban contracts (with 5 independent sub-crates), x402/MPP payment protocols, multi-LLM support, MCP server (12 tools, 13/13 PASS), published SDKs (npm + PyPI), JARGUS-verified security (83/83 PASS, AAA Grade) — establishes the architectural foundation for mainnet readiness pending formal third-party audit.
 
 ---
 

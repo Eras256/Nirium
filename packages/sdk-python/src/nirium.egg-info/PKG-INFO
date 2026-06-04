@@ -1,23 +1,28 @@
 Metadata-Version: 2.4
 Name: nirium
-Version: 0.5.0
+Version: 0.6.1
 Summary: Official Python SDK for Nirium autonomous agents on Stellar (x402 + MPP)
-Author: Nirium Protocol
-License: MIT
-Project-URL: Homepage, https://nirium.dev
+Author: Nirium Team
+Author-email: Nirium Protocol <xvaiosx7@gmail.com>
+License-Expression: MIT
+Project-URL: Homepage, https://nirium.xyz
 Project-URL: Repository, https://github.com/nirium/nirium
-Project-URL: Documentation, https://nirium.dev/docs
-Keywords: nirium,stellar,defi,sdk,soroban,agent,x402,mpp,agentic-payments,usdc
+Project-URL: Documentation, https://nirium.xyz/docs
+Project-URL: Bug Tracker, https://github.com/nirium/nirium/issues
+Keywords: nirium,stellar,soroban,defi,sdk,agent,autonomous,treasury,x402,mpp,agentic-payments,usdc,cetes,etherfuse,rwa
 Requires-Python: >=3.9
 Description-Content-Type: text/markdown
 Requires-Dist: aiohttp>=3.9.0
 Requires-Dist: websockets>=13.0
 Requires-Dist: stellar-sdk>=11.0.0
+Dynamic: author
 Dynamic: requires-python
 
 # nirium
 
-Official Python SDK for the **Nirium Protocol** — autonomous DeFi agent on Stellar/Soroban.
+Official Python SDK for the **Nirium Protocol** — autonomous AI treasury infrastructure on Stellar/Soroban.
+
+Nirium agents rebalance USDC ↔ CETES (tokenized Mexican T-bills via Etherfuse) 24/7 without human intervention. Built for developers who want to integrate autonomous treasury management, agentic payments (x402 + MPP), and real-time market signals into their applications.
 
 ## Install
 
@@ -45,9 +50,9 @@ async def main():
     market = await agent.get_market()
     print(f"XLM Price: ${market['xlmPrice']:.4f}")
 
-    # Execute a strategy
-    result = await agent.execute("flash-loan-arb", "XLM-USDC", {"amount": 5000})
-    print(f"Profit: {result['profit']}")
+    # Execute a treasury rebalance strategy
+    result = await agent.execute("blend-yield", "USDC", {"amount": 5000})
+    print(f"Success: {result['success']} | TX: {result.get('txHash')}")
 
 asyncio.run(main())
 ```
@@ -74,6 +79,28 @@ agent = Agent(api_url="https://nirium-agent.fly.dev", api_key="sk_inst_...")
 agent = Agent(api_url="https://nirium-agent.fly.dev", api_key="sk_inst_...", token="eyJhbG...")
 ```
 
+## Payment Protocols
+
+### x402 — Pay-Per-Request
+```python
+agent.init_x402(
+    secret_key="S...",          # Stellar secret key
+    network="stellar:testnet"
+)
+
+response = await agent.x402_fetch("https://nirium-agent.fly.dev/api/v1/premium/signals")
+```
+
+### MPP — Session-Based Budget Delegation
+```python
+agent.init_mpp(
+    secret_key="S...",
+    network="stellar:testnet",
+)
+
+response = await agent.mpp_fetch("https://nirium-agent.fly.dev/api/v1/mpp/signals")
+```
+
 ### Endpoint Access Model
 
 | Access | Endpoints |
@@ -81,6 +108,8 @@ agent = Agent(api_url="https://nirium-agent.fly.dev", api_key="sk_inst_...", tok
 | **Public** (no key) | `health`, `loop/status`, `execute-demo`, `signals/recent`, `skills` list |
 | **Protected** (API key) | `execute`, `market`, `loop/start\|stop\|scan`, `subscriptions`, `skills/install`, `webhooks` |
 | **WebSocket** (JWT) | `/ws/signals` — real-time signal stream |
+| **x402 Premium** | `/api/v1/premium/signals` ($0.02 USDC), `/api/v1/premium/market` ($0.05 USDC) |
+| **MPP** | `/api/v1/mpp/signals`, `/api/v1/mpp/market` |
 
 ## API Coverage
 
@@ -89,16 +118,30 @@ agent = Agent(api_url="https://nirium-agent.fly.dev", api_key="sk_inst_...", tok
 | Health | `ping()`, `health()`, `system_health()` |
 | Execution | `execute()`, `execute_demo()` |
 | Market | `get_tickers()`, `get_market()`, `get_stats()`, `get_loop_status()`, `start_loop()`, `stop_loop()`, `trigger_scan()` |
-| Signals | `get_recent_signals()` |
-| Skills | `get_skills()`, `install_skill()`, `uninstall_skill()` |
+| Signals | `create_subscription()`, `get_subscriptions()`, `delete_subscription()`, `get_subscription_stats()`, `get_recent_signals()` |
+| Skills | `get_skills()`, `install_skill()`, `uninstall_skill()`, `get_skill_marketplace()`, `execute_skill_action()` |
+| Strategies | `get_strategies()` |
 | Webhooks | `register_webhook()`, `get_webhooks()`, `delete_webhook()`, `test_webhook()` |
+| Auth | `get_auth_token()`, `create_auth_key()`, `get_auth_keys()`, `revoke_auth_key()` |
+| Revenue | `get_revenue()`, `get_info()` |
+| Admin | `configure_llm()` |
 | WebSocket | `subscribe()`, `on()` decorator |
+| x402 Payments | `init_x402()`, `x402_fetch()` |
+| MPP Payments | `init_mpp()`, `mpp_fetch()` |
 
 ## Requirements
 
 - Python >= 3.10
 - aiohttp >= 3.9.0
 - websockets >= 13.0
+
+## Links
+
+- [Documentation](https://nirium.xyz/docs)
+- [Developer Sandbox](https://nirium.xyz/sandbox)
+- [API Reference](https://nirium.xyz/docs/api)
+- [MCP Server Integration](https://nirium.xyz/docs/mcp)
+- [GitHub](https://github.com/nirium/nirium)
 
 ## License
 

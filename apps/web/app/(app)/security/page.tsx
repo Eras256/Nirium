@@ -211,11 +211,11 @@ export default function SecurityPage() {
                             <span className="text-xs text-stellar-teal/80 font-mono">Stellar Testnet</span>
                         </div>
                         <code className="text-sm text-white/80 font-mono break-all block">
-                            CAU2XBJTQUBTMPAUFRX7GMZ337I5WLBI4GYPWHZEVXTMJ66D3CP6DEL4
+                            CBTWMZCG3P72EHFAQ4ZLSEBIOFYJC244H5J6DHZIJ56FHFWJ2CFAWSZU
                         </code>
                         <div className="mt-4 flex flex-wrap gap-3">
                             <a
-                                href="https://stellar.expert/explorer/testnet/contract/CAU2XBJTQUBTMPAUFRX7GMZ337I5WLBI4GYPWHZEVXTMJ66D3CP6DEL4"
+                                href="https://stellar.expert/explorer/testnet/contract/CBTWMZCG3P72EHFAQ4ZLSEBIOFYJC244H5J6DHZIJ56FHFWJ2CFAWSZU"
                                 target="_blank"
                                 rel="noopener"
                                 className="inline-flex items-center gap-2 text-xs text-stellar-teal hover:underline"

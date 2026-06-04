@@ -97,7 +97,7 @@ export default function OpsConsole({ isExpanded, onToggleExpand, walletAddress, 
                 </button>
             </div>
 
-            <div ref={logContainerRef} className="flex-1 bg-black/50 p-4 font-mono text-[10px] overflow-y-auto custom-scrollbar">
+            <div ref={logContainerRef} className="flex-1 bg-black/50 p-4 font-mono text-[10px] overflow-y-auto custom-scrollbar min-h-0">
                 <div className="space-y-1.5">
                     {status === 'unavailable' && (
                         <div className="text-yellow-600 italic">No database connection.</div>
@@ -173,6 +173,30 @@ export default function OpsConsole({ isExpanded, onToggleExpand, walletAddress, 
                     })}
                     </AnimatePresence>
                 </div>
+            </div>
+            {/* Deployed Contracts Footer */}
+            <div className="shrink-0 border-t border-white/5 bg-black/30 px-4 py-2 flex flex-wrap items-center gap-x-4 gap-y-1">
+                <span className="text-[7px] font-mono text-white/20 uppercase tracking-[0.2em]">Soroban Testnet</span>
+                <div className="h-2 w-px bg-white/10 hidden sm:block" />
+                <a
+                    href="https://stellar.expert/explorer/testnet/contract/CBTWMZCG3P72EHFAQ4ZLSEBIOFYJC244H5J6DHZIJ56FHFWJ2CFAWSZU"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-center gap-1.5 group"
+                >
+                    <span className="text-[7px] font-mono text-white/20 group-hover:text-stellar-teal/60 transition-colors">NiriumVault</span>
+                    <span className="text-[7px] font-mono text-stellar-teal/40 group-hover:text-stellar-teal transition-colors tracking-wider">CBTWMZ…AWSZU</span>
+                </a>
+                <div className="h-2 w-px bg-white/10 hidden sm:block" />
+                <a
+                    href="https://stellar.expert/explorer/testnet/contract/CC2TU5BDTKTPRRRQPEF77I54XYHFQ25XGIRO2TCWKSR7NRJDFR5L5NR5"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-center gap-1.5 group"
+                >
+                    <span className="text-[7px] font-mono text-white/20 group-hover:text-stellar-teal/60 transition-colors">NiriumProtocol</span>
+                    <span className="text-[7px] font-mono text-stellar-teal/40 group-hover:text-stellar-teal transition-colors tracking-wider">CC2TU5…L5NR5</span>
+                </a>
             </div>
         </motion.div>
     );

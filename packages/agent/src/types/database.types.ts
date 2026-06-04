@@ -1,4 +1,9 @@
+// SPDX-License-Identifier: Apache-2.0
+// Copyright 2026 Nirium Protocol Contributors
+
 export type SignalType =
+    | 'cetes_rebalance_opportunity'
+    | 'cetes_exit_opportunity'
     | 'path_arbitrage_opportunity'
     | 'cross_dex_opportunity'
     | 'blend_yield_shift'
@@ -45,7 +50,7 @@ export interface MarketState {
 }
 
 export interface AIDecision {
-    action: 'buy' | 'sell' | 'hold';
+    action: 'buy' | 'sell' | 'hold' | 'rebalance';
     confidence: number;
     reasoning: string;
     timestamp: string;

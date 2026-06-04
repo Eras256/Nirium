@@ -1,11 +1,7 @@
 [workspace]
 members = [
     "packages/contracts",
-    "packages/contracts/elo",
-    "packages/contracts/marketplace",
-    "packages/contracts/sentinel",
-    "packages/contracts/hub",
-    "packages/contracts/skill-vault",
+    "packages/contracts/protocol",
 ]
 resolver = "2"
 

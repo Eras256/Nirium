@@ -1,77 +1,114 @@
-# --- NIRIUM SHOWROOM .gitignore --- (BSL 1.1 Public Distribution)
-
-# Node/PNPM
 node_modules/
-.npmrc
-pnpm-lock.yaml
-package-lock.json
-
-# Build / Transpiled
+**/node_modules/
 dist/
-build/
-target/
-.vercel
-.next/
-out/
-*.tsbuildinfo
+**/dist/
+.turbo/
+**/ .turbo/
+/.pnpm-debug.log*
+/.next-internal
 
-# ══════════════════════════════════════════════════
-# SECRETOS — NUNCA DEBEN APARECER EN EL SHOWROOM
-# ══════════════════════════════════════════════════
+# next.js
+/.next/
+/out/
+
+# production
+/build
+
+# misc
+.DS_Store
+*.pem
+
+# debug
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# local env files
+.env*.local
+
+# vercel
+.vercel
+
+# typescript
+*.tsbuildinfo
+next-env.d.ts
+
+# Rust / Soroban
+/target/
+target/
+**/target/
+Cargo.lock
+*.wasm
+
+
+
+# ---------------------------------------------
+# AI Agent Generated Documentation (Ignored)
+# ---------------------------------------------
+# Ignoring prompts and plans generated for other networks/hackathons
+# Ignore all root markdown files except core documentation
+*.md
+!README.md
+!CONTRIBUTING.md
+!NIRIUM_TECHNICAL_PAPER.md
+!DEMO_SCRIPT.md
+!SECURITY.md
+!SECURITY_AUDIT_V2.md
+!claude.md
+!IsacapKey.md
+!SDKs.md
+!MCP_INTEGRATION_GUIDE.md
+!MARKETING_PLAN_APRIL_2026.md
+!Pitch_Alberto_Stellar_House_CDMX.md
+!Playbook_Stellar_House_CDMX.md
+!SCF_Pitch_Deck_Completo.md
+!Elevator_Pitches.md
+!CODE_OF_CONDUCT.md
+!LICENSING.md
+!SCF_Pitch_Deck_REFINED.md
+!INTERNAL_SECURITY_AUDIT.md
+!supanirium.md
+
+# Ignoring plans generated if any
+implementation_plan.json
+
+# Internal product strategy docs (not committed)
+nodos.md
+qapitch.md
+
+# Secrets
 .env
 .env.*
-*.env
-*.env.local
-.env.local
-.contract-ids.env
-central_issuer.json
-packages/agent/.env
-apps/web/.env.local
 
-# ══════════════════════════════════════════════════
-# LOGICA PROPIETARIA — PROTEGIDA (STUBS EN SU LUGAR)
-# ══════════════════════════════════════════════════
-packages/agent/src/services/swarm/
-packages/agent/src/execution/executeStrategy.ts
-packages/agent/src/providers/llm/
-packages/agent/scripts/
-scripts/surgical_filter.sh
-scripts/public_export.sh
+# AI config
+.gemini/
 
-# ══════════════════════════════════════════════════
-# INFRAESTRUCTURA INTERNA
-# ══════════════════════════════════════════════════
-db_scripts/
-supabase/
-fuzz/
-bin/
-
-# ══════════════════════════════════════════════════
-# AI / INSTRUCCIONES INTERNAS
-# ══════════════════════════════════════════════════
-.claude/
-claude.md
-.agent/
-
-# ══════════════════════════════════════════════════
-# DIRECTORIOS DE TRABAJO
-# ══════════════════════════════════════════════════
-nirium-public-rebuilt/
-nirium-public-showroom/
-tmp/
-tmp-sdk-test/
-
-# IDE
-.DS_Store
-.idea/
-.vscode/
+# Benchmarking
+# Python / Local Dev Extras
+.venv/
+**/.venv/
+venv/
+**/venv/
 *.log
+.pyre_configuration
+pyrightconfig.json
+apps/web/.env.local
+nirium-soroban-contracts/
+*.map
+arbitrumagents.md
+agent_*_keys.json
 
 # Compliance (internal docs - gitignored)
 compliance/eligibility-checklist.md
 compliance/social-media-guide.md
 compliance/video-demo-script.md
 compliance/out-of-scope-findings.md
+# Note: claude.md is tracked (see !claude.md exception above)
 
-# JARGUS — propietario interno, nunca debe entrar al repo público
-jargus/
+# JARGUS — Framework propietario de Gio Vargas (pentesting)
+# Tracked en el repo PRIVADO — nunca sincronizar al repo público
+# (el script de sync solo copia README/SECURITY/SDKs/TECHNICAL_PAPER)
+
+# Working/throwaway dirs (local only)
+scratch/
+.vercel-backup/

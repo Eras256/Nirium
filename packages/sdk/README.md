@@ -1,6 +1,8 @@
 # nirium
 
-Official TypeScript SDK for the **Nirium Protocol** — autonomous DeFi agent infrastructure on Stellar/Soroban.
+Official TypeScript SDK for the **Nirium Protocol** — autonomous AI treasury infrastructure on Stellar/Soroban.
+
+Nirium agents rebalance USDC ↔ CETES (tokenized Mexican T-bills via Etherfuse) 24/7 without human intervention. Built for developers who want to integrate autonomous treasury management, agentic payments (x402 + MPP), and real-time market signals into their applications.
 
 ## Install
 
@@ -26,9 +28,9 @@ console.log('Agent alive:', alive);
 const market = await agent.getMarket();
 console.log('XLM Price:', market.xlmPrice);
 
-// Execute a strategy
-const result = await agent.execute('flash-loan-arb', 'XLM-USDC', { amount: 5000 });
-console.log('Profit:', result.profit);
+// Execute a treasury rebalance strategy
+const result = await agent.execute('blend-yield', 'USDC', { amount: 5000 });
+console.log('Result:', result.success, result.txHash);
 
 // Real-time signals via WebSocket
 agent.subscribe((signal) => {
@@ -43,9 +45,13 @@ agent.subscribe((signal) => {
 | Health | `ping()`, `health()`, `systemHealth()` |
 | Execution | `execute()`, `executeDemo()` |
 | Market | `getTickers()`, `getMarket()`, `getStats()`, `getLoopStatus()`, `startLoop()`, `stopLoop()`, `triggerScan()` |
-| Signals | `createSubscription()`, `getRecentSignals()` |
-| Skills | `getSkills()`, `installSkill()`, `uninstallSkill()` |
+| Signals | `createSubscription()`, `getSubscriptions()`, `deleteSubscription()`, `getSubscriptionStats()`, `getRecentSignals()` |
+| Skills | `getSkills()`, `installSkill()`, `uninstallSkill()`, `getSkillMarketplace()`, `executeSkillAction()` |
+| Strategies | `getStrategies()` |
 | Webhooks | `registerWebhook()`, `getWebhooks()`, `deleteWebhook()`, `testWebhook()` |
+| Auth | `getAuthToken()`, `createAuthKey()`, `getAuthKeys()`, `revokeAuthKey()` |
+| Revenue | `getRevenue()`, `getInfo()` |
+| Admin | `configureLLM()` |
 | WebSocket | `subscribe()`, `onLog()`, `disconnect()` |
 | x402 Payments | `initX402()`, `x402Fetch()` |
 | MPP Payments | `initMpp()`, `mppFetch()` |
@@ -99,7 +105,8 @@ const data = await response.json();
 | **Public** (no key) | `health`, `loop/status`, `execute-demo`, `signals/recent`, `skills` list |
 | **Protected** (API key) | `execute`, `market`, `loop/start\|stop\|scan`, `subscriptions`, `skills/install`, `webhooks` |
 | **WebSocket** (JWT) | `/ws/signals` — real-time signal stream |
-| **x402 Premium** | `/api/v1/premium/signals` ($0.02), `/api/v1/premium/market` ($0.05) |
+| **x402 Premium** | `/api/v1/premium/signals` ($0.02 USDC), `/api/v1/premium/market` ($0.05 USDC) |
+| **MPP** | `/api/v1/mpp/signals`, `/api/v1/mpp/market` |
 
 ## Requirements
 
@@ -108,10 +115,12 @@ const data = await response.json();
 
 ## Links
 
-- [Full SDK Documentation](../../SDKs.md)
-- [API Documentation](../../API_DOCUMENTATION_OPENAPI.yaml)
-- [MCP Integration Guide](../../MCP_INTEGRATION_GUIDE.md)
+- [Documentation](https://nirium.xyz/docs)
+- [Developer Sandbox](https://nirium.xyz/sandbox)
+- [API Reference](https://nirium.xyz/docs/api)
+- [MCP Server Integration](https://nirium.xyz/docs/mcp)
+- [GitHub](https://github.com/nirium/nirium)
 
 ## License
 
-MIT — Nirium Protocol
+Apache 2.0 — Nirium Protocol

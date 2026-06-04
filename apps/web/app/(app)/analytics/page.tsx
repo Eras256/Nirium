@@ -14,6 +14,8 @@ import { useEffect, useState, useRef } from "react";
 import { useLanguage } from "@/context/LanguageContext";
 import OpsConsole from "@/components/layout/OpsConsole";
 import { ComplianceBanner, AtomicProofBadge } from "@/components/ui/ComplianceBanner";
+import { useEloReputation } from "@/hooks/useNiriumContracts";
+import { getCETESBalance, vaultGetVaultCount, vaultGetTotalFees } from "@/lib/sorobanContracts";
 
 // ── StatCard ──────────────────────────────────────────────────────────────
 const StatCard = ({ title, value, change, icon: Icon, color, status }: any) => (
@@ -80,9 +82,34 @@ export default function AnalyticsPage() {
     const latency = 142;
     const logContainerRef = useRef<HTMLDivElement>(null);
 
+    // ── Live on-chain stats ──────────────────────────────────────────────────
+    const [vaultCount, setVaultCount] = useState<string>('—');
+    const [feesCollected, setFeesCollected] = useState<string>('—');
+    const [cetesBalance, setCetesBalance] = useState<string>('—');
+    const [eloScore, setEloScore] = useState<string>('—');
+    const [cetesRate, setCetesRate] = useState<string>('—');
+    const elo = useEloReputation();
+
     useEffect(() => {
         setChartData(generateHistory(7, 4));
     }, [timeRange]);
+
+    useEffect(() => {
+        // Fetch on-chain metrics
+        vaultGetVaultCount().then(n => setVaultCount(String(n))).catch(() => {});
+        vaultGetTotalFees().then(f => setFeesCollected(`${(Number(f) / 10_000_000).toFixed(2)} XLM`)).catch(() => {});
+
+        if (accountStr) {
+            getCETESBalance(accountStr).then(b => setCetesBalance(`${Number(b).toFixed(2)} CETES`)).catch(() => {});
+            elo.getScore(accountStr).then(s => setEloScore(String(s))).catch(() => {});
+        }
+
+        // Fetch live CETES rate from agent API
+        fetch('https://nirium-agent.fly.dev/api/tickers')
+            .then(r => r.json())
+            .then(d => { if (d.cetesRate) setCetesRate(`${d.cetesRate.toFixed(2)}%`); })
+            .catch(() => {});
+    }, [accountStr]);
 
     return (
         <main className="min-h-screen pt-8 px-4 pb-20 relative overflow-hidden flex flex-col bg-nirium-obsidian">
@@ -123,42 +150,43 @@ export default function AnalyticsPage() {
 
                 <ComplianceBanner />
 
-                {/* KPI Grid */}
+                {/* KPI Grid — live on-chain data */}
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4 mb-8">
                     <StatCard
-                        title="Liquid Vault Balance"
-                        value="1.00"
-                        change="READY"
+                        title="CETES Balance"
+                        value={cetesBalance}
+                        change="ON-CHAIN"
                         icon={Wallet}
                         color="text-stellar-teal"
-                        status="READY"
+                        status="LIVE"
                     />
                     <StatCard
-                        title="Autonomous Nodes"
-                        value="6"
-                        change="MONITORING"
+                        title="Vaults On-Chain"
+                        value={vaultCount}
+                        change="SOROBAN"
                         icon={Server}
                         color="text-stellar-yellow"
-                        status="PROCESSING"
+                        status="LIVE"
                     />
                     <StatCard
-                        title="24H Efficiency Delta"
-                        value="+0.04%"
-                        change="Optimized"
+                        title="ELO Score"
+                        value={eloScore}
+                        change="REPUTATION"
                         icon={TrendingUp}
                         color="text-green-400"
+                        status="LIVE"
                     />
                     <StatCard
-                        title="CETES Inventory"
-                        value="$2,001"
-                        change="ETHERFUSE"
+                        title="Fees Collected"
+                        value={feesCollected}
+                        change="PROTOCOL"
                         icon={Database}
                         color="text-blue-400"
                         status="LIVE"
                     />
                     <StatCard
                         title="CETES Rate (Banxico)"
-                        value="3.38%"
+                        value={cetesRate}
                         change="REF. ONLY"
                         icon={Shield}
                         color="text-stellar-teal"

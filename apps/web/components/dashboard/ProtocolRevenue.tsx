@@ -24,6 +24,7 @@ interface RevenueStats {
 }
 
 import { useLanguage } from "@/context/LanguageContext";
+import { useEloReputation } from "@/hooks/useNiriumContracts";
 
 export default function ProtocolRevenue({ compact = false }: { compact?: boolean }) {
     const { t } = useLanguage();
@@ -40,6 +41,14 @@ export default function ProtocolRevenue({ compact = false }: { compact?: boolean
     const prevEventsCount = useRef(0);
 
     const treasury = "GC4Q5TWWXI7IHN6DYCBEKCOWJWCKY4JE2NLKLU5SE3YL44IUUFPKUOPC";
+    const elo = useEloReputation();
+
+    // Fetch real ELO score from NiriumProtocol contract on Soroban
+    useEffect(() => {
+        elo.getScore(treasury)
+            .then((score: number) => { if (score > 0) setStats(prev => ({ ...prev, eloHealth: score })); })
+            .catch(() => {}); // fallback stays at 1450
+    }, []);
 
     const fetchRevenue = useCallback(async () => {
         try {

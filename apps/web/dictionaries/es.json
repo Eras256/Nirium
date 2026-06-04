@@ -22,7 +22,9 @@
         "compliance": "Compliance",
         "developers": "Developers",
         "pricing": "Precios",
-        "launch_app": "Launch app"
+        "launch_app": "Launch app",
+        "coming_soon_nav": "PRÓXIMAMENTE",
+        "back_to_marketing": "← Inicio"
     },
     "footer": {
         "protocol": "Nirium",
@@ -113,7 +115,7 @@
     "home": {
         "hero_title_1": "PAGOS GLOBALES &",
         "hero_title_2": "TESORERÍA AUTÓNOMA",
-        "hero_subtitle": "Envía pagos cross-border al 1.4% total y optimiza liquidez en piloto automático. Infraestructura institucional de software sobre Stellar.",
+        "hero_subtitle": "Aprovisionamiento autónomo de CETES vía Etherfuse. Licencia de software desde $299/mo + por llamada API. Infraestructura institucional sobre Stellar (Testnet).",
         "hero_disclaimer": "Infraestructura software-only en testnet. Fees indicativos basados en condiciones actuales de mercado Stellar SDEX. No es un servicio de remesas.",
         "launch_dashboard": "VER EN ACCIÓN",
         "read_protocol": "CÓMO FUNCIONA",
@@ -125,7 +127,7 @@
             "title": "COMPARA",
             "span": "Y DECIDE",
             "subtitle": "El costo real de mover dinero entre países. Nirium ya incluye el spread del mercado.",
-            "disclaimer": "Fees indicativos en Stellar Testnet. El corredor de mercado (0.8%) depende de liquidez en SDEX. Nirium provee infraestructura de software — no es operador de remesas.",
+            "disclaimer": "Fees indicativos en Stellar Testnet. Nirium cobra licencias de software fijas. Los costos de ejecución Etherfuse (~0.20%) son cobrados directamente por Etherfuse. El partner regulado define sus comisiones financieras.",
             "col_provider": "Proveedor",
             "col_cost": "Costo All-in",
             "col_speed": "Liquidación",
@@ -169,7 +171,7 @@
                 }
             ],
             "nirium_name": "Nirium Protocol",
-            "nirium_cost": "~1.4% all-in",
+            "nirium_cost": "~0.8% all-in",
             "nirium_speed": "3–5 segundos",
             "nirium_custody": "Sí (Multifirma)",
             "nirium_yield": "Sí (Soroban)",
@@ -218,7 +220,7 @@
         "elo_cta": "VER LA TABLA",
         "contracts_title": "ARQUITECTURA",
         "contracts_span": "SOROBAN",
-        "contracts_subtitle": "Infraestructura descentralizada verificable. Audita en tiempo real los 5 contratos inteligentes principales que operan el protocolo en Stellar.",
+        "contracts_subtitle": "Infraestructura descentralizada verificable. Audita en tiempo real los 2 contratos inteligentes principales que operan el protocolo en Stellar.",
         "contract_role_vault": "Custodia multifirma (Non-Custodial)",
         "contract_role_sentinel": "Motor de validación de invariantes",
         "contract_role_elo": "Registro inmutable de reputación",
@@ -300,7 +302,7 @@
         "dual_species_span": "FLEXIBLE",
         "dual_species_subtitle": "Infraestructura diseñada tanto para operadores financieros como para equipos de ingeniería.",
         "dual_species_human_title": "Para Tesorería y Operaciones",
-        "dual_species_human_desc": "Panel de control institucional para gestionar liquidez cross-border, monitorear ejecución y aprobar transacciones multifirma. Sin curva de aprendizaje técnico.",
+        "dual_species_human_desc": "Kit de operaciones de tesorería para equipos DevOps y fintech — control programático de vaults, multifirma y auditorías de compliance vía SDK. Sin riesgo custodial.",
         "dual_species_human_cta": "Explorar Consola",
         "dual_species_agent_title": "Para Equipos de Ingeniería",
         "dual_species_agent_desc": "Integración nativa vía SDKs (TypeScript/Python) y APIs REST. Despliega infraestructura financiera global (MPP, x402) en tu propio stack en cuestión de horas.",
@@ -356,11 +358,11 @@
             "items": {
                 "liquidity": {
                     "name": "PAGOS CROSS-BORDER",
-                    "desc": "Motor FX institucional. MXN→USDC→destino al ~1.4% total con liquidación en 3–5 segundos en Stellar SDEX."
+                    "desc": "Motor institucional. Aprovisionamiento USDC→CETES al ~0.8% total (SDK + Etherfuse) con liquidación en 3–5 segundos."
                 },
                 "b2b": {
                     "name": "RWA TOKENIZER",
-                    "desc": "CETES vía Etherfuse en Stellar. Widget white-label para que fintechs ofrezcan bonos tokenizados a sus usuarios."
+                    "desc": "Soberanos CETES vía Etherfuse en Stellar. Infraestructura B2B pura sin intermediación, acuñación directa en Sandbox."
                 },
                 "treasury": {
                     "name": "AI-TREASURY",
@@ -457,7 +459,7 @@
                     },
                     "rwa_market": {
                         "name": "Mercado RWA Institucional",
-                        "tagline": "Marketplace fraccionado para bonos y bienes raíces tokenizados. Los agentes gestionan la liquidez secundaria en el SDEX 24/7.",
+                        "tagline": "Infraestructura B2B para instrumentos soberanos (CETES). Los agentes gestionan el ruteo 24/7 sin custodia.",
                         "stack": [
                             "Vault",
                             "Execute",
@@ -635,7 +637,7 @@
                 "treasury_auto": "Tesorería",
                 "rules": "REGLAS",
                 "fx_trigger": "Dólar a $19.50",
-                "settle_cetes": "Invertir en Bonos",
+                "settle_cetes": "Aprovisionar CETES",
                 "builder_hint": "// Mueve piezas para automatizar",
                 "elo_tier_suffix": "Puntaje ELO"
             },
@@ -675,80 +677,120 @@
         "title": "PANEL INSTITUCIONAL",
         "version_live": "STELLAR TESTNET · v0.6.1",
         "fleet_status": "Monitoreo de Infraestructura",
-        "active_agents": "Nodos Ejecutores",
+        "active_agents": "Nodos de Ejecución B2B",
         "total_profit": "Ahorro Estructural (Spread)",
         "ops_console": "Consola de Operaciones Institucional",
-        "loading_dashboard": "Cargando tu panel de control...",
-        "no_helpers": "No hay agentes ejecutándose.",
-        "onboarding_desc": "Crea tu bóveda y elige un agente para comenzar a automatizar.",
+        "loading_dashboard": "Cargando telemetría del SDK...",
+        "no_helpers": "No hay nodos de ejecución activos.",
+        "no_helpers_desc": "Inicializa tu bóveda y delega el agente para activar el rebalanceo autónomo.",
+        "start_first_node": "Activar Primer Nodo",
+        "add_node": "Desplegar Nodo de Ejecución",
+        "build_node": "Construir Nodo Personalizado",
+        "your_helpers": "NODOS DE EJECUCIÓN ACTIVOS",
+        "onboarding_desc": "Inicializa tu bóveda institucional y configura la integración SDK para comenzar.",
         "stats": {
-            "reputation": "ELO DE EJECUCIÓN",
-            "wallets": "BÓVEDAS ACTIVAS",
-            "helpers": "AGENTES DESPLEGADOS",
-            "treasury": "Tesorería Global",
-            "secured_capital": "TVL (NO CUSTODIAL)",
+            "reputation": "REPUTACIÓN DE INFRAESTRUCTURA",
+            "wallets": "BÓVEDAS CORPORATIVAS",
+            "helpers": "NODOS DESPLEGADOS",
+            "treasury": "Float Corporativo",
+            "secured_capital": "TVL INSTITUCIONAL",
             "efficiency": "TASA DE EFICIENCIA (FX)",
             "projected_accrual": "DELTA DIARIO",
             "status_active": "OPERATIVO",
             "status_running": "PROCESANDO",
-            "trust_verified": "Auditable On-Chain (Stellar)"
+            "trust_verified": "Auditable On-Chain (SCF 7.0)"
         },
         "revenue_card": {
             "title": "Flujo de Liquidación Institucional",
             "fees": "COSTO DE EJECUCIÓN",
             "settlements": "Volumen Liquidado",
-            "feed_title": "Telemetría de Protocolo",
-            "awaiting": "A la espera de enrutamiento FX...",
+            "feed_title": "Telemetría del SDK",
+            "awaiting": "A la espera de enrutamiento corporativo...",
             "powered_by": "Infraestructura MPP & x402",
-            "live_stream": "REAL-TIME",
+            "live_stream": "TIEMPO REAL",
             "last_update": "Sync"
         },
         "vault_control": {
-            "title": "Bóveda Multisig",
+            "title": "Bóveda Multisig B2B",
             "locked": "BLOQUEADO (ASIGNADO)",
-            "unlocked": "LIQUIDEZ DISPONIBLE",
+            "unlocked": "LIQUIDEZ OPERATIVA",
             "create_vault": "+ ABRIR BÓVEDA INSTITUCIONAL",
             "deposit": "Aportar Liquidez",
             "withdraw": "Retirar Capital"
         },
+        "auto_rebalance": {
+            "label": "Auto-Rebalanceo USDC → CETES",
+            "enabled_desc": "El agente Nirium rebalancea cuando CETES > 4% — no custodial",
+            "disabled_desc": "Activa para que Nirium mueva el USDC inactivo a CETES automáticamente",
+            "node_title": "Auto-Rebalanceo USDC→CETES",
+            "node_trigger": "Disparador",
+            "node_trigger_value": "CETES > 4%",
+            "node_vault": "Bóveda",
+            "node_footer": "Delegado en Soroban · no custodial",
+            "agent_active": "AGENTE NIRIUM ACTIVO",
+            "toast_enabled": "Auto-Rebalanceo activado — el agente Nirium rebalanceará tu bóveda autónomamente",
+            "toast_disabled": "Auto-Rebalanceo desactivado",
+            "toast_error": "Error al cambiar Auto-Rebalanceo"
+        },
+        "auto_exit": {
+            "label": "Auto-Salida CETES → USDC",
+            "enabled_desc": "El agente sale a USDC cuando CETES cae por debajo del 3.5%",
+            "disabled_desc": "Salir a USDC automáticamente si la tasa cae — requiere delegación",
+            "delegation_required": "Activa primero el Auto-Rebalanceo para registrar la delegación",
+            "node_title": "Auto-Salida CETES → USDC",
+            "node_trigger": "Salir si baja de",
+            "node_trigger_value": "CETES < 3.5%",
+            "node_vault": "Bóveda",
+            "node_footer": "Delegado en Soroban · no custodial",
+            "agent_active": "AGENTE NIRIUM ACTIVO",
+            "toast_enabled": "Auto-Salida activada — el agente saldrá de CETES cuando la tasa baje del 3.5%",
+            "toast_disabled": "Auto-Salida desactivada",
+            "toast_error": "Error al cambiar Auto-Salida"
+        },
+        "xlm_vault_info": "Las bóvedas XLM usan optimización de corredores cross-border — el auto-rebalanceo aplica a bóvedas USDC",
+        "cetes_vault_active": "Bóveda ya en CETES — rebalanceo activo por defecto",
         "modals": {
-            "deploy_title": "¿Desplegar {name}?",
+            "deploy_title": "¿Inicializar {name}?",
             "fee_label": "FEE DE RED (XLM)",
             "fee_approved": "APROBADO",
-            "deploy_desc": "Desplegando agente financiero. Se aprovisionará un contrato no-custodial en Soroban.",
+            "deploy_desc": "Desplegando infraestructura SDK. Se aprovisionará un contrato no-custodial en Soroban.",
             "confirm": "ACTIVAR EN STELLAR",
             "cancel": "CANCELAR",
-            "stop_title": "¿Terminar Ejecución de Agente?",
-            "stop_desc": "La automatización FX y de Tesorería se suspenderá inmediatamente. La bóveda permanece segura.",
+            "stop_title": "¿Suspender Ejecución del SDK?",
+            "stop_desc": "El rebalanceo automatizado de tesorería institucional se suspenderá. La bóveda multisig permanece segura.",
             "stop_warning": "Alerta de Tesorería",
-            "stop_confirm": "TERMINAR EJECUCIÓN"
+            "stop_confirm": "SUSPENDER EJECUCIÓN"
         },
         "toasts": {
             "insufficient_balance": "Liquidez Insuficiente: Saldo mínimo {amount} XLM",
-            "deployment_failed": "Falla de Despliegue",
-            "check_freighter": "Verifica estado de firmas en Freighter.",
-            "deploying_vault": "Inicializando Soroban Multisig...",
-            "deposit_success": "Fondeo Confirmado",
-            "deposit_desc": "{amount} {asset} ruteados a la Bóveda Institucional.",
-            "view_tx": "Auditar Tx",
-            "withdrawal_success": "Retiro Liquidado",
-            "withdrawal_desc": "{amount} {asset} transferidos exitosamente.",
-            "stop_agent_success": "Ejecución Terminada",
+            "deployment_failed": "Falla en Aprovisionamiento SDK",
+            "check_freighter": "Verifique el estado de firmas institucionales en Freighter.",
+            "deploying_vault": "Inicializando Bóveda Institucional en Soroban...",
+            "deposit_success": "Fondeo Corporativo Confirmado",
+            "deposit_desc": "{amount} {asset} ruteados de forma segura a la Bóveda Institucional.",
+            "view_tx": "Auditar Registro On-Chain",
+            "withdrawal_success": "Retiro Institucional Liquidado",
+            "withdrawal_desc": "{amount} {asset} liquidados exitosamente.",
+            "stop_agent_success": "Ejecución del SDK Suspendida",
             "dismiss": "CERRAR"
         },
         "telemetry_feed": {
-            "title": "Telemetría de Nodos de Decisión",
+            "title": "Telemetría de Integración B2B",
             "waiting": "MONITOREANDO PIPELINES INSTITUCIONALES...",
-            "uplink": "Feed de Telemetría // Conexión"
+            "uplink": "Feed de Auditoría Criptográfica // Conexión"
         },
         "payment_streams": {
-            "title": "Liquidación en Tiempo Real",
+            "title": "Liquidación B2B en Tiempo Real",
             "waiting": "A la espera de triggers de enrutamiento corporativo...",
             "engine_active": "Motor Dual (x402/MPP) Operativo",
-            "market_rates": "Tasas de Mercado Actuales",
+            "market_rates": "Tasa de Referencia CETES",
             "supply": "Aporte",
             "borrow": "Préstamo",
-            "target_yield": "TASA FX EJECUTADA"
+            "target_yield": "TASA DE LIQUIDACIÓN",
+            "cetes_banxico": "CETES (Banxico)",
+            "cetes_rate_label": "Tasa ref.",
+            "network_fee": "Fee de red",
+            "corridors": "Corredores activos"
         }
     },
     "common": {
@@ -790,19 +832,19 @@
         "coc_compliant": "CUMPLIMIENTO COC"
     },
     "builder": {
-        "drag_n_drop": "Arrastra Nodos al Diseñador",
-        "simulate": "Simular Huella de Recursos",
-        "publish": "Desplegar en Stellar Testnet",
+        "drag_n_drop": "Arrastra Nodos de Infraestructura al Canvas",
+        "simulate": "Simular Ejecución B2B",
+        "publish": "Aprovisionar en Soroban",
         "categories": {
-            "atomic_engine": "Motor Atómico",
-            "signal_inputs": "Entradas de Señal",
-            "ai_intelligence": "Lógica de Automatización",
-            "trading_swaps": "Trading & Swaps",
-            "settlements": "Liquidaciones"
+            "atomic_engine": "Reglas de Tesorería (Soroban)",
+            "signal_inputs": "Triggers Corporativos",
+            "ai_intelligence": "Lógica de Aprobación (Multisig)",
+            "trading_swaps": "Ruteo de Liquidez (USDC/CETES)",
+            "settlements": "Liquidaciones Institucionales"
         },
-        "search_placeholder": "Buscar componentes de sistema...",
-        "asset_selector": "Seleccionar Activo Base",
-        "collapse": "Colapsar Interfaz"
+        "search_placeholder": "Buscar módulos de SDK...",
+        "asset_selector": "Seleccionar Activo de Tesorería",
+        "collapse": "Colapsar Entorno B2B"
     },
     "settings": {
         "ai_providers": {
@@ -826,70 +868,70 @@
         "sections": {
             "nature": {
                 "title": "1. Naturaleza del Servicio y Marco Legal (México)",
-                "content": "Nirium es una plataforma de infraestructura tecnológica (IaaS) diseñada bajo los estándares de 'Modelos Novedosos' conforme al Artículo 80 de la Ley para Regular las Instituciones de Tecnología Financiera (México). Nirium opera estrictamente como un proveedor de software que facilita la automatización de flujos de tesorería y no como una Institución de Tecnología Financiera (ITF) o entidad bancaria. La plataforma proporciona rastro forense inmutable (Protocol Archive) y protocolos de seguridad Soroban para la experimentación con activos digitales en entornos controlados. Los servicios de custodia, liquidación y emisión de Cetes (RWA) son responsabilidad exclusiva de proveedores terceros regulados (Etherfuse/Indeval) bajo sus propias licencias y términos."
+                "content": "Nirium es exclusivamente software de infraestructura tecnológica (IaaS) diseñado bajo los estándares de 'Modelos Novedosos' conforme al Artículo 80 de la Ley para Regular las Instituciones de Tecnología Financiera (Ley Fintech). Nirium opera estrictamente como un proveedor de software B2B que facilita la orquestación de flujos de tesorería y NO como una Institución de Tecnología Financiera (ITF), IFPE, o entidad bancaria. La plataforma proporciona telemetría inmutable y protocolos de seguridad Soroban para la experimentación con infraestructura digital. Los servicios de custodia, liquidación y emisión de CETES (RWA) son responsabilidad exclusiva de proveedores terceros regulados (Etherfuse/Indeval) bajo sus propias licencias y términos de servicio."
             },
             "no_guarantees": {
-                "title": "2. Sin Garantías — No es un Producto de Inversión",
-                "content": "Nirium no garantiza rendimientos de ningún tipo. El sistema de reputación ELO es estrictamente informativo y refleja el historial de ejecución algorítmico en Stellar Testnet — no constituye una promesa de ganancias futuras.\n\nNirium no es un producto de inversión, valor, fondo ni instrumento financiero. El capital permanece bajo el control soberano de las llaves privadas del usuario en todo momento. Nirium es un protocolo de infraestructura tecnológica con el que los usuarios interactúan bajo su propio riesgo."
+                "title": "2. Sin Garantías — Acuerdo de Nivel de Servicio (SLA)",
+                "content": "Nirium no garantiza rendimientos financieros de ningún tipo ni asume responsabilidad por la liquidez del mercado secundario. Las proyecciones de ruteo y métricas de spread son estrictamente informativas y reflejan el historial de ejecución algorítmica en Stellar Testnet.\n\nNirium no es un producto de inversión, valor, ni fondo mutuo. El capital permanece bajo el control soberano de las llaves corporativas del operador regulado en todo momento. Nirium es un SDK de automatización con el que las instituciones interactúan asumiendo el riesgo tecnológico."
             },
             "ai_liability": {
-                "title": "3. Responsabilidad de Agentes Autónomos e IA",
-                "content": "Al activar el 'Flota' o 'Loop' de agentes, el usuario otorga un mandato técnico limitado para que el código (LLM/Agente) construya y proponga transacciones basadas en parámetros preconfigurados. El usuario reconoce que los modelos de lenguaje (OpenAI, Anthropic, Ollama) pueden presentar 'alucinaciones algorítmicas', sesgos de datos o latencia crítica. Nirium actúa como una interfaz de transmisión y no asume responsabilidad por las decisiones autónomas tomadas por el kernel de IA ni por fallos sistémicos en los oráculos de precios descentralizados o la red pública Stellar."
+                "title": "3. Responsabilidad de Nodos Autónomos y Oráculos",
+                "content": "Al activar nodos de infraestructura o lógicas de aprobación, la institución otorga un mandato técnico para que el código proponga transacciones basadas en umbrales corporativos preconfigurados. El operador reconoce que los sistemas automatizados, oráculos de precios y APIs externas pueden presentar latencia crítica, caídas de servicio o datos corruptos. Nirium actúa como capa de middleware y no asume responsabilidad por pérdidas derivadas de fallos sistémicos en los rieles de liquidación subyacentes o la red pública Stellar."
             },
             "rwa_disclaimer": {
-                "title": "4. Riesgos de Activos del Mundo Real (RWA)",
-                "content": "Las operaciones con Cetes y otros activos del mundo real (RWA) están sujetas a la disponibilidad, ventanas de operación bancaria y regulación del sistema financiero mexicano. Nirium actúa únicamente como puente tecnológico (Middleware). El riesgo de contraparte, la custodia de los activos subyacentes y la liquidez de los mismos recaen íntegramente en el emisor del bono y el custodio final (Indeval). La tokenización de estos activos en Stellar Testnet es representativa y experimental."
+                "title": "4. Riesgos de Activos del Mundo Real (CETES)",
+                "content": "Las operaciones con CETES están sujetas a la disponibilidad institucional, ventanas de operación bancaria y regulación de Banxico. Nirium actúa únicamente como puente tecnológico (Middleware). El riesgo de contraparte, la custodia legal del activo subyacente y el cumplimiento AML recaen íntegramente en el emisor del bono, el custodio final y el operador regulado. La tokenización de estos activos en Stellar Testnet es una prueba de concepto tecnológica."
             },
             "dispute": {
-                "title": "5. Jurisdicción y Arbitraje Criptográfico",
-                "content": "Cualquier controversia se resolverá mediante arbitraje vinculante bajo las reglas de la Cámara de Comercio de la Ciudad de México. Al conectar su wallet, el usuario renuncia expresamente a juicios colectivos (Class Actions). Estos términos se rigen por las leyes federales de los Estados Unidos Mexicanos."
+                "title": "5. Jurisdicción y Arbitraje Tecnológico",
+                "content": "Cualquier controversia relacionada con el licenciamiento del software se resolverá mediante arbitraje vinculante bajo las reglas de la Cámara de Comercio de la Ciudad de México. Al aprovisionar un entorno corporativo, la institución renuncia expresamente a juicios colectivos. Estos términos se rigen por las leyes federales de los Estados Unidos Mexicanos."
             },
             "infrastructure": {
-                "title": "6. Infraestructura y Disponibilidad (SaaS/IaaS)",
-                "content": "Nirium proporciona servicios de infraestructura 'tal cual' (as is) bajo el modelo Software-as-a-Service (SaaS). Debido a que la ejecución final depende de la red pública Stellar, proveedores de LLM de terceros y oráculos de datos, Nirium no garantiza una disponibilidad del 100%. La plataforma implementa protocolos de seguridad inspirados en ISO 27001 para la capa de datos, pero no es responsable por pérdidas derivadas de congestión de blockchain, bifurcaciones de red (forks) o interrupciones de servicios en la nube de terceros."
+                "title": "6. Disponibilidad de Infraestructura (SaaS)",
+                "content": "Nirium proporciona servicios de software 'tal cual' (as is). Debido a que la ejecución final depende de la red Stellar y APIs de terceros (ej. Etherfuse), Nirium no garantiza un SLA de disponibilidad del 100%. La plataforma implementa protocolos de seguridad criptográfica, pero no es responsable por pérdidas derivadas de congestión de blockchain, bifurcaciones de red (forks) o interrupciones de servicios en la nube de terceros (AWS/GCP)."
             },
             "reverse_solicitation": {
-                "title": "7. Solicitud Inversa e Internacional",
-                "content": "Nirium no realiza oferta pública de valores ni servicios financieros en jurisdicciones fuera de su registro. El acceso a la plataforma por parte de usuarios en jurisdicciones con restricciones se considera una solicitud proactiva, privada e individual del usuario ('Reverse Solicitation'). El usuario declara que no ha sido inducido por publicidad dirigida y es el único responsable de cumplir con las leyes de su residencia."
+                "title": "7. Cumplimiento B2B y Solicitud Institucional",
+                "content": "Nirium no realiza oferta pública de valores, intermediación de pagos ni servicios financieros al consumidor final (retail). El acceso a la infraestructura por parte de corporaciones extranjeras se considera una solicitud B2B privada ('Reverse Solicitation'). La institución integradora es la única responsable de cumplir con las leyes financieras y de prevención de lavado de dinero (AML) en su jurisdicción de operación."
             },
             "intellectual_property": {
-                "title": "8. Propiedad Intelectual Algorítmica",
-                "content": "Todos los algoritmos, lógica de agentes ('Flota'), arquitecturas de red y visualizaciones propietarias son propiedad intelectual exclusiva de Nirium. El uso de la plataforma otorga una licencia de uso limitada, no exclusiva y revocable. El uso de la interfaz no otorga derechos de propiedad, modificación o ingeniería inversa sobre el motor de inteligencia artificial core."
+                "title": "8. Propiedad Intelectual del SDK",
+                "content": "Todos los contratos inteligentes Soroban, lógica de ruteo, endpoints REST y visualizaciones propietarias del Treasury Builder son propiedad intelectual exclusiva de Nirium. El aprovisionamiento otorga una licencia de uso de software B2B limitada, no exclusiva y revocable."
             },
             "stellar_code": {
                 "title": "9. Alineación con el Código de Conducta de Stellar y SCF 7.0",
-                "content": "Nirium se adhiere estrictamente a los principios de la Stellar Development Foundation (SDF) y las directrices de la Stellar Community Fund (SCF) versión 7.0 (Actualizada 30 de Abril de 2026), promoviendo un ecosistema de innovación abierta, respeto mutuo y transparencia técnica. Los usuarios se comprometen a seguir el Código de Conducta oficial de Stellar, prohibiendo comportamientos maliciosos que comprometan la integridad de la red o la comunidad."
+                "content": "Nirium se adhiere estrictamente a los principios de la Stellar Development Foundation (SDF) y los estándares institucionales de la Stellar Community Fund (SCF) versión 7.0 (Actualizada 30 de Abril de 2026), promoviendo infraestructura abierta, respeto corporativo y trazabilidad forense."
             }
         }
     },
     "legal_modal": {
-        "title": "Acceso a la Núcleo: Protocolo de Consentimiento",
+        "title": "Acceso a la Infraestructura: Protocolo de Consentimiento",
         "consent_required": "FIRMA DE CONSENTIMIENTO CRIPTOGRÁFICO:",
-        "acknowledge_prefix": "Al firmar este payload, usted declara bajo protesta de decir verdad que:",
-        "item_non_custodial": "Entiende que Nirium es un software no-custodial and experimental; sus llaves son su responsabilidad.",
-        "item_elo_historical": "Reconoce que los retornos históricos (ELO) no implican tasas de ejecución futuras garantizadas.",
-        "item_systemic_risk": "Acepta el riesgo sistémico de la IA y reconoce que las 'alucinaciones' del modelo son un vector de riesgo operacional.",
-        "item_liability": "Libera a los desarrolladores de Nirium de toda responsabilidad por pérdidas de capital derivadas de volatilidad o fallos de red.",
-        "item_scf_coc": "Usted acepta seguir el Código de Conducta de Stellar y reconoce nuestra alineación con los estándares de transparencia de SCF 7.0.",
-        "button_sign": "FIRMAR Y ESTABLECER ENLACE ESTRATÉGICO",
-        "button_signing": "ESPERANDO FIRMA DE FREIGHTER...",
-        "governing_law": "Regido por la Ley Fintech (México) y Estándares Globales 2026.",
+        "acknowledge_prefix": "Al firmar este payload, la institución declara bajo protesta de decir verdad que:",
+        "item_non_custodial": "Entiende que Nirium es un proveedor de software B2B; las llaves maestras y la custodia son responsabilidad absoluta del operador regulado.",
+        "item_elo_historical": "Reconoce que las simulaciones de ruteo no implican ni garantizan tasas de liquidación o disponibilidad futura.",
+        "item_systemic_risk": "Acepta el riesgo tecnológico sistémico inherente a los contratos inteligentes, latencia de oráculos y APIs de terceros (SLA).",
+        "item_liability": "Libera a Nirium Software de toda responsabilidad legal por fallos de red, bugs en la lógica de automatización o interrupciones en la liquidación de CETES.",
+        "item_scf_coc": "La institución se compromete a respetar el Código de Conducta de Stellar y los estándares de transparencia B2B de SCF 7.0.",
+        "button_sign": "FIRMAR ACUERDO DE SOFTWARE B2B",
+        "button_signing": "ESPERANDO FIRMA MULTISIG...",
+        "governing_law": "Regido por la Ley Fintech (Art. 80) y Estándares de Software B2B 2026.",
         "read_more_prefix": "Consulte nuestros ",
         "terms_link": "Términos Completos",
         "risk_link": "Aviso de Cetes (RWA)"
     },
     "risk_disclosure": {
-        "title": "Aviso de Riesgo Algorítmico",
+        "title": "Aviso de Riesgo de Infraestructura",
         "last_updated": "30 de Abril de 2026",
-        "mandatory": "RECONOCIMIENTO OBLIGATORIO: Usted está utilizando software de código abierto algorítmico y altamente experimental.",
+        "mandatory": "RECONOCIMIENTO OBLIGATORIO: Usted está operando una capa de software de infraestructura B2B (Middleware).",
         "sections": {
             "execution": {
-                "title": "1. Riesgos de Ejecución Autónoma",
-                "content": "Al delegar las operaciones de la bóveda a agentes de IA o lógica de estrategia publicada por la comunidad, usted está autorizando al código para ejecutar transacciones financieras autónomas en la red Stellar. Si bien los contratos inteligentes de Soroban utilizan envoltorios atómicos de invocación única (protección 'Panic on loss'), las fallas sistémicas, la manipulación de oráculos o la falta extrema de liquidez pueden resultar en la pérdida total de los fondos."
+                "title": "1. Riesgos de Automatización Programática",
+                "content": "Al delegar el ruteo de la bóveda a flujos de automatización programática a través de Nirium, la institución autoriza al software para gestionar instrucciones on-chain. Si bien los contratos Soroban implementan controles estrictos (ej. límites de exposición), fallas sistémicas, indisponibilidad de la API de liquidación (Etherfuse) o errores de orquestación pueden comprometer las operaciones de tesorería corporativa."
             },
             "governance": {
-                "title": "3. Gobernanza del Ecosistema y Alineación SCF 7.0",
-                "content": "Nirium opera dentro del marco del Stellar Community Fund (SCF 7.0) y se adhiere al Código de Conducta de Stellar. Aunque nos esforzamos por alcanzar los más altos estándares de transparencia, nuestro proyecto es experimental y se basa en hitos. Se espera que los usuarios participen en la comunidad con integridad profesional y sigan las directrices oficiales actualizadas a abril de 2026."
+                "title": "3. Gobernanza Institucional y SCF 7.0",
+                "content": "Nirium proporciona software B2B en alineación con las directivas del Stellar Community Fund (SCF 7.0) y el Código de Conducta de Stellar. La institución integradora asume la responsabilidad exclusiva del cumplimiento KYC/AML y normativo ante las autoridades pertinentes. La tecnología provista es estrictamente una capa de ruteo inmutable actualizada a mayo de 2026."
             }
         },
         "footer": "Al conectar su billetera, usted acepta todos los riesgos descritos anteriormente."
@@ -899,64 +941,64 @@
         "last_updated": "30 de Abril de 2026",
         "sections": {
             "sovereignty": {
-                "title": "1. Arquitectura No Custodial",
-                "content": "Nirium es una interfaz no custodial. Nunca recopilamos, almacenamos ni transmitimos sus claves privadas o frases de recuperación. Toda la firma de transacciones ocurre localmente dentro de su proveedor de billetera autorizado (ej: Freighter). Usted es el único custodio de sus activos."
+                "title": "1. Arquitectura de Software No Custodial",
+                "content": "Nirium es middleware tecnológico. Nunca recopilamos, almacenamos ni procesamos claves privadas corporativas. Toda firma de instrucción ocurre localmente dentro del módulo HSM o billetera institucional de la empresa operadora."
             },
             "anonymity": {
-                "title": "2. Transparencia On-Chain",
-                "content": "Como protocolo construido sobre Stellar, todas las transacciones y operaciones de las bóvedas son públicas e inmutables. Nirium no vincula sus claves públicas con su identidad real, a menos que sea requerido explícitamente por módulos de cumplimiento institucional (KYC/KYB) gestionados por terceros autorizados."
+                "title": "2. Trazabilidad Forense On-Chain",
+                "content": "Como infraestructura Stellar, todas las operaciones de bóveda generan un hash inmutable (HMAC-SHA256). Nirium no asocia estas operaciones a identidades corporativas, recayendo la responsabilidad de identidad (KYB - Conozca a su Institución) exclusivamente en el operador regulado y proveedores de liquidación (ej. Etherfuse)."
             },
             "telemetry": {
-                "title": "3. Telemetría Mínima",
-                "content": "Recopilamos telemetría técnica (versión del navegador, latencia de red, registros de ejecución) estrictamente para el mantenimiento del protocolo y el monitoreo de seguridad. No vendemos datos de usuario ni utilizamos rastreadores de marketing de terceros."
+                "title": "3. Telemetría de SLA",
+                "content": "Solo registramos telemetría técnica (uptime de nodos, latencia de oráculos, métricas de red) estrictamente para garantizar el Acuerdo de Nivel de Servicio (SLA) de la infraestructura B2B. No hay rastreo de comportamiento comercial."
             },
             "institutional": {
-                "title": "4. Cumplimiento Institucional y Transparencia SCF",
-                "content": "De acuerdo con las directrices de transparencia de SCF 7.0, Nirium mantiene una arquitectura técnica de código abierto. Priorizamos la soberanía de los datos y los protocolos de privacidad de grado institucional, asegurando que sus operaciones financieras permanezcan confidenciales mientras cumplimos con los estándares de cumplimiento globales actualizados a abril de 2026."
+                "title": "4. Cumplimiento Fintech y SCF",
+                "content": "Nirium mantiene una arquitectura B2B diseñada para facilitar las auditorías de la CNBV (Art. 80 Ley Fintech), priorizando la inmutabilidad de los datos y el cumplimiento de las normativas del Stellar Community Fund (SCF 7.0) a mayo de 2026."
             }
         }
     },
     "disclaimers": {
-        "title": "Avisos Legales y Descargos de Responsabilidad",
-        "last_updated": "30 de Abril de 2026",
-        "mandatory": "LECTURA OBLIGATORIA: El Protocolo Nirium es software experimental y no auditado.",
+        "title": "Avisos Legales (Software-Only B2B)",
+        "last_updated": "30 de Mayo de 2026",
+        "mandatory": "AVISO CORPORATIVO: El SDK Nirium es software de infraestructura tecnológica (Middleware).",
         "sections": {
             "general": {
-                "title": "1. Descargo de Responsabilidad General",
-                "content": "Nirium Protocol es un software experimental, no auditado, desplegado exclusivamente en Stellar Testnet. Todas las interacciones involucran tokens de prueba sin valor monetario. Nirium no gestiona, controla ni custodia activos financieros reales en esta etapa.\n\nEl desempeño pasado de cualquier algoritmo, estrategia o agente —incluyendo puntajes ELO y métricas simuladas— NO garantiza ni implica resultados futuros. La volatilidad es inherente a los protocolos DeFi y los usuarios deben esperar la posibilidad de pérdida total."
+                "title": "1. Proveedor de Software B2B",
+                "content": "Nirium Protocol opera exclusivamente como proveedor de software (SaaS/SDK). Nirium no gestiona, no custodia, no provee liquidez ni actúa como intermediario financiero (ITF/IFPE). Cualquier integración en producción es responsabilidad regulatoria de la institución operadora bajo la legislación aplicable en su jurisdicción."
             },
             "no_advice": {
-                "title": "2. No es Asesoría Financiera",
-                "content": "Nada en este sitio web, documentación o comunicación de Nirium constituye asesoría financiera, de inversión o de trading. Debe consultar con un asesor profesional calificado antes de tomar decisiones. El equipo de Nirium no son asesores financieros registrados ni corredores de bolsa."
+                "title": "2. Ausencia de Asesoría Financiera",
+                "content": "Ninguna documentación técnica, SDK o portal de Nirium constituye recomendación, asesoría financiera o invitación de inversión corporativa. Nirium Inc. es una empresa de software."
             },
             "smart_contract": {
-                "title": "3. Riesgo de Contratos Inteligentes",
-                "content": "Los contratos inteligentes de Soroban (Vault, ELO Registry, etc.) NO han sido auditados formalmente. Pueden contener errores o vulnerabilidades que resulten en la pérdida de fondos. Nirium proporciona estos contratos 'tal cual', sin garantías de ningún tipo."
+                "title": "3. Riesgo de Contratos Inteligentes Soroban",
+                "content": "El uso de la infraestructura involucra contratos inteligentes en Stellar/Soroban. La institución asume el riesgo tecnológico inherente a posibles fallos lógicos a nivel de red, aceptando el licenciamiento 'tal cual' del software."
             },
             "ai_agent": {
-                "title": "4. Riesgo de Ejecución de Agentes de IA",
-                "content": "Nirium utiliza agentes de IA autónomos (LLM). Estos sistemas son inherentemente impredecibles y pueden presentar 'alucinaciones' o tomar decisiones económicas subóptimas. Al activar cualquier agente, usted acepta la responsabilidad total de los resultados."
+                "title": "4. Riesgo de Orquestación y APIs Externas",
+                "content": "Nirium actúa como enrutador de instrucciones hacia APIs de terceros (Etherfuse). La latencia, rechazos de liquidación, o caídas de oráculos externos escapan al control de Nirium y eximen a la plataforma de responsabilidades compensatorias."
             },
             "testnet": {
-                "title": "5. Distinción Testnet vs Mainnet",
-                "content": "Nirium opera exclusivamente en Stellar Testnet. Los tokens no tienen valor real, la red puede reiniciarse y todas las métricas de rendimiento son simulaciones de validación tecnológica."
+                "title": "5. Fase de Sandbox / Simulador",
+                "content": "El entorno actual está configurado sobre Stellar Testnet para pruebas de integración B2B (Sandbox normativo Art. 80). No existen flujos de fondos reales."
             },
             "no_warranty": {
-                "title": "6. Sin Garantía (Software AS-IS)",
-                "content": "EL SOFTWARE SE PROPORCIONA 'TAL CUAL', SIN GARANTÍA DE NINGÚN TIPO. Los autores no serán responsables de ninguna reclamación, daños u otra responsabilidad derivada del uso del software."
+                "title": "6. Licencia de Software As-Is",
+                "content": "EL SOFTWARE SDK SE LICENCIA 'TAL CUAL', SIN GARANTÍA EXPLÍCITA DE DISPONIBILIDAD ABSOLUTA, UPTIME GARANTIZADO O ADECUACIÓN LEGAL. Los autores están eximidos de responsabilidad corporativa."
             },
             "jurisdiction": {
-                "title": "7. Restricciones Jurisdiccionales",
-                "content": "Nirium no solicita ni proporciona servicios en jurisdicciones prohibidas o restringidas, incluyendo países sujetos a sanciones de la OFAC. El usuario es responsable de cumplir con las leyes de su jurisdicción."
+                "title": "7. Cumplimiento de la Institución Integradora",
+                "content": "La corporación que implementa el SDK Nirium debe garantizar sus propios procesos AML, KYB y licenciamientos aplicables para el uso de infraestructura criptográfica en sus operaciones comerciales."
             }
         },
-        "footer": "Al acceder a este sitio o interactuar con el Protocolo Nirium, usted reconoce que ha leído, entendido y aceptado todos los descargos de responsabilidad anteriores."
+        "footer": "Al integrar este SDK o interactuar con el Middleware Nirium, la institución reconoce que ha leído, entendido y aceptado todos los descargos de responsabilidad corporativos anteriores."
     },
     "docs": {
         "nav": {
             "overview": "VISIÓN GENERAL",
             "api_sandbox": "API Y SANDBOX",
-            "ideas": "CASOS DE USO",
+            "ideas": "BLUEPRINTS",
             "architecture": "ARQUITECTURA",
             "contracts": "CONTRATOS INTELIGENTES",
             "agent": "NODOS DE EJECUCIÓN",
@@ -965,79 +1007,79 @@
             "security": "SEGURIDAD Y CUMPLIMIENTO",
             "previous": "ANTERIOR",
             "next": "SIGUIENTE",
-            "loading": "Cargando documentación..."
+            "loading": "Cargando documentación institucional..."
         },
         "overview": {
             "back": "Volver al Inicio",
-            "title": "Documentación del Protocolo",
-            "subtitle": "Referencia técnica para construir, automatizar y escalar sobre la infraestructura Nirium.",
+            "title": "Documentación B2B de Nirium",
+            "subtitle": "Referencia técnica para integrar, automatizar y auditar flujos de tesorería corporativa (USDC a CETES) sobre Soroban.",
             "hero": {
-                "version": "Versión",
-                "contracts": "Contratos Desplegados",
-                "helpers": "Nodos Activos",
-                "fee": "Comisión de Ejecución",
-                "coins": "Activos Soportados"
+                "version": "Versión del SDK",
+                "contracts": "Contratos Activos",
+                "helpers": "Nodos Desplegados",
+                "fee": "Costo de Red (XLM)",
+                "coins": "Instrumentos Soberanos"
             },
-            "testnet_notice": "Entorno Testnet. Todos los contratos, bóvedas y nodos operan exclusivamente en Stellar Testnet. No hay capital real en riesgo. Los indicadores de ejecución son proyecciones simuladas, no garantías.",
-            "summary_title": "Resumen Ejecutivo",
-            "summary_p1": "Nirium es una infraestructura de automatización de tesorería no custodial construida sobre Stellar. Permite el despliegue autónomo de capital — asignación de CETES, liquidación cross-border y facturación a nivel de protocolo — sin riesgo custodial.",
-            "summary_p2": "Componentes core: 6 contratos Soroban que gestionan bóvedas no custodiales, un sistema de reputación ELO para nodos, y micro-facturación x402 por llamada para consumidores institucionales de API.",
-            "summary_who": "¿Para quién es? Integradores de protocolo — sin necesidad de Rust, use el Constructor Visual de Esquemas. Desarrolladores — cada componente expone una API REST documentada.",
-            "summary_warning": "Software experimental en Testnet. Contratos inteligentes no auditados. No constituye asesoría financiera.",
-            "progressive_title": "Modos de Ejecución",
-            "progressive_subtitle": "Seleccione el modelo de autorización de ejecución preferido.",
+            "testnet_notice": "Entorno Sandbox B2B. Los nodos y contratos operan bajo simulación en Stellar Testnet para garantizar el cumplimiento normativo (Art. 80) antes de desplegar capital real.",
+            "summary_title": "Resumen Ejecutivo de Infraestructura",
+            "summary_p1": "Nirium es exclusivamente un proveedor de software de infraestructura (SDK/API) construido sobre la red Stellar. Facilitamos el ruteo autónomo de capital corporativo —con un enfoque primario en la tokenización de CETES vía Etherfuse— sin que Nirium asuma custodia, liquidez o roles de ITF.",
+            "summary_p2": "La arquitectura core se compone de contratos Soroban auditados, nodos de ejecución programáticos con micro-pagos atómicos (x402/MPP) y un sistema de telemetría forense anclado a IPFS para cumplir con los estándares de la CNBV.",
+            "summary_who": "¿Para quién es? Operadores regulados y Fintechs. Integre nuestro SDK TypeScript o despliegue lógicas a través del Treasury Builder para generar trazas de cumplimiento inmutables (HMAC-SHA256).",
+            "summary_warning": "Software-only. Nirium no provee asesoría legal ni financiera. Todos los contratos están en fase Sandbox/Testnet.",
+            "progressive_title": "Modelos de Aprobación de Flujo",
+            "progressive_subtitle": "Configure el nivel de autonomía del nodo B2B para ajustarse a sus políticas de compliance interno.",
             "control_approve": {
-                "title": "Autorización Manual",
-                "item1": "El operador firma cada transacción",
-                "item2": "Requiere aprobación criptográfica por acción",
-                "item3": "No custodial en todo momento",
-                "item4": "Recomendado para flujos de alta cuantía y baja frecuencia"
+                "title": "Firma Multisig (Manual)",
+                "item1": "La institución aprueba cada lote (batch)",
+                "item2": "Autorización 2-de-3 requerida en Soroban",
+                "item3": "Control estricto para montos altos",
+                "item4": "Recomendado para la liquidación inicial de CETES"
             },
             "control_auto": {
-                "title": "Ejecución Autónoma",
-                "item1": "El nodo ejecuta dentro del conjunto de reglas preautorizadas",
-                "item2": "Respuesta sub-segundo, operación continua",
-                "item3": "Delegación completamente no custodial",
-                "item4": "Óptimo para estrategias de tesorería de alta frecuencia"
+                "title": "Aprovisionamiento Autónomo",
+                "item1": "El nodo rutea liquidez bajo umbrales estrictos",
+                "item2": "Auditoría instantánea en IPFS por evento",
+                "item3": "Ejecución continua sin bloqueo de UI",
+                "item4": "Ideal para optimización 24/7 del float corporativo"
             },
-            "features_title": "Capacidades del Protocolo (v0.6.1)",
+            "features_title": "Módulos de Arquitectura (v0.6.1)",
             "features": {
                 "builder": {
-                    "title": "Constructor Visual de Esquemas",
-                    "desc": "Compose esquemas de automatización mediante editor de nodos drag-and-drop."
+                    "title": "Treasury Builder (Visual)",
+                    "desc": "Conecte nodos de infraestructura y webhooks mediante un lienzo de configuración drag-and-drop."
                 },
                 "guides": {
-                    "title": "Guías de Integración",
-                    "desc": "Walkthroughs técnicos paso a paso para todas las funciones del protocolo."
+                    "title": "Guías de Integración API",
+                    "desc": "Documentación de 44+ endpoints REST para conectar sus sistemas legacy."
                 },
                 "marketplace": {
-                    "title": "Marketplace de Estrategias",
-                    "desc": "Esquemas institucionales prediseñados instalables en una sola operación."
+                    "title": "Librería de Blueprints",
+                    "desc": "Esquemas pre-configurados para ruteo de USDC a CETES y liquidación cross-border."
                 },
                 "dashboard": {
-                    "title": "Dashboard Institucional",
-                    "desc": "Telemetría en tiempo real: despliegue de capital, nodos y flujos de liquidación."
+                    "title": "Consola de Telemetría",
+                    "desc": "Monitoree la actividad del nodo, latencias y exporte logs forenses JSON."
                 },
                 "wallets": {
-                    "title": "Bóvedas Multi-Activo",
-                    "desc": "Bóvedas no custodiales con soporte XLM, USDC y CETES por esquema."
+                    "title": "Contratos de Bóveda",
+                    "desc": "Instanciación no-custodial de bóvedas Soroban vinculadas a su llave maestra."
                 },
                 "ipfs": {
-                    "title": "Log de Auditoría Inmutable",
-                    "desc": "Todas las decisiones de nodos comprometidas en IPFS para auditabilidad criptográfica."
+                    "title": "Integridad Criptográfica",
+                    "desc": "Toda mutación de estado se firma con HMAC-SHA256 y persiste en redes descentralizadas."
                 }
             },
-            "transactions_title": "Transacciones On-Chain (Stellar)",
+            "transactions_title": "Traza de Auditoría (Stellar Testnet)",
             "tx_table": {
-                "tx": "Transacción",
-                "amount": "Monto",
-                "fee": "Comisión",
-                "status": "Estado",
-                "link": "Explorador",
-                "success": "Confirmada",
-                "view": "Inspeccionar"
+                "tx": "Identificador Hash",
+                "amount": "Volumen (USDC)",
+                "fee": "Network Fee",
+                "status": "Estado de Consenso",
+                "link": "Referencia Pública",
+                "success": "Asentada",
+                "view": "Verificar en Explorador"
             },
-            "operator_wallet": "Bóveda Operadora",
+            "operator_wallet": "Llave Institucional (Operador)",
             "testnet_warning": "Testnet — sin capital real en riesgo",
             "stats": {
                 "version": "Versión Testnet",
@@ -1645,9 +1687,9 @@
                 },
                 {
                     "name": "RWA Institucional",
-                    "desc": "Marketplace fraccionado para bonos y bienes raíces tokenizados. Los agentes gestionan la liquidez secundaria en el SDEX 24/7.",
+                    "desc": "Infraestructura B2B para instrumentos soberanos (CETES). Los agentes gestionan el ruteo 24/7 sin custodia.",
                     "diff": "Advanced",
-                    "code": "// Provisión de liquidez 24/7 para RWA\nmarket.placeBid('BOND_TOKEN', 1000)\n  .with(institutional_vault_keys)\n  .monitor(spread_threshold);"
+                    "code": "// Aprovisionamiento programático 24/7 para CETES vía Etherfuse\napi.sand.etherfuse.mint('CETES_TOKEN', 1000)\n  .with(operator_auth)\n  .monitor(80_bps_fee);"
                 },
                 {
                     "name": "Bóvedas de Mitigación de Riesgo",
@@ -1678,80 +1720,80 @@
     },
     "marketplace": {
         "header": {
-            "badge": "Protocol Marketplace",
-            "title": "PROTOCOLO",
-            "span": "MARKETPLACE",
-            "subtitle": "Despliegue kernels autónomos en la Red Stellar dirigidos a bóvedas de XLM o USDC. // Alineado con el Código de Conducta de Stellar y los Criterios de Mérito de SCF 7.0",
+            "badge": "Librería de Infraestructura B2B",
+            "title": "PROTOCOL",
+            "span": "BLUEPRINTS",
+            "subtitle": "Despliegue kernels autónomos en Stellar para gestionar flujos de tesorería corporativa (USDC a CETES). // Alineado con el Código de Conducta de Stellar y los Estándares de Transparencia de SCF 7.0",
             "architect_unit": "Unidad de Arquitectura",
-            "launch_builder": "Lanzar Treasury Builder"
+            "launch_builder": "Configurar Blueprint"
         },
         "strategies": {
-            "title": "Kernels Disponibles",
+            "title": "Kernels de Tesorería Disponibles",
             "risk_levels": {
-                "very_low": "Muy Bajo",
-                "low": "Bajo",
-                "medium": "Medio",
-                "high": "Alto",
-                "risk_label": "Riesgo"
+                "very_low": "Riesgo Soberano",
+                "low": "Bajo Riesgo",
+                "medium": "Dinámico",
+                "high": "Especulativo (No Soportado)",
+                "risk_label": "Perfil"
             },
             "stats": {
-                "alpha": "Eficiencia de Ejecución",
-                "liquidity": "Profundidad de Liquidez",
-                "secure_kernel": "KERNEL SEGURO v0.6.1"
+                "alpha": "Ahorro de Ejecución (Spread)",
+                "liquidity": "Float Operativo",
+                "secure_kernel": "KERNEL B2B v0.6.1"
             },
             "buttons": {
-                "backtest": "BACKTEST",
-                "initialize": "INICIALIZAR"
+                "backtest": "SIMULAR",
+                "initialize": "APROVISIONAR"
             },
             "items": {
                 "kinetic-vector": {
-                    "name": "Kinetic Vector XLM-USDC",
-                    "desc": "Vector de ruteo de liquidez de alta eficiencia para corredores XLM-USDC. Optimiza las rutas de ejecución mediante transacciones atómicas multi-op de Soroban para minimizar el deslizamiento."
+                    "name": "Nirium Core: USDC a CETES",
+                    "desc": "El blueprint principal de infraestructura. Convierte automáticamente liquidez ociosa en USDC hacia CETES usando los rieles de Etherfuse, manteniendo el capital seguro en contratos Soroban."
                 },
                 "liquidity-optimizer": {
-                    "name": "Optimizador de Micro-Liquidez",
-                    "desc": "Kernel de provisión de liquidez automatizada para nuevos pools de Soroban. Mantiene una profundidad óptima y mejora la estabilidad del mercado mediante rebalanceo gestionado por riesgo."
+                    "name": "Orquestador x402 / MPP",
+                    "desc": "Blueprint para integrar pagos programáticos máquina a máquina. Permite a los agentes desencadenar micro-pagos atómicos por llamada (x402) o en lotes por sesión (MPP) para liquidaciones institucionales."
                 },
                 "lst-peg": {
-                    "name": "Restauración de Peg LST",
-                    "desc": "Kernel de estabilización algorítmica para Liquid Staking Tokens (LST). Garantiza la paridad de peg entre afXLM/vXLM y XLM nativo mediante rebalanceo automatizado de bóvedas."
+                    "name": "Ruteo Cross-Border B2B",
+                    "desc": "Kernel de liquidación optimizada de remesas corporativas. Usa la liquidez nativa de la red Stellar (SDEX) para lograr tiempos de asentamiento ~4s en operaciones transfronterizas de alto volumen."
                 },
                 "eliza-sentiment": {
-                    "name": "Motor de Sentimiento Eliza",
-                    "desc": "Infraestructura de telemetría y análisis de ejecución. Procesa flujos de datos para optimizar la toma de decisiones de los agentes en el ecosistema Stellar."
+                    "name": "Centinela de Cumplimiento (CNBV)",
+                    "desc": "Módulo criptográfico que firma todas las decisiones de tesorería con HMAC-SHA256 y ancla el registro en IPFS para garantizar la inmutabilidad y auditoría requerida por la normativa Fintech (Art. 80)."
                 }
             }
         },
         "plugins": {
-            "title": "Integraciones Modulares",
-            "premium": "Premium",
-            "verified": "Verificado",
-            "install": "Instalar",
-            "pay": "Pagar {price}",
+            "title": "Módulos de Extensión SDK",
+            "premium": "Institucional",
+            "verified": "Auditable",
+            "install": "Aprovisionar",
+            "pay": "Costos de Red",
             "items": {
                 "flash-loan-executor": {
                     "name": "Ejecutor de Préstamos Flash",
-                    "desc": "EJECUTA PRÉSTAMOS FLASH ATÓMICOS USANDO PRIMITIVAS DE SOROBAN DE UNA SOLA INVOCACIÓN. FACTURADO VÍA X402."
+                    "desc": "FACILITA PRÉSTAMOS FLASH INTRA-LEDGER PARA REBALANCEOS COMPLEJOS EN SOROBAN. AUDITADO BAJO JARGUS V3.0."
                 },
                 "price-oracle": {
-                    "name": "Oráculo de Precios Multi-Fuente",
-                    "desc": "AGREGA PRECIOS DE COINGECKO, DEFILLAMA, PYTH. SUSCRIPCIÓN MPP EN TIEMPO REAL."
+                    "name": "Oráculo de Referencia Institucional",
+                    "desc": "INTEGRA FEEDS DE PRECIOS REGULADOS PARA EJECUCIÓN EXACTA DE TASAS FX Y SPREAD."
                 },
                 "telegram-alerts-pro": {
-                    "name": "Telegram Alerts Pro",
-                    "desc": "NOTIFICACIONES AVANZADAS DE TELEGRAM CON FORMATO ENRIQUECIDO. COMPATIBLE CON MPP."
+                    "name": "Webhook de Alertas Corporativas",
+                    "desc": "DESPACHA EVENTOS DE TESORERÍA FIRMADOS A INFRAESTRUCTURA DE TERCEROS VÍA WEBHOOKS."
                 },
                 "soroswap-lp-manager": {
-                    "name": "Gestor de LP de Soroswap",
-                    "desc": "REBALANCEO AUTOMATIZADO Y GESTIÓN DE LIQUIDEZ PARA POOLS DE LIQUIDEZ DE SOROSWAP."
+                    "name": "Gestor de Tesorería Distribuida",
+                    "desc": "REBALANCEA AUTOMÁTICAMENTE EL CAPITAL OCIOSO A TRAVÉS DE MÚLTIPLES BÓVEDAS INSTITUCIONALES."
                 },
                 "ipfs-blackbox-logger": {
-                    "name": "IPFS Blackbox Logger",
-                    "desc": "ARCHIVA TODOS LOS LOGS DE EJECUCIÓN DE AGENTES EN ALMACENAMIENTO DESCENTRALIZADO IPFS PARA AUDITORÍA."
+                    "name": "Motor de Auditoría IPFS (CNBV)",
+                    "desc": "ARCHIVA TODOS LOS EVENTOS DE EJECUCIÓN (HMAC-SHA256) EN ALMACENAMIENTO IPFS PARA COMPLIANCE FORENSE."
                 },
                 "eliza-trading-brain": {
-                    "name": "Cerebro de Trading ElizaOS",
-                    "desc": "EMBEBE UN AGENTE DE IA ELIZAOS COMO CAPA DE TOMA DE DECISIONES PARA ESTRATEGIAS DE TRADING."
+                    "name": "Capa Lógica de Aprobación",
+                    "desc": "APLICA FIRMAS MULTISIG (2-DE-3) A EVENTOS CRÍTICOS DEL PROTOCOLO ANTES DE EJECUTAR EN STELLAR."
                 }
             }
         },
@@ -1993,30 +2035,30 @@
     },
     "analytics": {
         "header": {
-            "title_pre": "ANALÍTICAS DE",
-            "title_span": "TESORERÍA",
-            "subtitle": "Telemetría en tiempo real y métricas de despliegue de capital",
-            "wallet_prefix": "BÓVEDA",
-            "guest_view": "SOLO LECTURA",
-            "connect_prompt": "[!] AUTENTICA PARA ACCEDER A LA TELEMETRÍA"
+            "title_pre": "TELEMETRÍA DE",
+            "title_span": "INFRAESTRUCTURA",
+            "subtitle": "Monitoreo en tiempo real y métricas de float corporativo",
+            "wallet_prefix": "BÓVEDA B2B",
+            "guest_view": "VISTA DE AUDITORÍA (SOLO LECTURA)",
+            "connect_prompt": "[!] AUTENTIQUE SU BÓVEDA INSTITUCIONAL PARA ACCEDER AL FEED"
         },
         "stats": {
-            "wallet_balance": "Balance Líquido",
-            "active_helpers": "Nodos Activos",
-            "earned_today": "Acumulado 24H (Est.)",
-            "money_at_work": "Capital Desplegado",
-            "current_rate": "Tasa Benchmark (XLM)",
+            "wallet_balance": "Liquidez Operativa",
+            "active_helpers": "Nodos Desplegados",
+            "earned_today": "Ahorro Estructural 24H",
+            "money_at_work": "Float Administrado (CETES)",
+            "current_rate": "Tasa de Referencia Institucional",
             "status": {
-                "ready": "LISTO",
+                "ready": "OPERATIVO",
                 "running": "PROCESANDO",
-                "standby": "EN ESPERA",
+                "standby": "EN ESPERA DE TRIGGERS",
                 "live": "EN VIVO",
                 "idle": "INACTIVO"
             }
         },
         "chart": {
-            "title": "LÍNEA DE TIEMPO DE EJECUCIÓN",
-            "projected": "PROYECTADO",
+            "title": "TIMELINE DE REBALANCEO AUTÓNOMO",
+            "projected": "PROYECCIÓN",
             "ranges": {
                 "day": "24H",
                 "week": "7D",
@@ -2024,182 +2066,182 @@
             }
         },
         "opportunities": {
-            "title": "NÚCLEO DE DESPLIEGUE DE CAPITAL",
+            "title": "VECTORES DE LIQUIDACIÓN AUTÓNOMA",
             "types": {
-                "stable": "ESTABLE",
-                "volatile": "VOLÁTIL",
-                "low_risk": "RIESGO BASE",
-                "live": "EN VIVO"
+                "stable": "CERO RIESGO (SOBERANO)",
+                "volatile": "FX DINÁMICO",
+                "low_risk": "RIESGO CONTROLADO",
+                "live": "ON-CHAIN"
             },
             "items": {
-                "blend_xlm": "Oferta XLM (Blend)",
-                "blend_usdc": "Préstamos USDC (Blend)",
-                "soroswap": "Pool XLM/USDC (Soroswap)",
-                "sdex": "Orderbook SDEX",
-                "strategic_log": "Registro On-Chain (Estratégico)"
+                "blend_xlm": "Inventario CETES (Etherfuse)",
+                "blend_usdc": "Liquidez de Bóveda (USDC)",
+                "soroswap": "Reserva Operativa",
+                "sdex": "Asignación de Tesorería",
+                "strategic_log": "Registro de Prueba de Auditoría"
             }
         },
         "telemetry": {
-            "horizon": "Estado de Horizon",
-            "soroban": "Soroban RPC",
-            "latency": "Latencia Promedio",
-            "version": "Versión del Protocolo",
+            "horizon": "Estado de Nodo Horizon",
+            "soroban": "RPC Institucional (Soroban)",
+            "latency": "Latencia de Ejecución",
+            "version": "Versión del SDK B2B",
             "operational": "Operativo",
-            "active": "Activo"
+            "active": "Sincronizado"
         },
         "safety": {
             "title": "AUDITORÍA DE CUMPLIMIENTO",
-            "subtitle": "INTEGRIDAD DE RED (SCF 7.0)",
-            "wallets_ready": "BÓVEDAS ASEGURADAS",
-            "record_status": "Logging Inmutable & Ético: ACTIVO"
+            "subtitle": "INTEGRIDAD DE RED (SCF 7.0 / INSTAWARD)",
+            "wallets_ready": "BÓVEDAS CORPORATIVAS ASEGURADAS",
+            "record_status": "Logging Inmutable & Ético (Art. 80): ACTIVO"
         }
     },
     "ramp": {
         "header": {
-            "badge": "Canal de Entrada de Capital",
-            "title": "Onramp Institucional",
-            "subtitle": "Transfiera fondos hacia su bóveda Nirium a través de canales regulados. Entorno de prueba (SCF Sandbox) compatible con el Código de Conducta de Stellar — no se movilizan fondos reales."
+            "badge": "Fondeo SPEI → CETES vía Etherfuse",
+            "title": "Fondea tu vault vía SPEI",
+            "subtitle": "Transfiere MXN vía SPEI a una CLABE. Etherfuse — operador regulado independiente — lo convierte en CETES tokenizados en Stellar a la tasa de referencia Banxico. KYC/KYB requerido. Sandbox activo — no se movilizan fondos reales."
         },
         "component": {
-            "title": "Onramp Institucional",
-            "powered_by": "Soportado por Etherfuse (Testnet)",
-            "select_bond": "Seleccionar Opción CETES",
+            "title": "Fondeo SPEI → CETES",
+            "powered_by": "Operado por Etherfuse · Testnet Stellar",
+            "select_bond": "Instrumento Soberano (CETES — Banxico)",
             "errors": {
-                "amount": "El monto debe estar entre 1 y 500 MXN en el Sandbox",
-                "wallet": "Por favor ingrese una dirección de billetera Stellar Testnet (G...)"
+                "amount": "El monto debe estar entre 1 y 10,000 MXN en el Sandbox",
+                "wallet": "Por favor ingrese la dirección de su bóveda corporativa en Testnet (G...)"
             },
             "form": {
-                "amount_label": "Monto de Depósito (MXN)",
-                "wallet_label": "Destino (Testnet)",
+                "amount_label": "Monto de Fondeo (MXN)",
+                "wallet_label": "Bóveda Destino (Testnet)",
                 "wallet_placeholder": "G...",
-                "button": "Generar Cotización Institucional"
+                "button": "Generar Instrucción de Fondeo"
             },
             "status": {
-                "registering": "Registrando contraparte en Etherfuse...",
-                "requesting": "Solicitando tasas mayoristas a Etherfuse...",
-                "kyc_title": "KYC Requerido",
-                "kyc_desc": "Cumplimiento normativo SEP-12 requerido. Complete la simulación de KYC para habilitar el onramp en Testnet, garantizando la seguridad institucional.",
-                "kyc_button": "Completar KYC en Etherfuse",
-                "kyc_retry": "Tras completar el KYC, haga clic aquí para reintentar",
-                "securing": "Asegurando asignación de CETES...",
-                "awaiting": "Aguardando transferencia SPEI...",
-                "simulating": "Sandbox simulando automáticamente recepción de fondos..."
+                "registering": "Registrando institución contraparte en la API de Etherfuse...",
+                "requesting": "Solicitando spreads mayoristas a Etherfuse...",
+                "kyc_title": "KYB/KYC Requerido",
+                "kyc_desc": "Cumplimiento normativo SEP-12 (Art. 80) requerido. Complete la simulación de debida diligencia para habilitar la cuenta corporativa en Testnet.",
+                "kyc_button": "Completar Onboarding en Etherfuse",
+                "kyc_retry": "Tras la aprobación del KYB, haga clic aquí para reintentar",
+                "securing": "Asegurando asignación primaria de CETES...",
+                "awaiting": "Aguardando transferencia corporativa SPEI...",
+                "simulating": "Sandbox simulando recepción interbancaria de fondos..."
             },
             "quote": {
-                "source": "Fiat de Origen",
-                "target": "Activo Destino",
-                "rate": "Tipo de Cambio",
-                "expires": "Expira en: 2m",
-                "cancel": "Cancelar",
-                "confirm": "Confirmar y Procesar"
+                "source": "Moneda de Origen",
+                "target": "Activo Soberano",
+                "rate": "Tasa de Asignación",
+                "expires": "Cotización expira en: 2m",
+                "cancel": "Abortar",
+                "confirm": "Firmar y Procesar"
             },
             "wiring": {
-                "title": "Envíe MXN vía SPEI a:",
-                "clabe": "CLABE",
-                "bank": "Banco Beneficiario",
-                "beneficiary": "Beneficiario",
-                "amount": "Monto a Transferir"
+                "title": "Instrucción de Fondeo SPEI:",
+                "clabe": "Cuenta CLABE (Custodio)",
+                "bank": "Banco Receptor",
+                "beneficiary": "Beneficiario Institucional",
+                "amount": "Monto de Liquidación"
             },
             "success": {
-                "title": "Transferencia Compensada",
-                "desc": "El Sandbox de Tesorería simuló exitosamente la recepción de Fiat. Etherfuse está minteando CETES directamente a su bóveda.",
-                "button": "Procesar Otra Operación"
+                "title": "Liquidación Interbancaria Compensada",
+                "desc": "El Sandbox ha validado el pago SPEI. La API de Etherfuse está emitiendo los CETES correspondientes directamente a su contrato inteligente de bóveda.",
+                "button": "Procesar Nuevo Lote"
             },
             "legal": {
-                "infrastructure": "Infraestructura",
-                "compliance": "Cumplimiento",
-                "security": "Seguridad",
-                "agreements": "Acuerdos",
-                "ethics_aligned": "Alineación Ética"
+                "infrastructure": "Infraestructura B2B",
+                "compliance": "Compliance (SEP-12)",
+                "security": "Seguridad de Custodia",
+                "agreements": "Acuerdos (SLA)",
+                "ethics_aligned": "Alineación SCF 7.0"
             }
         }
     },
     "agents": {
-        "title": "NODOS DE EJECUCIÓN",
-        "subtitle": "Todos los eventos de infraestructura son sellados criptográficamente en el {strong}. Totalmente auditable.",
-        "permanent_record_strong": "registro inmutable",
-        "status_online": "SISTEMA ENCENDIDO: {v} // SEGURO",
-        "stellar_connection": "Conexión Stellar",
-        "latency": "Latencia",
-        "jargus_link": "Seguridad Jargus (78/78 vectores)",
-        "node": "Nodo",
+        "title": "INFRAESTRUCTURA DE NODOS B2B",
+        "subtitle": "Todos los eventos de ejecución están anclados criptográficamente en un {strong}. Infraestructura 100% auditable bajo estándares SCF 7.0.",
+        "permanent_record_strong": "registro inmutable de auditoría",
+        "status_online": "SISTEMA OPERATIVO: {v} // SEGURO",
+        "stellar_connection": "Nodo Stellar RPC",
+        "latency": "Latencia de Ejecución",
+        "jargus_link": "Certificación Jargus (78/78 Vectores)",
+        "node": "Nodo de Ejecución",
         "health": {
             "title": "TELEMETRÍA DE INFRAESTRUCTURA",
-            "connection": "Conexión",
-            "engine": "Motor de Ejecución",
-            "storage": "Almacenamiento Seguro",
-            "record": "Ledger Inmutable",
-            "running": "TRABAJANDO",
+            "connection": "Enlace de Red",
+            "engine": "Motor de Ejecución (Soroban)",
+            "storage": "Almacenamiento Criptográfico",
+            "record": "Registro Inmutable",
+            "running": "OPERATIVO",
             "protected": "PROTEGIDO",
-            "measuring": "revisando...",
-            "response_time": "Tiempo de Respuesta"
+            "measuring": "evaluando latencia...",
+            "response_time": "Tiempo de Respuesta (ms)"
         },
         "activity": {
-            "title": "ACTIVIDAD",
-            "moves_per_minute": "MOVIMIENTOS POR MINUTO (EN VIVO)"
+            "title": "FLUJO DE EJECUCIÓN",
+            "moves_per_minute": "TRANSACCIONES POR MINUTO (TELEMETRÍA EN VIVO)"
         },
         "record_panel": {
             "title": "LOG DE AUDITORÍA INMUTABLE",
-            "desc": "Todas las operaciones de los nodos se escriben en almacenamiento descentralizado. Este registro criptográfico no puede ser mutado ni ofuscado, garantizando cumplimiento regulatorio total.",
+            "desc": "Todas las operaciones de infraestructura se escriben en almacenamiento descentralizado (IPFS). Este registro criptográfico es a prueba de manipulaciones, garantizando el cumplimiento estricto con las normativas Fintech (ej. Art. 80).",
             "saved": "Eventos Indexados",
-            "lives": "Capa de Almacenamiento",
-            "how_long": "Retención",
-            "forever": "Inmutable"
+            "lives": "Capa de Persistencia",
+            "how_long": "Periodo de Retención",
+            "forever": "Permanente e Inmutable"
         },
         "console": {
-            "title": "Consola del Nodo",
-            "subtitle": "Aprovisione credenciales criptográficas seguras para sus nodos de ejecución.",
-            "no_wallet": "Billetera No Conectada",
-            "connect_prompt": "Conecta tu billetera para crear una llave",
-            "use_navbar": "Usa la Barra de Navegación para Conectar",
-            "security_note_label": "Nota de Seguridad",
-            "security_note": "Firmarás un mensaje para demostrar que la billetera es tuya. Es totalmente seguro.",
-            "generating": "Creando tu llave segura...",
-            "generate_button": "GENERAR NUEVA CLAVE API",
-            "success": "¡Llave lista!",
-            "api_key_label": "Clave API Generada",
-            "secret_label": "Tu Llave Secreta",
-            "warning": "¡Cuidado! No volveremos a mostrar esta llave. Guárdala bien ahora mismo.",
-            "permissions": "Alcance de Permisos",
-            "limit": "Límite",
-            "close": "Cerrar y Limpiar Pantalla"
+            "title": "Consola de Aprovisionamiento",
+            "subtitle": "Aprovisione credenciales criptográficas de API para sus nodos de ejecución corporativos.",
+            "no_wallet": "Bóveda No Vinculada",
+            "connect_prompt": "Conecte su bóveda institucional para generar credenciales",
+            "use_navbar": "Autentique vía Freighter en el menú superior",
+            "security_note_label": "Protocolo de Seguridad",
+            "security_note": "Se requiere firma criptográfica (HMAC-SHA256) para probar la propiedad de la bóveda. La firma nunca abandona su cliente local.",
+            "generating": "Aprovisionando entorno seguro...",
+            "generate_button": "APROVISIONAR CLAVE API",
+            "success": "Aprovisionamiento Exitoso",
+            "api_key_label": "Clave API de Integración",
+            "secret_label": "Secreto Institucional",
+            "warning": "ALERTA DE SEGURIDAD: Este secreto no volverá a mostrarse. Almacénelo en su bóveda corporativa (Vault) inmediatamente.",
+            "permissions": "Matriz de Permisos",
+            "limit": "Límite Operativo",
+            "close": "Cerrar Panel de Aprovisionamiento"
         },
         "cli": {
-            "title": "Nirium CLI",
-            "subtitle": "Aprovisione un kernel de nodo funcional al instante.",
+            "title": "CLI de Integración B2B",
+            "subtitle": "Aprovisione un kernel de ejecución programática en su infraestructura local.",
             "new": "NUEVO"
         },
         "sdk": {
-            "py": "SDK Python",
-            "js": "SDK Node.js",
-            "ready": "{v} Listo"
+            "py": "SDK Institucional (Python)",
+            "js": "SDK Institucional (Node.js)",
+            "ready": "Versión {v} Lista para Despliegue"
         },
         "tabs": {
-            "logs": "LOGS",
-            "sdk": "SDK",
-            "activity_title": "ACTIVIDAD EN VIVO",
-            "starter_title": "TEMPLATE DE INICIO",
-            "waiting": "Esperando actividad...",
-            "archive": "archivo",
-            "live_updates": "Telemetría en tiempo real. {n} eventos comprometidos en el registro inmutable.",
-            "connecting": "Conectando al almacenamiento de registros...",
-            "starter_desc": "Pon tu llave y lanza este ejemplo para billeteras de {asset}."
+            "logs": "REGISTROS DE AUDITORÍA",
+            "sdk": "INTEGRACIÓN SDK",
+            "activity_title": "TELEMETRÍA EN VIVO",
+            "starter_title": "ESQUEMA DE INTEGRACIÓN",
+            "waiting": "A la espera de triggers de ruteo corporativo...",
+            "archive": "archivo histórico",
+            "live_updates": "Feed telemétrico en tiempo real. {n} registros de auditoría anclados exitosamente.",
+            "connecting": "Estableciendo conexión con el registro de auditoría...",
+            "starter_desc": "Inyecte sus credenciales API para inicializar la infraestructura con su bóveda de {asset}."
         },
         "built_safe": {
             "title": "Garantías Éticas y de Protocolo",
-            "desc": "Los nodos de ejecución enrutan a través de contratos inteligentes en Stellar aplicando ejecución atómica. Todas las transiciones de estado se registran inmutablemente, alineándose con el Código de Conducta de Stellar y los estándares de transparencia del SCF 7.0."
+            "desc": "Los nodos de ejecución enrutan a través de contratos inteligentes en Stellar aplicando ejecución atómica. Todas las transiciones de estado se registran inmutablemente, alineándose con el Código de Conducta de Stellar y los estándares de transparencia Instaward y SCF 7.0."
         },
         "audit": {
-            "preparing": "Preparando archivo de auditoría...",
-            "success": "Archivo de auditoría generado exitosamente (nirium-audit.json)",
-            "error": "Error de generación",
-            "requested": "⚠️ SE HA SOLICITADO UN LOG DE AUDITORÍA",
-            "button": "DESCARGAR LOG DE AUDITORÍA"
+            "preparing": "Compilando reporte de auditoría...",
+            "success": "Archivo exportado exitosamente (nirium-audit-cnbv.json)",
+            "error": "Falla en compilación de reporte",
+            "requested": "⚠️ SOLICITUD DE EXPORTACIÓN DE LOG INSTITUCIONAL",
+            "button": "EXPORTAR REPORTE (JSON)"
         },
         "status": {
-            "connecting": "CONECTANDO...",
-            "live": "EN VIVO · {n} REGISTROS",
-            "error": "ERROR"
+            "connecting": "NEGOCIANDO CONEXIÓN...",
+            "live": "OPERATIVO · {n} TRANSACCIONES",
+            "error": "FALLA DE CONEXIÓN"
         }
     },
     "ai_modal": {
@@ -2257,213 +2299,213 @@
     },
     "compliance": {
         "title": "Cumplimiento y Confianza Institucional",
-        "regulatory_awareness": "Divulgación Regulatoria",
-        "disclosure_text": "Nirium es una infraestructura de software no custodial. No proporcionamos asesoramiento financiero, no gestionamos activos de terceros ni procesamos fiat directamente. Todas las operaciones financieras son ejecutadas en la red Stellar por el usuario a través de billeteras no custodiales. El cumplimiento regulatorio para operaciones fiat es gestionado por nuestros socios regulados terceros en alineación con las leyes locales (ej. Art. 80 Ley Fintech).",
-        "non_custodial_manifesto": "La naturaleza no custodial de Nirium asegura que usted, el usuario, mantenga el control exclusivo sobre sus llaves privadas y activos en todo momento. Nuestros agentes son 'ayudantes delegados' que actúan en su nombre mediante autorizaciones de contratos inteligentes atómicos.",
-        "atomic_proof": "Cada acción en este panel está respaldada por una prueba atómica on-chain. Haga clic en cualquier estado para verificar el hash de la transacción en Stellar.Expert.",
-        "scf_conduct": "La operación de esta interfaz implica la adhesión al Código de Conducta de Stellar y a los principios de innovación financiera responsable."
+        "regulatory_awareness": "Aviso Regulatorio: Proveedor de Software B2B",
+        "disclosure_text": "Nirium es exclusivamente un proveedor de software e infraestructura (SDK/API). No operamos como Institución de Tecnología Financiera (ITF), no gestionamos fondos de terceros, ni estamos sujetos a registro bajo el Art. 80 de la Ley Fintech. Toda la responsabilidad operativa, KYC, AML y cumplimiento recae en el operador institucional regulado que utiliza nuestra infraestructura. Nirium actúa únicamente como capa de ruteo descentralizado en Soroban.",
+        "non_custodial_manifesto": "La naturaleza no custodial de la infraestructura de Nirium asegura que la institución u operador mantenga el control exclusivo sobre sus llaves privadas y activos de tesorería en todo momento. Nuestros nodos de ejecución operan estrictamente bajo autorizaciones de contratos inteligentes (Soroban) predefinidas y auditables.",
+        "atomic_proof": "Cada acción automatizada está respaldada por una prueba atómica on-chain. Puede auditar cualquier transacción ejecutada por el SDK a través del explorador de Stellar (Stellar.Expert).",
+        "scf_conduct": "La utilización de este SDK implica la adhesión estricta al Código de Conducta de Stellar (Mayo 2026) y a los principios de innovación responsable del ecosistema (Instaward / SCF 7.0)."
     },
     "compliance_page": {
-        "badge": "Capa de Compliance",
+        "badge": "Arquitectura de Cumplimiento B2B",
         "hero": {
-            "title": "Audit Trail",
-            "subtitle": "Cada decisión del agente firmada con HMAC-SHA256, encadenada criptográficamente, anclada en IPFS, y exportable al formato que pide la CNBV."
+            "title": "Institutional Audit Trail",
+            "subtitle": "Cada ejecución del nodo B2B se firma con HMAC-SHA256, se ancla en IPFS y se estructura en formato JSON, listo para integración con sistemas de reporte regulatorio (ej. CNBV)."
         },
         "layers": {
-            "title": "Cuatro Capas de Prueba",
+            "title": "Cuatro Capas de Prueba Criptográfica",
             "hmac": {
-                "title": "HMAC-SHA256",
-                "desc": "Cada acción del agente se firma con la llave maestra del cliente. Si alguien manipula el registro, la firma se invalida automáticamente."
+                "title": "Firma Institucional (HMAC-SHA256)",
+                "desc": "Cada acción de infraestructura requiere la firma de la llave maestra corporativa. Cualquier mutación del payload invalida automáticamente la autenticidad del registro."
             },
             "chain": {
-                "title": "Cadena Criptográfica",
-                "desc": "Cada registro hashea al anterior. Cambiar uno solo rompe toda la cadena posterior. Es blockchain-style sin necesidad de blockchain."
+                "title": "Concatenación Criptográfica",
+                "desc": "Cada evento de ejecución aplica un hash sobre el estado anterior. Este diseño tipo blockchain garantiza la integridad forense del flujo completo de tesorería."
             },
             "ipfs": {
-                "title": "IPFS (Pinata)",
-                "desc": "El reporte completo se sube a IPFS. Recibes un CID inmutable. Cualquier auditor o regulador puede verificar el reporte sin tu intervención."
+                "title": "Persistencia Descentralizada (IPFS)",
+                "desc": "El registro de auditoría institucional se publica en IPFS. El CID inmutable generado asegura que firmas auditoras puedan verificar la integridad de la información de forma independiente."
             },
             "cnbv": {
-                "title": "Export CNBV",
-                "desc": "JSON estructurado con campos `folio`, `fecha_hora`, `tipo_operacion`, `agente`, `monto_usdc`, `red_blockchain`, `hash_transaccion`, `firma_hmac`, `integridad`. Listo para envío."
+                "title": "Exportación Estructurada (JSON)",
+                "desc": "Formatos pre-estructurados con identificadores estándar (`folio`, `monto_usdc`, `firma_hmac`, etc.) que aceleran la generación de reportes normativos para reguladores locales."
             }
         },
         "fintech_law": {
-            "title": "Diseñado para Ley Fintech Art. 80",
-            "subtitle": "67+ fintechs reguladas activas en México operan bajo la CNBV. Todas necesitan reportes auditables. Nirium los genera automáticamente.",
+            "title": "Diseñado para Operadores Regulados",
+            "subtitle": "Facilitamos la infraestructura para que los operadores Fintech (ej. Art. 80 en México) puedan probar la trazabilidad completa de sus operaciones automatizadas.",
             "requirements": {
-                "title": "¿Qué pide la CNBV?",
+                "title": "Requisitos de Auditoría Estándar",
                 "items": [
-                    "Trazabilidad completa de cada operación",
-                    "Identificación del actor que ejecutó",
-                    "Hash inmutable de cada transacción",
-                    "Reporte exportable a JSON estructurado",
-                    "Almacenamiento por 5 años"
+                    "Trazabilidad inmutable por cada operación",
+                    "Acreditación forense del nodo ejecutor",
+                    "Registro criptográfico de transiciones de estado",
+                    "Estructura agnóstica para ingesta JSON",
+                    "Soporte de almacenamiento distribuido a largo plazo"
                 ]
             },
             "stats": {
-                "fintechs": "Fintechs CNBV",
+                "fintechs": "Infraestructura",
                 "integration": "Integración",
-                "cost": "Costo Licencia",
-                "automated": "Automático"
+                "cost": "Costos API",
+                "automated": "Aprovisionamiento"
             }
         },
         "preview": {
-            "title": "Vista Previa del Reporte",
-            "integrity": "Cadena Íntegra"
+            "title": "Vista Previa de Telemetría",
+            "integrity": "Verificación Íntegra"
         },
-        "disclaimer": "Nirium provee la capa técnica para generar reportes auditables. La interpretación regulatoria, presentación ante CNBV y cumplimiento de Art. 80 son responsabilidad del operador regulado. Software-only, no asesoría legal.",
+        "disclaimer": "Nirium proporciona únicamente la infraestructura técnica de software. No proveemos asesoría legal. La interpretación, generación y presentación de reportes ante autoridades regulatorias (como la CNBV) es responsabilidad exclusiva del operador financiero que utiliza la API.",
         "cta": {
-            "title": "¿Reguladora Preguntando?",
-            "subtitle": "Genera el reporte en 30 segundos.",
-            "try_testnet": "Probar en Testnet",
-            "docs": "Documentación"
+            "title": "¿Requisitos de Auditoría Activos?",
+            "subtitle": "Exporte el registro criptográfico de su infraestructura en segundos.",
+            "try_testnet": "Auditar en Sandbox",
+            "docs": "Documentación Técnica"
         }
     },
     "developers_page": {
         "hero": {
             "title": "Construye en",
-            "subtitle": "SDK TypeScript, 44+ endpoints REST, servidor MCP para Claude/Cursor, y soporte nativo para x402 + MPP."
+            "subtitle": "Infraestructura B2B: SDK TypeScript, 44+ endpoints REST, servidor MCP para Claude/Cursor, y soporte nativo para micropagos x402 + MPP."
         },
         "quickstart": {
-            "title": "Quickstart: 5 Líneas",
-            "subtitle": "Rebalanceo autónomo + cross-border en producción."
+            "title": "Aprovisionamiento: 5 Líneas",
+            "subtitle": "Rebalanceo corporativo autónomo (USDC a CETES) en producción."
         },
         "agentic_payments": {
-            "title": "Pagos para Agentes IA",
-            "subtitle": "x402 para micro-pagos por llamada. MPP para presupuestos de sesión, fondeos pasivos y nóminas masivas.",
+            "title": "Micropagos B2B para Agentes",
+            "subtitle": "x402 para pagos atómicos por API. MPP para presupuestos corporativos de sesión y liquidaciones institucionales masivas.",
             "x402": {
-                "title": "x402 — Pago por Llamada"
+                "title": "x402 — Pago Atómico por Llamada"
             },
             "mpp": {
-                "title": "MPP — Sesión con Presupuesto"
+                "title": "MPP — Canal de Pago Corporativo"
             },
             "table": {
                 "tx_per_call": "Tx on-chain por llamada",
-                "facilitator": "Necesita facilitador",
-                "needs_xlm": "Cliente necesita XLM",
-                "best_for": "Mejor para",
-                "quick_setup": "Setup rápido",
-                "no_third_party": "Sin 3a parte",
-                "high_freq": "Alta frecuencia",
+                "facilitator": "Requiere facilitador SaaS",
+                "needs_xlm": "La institución necesita XLM",
+                "best_for": "Optimizado para",
+                "quick_setup": "Integración Rápida",
+                "no_third_party": "P2P B2B Nativo",
+                "high_freq": "Liquidación Alta Frecuencia",
                 "optional": "Opc."
             }
         },
         "mcp": {
-            "title": "Integración Desktop",
-            "subtitle": "Conecta tu instancia de Claude Desktop o Cursor a tu vault en 2 minutos. Permite que tu asistente IA gestione capital y consulte tasas directamente.",
-            "tools_count": "12 Herramientas Reales"
+            "title": "Integración de Consola (MCP)",
+            "subtitle": "Conecta tu instancia de Claude Desktop o Cursor a tu infraestructura en 2 minutos. Permite que el nodo gestione capital corporativo de forma segura y auditable.",
+            "tools_count": "12 Operaciones Base"
         },
         "hub": {
-            "title": "Hub de Ejecución",
-            "subtitle": "44+ Endpoints diseñados para tesorería autónoma institucional y auditoría.",
-            "infrastructure": "Infraestructura Core",
-            "explorer": "Explorador del Protocolo",
-            "subsystems": "+18 Subsistemas adicionales para Orquestación Flota"
+            "title": "Hub de Telemetría",
+            "subtitle": "44+ Endpoints diseñados estrictamente para el ruteo autónomo institucional y exportación forense (Ley Fintech).",
+            "infrastructure": "Infraestructura B2B Core",
+            "explorer": "Explorador de Cumplimiento",
+            "subsystems": "+18 Subsistemas modulares para Orquestación Institucional"
         },
         "nodes": {
-            "title": "Nodos Verificados",
-            "subtitle": "Smart contracts inmutables desplegados en Stellar Testnet."
+            "title": "Nodos de Ejecución Auditados",
+            "subtitle": "Contratos inteligentes Soroban no-custodiales desplegados en Stellar Testnet."
         },
         "resources": {
-            "view_docs": "Ver Documentación"
+            "view_docs": "Leer Documentación Técnica"
         },
         "cta": {
-            "title": "¿Listo para Construir?",
-            "subtitle": "API key gratis en testnet. Sin tarjeta.",
-            "get_key": "Obtener API Key"
+            "title": "¿Requisitos de Infraestructura?",
+            "subtitle": "Obtén acceso a los endpoints de aprovisionamiento en Sandbox.",
+            "get_key": "Generar API Key"
         }
     },
     "treasury_page": {
         "hero": {
-            "badge": "Producto principal",
-            "title": "Tesorería Autónoma",
-            "subtitle": "Un agente IA en Stellar que rebalancea tu tesorería entre USDC y CETES vía Etherfuse 24/7. Cero CFO. Cero Excel. Cero WhatsApp."
+            "badge": "Infraestructura Core",
+            "title": "SDK de Tesorería B2B",
+            "subtitle": "Infraestructura B2B en Stellar que rebalancea el float corporativo entre USDC y CETES vía Etherfuse 24/7. Cero intervenciones manuales. Cero desarrollos complejos."
         },
         "how_it_works": {
-            "title": "Cómo trabaja el agente",
+            "title": "Cómo funciona la integración SDK",
             "step1": {
-                "title": "Monitoreo Autónomo 24/7",
-                "body": "Consulta RATE actual de Blend (USDC lending en Stellar) y Etherfuse (Bonos tokenizados) en tiempo real. Sin esperas."
+                "title": "Monitoreo Programático 24/7",
+                "body": "Obtiene tasas de referencia del protocolo (Blend USDC y Etherfuse CETES) de manera programática en tiempo real vía oráculos Soroban."
             },
             "step2": {
-                "title": "Aplica tu política",
-                "body": "Tú defines: umbral de spread (1.5%), liquidez mínima USDC (0K), exposición máxima en bonos (60%). El agente respeta esas reglas."
+                "title": "Define reglas de ruteo",
+                "body": "Configura parámetros como límites de exposición, liquidez mínima operativa (0K) y políticas de ruteo corporativo B2B."
             },
             "step3": {
-                "title": "Decide rebalancear",
-                "body": "Si el spread Bonos vs USDC supera tu umbral, ejecuta. Si no, mantiene la posición. Cada decisión queda firmada y trazable."
+                "title": "Ejecuta políticas institucionales",
+                "body": "Si los parámetros cumplen las políticas, el SDK ejecuta de forma autónoma. Cada transacción queda firmada criptográficamente (HMAC-SHA256)."
             },
             "step4": {
-                "title": "Ejecuta en Stellar (~4s)",
-                "body": "Vía pathPaymentStrictReceive en SDEX o swap directo Etherfuse. Sin custodia. Las llaves siempre son del cliente."
+                "title": "Liquida en Stellar (~4s)",
+                "body": "Liquida automáticamente mediante contratos Soroban. Operación 100% no custodial; las llaves siempre permanecen bajo el control de la empresa."
             },
             "step5": {
-                "title": "Reporta y sigue trabajando",
-                "body": "Audit log con HMAC-SHA256, anclado en IPFS, exportable a CNBV. El agente mantiene ejecución autónoma continua 24/7."
+                "title": "Genera reportes de cumplimiento",
+                "body": "Exporta JSON listos para CNBV y auditores, todo anclado inmutablemente en IPFS. Operación autónoma continua asegurada."
             }
         },
         "assets": {
             "usdc": {
-                "desc": "Circle en Stellar",
+                "desc": "Circle (Liquidez B2B)",
                 "status": "Líquido",
-                "yield_label": "Tasa (Blend)",
-                "liquidity_label": "Liquidez",
-                "liquidity_value": "Inmediata",
-                "risk_label": "Riesgo",
+                "yield_label": "Tasa Ref. (Blend)",
+                "liquidity_label": "Liquidez Institucional",
+                "liquidity_value": "Instantánea",
+                "risk_label": "Perfil de Riesgo",
                 "risk_value": "Bajo"
             },
             "bonds": {
                 "title": "CETES",
-                "desc": "vía Etherfuse en Stellar",
-                "yield_label": "Tasa (Etherfuse)",
-                "liquidity_label": "Liquidez",
-                "liquidity_value": "24/7 (vs tradicional)",
+                "desc": "vía Etherfuse (Testnet)",
+                "yield_label": "Tasa Ref. (Etherfuse)",
+                "liquidity_label": "Liquidez Institucional",
+                "liquidity_value": "24/7 API",
                 "rating_label": "Calificación",
-                "rating_value": "Respaldado por Gobierno (MX — Banxico/SHCP)"
+                "rating_value": "Respaldo Gubernamental (MX)"
             },
-            "coming_soon": "Próximamente vía Etherfuse:"
+            "coming_soon": "Soporte multi-activo planeado:"
         },
         "cross_border": {
-            "title": "Cross-border como output",
-            "subtitle": "Cuando el agente rebalancea, los pagos cross-border son una consecuencia natural — no un producto separado.",
-            "traditional": "Tradicional",
-            "best_crypto": "Mejor crypto actual",
+            "title": "Ruteo cross-border eficiente",
+            "subtitle": "El rebalanceo autónomo habilita rieles de transferencia B2B como consecuencia de infraestructura directa.",
+            "traditional": "Rieles Legacy",
+            "best_crypto": "Soluciones Crypto",
             "nirium": "Nirium + Etherfuse",
-            "total_to_user": "Total al usuario",
-            "explanation": "El corredor Fiat ↔ CETES ↔ USDC vía Etherfuse evita el spread caro de XLM/USDC en SDEX y lo reemplaza con un fee de ~0.8% all-in (Nirium + Etherfuse)."
+            "total_to_user": "Liquidez Neta",
+            "explanation": "El corredor corporativo USDC ↔ CETES vía Etherfuse optimiza la tesorería B2B. Nirium provee la infraestructura de software (licencia fija). Etherfuse cobra ~0.20% por ejecución CETES. El Partner Regulado (ITF/casa de bolsa) establece y cobra todas las comisiones financieras de manera independiente."
         },
         "paths": {
-            "title": "Dos caminos según el usuario",
+            "title": "Dos flujos de integración B2B",
             "path1": {
-                "label": "Camino 1",
-                "title": "Onramp KYC (humanos)",
-                "desc": "Persona física o fintech con clientes regulados. KYC vía Etherfuse, depósito bancario local, recibe bonos tokenizados en su wallet Stellar.",
-                "item1": "KYC completo vía Etherfuse",
-                "item2": "Depósito SPEI desde banco",
-                "item3": "Cumplimiento CNBV listo"
+                "label": "Flujo 1",
+                "title": "Rampa Fintech (Operadores)",
+                "desc": "Para fintechs reguladas operando flujos fiat-to-crypto. Aprovisionamiento vía Etherfuse con KYC institucional completo y recepción en wallets corporativas.",
+                "item1": "KYC institucional vía Etherfuse",
+                "item2": "Recepción SPEI corporativa",
+                "item3": "Cumplimiento y logs CNBV"
             },
             "path2": {
-                "label": "Camino 2",
-                "title": "Swap sin KYC (agentes)",
-                "desc": "Agentes IA o protocolos DeFi que ya tienen USDC. Swap directo USDC ↔ Bonos vía Etherfuse o SDEX. Sin formularios. Sin pasaporte.",
-                "item1": "Solo crypto-to-crypto",
-                "item2": "API programática 24/7",
-                "item3": "Liquidación en ~4s"
+                "label": "Flujo 2",
+                "title": "Ruteo Programático (B2B)",
+                "desc": "Integración directa API/SDK para plataformas que ya operan con USDC. Swap institucional 24/7 sin interfaces de usuario innecesarias.",
+                "item1": "Ejecución crypto nativa",
+                "item2": "Disponibilidad API 24/7",
+                "item3": "Liquidación atómica en ~4s"
             }
         },
         "links": {
-            "title": "Profundiza",
-            "builder": "Diseña políticas de rebalanceo visualmente",
-            "security": "Cómo funciona la custodia",
-            "compliance": "Cumplimiento CNBV",
-            "view": "Ver"
+            "title": "Documentación Técnica",
+            "builder": "Diseño visual de flujos de ruteo",
+            "security": "Arquitectura de seguridad no custodial",
+            "compliance": "Logs criptográficos y reportes",
+            "view": "Explorar"
         },
         "cta": {
-            "title": "Activa tu agente hoy",
-            "subtitle": "Testnet gratis. Sin demo calls. Sin pitch enterprise.",
-            "start": "Comenzar gratis",
-            "pricing": "Ver pricing"
+            "title": "Comienza a construir",
+            "subtitle": "Acceso libre a Testnet. Sin demoras de ventas. Documentación directa.",
+            "start": "Abrir Sandbox",
+            "pricing": "Ver licenciamiento B2B"
         }
     },
     "coc_page": {
@@ -2483,5 +2525,13 @@
                 "content": "Para cumplir con los rigurosos estándares del Instaward, nuestra arquitectura impone protocolos de seguridad de nivel empresarial, flujos sólidos de autorización multifirma y trazabilidad completa on-chain. Priorizamos la confianza institucional manteniendo la separación de responsabilidades, operaciones no custodiales y una estricta conciencia regulatoria."
             }
         }
+    },
+    "legal": {
+        "disclaimer_short": "Nirium es software experimental en Stellar Testnet. No es asesoría financiera. No garantiza rendimientos, dividendos ni retornos. Úselo bajo su propio riesgo.",
+        "disclaimer_full": "Nirium es software experimental desplegado exclusivamente en Stellar Testnet. Todas las operaciones utilizan tokens de prueba sin valor monetario real. Los contratos inteligentes no han sido auditados formalmente por un tercero independiente (auditoría planificada para el Mes 3, post-financiamiento). Nirium no es asesoría financiera. No es un producto de inversión. No garantiza rendimientos, dividendos, apreciación de activos ni retornos de ningún tipo. Los datos de tasas de referencia mostrados (Blend APY, Etherfuse CETES) representan información pública del protocolo únicamente — no proyecciones ni promesas de retorno. XLM y los activos de Stellar son volátiles. Úselo bajo su propio riesgo. Este proyecto opera bajo el marco del Stellar Community Fund v7.0 y el Código de Conducta de Stellar (actualizado a mayo del 2026).",
+        "rate_disclaimer": "Tasa de referencia del protocolo únicamente. No es una proyección o garantía de retorno.",
+        "non_custodial": "No custodial. Tú tienes las llaves.",
+        "testnet_only": "Solo Testnet. Sin fondos reales.",
+        "scf_compliant": "Opera bajo SCF v7.0 y Stellar CoC"
     }
 }

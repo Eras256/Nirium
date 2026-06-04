@@ -75,14 +75,10 @@ export function useX402() {
                     }
                 } catch (walletErr: any) {
                     console.error("[x402] Wallet sign failed:", walletErr);
-                    // Fallback layer to ensure high availability during institutional load spikes,
-                    // but for our fallback procedures we can still allow the bypass if explicitly needed.
-                    if (walletErr.message?.includes("Bad union switch")) {
-                         console.warn("[x402] Extension bug detected, using recovery proof...");
-                         proof = "recovery_sig_" + Math.random().toString(36).substring(7);
-                    } else {
-                         throw walletErr;
-                    }
+                    // Propagate all wallet errors — fake signatures are rejected by the server
+                    // and "Bad union switch" indicates a Freighter extension bug that the user
+                    // must resolve (update extension or switch to desktop Freighter).
+                    throw walletErr;
                 }
 
                 if (!proof) {

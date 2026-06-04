@@ -1,9 +1,23 @@
 {
     "name": "nirium",
-    "version": "0.5.0",
+    "version": "0.6.1",
     "description": "Official TypeScript SDK for the Nirium autonomous agent economy on Stellar (x402 + MPP)",
     "main": "dist/index.js",
     "types": "dist/index.d.ts",
+    "homepage": "https://nirium.xyz",
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/Eras256/nirium-core-private"
+    },
+    "bugs": {
+        "url": "https://github.com/nirium/nirium/issues",
+        "email": "xvaiosx7@gmail.com"
+    },
+    "author": {
+        "name": "Nirium Protocol",
+        "email": "xvaiosx7@gmail.com",
+        "url": "https://nirium.xyz"
+    },
     "files": [
         "dist",
         "README.md"
@@ -29,14 +43,19 @@
     "keywords": [
         "nirium",
         "stellar",
+        "soroban",
         "defi",
         "sdk",
-        "soroban",
         "agent",
+        "autonomous",
+        "treasury",
         "x402",
         "mpp",
         "agentic-payments",
-        "usdc"
+        "usdc",
+        "cetes",
+        "etherfuse",
+        "rwa"
     ],
-    "license": "MIT"
+    "license": "Apache-2.0"
 }

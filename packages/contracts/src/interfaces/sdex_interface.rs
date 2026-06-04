@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: Apache-2.0
+// Copyright 2026 Nirium Protocol Contributors
+
 //! SDEX Interface — Stellar's Native Decentralized Exchange (built-in CLOB orderbook).
 //!
 //! The SDEX is built into Stellar's BASE PROTOCOL — no smart contract needed.

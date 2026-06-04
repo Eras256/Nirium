@@ -94,7 +94,7 @@ const ChatBot = () => {
                 fiat: "El [Fiat Hub](/ramp) conecta directamente con la API de **Etherfuse** para emitir CETES vía depósito SPEI (MXN).\n\nFlujo: SPEI → KYC → cotización → CLABE → CETES on-chain.",
                 devs: "La sección de [Developers](/developers) expone **44+ endpoints REST**, SDK TypeScript/Python, servidor MCP para Claude/Cursor, y soporte nativo para **x402 + MPP**.",
                 docs: {
-                    overview: "Visión general de Nirium v0.5.0: [Ver Documentación](/docs?tab=overview).",
+                    overview: "Visión general de Nirium v0.6.1: [Ver Documentación](/docs?tab=overview).",
                     api: "API Sandbox: Gestiona tus llaves y explora endpoints en [Docs > API](/docs?tab=api).",
                     blueprints: "Casos técnicos listos para clonar en [Docs > Blueprints](/docs?tab=blueprints).",
                     architecture: "Arquitectura del protocolo: [Docs > Architecture](/docs?tab=architecture).",
@@ -117,7 +117,7 @@ const ChatBot = () => {
                 fiat: "[Fiat Hub](/ramp) 直连 **Etherfuse** API，通过 SPEI（MXN）存款发行 CETES。\n\n流程：SPEI → KYC → 报价 → CLABE → 链上 CETES。",
                 devs: "[开发者](/developers) 提供 **44+ REST 端点**、TypeScript/Python SDK、Claude/Cursor MCP 服务器，以及原生 **x402 + MPP** 支持。",
                 docs: {
-                    overview: "Nirium v0.5.0 概览：[查看文档](/docs?tab=overview)。",
+                    overview: "Nirium v0.6.1 概览：[查看文档](/docs?tab=overview)。",
                     api: "API 沙盒：在 [文档 > API](/docs?tab=api) 管理密钥。",
                     blueprints: "技术案例：[文档 > Blueprints](/docs?tab=blueprints)。",
                     architecture: "系统架构：[文档 > Architecture](/docs?tab=architecture)。",
@@ -140,7 +140,7 @@ const ChatBot = () => {
                 fiat: "The [Fiat Hub](/ramp) connects directly to the **Etherfuse** API to issue CETES via SPEI deposit (MXN).\n\nFlow: SPEI → KYC → quote → CLABE → CETES on-chain.",
                 devs: "The [Developers](/developers) section exposes **44+ REST endpoints**, TypeScript/Python SDK, MCP server for Claude/Cursor, and native **x402 + MPP** support.",
                 docs: {
-                    overview: "Nirium v0.5.0 overview: [View Documentation](/docs?tab=overview).",
+                    overview: "Nirium v0.6.1 overview: [View Documentation](/docs?tab=overview).",
                     api: "API Sandbox: Manage keys and explore endpoints at [Docs > API](/docs?tab=api).",
                     blueprints: "Technical use cases ready to clone at [Docs > Blueprints](/docs?tab=blueprints).",
                     architecture: "Protocol architecture: [Docs > Architecture](/docs?tab=architecture).",

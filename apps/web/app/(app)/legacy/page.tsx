@@ -47,11 +47,8 @@ const getAgentData = (t: any) => [
 ];
 
 const getContractData = (t: any) => [
-    { name: t.home.institutional_use_cases.contract_display.vault, addr: 'CAU2...EL4', full: 'CAU2XBJTQUBTMPAUFRX7GMZ337I5WLBI4GYPWHZEVXTMJ66D3CP6DEL4', role_key: 'vault', color: '#00F3FF' },
-    { name: t.home.institutional_use_cases.contract_display.elo, addr: 'CC6Z...JWF2', full: 'CC6Z3WJWRKVEAXEKIQ5S3LFEMKRF4L2FTN5YZDQU27MQRQAWA5QBJWF2', role_key: 'elo', color: '#A78BFA' },
-    { name: t.home.institutional_use_cases.contract_display.marketplace, addr: 'CB6Q...UABC', full: 'CB6Q3LKBJ7CAAZY4MK7EG5R6FDDTJHB52ZEENI6BQLBJNFKBQRIAUABC', role_key: 'marketplace', color: '#34D399' },
-    { name: t.home.institutional_use_cases.contract_display.sentinel, addr: 'CCP5...WPY2', full: 'CCP5OY3TTDVIREQYGOUZUXS2MZJO3LLJD6Z22Z3VROWFCPJAON22WPY2', role_key: 'sentinel', color: '#EF4444' },
-    { name: t.home.institutional_use_cases.contract_display.settlement, addr: 'CANZ...Z6KS', full: 'CANZP2OJUS2Y5VXE4YHRR75LE2WKE7QTJOCCWENR7X65DWE6QEJZV6KS', role_key: 'settlement', color: '#F59E0B' },
+    { name: t.home.institutional_use_cases.contract_display.vault, addr: 'CAARZ...JZV', full: 'CBTWMZCG3P72EHFAQ4ZLSEBIOFYJC244H5J6DHZIJ56FHFWJ2CFAWSZU', role_key: 'vault', color: '#00F3FF' },
+    { name: 'NiriumProtocol', addr: 'CBIJ2...MSE', full: 'CC2TU5BDTKTPRRRQPEF77I54XYHFQ25XGIRO2TCWKSR7NRJDFR5L5NR5', role_key: 'elo', color: '#A78BFA' },
 ];
 
 
@@ -135,7 +132,7 @@ export default function Home() {
                                     <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-stellar-teal opacity-75"></span>
                                     <span className="relative inline-flex rounded-full h-2 w-2 bg-stellar-teal"></span>
                                 </span>
-                                v0.5.0 // {t.home.institutional_use_cases.extra.mpp_enabled}
+                                v0.6.1 // {t.home.institutional_use_cases.extra.mpp_enabled}
                             </div>
                         </div>
  
@@ -811,7 +808,7 @@ export default function Home() {
                                 <Activity className="w-4 h-4 text-stellar-teal" />
                             </div>
                             <code className="text-white block overflow-x-auto whitespace-nowrap text-xs sm:text-sm custom-scrollbar pb-2">
-                                <span className="text-purple-400">import</span> {"{"}Agent{"}"} <span className="text-purple-400">from</span> <span className="text-green-400">&apos;@nirium/sdk&apos;</span>;<br />
+                                <span className="text-purple-400">import</span> {"{"}Agent{"}"} <span className="text-purple-400">from</span> <span className="text-green-400">&apos;nirium&apos;</span>;<br />
                                 <span className="text-blue-400">const</span> bot = <span className="text-blue-400">new</span> Agent(<span className="text-yellow-300">&quot;sk_live_...&quot;</span>);<br />
                                 <span className="text-gray-500">{t.home.institutional_use_cases.builder_data.code_comment}</span><br />
                                 bot.bill(<span className="text-cyan-400">&apos;user_402&apos;</span>, {"{"} units: 1, trigger: <span className="text-green-400">&apos;inference&apos;</span> {"}"});

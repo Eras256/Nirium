@@ -175,13 +175,21 @@ export default function DevelopersPage() {
                             {t.developers_page.hero.subtitle}
                         </motion.p>
 
-                        <motion.div 
+                        <motion.div
                             initial={{ opacity: 0, scale: 0.95 }}
                             animate={{ opacity: 1, scale: 1 }}
                             transition={{ delay: 0.3 }}
                             className="mt-16 max-w-sm mx-auto"
                         >
                             <CodeBlock code={INSTALL_CODE} lang="bash" />
+                            <div className="mt-3 flex items-center justify-center gap-3">
+                                <a href="https://www.npmjs.com/package/nirium" target="_blank" rel="noopener noreferrer" className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-red-500/10 border border-red-500/20 text-red-400 text-[10px] font-mono hover:bg-red-500/20 transition-colors">
+                                    npm ↗
+                                </a>
+                                <a href="https://pypi.org/project/nirium/" target="_blank" rel="noopener noreferrer" className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-stellar-blue/10 border border-stellar-blue/20 text-stellar-blue text-[10px] font-mono hover:bg-stellar-blue/20 transition-colors">
+                                    pip ↗
+                                </a>
+                            </div>
                         </motion.div>
                     </div>
                 </section>
@@ -348,7 +356,7 @@ export default function DevelopersPage() {
                                 className="mb-6 px-4 py-1.5 rounded-full bg-stellar-teal/10 border border-stellar-teal/30 flex items-center gap-2"
                             >
                                 <Activity className="w-3 h-3 text-stellar-teal animate-pulse" />
-                                <span className="text-[10px] font-black text-stellar-teal uppercase tracking-[0.2em]">Live Protocol Surface v0.5.0</span>
+                                <span className="text-[10px] font-black text-stellar-teal uppercase tracking-[0.2em]">Live Protocol Surface v0.6.1</span>
                             </motion.div>
                             
                             <h2 className="text-4xl sm:text-7xl font-black uppercase italic tracking-tighter text-white mb-6 leading-none">
@@ -546,14 +554,10 @@ export default function DevelopersPage() {
 
                         <div className="grid gap-4">
                             {[
-                                { name: 'NiriumVault (Core)', id: 'CAU2XBJTQUBTMPAUFRX7GMZ337I5WLBI4GYPWHZEVXTMJ66D3CP6DEL4', desc_en: 'Primary institutional multisig vault', desc_es: 'Vault multisig institucional principal', desc_zh: '主机构多签保险库' },
-                                { name: 'ELO Reputation', id: 'CC6Z3WJWRKVEAXEKIQ5S3LFEMKRF4L2FTN5YZDQU27MQRQAWA5QBJWF2', desc_en: 'Agent performance & reputation scoring', desc_es: 'Reputación y scoring de agentes', desc_zh: '智能体性能与声誉评分系统' },
-                                { name: 'Strategy Marketplace', id: 'CB6Q3LKBJ7CAAZY4MK7EG5R6FDDTJHB52ZEENI6BQLBJNFKBQRIAUABC', desc_en: 'Strategy registry & discovery hub', desc_es: 'Registro y hub de estrategias', desc_zh: '策略注册与发现中心' },
-                                { name: 'Compliance Sentinel', id: 'CCP5OY3TTDVIREQYGOUZUXS2MZJO3LLJD6Z22Z3VROWFCPJAON22WPY2', desc_en: 'Security monitoring & emergency pause', desc_es: 'Monitoreo y pausa de emergencia', desc_zh: '安全监控与紧急暂停系统' },
-                                { name: 'Settlement Hub', id: 'CANZP2OJUS2Y5VXE4YHRR75LE2WKE7QTJOCCWENR7X65DWE6QEJZV6KS', desc_en: 'x402 & MPP protocol controller', desc_es: 'Controlador de x402 y MPP', desc_zh: 'x402 与 MPP 协议控制器' },
-                                { name: 'Skill Vault', id: 'CB4JM3PP7GWKJUAYIZ7ZULWFTFJ57FTTUFZTFIDF4JCAPF664OJCXIEI', desc_en: 'AI skill monetization & access control', desc_es: 'Monetización de skills IA', desc_zh: 'AI 技能货币化与访问控制' },
+                                { name: 'NiriumVault', id: 'CBTWMZCG3P72EHFAQ4ZLSEBIOFYJC244H5J6DHZIJ56FHFWJ2CFAWSZU', desc_en: 'Core treasury: vaults, agent delegation, strategy execution, 2-of-3 multisig', desc_es: 'Tesorería core: vaults, delegación de agentes, ejecución de estrategias, multisig 2-de-3', desc_zh: '核心金库：保险库、代理委托、策略执行、2/3多签' },
+                                { name: 'NiriumProtocol', id: 'CC2TU5BDTKTPRRRQPEF77I54XYHFQ25XGIRO2TCWKSR7NRJDFR5L5NR5', desc_en: 'Unified registry: ELO reputation, strategy marketplace, agent scoring, skill gate', desc_es: 'Registro unificado: reputación ELO, marketplace, scoring de agentes, skill gate', desc_zh: '统一注册表：ELO声誉、策略市场、代理评分、技能门控' },
                                 { name: 'CETES (Mexican Bonds)', id: 'CC72F57YTPX76HAA64JQOEGHQAPSADQWSY5DWVBR66JINPFDLNCQYHIC', desc_en: 'Government Bond Asset (Etherfuse)', desc_es: 'Activo de Bonos (Etherfuse)', desc_zh: '政府债券资产 (Etherfuse)' },
-                                { name: 'USDC (Stellar Testnet)', id: 'CBIELTK6YBZJU5UP2WWQEQ4YkVDt3QOF4D7TaNz5WBqVIJgF57e', desc_en: 'Primary liquidity asset', desc_es: 'Activo de liquidez principal', desc_zh: '主要流动性资产' },
+                                { name: 'USDC (Stellar Testnet SAC)', id: 'CBIELTK6YBZJU5UP2WWQEUCYKLPU6AUNZ2BQ4WWFEIE3USCIHMXQDAMA', desc_en: 'Primary liquidity asset', desc_es: 'Activo de liquidez principal', desc_zh: '主要流动性资产' },
                             ].map((contract) => (
                                 <div key={contract.name} className="p-8 rounded-3xl border border-white/10 bg-black/40 backdrop-blur-md group hover:border-stellar-teal/40 transition-all">
                                     <div className="flex items-start justify-between gap-6">

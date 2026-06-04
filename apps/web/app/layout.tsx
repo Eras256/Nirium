@@ -14,7 +14,7 @@ export const metadata: Metadata = {
         default: "Nirium Protocol | Autonomous Treasury Infrastructure on Stellar (Testnet)",
         template: "%s | Nirium Protocol"
     },
-    description: "Institutional DeFi infrastructure powered by autonomous agents on Stellar/Soroban. x402 micropayments, MPP session budgets, cross-border FX (MXN-USDC), multi-asset vaults. SDK v0.5.0. Testnet — not financial advice.",
+    description: "Institutional DeFi infrastructure powered by autonomous agents on Stellar/Soroban. x402 micropayments, MPP session budgets, cross-border FX (MXN-USDC), multi-asset vaults. SDK v0.6.1. Testnet — not financial advice.",
     keywords: ["Stellar ecosystem", "AI Agents", "DeFi infrastructure", "Soroban", "Smart Contracts", "Nirium", "Treasury Automation", "x402", "MPP", "Stellar Testnet", "cross-border FX", "MXN USDC"],
     authors: [{ name: "Nirium Core" }],
     creator: "Nirium",

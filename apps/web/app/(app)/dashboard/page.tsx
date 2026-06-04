@@ -23,9 +23,10 @@ import { useVault, useEloReputation } from "@/hooks/useNiriumContracts";
 import { getWebSocketUrl } from "@/lib/constants";
 import { simulateSorobanTx } from "@/lib/stellarSim";
 import { handleWalletError } from "@/components/wallet/WalletErrorHandler";
-import { NATIVE_ASSET_ID, USDC_ASSET_ID, CETES_ASSET_ID, vaultDeposit, vaultWithdraw, vaultCreate, vaultClose, vaultRevokeAgent, vaultDelegateAgent, vaultGetVaultCount, CETES_ASSET, getCETESBalance, hasCETESTrustline } from "@/lib/sorobanContracts";
+import { NATIVE_ASSET_ID, USDC_ASSET_ID, CETES_ASSET_ID, vaultDeposit, vaultWithdraw, vaultCreate, vaultClose, vaultRevokeAgent, vaultDelegateAgent, vaultGetVaultCount, CETES_ASSET, getCETESBalance, hasCETESTrustline, eloGetTotalSentinels } from "@/lib/sorobanContracts";
 import { generateOnboardingUrl, getOrCreateCustomerIds } from "@/lib/etherfuseApi";
 import MarketTicker from "@/components/dashboard/MarketTicker";
+import AuditTrailViewer from "@/components/dashboard/AuditTrailViewer";
 import ProtocolKernel from "@/components/dashboard/ProtocolKernel";
 import StatusBadge from "@/components/ui/StatusBadge";
 import { useLanguage } from "@/context/LanguageContext";
@@ -73,7 +74,7 @@ function ProtocolKernelSmall() {
 }
 
 function DashboardContent() {
-    const { t } = useLanguage();
+    const { t, language } = useLanguage();
     const router = useRouter();
     const searchParams = useSearchParams();
     const { isLocked } = useSecurityKillSwitch();
@@ -146,6 +147,7 @@ function DashboardContent() {
 
     const [blendData, setBlendData] = useState<{ supplyApy: number, borrowApy: number } | null>(null);
     const [phoenixData, setPhoenixData] = useState<{ supplyApy: number, borrowApy: number } | null>(null);
+    const [currentMarketState, setCurrentMarketState] = useState<{ etherfuseApy: number; baseFee: number; pathPaymentRoutes: any[] } | null>(null);
     const [walletBalance, setWalletBalance] = useState<number>(0);
     const [cetesBalance, setCetesBalance] = useState<string>('0');
     const [hasCetesTrust, setHasCetesTrust] = useState<boolean>(false);
@@ -165,12 +167,14 @@ function DashboardContent() {
     useEffect(() => {
         const fetchOnChainData = async () => {
             try {
-                const [count, fees] = await Promise.all([
+                const [count, fees, sentinels] = await Promise.all([
                     vault.getVaultCount(),
                     vault.getTotalFees(),
+                    eloGetTotalSentinels(),
                 ]);
                 setOnChainVaultCount(count);
-                setOnChainTotalFees(fees / 10_000_000); // convert stroops → XLM
+                setOnChainTotalFees(fees / 10_000_000);
+                setGlobalActiveAgents(Number(sentinels));
                 if (accountStr) {
                     const score = await elo.getScore(accountStr);
                     setOnChainElo(score);
@@ -225,6 +229,14 @@ function DashboardContent() {
 
     const [vaultBalance, setVaultBalance] = useState<number>(0);
     const [vaultId, setVaultId] = useState<number | null>(null);
+    const [autoRebalance, setAutoRebalance] = useState<boolean>(false);
+    const [autoRebalanceLoading, setAutoRebalanceLoading] = useState<boolean>(false);
+    const [delegationId, setDelegationId] = useState<string | null>(null);
+    const [autoExit, setAutoExit] = useState<boolean>(false);
+    const [autoExitLoading, setAutoExitLoading] = useState<boolean>(false);
+    const [delegationTxHash, setDelegationTxHash] = useState<string | null>(null);
+    const [rebalanceThreshold, setRebalanceThreshold] = useState<number>(4.0);
+    const [reverseThreshold, setReverseThreshold] = useState<number>(3.5);
     const [ownerCapId, setOwnerCapId] = useState<string | null>(null);
     const [amountInput, setAmountInput] = useState<string>("0.1");
     const [installedSkills, setInstalledSkills] = useState<any[]>([]);
@@ -347,10 +359,10 @@ function DashboardContent() {
                 // const market = await blend.queryMarket();
                 // setBlendData(market.stellar.apy);
 
-                // Setting "Real-like" dynamic data for stability if SDK is not fully configured in frontend package
-                // (To avoid build errors with 'fs' dependencies in browser)
-                setBlendData({ supplyApy: 12.45, borrowApy: 14.80 });
-                setPhoenixData({ supplyApy: 13.20, borrowApy: 15.10 });
+                // Blend/Phoenix rates not used in main stats — CETES rate from Etherfuse is the reference
+                // These remain available for the Strategy Builder internal calculations
+                setBlendData({ supplyApy: 0, borrowApy: 0 });
+                setPhoenixData({ supplyApy: 0, borrowApy: 0 });
 
             } catch (e) {
                 console.error("Protocol data fetch error", e);
@@ -465,6 +477,24 @@ function DashboardContent() {
             }
         };
         fetchMeta();
+    }, []);
+
+    // Fetch live market state (CETES rate, base fee, corridors)
+    useEffect(() => {
+        const fetchMarket = async () => {
+            try {
+                const res = await fetch('/api/market');
+                const data = await res.json();
+                setCurrentMarketState({
+                    etherfuseApy: data.cetesRate ?? 0,
+                    baseFee: data.baseFee ?? 100,
+                    pathPaymentRoutes: data.pathPaymentRoutes ?? [],
+                });
+            } catch { /* use fallback */ }
+        };
+        fetchMarket();
+        const interval = setInterval(fetchMarket, 30_000);
+        return () => clearInterval(interval);
     }, []);
 
     const STRATEGIES = protocolMeta.strategies || {};
@@ -719,7 +749,7 @@ function DashboardContent() {
                 name: currentStrategy.name,
                 emoji: currentStrategy.emoji,
                 status: "RUNNING",
-                yield: "~14.2%",
+                yield: "~6.5%",
                 tx_digest: txHash,
                 config: !isNaN(newVaultId) ? { vault_id: newVaultId } : {}
             }).then((newStrategy: any) => {
@@ -729,7 +759,7 @@ function DashboardContent() {
                     name: currentStrategy.name,
                     emoji: currentStrategy.emoji,
                     status: "RUNNING",
-                    yield: "~14.2%",
+                    yield: "~6.5%",
                     tx_digest: txHash,
                 };
                 setActiveStrategies(prev => {
@@ -954,6 +984,158 @@ function DashboardContent() {
         }
     }, [account]);
 
+    // --- RESTORE AUTO-REBALANCE STATE FROM LOCALSTORAGE ---
+    useEffect(() => {
+        if (!account?.address) return;
+        try {
+            const saved = localStorage.getItem(`nirium-autorebalance-${account.address}`);
+            if (!saved) return;
+
+            const { autoRebalance: ar, delegationId: di, autoExit: ae, txHash: th, rebalanceThreshold: rt, reverseThreshold: rv } = JSON.parse(saved);
+            if (ar) { setAutoRebalance(true); setDelegationId(di ?? null); if (th) setDelegationTxHash(th); }
+            if (ae) setAutoExit(true);
+            if (rt) setRebalanceThreshold(rt);
+            if (rv) setReverseThreshold(rv);
+
+            // If the saved delegation ID is a fake demo-del-xxx (created when the agent was unreachable),
+            // re-register in Supabase now that CORS + service role key are configured.
+            // The Soroban delegation already exists on-chain — no Freighter signature needed.
+            if (ar && di && (di.startsWith('demo-del-') || !di.includes('-'))) {
+                const savedVaultId = (() => {
+                    for (const asset of ['USDC', 'XLM', 'CETES']) {
+                        try {
+                            const v = localStorage.getItem(`nirium-vault-v2-${asset}-${account.address}`);
+                            if (v) { const p = JSON.parse(v); if (p?.vaultId) return p.vaultId; }
+                        } catch { /* skip */ }
+                    }
+                    return null;
+                })();
+
+                if (savedVaultId) {
+                    const AGENT_API_URL = process.env.NEXT_PUBLIC_AGENT_URL || 'https://nirium-agent.fly.dev';
+                    const token = localStorage.getItem('nirium-token') || 'demo-token';
+                    fetch(`${AGENT_API_URL}/api/vault/delegate`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+                        body: JSON.stringify({
+                            user_wallet: account.address,
+                            vault_id: savedVaultId,
+                            rebalance_threshold: rt ?? 4.0,
+                        }),
+                    }).then(async r => {
+                        if (r.ok) {
+                            const data = await r.json();
+                            const realId = data.delegation?.id;
+                            if (realId) {
+                                setDelegationId(realId);
+                                const updated = JSON.parse(localStorage.getItem(`nirium-autorebalance-${account.address}`) ?? '{}');
+                                updated.delegationId = realId;
+                                localStorage.setItem(`nirium-autorebalance-${account.address}`, JSON.stringify(updated));
+                            }
+                        }
+                    }).catch(() => { /* silent — agent may be starting up */ });
+                }
+            }
+        } catch { /* ignore */ }
+    }, [account?.address]);
+
+    // --- RECONCILE WITH SUPABASE (DB es la fuente de verdad por wallet) ---
+    // Poll cada 15s al endpoint de la wallet conectada para mantener el toggle
+    // sincronizado con DB, incluso si un STOP/activate no se propagó por timeouts de red.
+    useEffect(() => {
+        if (!account?.address) return;
+        const AGENT_API_URL = process.env.NEXT_PUBLIC_AGENT_URL || 'https://nirium-agent.fly.dev';
+        const wallet = account.address;
+
+        const sync = async () => {
+            const ctrl = new AbortController();
+            const t = setTimeout(() => ctrl.abort(), 8000);
+            try {
+                const r = await fetch(`${AGENT_API_URL}/api/vault/delegate/${wallet}`, { signal: ctrl.signal });
+                if (!r.ok) return;
+                const data = await r.json();
+                const d = data?.delegation;
+                if (d && d.is_active) {
+                    setAutoRebalance(true);
+                    setDelegationId(d.id);
+                    if (d.rebalance_threshold) setRebalanceThreshold(Number(d.rebalance_threshold));
+                    if (d.reverse_rebalance) {
+                        setAutoExit(true);
+                        if (d.reverse_threshold) setReverseThreshold(Number(d.reverse_threshold));
+                    } else {
+                        setAutoExit(false);
+                    }
+                    const stored = JSON.parse(localStorage.getItem(`nirium-autorebalance-${wallet}`) ?? '{}');
+                    localStorage.setItem(`nirium-autorebalance-${wallet}`, JSON.stringify({
+                        ...stored,
+                        autoRebalance: true,
+                        delegationId: d.id,
+                        rebalanceThreshold: Number(d.rebalance_threshold),
+                        autoExit: !!d.reverse_rebalance,
+                        reverseThreshold: Number(d.reverse_threshold),
+                    }));
+                } else {
+                    // No hay fila activa en Supabase. Antes de borrar el estado, verificamos
+                    // si tenemos una delegación on-chain pendiente de sincronizar (placeholder
+                    // demo-del-* con txHash real). Si la hay, re-intentamos el registro.
+                    const stored = localStorage.getItem(`nirium-autorebalance-${wallet}`);
+                    if (stored) {
+                        try {
+                            const parsed = JSON.parse(stored);
+                            const isPending = parsed?.autoRebalance === true
+                                && typeof parsed?.delegationId === 'string'
+                                && parsed.delegationId.startsWith('demo-del-')
+                                && parsed?.txHash;
+                            if (isPending) {
+                                const resolvedVaultId = (() => {
+                                    for (const asset of ['USDC', 'XLM', 'CETES']) {
+                                        try {
+                                            const v = localStorage.getItem(`nirium-vault-v2-${asset}-${wallet}`);
+                                            if (v) { const p = JSON.parse(v); if (p?.vaultId) return p.vaultId; }
+                                        } catch { /* skip */ }
+                                    }
+                                    return null;
+                                })();
+                                if (resolvedVaultId) {
+                                    const token = localStorage.getItem('nirium-token') || 'demo-token';
+                                    fetch(`${AGENT_API_URL}/api/vault/delegate`, {
+                                        method: 'POST',
+                                        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+                                        body: JSON.stringify({
+                                            user_wallet: wallet,
+                                            vault_id: resolvedVaultId,
+                                            rebalance_threshold: parsed.rebalanceThreshold ?? 4.0,
+                                        }),
+                                    }).then(async r2 => {
+                                        if (!r2.ok) return;
+                                        const data2 = await r2.json();
+                                        const realId = data2?.delegation?.id;
+                                        if (realId) {
+                                            setDelegationId(realId);
+                                            const updated = { ...parsed, delegationId: realId };
+                                            localStorage.setItem(`nirium-autorebalance-${wallet}`, JSON.stringify(updated));
+                                        }
+                                    }).catch(() => { /* siguiente tick re-intenta */ });
+                                    return; // No borramos el estado mientras retry está en curso
+                                }
+                            }
+                        } catch { /* ignore parse error */ }
+                    }
+                    setAutoRebalance(false);
+                    setAutoExit(false);
+                    setDelegationId(null);
+                    setDelegationTxHash(null);
+                    localStorage.removeItem(`nirium-autorebalance-${wallet}`);
+                }
+            } catch { /* timeout o offline — conserva estado actual */ }
+            finally { clearTimeout(t); }
+        };
+
+        sync();
+        const interval = setInterval(sync, 15000);
+        return () => clearInterval(interval);
+    }, [account?.address]);
+
     // --- REAL-TIME LOGS VIA WEBSOCKET ---
     const wsRef = useRef<WebSocket | null>(null);
     const accountRef = useRef(account);
@@ -1084,30 +1266,31 @@ function DashboardContent() {
     // Load Vault & OwnerCap from LocalStorage on mount
     useEffect(() => {
         if (account?.address) {
+            const CURRENT_VAULT_CONTRACT = process.env.NEXT_PUBLIC_CONTRACT_VAULT || 'CBTWMZCG3P72EHFAQ4ZLSEBIOFYJC244H5J6DHZIJ56FHFWJ2CFAWSZU';
             const savedData = localStorage.getItem(`nirium-vault-v2-${baseAsset}-${account.address}`);
             if (savedData) {
                 try {
                     const vaultData = JSON.parse(savedData);
-                    if (typeof vaultData === 'object' && vaultData.vaultId !== undefined) {
-                        // Parse as number (handles both numeric and string IDs from old vaults)
+                    // If vault was created on a different contract, clear it — it's an orphaned vault
+                    if (vaultData.contractId && vaultData.contractId !== CURRENT_VAULT_CONTRACT) {
+                        console.warn('[Vault] Orphaned vault detected — contract changed. Clearing cache.');
+                        localStorage.removeItem(`nirium-vault-v2-${baseAsset}-${account.address}`);
+                        localStorage.removeItem(`nirium-autorebalance-${account.address}`);
+                        setVaultId(null);
+                        setOwnerCapId(null);
+                    } else if (typeof vaultData === 'object' && vaultData.vaultId !== undefined) {
                         const numericId = typeof vaultData.vaultId === 'number'
                             ? vaultData.vaultId
                             : parseInt(String(vaultData.vaultId), 10);
-
                         if (!isNaN(numericId)) {
                             setVaultId(numericId);
-                            if (vaultData.ownerCapId) {
-                                setOwnerCapId(vaultData.ownerCapId);
-                            }
+                            if (vaultData.ownerCapId) setOwnerCapId(vaultData.ownerCapId);
                         } else {
-                            // Old format with G... address - clear it
-                            console.warn('Legacy vault ID detected (Stellar address). Please create a new vault.');
                             localStorage.removeItem(`nirium-vault-v2-${baseAsset}-${account.address}`);
                             setVaultId(null);
                             setOwnerCapId(null);
                         }
                     } else {
-                        // Invalid format
                         setVaultId(null);
                         setOwnerCapId(null);
                     }
@@ -1268,7 +1451,9 @@ function DashboardContent() {
         });
     };
 
-    const executeWithdraw = async (amount: string) => {
+    const executeWithdraw = async (amount: string, retryCount = 0) => {
+        const MAX_RETRIES = 3;
+
         if (!account) {
             toast.error("Please connect your wallet");
             return;
@@ -1296,43 +1481,331 @@ function DashboardContent() {
             return;
         }
 
-        const toastId = toast.loading(`Withdrawing ${amount} ${baseAsset}...`);
-        try {
-            // Convert amount to stroops (1 XLM/USDC = 10^7 stroops)
-            const amountInStroops = BigInt(Math.floor(parseFloat(amount) * 10_000_000));
+        // Validate withdrawal amount
+        const withdrawAmount = parseFloat(amount);
+        if (isNaN(withdrawAmount) || withdrawAmount <= 0) {
+            toast.error("Invalid Amount", {
+                description: "Please enter a positive number to withdraw."
+            });
+            return;
+        }
 
-            // Call the actual Soroban vault contract withdraw function
+        // Check vault has sufficient balance
+        if (withdrawAmount > vaultBalance) {
+            toast.error(`Insufficient ${baseAsset} in Vault`, {
+                description: `Vault balance: ${vaultBalance.toFixed(7)} ${baseAsset}. You requested ${withdrawAmount} ${baseAsset}.`
+            });
+            return;
+        }
+
+        // CETES trustline pre-check (Stellar requires trustline before receiving non-native assets)
+        // Reference: https://developers.stellar.org/docs/build/guides/basics/verify-trustlines
+        if (baseAsset === 'CETES' && !hasCetesTrust) {
+            toast.error("CETES Trustline Not Found", {
+                description: "Your wallet needs a CETES trustline to receive this asset. Add the trustline in Freighter first.",
+                action: {
+                    label: "Add via Etherfuse",
+                    onClick: () => window.open('https://devnet.etherfuse.com', '_blank')
+                }
+            });
+            return;
+        }
+
+        // USDC trustline pre-check (SAC assets also need trustline on classic side for withdrawal)
+        if (baseAsset === 'USDC') {
+            try {
+                const { Horizon } = await import('@stellar/stellar-sdk');
+                const horizonServer = new Horizon.Server(process.env.NEXT_PUBLIC_HORIZON_URL || 'https://horizon-testnet.stellar.org');
+                const acct = await horizonServer.loadAccount(account.address);
+                const hasUSDC = acct.balances.some(
+                    (b: any) => b.asset_type !== 'native' && b.asset_code === 'USDC'
+                );
+                if (!hasUSDC) {
+                    toast.error("USDC Trustline Not Found", {
+                        description: "Your wallet needs a USDC trustline to receive this asset. Add it in Freighter settings."
+                    });
+                    return;
+                }
+            } catch {
+                // If Horizon is unreachable, proceed — the contract will catch it
+            }
+        }
+
+        const isRetry = retryCount > 0;
+        const toastId = toast.loading(
+            isRetry
+                ? `Retrying withdrawal (${retryCount}/${MAX_RETRIES})...`
+                : `Withdrawing ${amount} ${baseAsset}...`
+        );
+
+        try {
+            // Convert amount to stroops (1 XLM/USDC/CETES = 10^7 stroops — Stellar 7-decimal precision)
+            const amountInStroops = BigInt(Math.floor(withdrawAmount * 10_000_000));
+
             const result = await vaultWithdraw(account.address, vaultId, amountInStroops);
 
             toast.dismiss(toastId);
 
             if (result.success) {
-                // Update vault balance optimistically
-                setVaultBalance(prev => Math.max(0, prev - parseFloat(amount)));
+                setVaultBalance(prev => Math.max(0, prev - withdrawAmount));
+                setWalletBalance(prev => prev + withdrawAmount);
 
-                // Immediately update wallet balance (add withdrawn amount)
-                setWalletBalance(prev => prev + parseFloat(amount));
-
-                toast.success("Withdrawal Successful", {
-                    description: `${amount} ${baseAsset} withdrawn from Vault on-chain.`,
+                toast.success(t.dashboard.toasts.withdrawal_success, {
+                    description: t.dashboard.toasts.withdrawal_desc
+                        .replace('{amount}', amount)
+                        .replace('{asset}', baseAsset),
                     action: result.txHash ? {
-                        label: "View Tx",
+                        label: t.dashboard.toasts.view_tx,
                         onClick: () => window.open(`https://stellar.expert/explorer/testnet/tx/${result.txHash}`, "_blank")
                     } : undefined
                 });
 
-                // Log the successful withdrawal
                 writeLog(`VAULT WITHDRAW: ${amount} ${baseAsset} | Vault ID: ${vaultId} | Tx: ${result.txHash?.slice(0, 12)}...`, 'success');
             } else {
-                throw new Error(result.error || 'Withdrawal failed');
+                // Classify the error for actionable user feedback
+                const err = result.error || 'Withdrawal failed';
+
+                if (err.includes('insufficient vault balance') || err.includes('balance')) {
+                    toast.error(`Insufficient ${baseAsset} in Vault`, {
+                        description: `The vault does not have enough ${baseAsset}. Current balance: ${vaultBalance.toFixed(7)} ${baseAsset}.`
+                    });
+                } else if (err.includes('vault not found')) {
+                    toast.error("Vault Not Found", {
+                        description: "This vault may have been closed or the contract was redeployed. Clear cache and reconnect."
+                    });
+                } else if (err.includes('not_paused') || err.includes('paused')) {
+                    toast.error("Contract Paused", {
+                        description: "The NiriumVault contract is temporarily paused for maintenance."
+                    });
+                } else if (result.isSimulationError) {
+                    toast.error("Transaction Simulation Failed", {
+                        description: "The Soroban RPC rejected this transaction during simulation. This usually means the contract state changed. Try again."
+                    });
+                } else {
+                    throw new Error(err);
+                }
+
+                writeLog(`VAULT WITHDRAW FAILED: ${err}`, 'error');
             }
         } catch (e: any) {
             console.error('Withdrawal error:', e);
             toast.dismiss(toastId);
-            toast.error("Withdrawal Failed", {
-                description: e.message || "Failed to withdraw from vault contract"
-            });
-            writeLog(`VAULT WITHDRAW FAILED: ${e.message}`, 'error');
+
+            const errorMsg = e.message || 'Unknown error';
+
+            // Retry on transient network errors (exponential backoff: 2s, 4s, 8s)
+            const isTransient = errorMsg.includes('timeout') ||
+                errorMsg.includes('fetch') ||
+                errorMsg.includes('network') ||
+                errorMsg.includes('ECONNREFUSED') ||
+                errorMsg.includes('504') ||
+                errorMsg.includes('503');
+
+            if (isTransient && retryCount < MAX_RETRIES) {
+                const delay = Math.pow(2, retryCount + 1) * 1000; // 2s, 4s, 8s
+                toast.info(`Network issue detected. Retrying in ${delay / 1000}s...`, {
+                    description: `Attempt ${retryCount + 1} of ${MAX_RETRIES}`
+                });
+                setTimeout(() => executeWithdraw(amount, retryCount + 1), delay);
+                return;
+            }
+
+            if (isTransient) {
+                toast.error("Network Unavailable", {
+                    description: "Could not reach the Stellar network after 3 attempts. Please check your connection and try again."
+                });
+            } else if (errorMsg.includes('User declined')) {
+                toast.error("Transaction Cancelled", {
+                    description: "You declined the transaction in Freighter."
+                });
+            } else {
+                toast.error("Withdrawal Failed", {
+                    description: errorMsg
+                });
+            }
+
+            writeLog(`VAULT WITHDRAW FAILED: ${errorMsg}`, 'error');
+        }
+    };
+
+    // Nirium agent public key — receives delegation to execute on user vaults
+    const NIRIUM_AGENT_KEY = 'GAVU2GH5RZUIQKLHM4FTVGTUY2V4XNVGWNGO2T6LVU7U74IYJGGYZ667';
+    const AGENT_API = process.env.NEXT_PUBLIC_AGENT_URL || 'https://nirium-agent.fly.dev';
+
+    const handleAutoRebalanceToggle = async () => {
+        if (!account || !vaultId) {
+            toast.error("Connect wallet and create a vault first");
+            return;
+        }
+        setAutoRebalanceLoading(true);
+        try {
+            if (!autoRebalance) {
+                // Preflight: verifica que la wallet conectada sea el owner on-chain del vault.
+                // Sin esto, delegate_agent fallaría en vault.owner.require_auth() después de
+                // que el usuario firme con Freighter — y el auto-recovery dispararía 2 firmas
+                // adicionales que también fallan.
+                try {
+                    const vData = await vault.getVault(Number(vaultId));
+                    const onChainOwner = (vData as any)?.owner;
+                    if (onChainOwner && onChainOwner !== account.address) {
+                        toast.error(`Esta bóveda pertenece a otra wallet (${String(onChainOwner).slice(0, 8)}…). Conecta esa wallet en Freighter o crea una nueva bóveda.`);
+                        return;
+                    }
+                } catch { /* si la lectura falla, dejamos que el flujo siga — peor caso, falla la tx */ }
+
+                // 1. Delegate vault to Nirium's agent key on Soroban — capture TX hash
+                const delegateResult = await vaultDelegateAgent(account.address, vaultId, NIRIUM_AGENT_KEY);
+                const txHash = (delegateResult as any)?.txHash;
+                const txSuccess = (delegateResult as any)?.success;
+                const txError = (delegateResult as any)?.error;
+
+                // Si el contrato rechazó la llamada, casi siempre es porque el agente ya está delegado
+                // para este vault (estado previo no revocado). Intentamos revoke + re-delegate.
+                if (txSuccess === false) {
+                    if (typeof txError === 'string' && txError.includes('failed on-chain')) {
+                        try {
+                            await vaultRevokeAgent(account.address, vaultId, NIRIUM_AGENT_KEY, true);
+                            const retry = await vaultDelegateAgent(account.address, vaultId, NIRIUM_AGENT_KEY);
+                            if ((retry as any)?.success === false) {
+                                toast.error(`Soroban rechazó la delegación: ${(retry as any)?.error ?? 'unknown'}`);
+                                return;
+                            }
+                            (delegateResult as any).txHash = (retry as any).txHash;
+                        } catch (e: any) {
+                            toast.error(`No se pudo delegar on-chain: ${e?.message ?? txError}`);
+                            return;
+                        }
+                    } else {
+                        toast.error(`Soroban rechazó la delegación: ${txError ?? 'unknown'}`);
+                        return;
+                    }
+                }
+                const finalTxHash = (delegateResult as any).txHash ?? txHash;
+
+                // Optimistic UI: la delegación on-chain ya quedó firmada. Marcamos el nodo
+                // activo *antes* del POST a Supabase para que (a) el usuario vea feedback
+                // inmediato (1/10) y (b) si vuelve a clickear, dispare el flujo de STOP
+                // (revoke) en vez de un nuevo delegate_agent on-chain.
+                const pendingDelegationId = `demo-del-${Date.now()}`;
+                setDelegationTxHash(finalTxHash ?? null);
+                setAutoRebalance(true);
+                setDelegationId(pendingDelegationId);
+                localStorage.setItem(`nirium-autorebalance-${account.address}`, JSON.stringify({
+                    autoRebalance: true,
+                    delegationId: pendingDelegationId,
+                    autoExit,
+                    txHash: finalTxHash ?? null,
+                    rebalanceThreshold,
+                    reverseThreshold,
+                }));
+
+                // 2. Register delegation in agent backend — reintenta hasta 3 veces si la red Fly→Supabase está degradada
+                const token = localStorage.getItem('nirium-token') || 'demo-token';
+                let newDelegationId: string | null = null;
+                for (let attempt = 0; attempt < 3 && !newDelegationId; attempt++) {
+                    try {
+                        const res = await fetch(`${AGENT_API}/api/vault/delegate`, {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+                            body: JSON.stringify({ user_wallet: account.address, vault_id: vaultId, rebalance_threshold: rebalanceThreshold }),
+                        });
+                        if (res.ok) {
+                            const data = await res.json();
+                            if (data.delegation?.id) newDelegationId = data.delegation.id;
+                        }
+                    } catch { /* siguiente intento */ }
+                    if (!newDelegationId && attempt < 2) await new Promise(r => setTimeout(r, 1500));
+                }
+
+                if (!newDelegationId) {
+                    // El registro en Supabase falló — el reconcile sync re-intentará en el próximo tick
+                    // (usa el placeholder demo-del-* para detectar que la fila aún no está sincronizada).
+                    toast.warning('Delegación on-chain confirmada — sincronizando con backend en segundo plano…', {
+                        action: finalTxHash ? {
+                            label: t.dashboard.toasts.view_tx,
+                            onClick: () => window.open(`https://stellar.expert/explorer/testnet/tx/${finalTxHash}`, '_blank'),
+                        } : undefined,
+                    });
+                    return;
+                }
+
+                setDelegationId(newDelegationId);
+                localStorage.setItem(`nirium-autorebalance-${account.address}`, JSON.stringify({ autoRebalance: true, delegationId: newDelegationId, autoExit, txHash: finalTxHash ?? null, rebalanceThreshold, reverseThreshold }));
+
+                toast.success(t.dashboard.auto_rebalance.toast_enabled, {
+                    action: finalTxHash ? {
+                        label: t.dashboard.toasts.view_tx,
+                        onClick: () => window.open(`https://stellar.expert/explorer/testnet/tx/${finalTxHash}`, '_blank'),
+                    } : undefined,
+                });
+            } else {
+                // 1. Mark inactive in backend FIRST — para detener el loop incluso si el usuario cancela la firma Freighter
+                {
+                    const token = localStorage.getItem('nirium-token');
+                    await fetch(`${AGENT_API}/api/vault/delegate/${delegationId ?? 'none'}`, {
+                        method: 'DELETE',
+                        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+                        body: JSON.stringify({ user_wallet: account.address }),
+                    }).catch(() => {});
+                }
+
+                // 2. Update UI state inmediatamente — el toggle/nodo desaparece sin esperar Freighter
+                setAutoRebalance(false);
+                setAutoExit(false);
+                setDelegationId(null);
+                setDelegationTxHash(null);
+                localStorage.removeItem(`nirium-autorebalance-${account.address}`);
+
+                // 3. Revocar delegación on-chain en Soroban (best-effort — si el usuario cancela, el loop ya está detenido)
+                let revokeTxHash: string | undefined;
+                try {
+                    const revokeResult = await vaultRevokeAgent(account.address, vaultId, NIRIUM_AGENT_KEY);
+                    revokeTxHash = (revokeResult as any)?.txHash;
+                } catch { /* el usuario canceló o falló la firma — la DB ya está inactiva */ }
+
+                toast.success(t.dashboard.auto_rebalance.toast_disabled, {
+                    action: revokeTxHash ? {
+                        label: t.dashboard.toasts.view_tx,
+                        onClick: () => window.open(`https://stellar.expert/explorer/testnet/tx/${revokeTxHash}`, '_blank'),
+                    } : undefined,
+                });
+            }
+        } catch (e: any) {
+            toast.error(`${t.dashboard.auto_rebalance.toast_error}: ${e.message}`);
+        } finally {
+            setAutoRebalanceLoading(false);
+        }
+    };
+
+    const handleAutoExitToggle = async () => {
+        if (!account || !vaultId) {
+            toast.error("Connect wallet and create a vault first");
+            return;
+        }
+        if (!delegationId) {
+            toast.error(t.dashboard.auto_exit.delegation_required);
+            return;
+        }
+        setAutoExitLoading(true);
+        try {
+            const newAutoExit = !autoExit;
+            const token = localStorage.getItem('nirium-token') || 'demo-token';
+            // Optimistic update — persist locally first, then try backend
+            setAutoExit(newAutoExit);
+            localStorage.setItem(`nirium-autorebalance-${account.address}`, JSON.stringify({ autoRebalance: true, delegationId, autoExit: newAutoExit, txHash: delegationTxHash }));
+            try {
+                const res = await fetch(`${AGENT_API}/api/vault/delegate/${delegationId}/reverse`, {
+                    method: 'PATCH',
+                    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+                    body: JSON.stringify({ enabled: newAutoExit, reverse_threshold: reverseThreshold }),
+                });
+                if (!res.ok) console.warn('[Auto-Exit] Backend update failed silently:', await res.text().catch(() => ''));
+            } catch { /* API unreachable — state already saved locally */ }
+            toast.success(autoExit ? t.dashboard.auto_exit.toast_disabled : t.dashboard.auto_exit.toast_enabled);
+        } catch (e: any) {
+            toast.error(`${t.dashboard.auto_exit.toast_error}: ${e.message}`);
+        } finally {
+            setAutoExitLoading(false);
         }
     };
 
@@ -1407,7 +1880,8 @@ function DashboardContent() {
                     vaultId: numericVaultId,
                     ownerCapId: `cap_${numericVaultId}_${Date.now()}`,
                     createdAt: Date.now(),
-                    txHash: result.txHash
+                    txHash: result.txHash,
+                    contractId: process.env.NEXT_PUBLIC_CONTRACT_VAULT || 'CBTWMZCG3P72EHFAQ4ZLSEBIOFYJC244H5J6DHZIJ56FHFWJ2CFAWSZU',
                 };
 
                 localStorage.setItem(
@@ -2210,7 +2684,7 @@ function DashboardContent() {
                         {t.dashboard.stats.helpers}
                     </h3>
                     <div className="text-xl font-mono text-white font-bold flex items-baseline gap-2">
-                        {globalActiveAgents !== null ? globalActiveAgents : '--'}
+                        {activeStrategies.length + (autoRebalance ? 1 : 0) + (autoExit ? 1 : 0)}
                         <span className="text-[10px] text-gray-600">NODES</span>
                     </div>
                 </div>
@@ -2262,28 +2736,29 @@ function DashboardContent() {
                 </div>
                 <div className="glass-panel p-4 rounded-xl border border-white/5">
                     <h3 className="text-xs text-gray-400 uppercase tracking-wider mb-1">
-                        {t.dashboard.stats.efficiency} ({baseAsset})
+                        {t.dashboard.payment_streams.cetes_banxico}
                     </h3>
                     <div className="text-xl font-mono text-stellar-teal font-bold flex items-center gap-2">
-                        {baseAsset === 'USDC'
-                            ? (phoenixData ? phoenixData.supplyApy.toFixed(2) : '0.00')
-                            : (blendData ? blendData.supplyApy.toFixed(2) : '0.00')}%
-                        <span className="text-[10px] bg-green-500/20 text-green-400 px-1.5 rounded animate-pulse">LIVE</span>
+                        {(currentMarketState?.etherfuseApy ?? 0) > 0
+                            ? `${currentMarketState!.etherfuseApy.toFixed(2)}%`
+                            : '...'}
+                        <span className="text-[10px] bg-stellar-teal/20 text-stellar-teal px-1.5 rounded animate-pulse">LIVE</span>
                     </div>
                     <div className="text-[10px] text-gray-500 mt-1 font-mono">
-                        {baseAsset === 'USDC' ? 'Phoenix USDC Pool' : 'Blend XLM Supply'}
+                        {t.dashboard.payment_streams.cetes_rate_label} · Etherfuse · NON-FINANCIAL ADVICE
                     </div>
                 </div>
                 <div className="glass-panel p-4 rounded-xl border border-white/5">
-                    <h3 className="text-xs text-gray-400 uppercase tracking-wider mb-1">{t.dashboard.stats.projected_accrual}</h3>
+                    <h3 className="text-xs text-gray-400 uppercase tracking-wider mb-1">{t.dashboard.payment_streams.network_fee}</h3>
                     <div className="text-xl font-mono text-white font-bold">
-                        +{(vaultBalance * ((blendData?.supplyApy || 0) / 100 / 365)).toFixed(4)} <span className="text-xs text-gray-500">{baseAsset}</span>
+                        {currentMarketState?.baseFee ?? 100} <span className="text-xs text-gray-500">stroops</span>
                     </div>
+                    <div className="text-[10px] text-gray-500 mt-1 font-mono">~${((currentMarketState?.baseFee ?? 100) * 0.0000001 * 0.155).toFixed(6)} USD</div>
                 </div>
                 <div className="glass-panel p-4 rounded-xl border border-white/5">
                     <h3 className="text-xs text-gray-400 uppercase tracking-wider mb-1">{t.dashboard.stats.helpers}</h3>
                     <div className="text-xl font-mono text-purple-400 font-bold">
-                        {activeStrategies.length} <span className="text-xs text-gray-500">AGENTS</span>
+                        {activeStrategies.length + (autoRebalance ? 1 : 0) + (autoExit ? 1 : 0)} <span className="text-xs text-gray-500">AGENTS</span>
                     </div>
                 </div>
             </div>
@@ -2297,7 +2772,7 @@ function DashboardContent() {
                     className="lg:col-span-2 space-y-6"
                 >
                     {/* Persistent Secure Vault Control */}
-                    <div className="glass-panel rounded-2xl p-6 relative overflow-hidden border border-white/5 hover:border-white/10 transition-all">
+                    <div data-vault-section className="glass-panel rounded-2xl p-6 relative overflow-hidden border border-white/5 hover:border-white/10 transition-all">
                         <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 relative z-10">
                             <div className="flex items-center gap-5">
                                 <div className="w-16 h-16 bg-gradient-to-br from-gray-900 to-black rounded-2xl border border-white/10 flex items-center justify-center relative group">
@@ -2389,6 +2864,122 @@ function DashboardContent() {
                             </div>
                         </div>
 
+                        {/* Auto-Rebalance Toggle — only for USDC vaults */}
+                        {vaultId && baseAsset === 'USDC' && (
+                            <div className="relative z-10 mt-4 pt-4 border-t border-white/5 space-y-3">
+                                {/* Threshold config — visible only when toggle is OFF */}
+                                {!autoRebalance && (
+                                    <div className="bg-white/[0.03] rounded-xl p-3 border border-white/5">
+                                        <div className="flex items-center justify-between mb-2">
+                                            <p className="text-[10px] text-gray-400 font-mono uppercase tracking-widest">
+                                                {language === 'es' ? 'Mover cuando CETES supere' : language === 'zh' ? '当 CETES 超过时移动' : 'Move when CETES exceeds'}
+                                            </p>
+                                            <span className="text-xs font-black text-stellar-teal font-mono">{rebalanceThreshold.toFixed(1)}%</span>
+                                        </div>
+                                        <input
+                                            type="range"
+                                            min={2.0} max={8.0} step={0.1}
+                                            value={rebalanceThreshold}
+                                            onChange={e => setRebalanceThreshold(parseFloat(e.target.value))}
+                                            className="w-full h-1.5 accent-stellar-teal cursor-pointer"
+                                        />
+                                        <div className="flex justify-between text-[9px] text-gray-600 font-mono mt-1">
+                                            <span>2%</span>
+                                            {(currentMarketState?.etherfuseApy ?? 0) > 0 ? (
+                                                <span className="text-stellar-teal/60">
+                                                    {language === 'es' ? 'Hoy' : 'Today'}: {currentMarketState!.etherfuseApy.toFixed(2)}%
+                                                </span>
+                                            ) : null}
+                                            <span>8%</span>
+                                        </div>
+                                    </div>
+                                )}
+                                <div className="flex items-center justify-between gap-4">
+                                    <div>
+                                        <p className="text-xs font-bold text-white flex items-center gap-2">
+                                            <Zap size={12} className={autoRebalance ? 'text-stellar-teal animate-pulse' : 'text-gray-600'} />
+                                            {t.dashboard.auto_rebalance.label}
+                                        </p>
+                                        <p className="text-[10px] text-gray-500 mt-0.5 font-mono">
+                                            {autoRebalance
+                                                ? `CETES > ${rebalanceThreshold.toFixed(1)}% — ${t.dashboard.auto_rebalance.enabled_desc}`
+                                                : t.dashboard.auto_rebalance.disabled_desc}
+                                        </p>
+                                    </div>
+                                    <button
+                                        onClick={handleAutoRebalanceToggle}
+                                        disabled={autoRebalanceLoading}
+                                        className={`relative w-12 h-6 rounded-full transition-all duration-300 flex items-center shrink-0 ${
+                                            autoRebalance ? 'bg-stellar-teal' : 'bg-white/10'
+                                        } ${autoRebalanceLoading ? 'opacity-50 cursor-wait' : 'cursor-pointer'}`}
+                                    >
+                                        <span className={`absolute w-4 h-4 bg-white rounded-full shadow-lg transition-all duration-300 ${autoRebalance ? 'left-7' : 'left-1'}`} />
+                                    </button>
+                                </div>
+                            </div>
+                        )}
+                        {vaultId && baseAsset === 'CETES' && (
+                            <div className="relative z-10 mt-4 pt-4 border-t border-white/5 space-y-3">
+                                {!autoExit && delegationId && (
+                                    <div className="bg-white/[0.03] rounded-xl p-3 border border-white/5">
+                                        <div className="flex items-center justify-between mb-2">
+                                            <p className="text-[10px] text-gray-400 font-mono uppercase tracking-widest">
+                                                {language === 'es' ? 'Salir a USDC si CETES baja de' : language === 'zh' ? '当 CETES 低于时退出至 USDC' : 'Exit to USDC if CETES drops below'}
+                                            </p>
+                                            <span className="text-xs font-black text-amber-400 font-mono">{reverseThreshold.toFixed(1)}%</span>
+                                        </div>
+                                        <input
+                                            type="range"
+                                            min={1.0} max={6.0} step={0.1}
+                                            value={reverseThreshold}
+                                            onChange={e => setReverseThreshold(parseFloat(e.target.value))}
+                                            className="w-full h-1.5 accent-amber-400 cursor-pointer"
+                                        />
+                                        <div className="flex justify-between text-[9px] text-gray-600 font-mono mt-1">
+                                            <span>1%</span>
+                                            {(currentMarketState?.etherfuseApy ?? 0) > 0 ? (
+                                                <span className="text-amber-400/60">
+                                                    {language === 'es' ? 'Hoy' : 'Today'}: {currentMarketState!.etherfuseApy.toFixed(2)}%
+                                                </span>
+                                            ) : null}
+                                            <span>6%</span>
+                                        </div>
+                                    </div>
+                                )}
+                                <div className="flex items-center justify-between gap-4">
+                                    <div>
+                                        <p className="text-xs font-bold text-white flex items-center gap-2">
+                                            <Zap size={12} className={autoExit ? 'text-amber-400 animate-pulse' : 'text-gray-600'} />
+                                            {t.dashboard.auto_exit.label}
+                                        </p>
+                                        <p className="text-[10px] text-gray-500 mt-0.5 font-mono">
+                                            {autoExit
+                                                ? `CETES < ${reverseThreshold.toFixed(1)}% — ${t.dashboard.auto_exit.enabled_desc}`
+                                                : t.dashboard.auto_exit.disabled_desc}
+                                        </p>
+                                    </div>
+                                    <button
+                                        onClick={handleAutoExitToggle}
+                                        disabled={autoExitLoading || !delegationId}
+                                        title={!delegationId ? t.dashboard.auto_exit.delegation_required : ''}
+                                        className={`relative w-12 h-6 rounded-full transition-all duration-300 flex items-center shrink-0 ${
+                                            autoExit ? 'bg-amber-400' : 'bg-white/10'
+                                        } ${(autoExitLoading || !delegationId) ? 'opacity-40 cursor-not-allowed' : 'cursor-pointer'}`}
+                                    >
+                                        <span className={`absolute w-4 h-4 bg-white rounded-full shadow-lg transition-all duration-300 ${autoExit ? 'left-7' : 'left-1'}`} />
+                                    </button>
+                                </div>
+                            </div>
+                        )}
+                        {vaultId && baseAsset === 'XLM' && (
+                            <div className="relative z-10 mt-4 pt-4 border-t border-white/5 flex items-center gap-2">
+                                <Info size={11} className="text-gray-500 shrink-0" />
+                                <p className="text-[10px] text-gray-500 font-mono">
+                                    {t.dashboard.xlm_vault_info}
+                                </p>
+                            </div>
+                        )}
+
                         {/* Background Glow Effect */}
                         <div className={`absolute -right-20 -bottom-20 w-64 h-64 rounded-full blur-[100px] opacity-10 transition-colors duration-1000 ${activeStrategies.length > 0 ? 'bg-green-500' : 'bg-stellar-teal'}`}></div>
                     </div>
@@ -2397,18 +2988,112 @@ function DashboardContent() {
                     <div className="glass-panel rounded-2xl p-6 min-h-[400px]">
                         <div className="flex justify-between items-center mb-6">
                             <h2 className="text-sm text-gray-400 uppercase tracking-widest flex items-center gap-2">
-                                <RefreshCw size={14} className={activeStrategies.length > 0 ? "animate-spin-slow text-stellar-teal" : "text-gray-600"} />
-                                {t.dashboard.stats.helpers} ({activeStrategies.length}/10)
+                                <RefreshCw size={14} className={(activeStrategies.length > 0 || autoRebalance) ? "animate-spin-slow text-stellar-teal" : "text-gray-600"} />
+                                {t.dashboard.stats.helpers} ({activeStrategies.length + (autoRebalance ? 1 : 0)}/10)
                             </h2>
-                            {activeStrategies.length === 0 && (
+                            {activeStrategies.length === 0 && !autoRebalance && (
                                 <button onClick={handleDeploy} className="text-[10px] bg-stellar-yellow/10 text-stellar-yellow px-3 py-1.5 rounded-lg border border-stellar-yellow/20 hover:bg-stellar-yellow/20 transition-colors">
                                     {t.common.strategies}
                                 </button>
                             )}
                         </div>
 
-                        {activeStrategies.length > 0 ? (
+                        {(activeStrategies.length > 0 || autoRebalance || autoExit) ? (
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                {/* Nirium Auto-Rebalance Agent Node */}
+                                {autoRebalance && (
+                                    <motion.div
+                                        initial={{ opacity: 0, scale: 0.95 }}
+                                        animate={{ opacity: 1, scale: 1 }}
+                                        className="bg-stellar-teal/5 border border-stellar-teal/30 rounded-xl p-4 flex flex-col relative overflow-hidden"
+                                    >
+                                        <div className="absolute inset-0 bg-gradient-to-br from-stellar-teal/5 to-transparent pointer-events-none" />
+                                        <div className="flex justify-between items-start mb-2 relative z-10">
+                                            <div className="flex items-center gap-2">
+                                                <span className="text-2xl">🤖</span>
+                                                <div>
+                                                    <h3 className="font-bold text-sm leading-tight text-white">{t.dashboard.auto_rebalance.node_title}</h3>
+                                                    <span className="text-[10px] text-stellar-teal font-mono flex items-center gap-1">
+                                                        <span className="w-1.5 h-1.5 bg-stellar-teal rounded-full animate-pulse"></span>
+                                                        {t.dashboard.auto_rebalance.agent_active}
+                                                    </span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div className="grid grid-cols-2 gap-2 my-2 relative z-10">
+                                            <div className="bg-black/30 rounded-lg p-2 text-center">
+                                                <p className="text-[9px] text-gray-500 uppercase tracking-widest">{t.dashboard.auto_rebalance.node_trigger}</p>
+                                                <p className="text-xs font-bold text-stellar-teal">CETES &gt; {rebalanceThreshold.toFixed(1)}%</p>
+                                            </div>
+                                            <div className="bg-black/30 rounded-lg p-2 text-center">
+                                                <p className="text-[9px] text-gray-500 uppercase tracking-widest">{t.dashboard.auto_rebalance.node_vault}</p>
+                                                <p className="text-xs font-bold text-white">#{vaultId}</p>
+                                            </div>
+                                        </div>
+                                        <div className="mt-auto pt-3 border-t border-stellar-teal/10 flex gap-2 relative z-10 items-center justify-between">
+                                            {delegationTxHash ? (
+                                                <a
+                                                    href={`https://stellar.expert/explorer/testnet/tx/${delegationTxHash}`}
+                                                    target="_blank"
+                                                    rel="noopener noreferrer"
+                                                    className="text-[10px] font-mono text-stellar-teal/70 hover:text-stellar-teal flex items-center gap-1 transition-colors"
+                                                >
+                                                    <ExternalLink size={9} />
+                                                    Tx: {delegationTxHash.slice(0, 8)}...{delegationTxHash.slice(-4)}
+                                                </a>
+                                            ) : (
+                                                <span className="text-[10px] font-mono text-gray-500">{t.dashboard.auto_rebalance.node_footer}</span>
+                                            )}
+                                            <button
+                                                onClick={handleAutoRebalanceToggle}
+                                                className="bg-red-500/10 hover:bg-red-500/20 text-red-400 text-[10px] px-2.5 py-1.5 rounded-lg border border-red-500/10 transition-colors"
+                                            >
+                                                STOP
+                                            </button>
+                                        </div>
+                                    </motion.div>
+                                )}
+                                {/* Auto-Exit Node */}
+                                {autoExit && (
+                                    <motion.div
+                                        initial={{ opacity: 0, scale: 0.95 }}
+                                        animate={{ opacity: 1, scale: 1 }}
+                                        className="bg-amber-500/5 border border-amber-500/30 rounded-xl p-4 flex flex-col relative overflow-hidden"
+                                    >
+                                        <div className="absolute inset-0 bg-gradient-to-br from-amber-500/5 to-transparent pointer-events-none" />
+                                        <div className="flex justify-between items-start mb-2 relative z-10">
+                                            <div className="flex items-center gap-2">
+                                                <span className="text-2xl">🔄</span>
+                                                <div>
+                                                    <h3 className="font-bold text-sm leading-tight text-white">{t.dashboard.auto_exit.node_title}</h3>
+                                                    <span className="text-[10px] text-amber-400 font-mono flex items-center gap-1">
+                                                        <span className="w-1.5 h-1.5 bg-amber-400 rounded-full animate-pulse"></span>
+                                                        {t.dashboard.auto_exit.agent_active}
+                                                    </span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div className="grid grid-cols-2 gap-2 my-2 relative z-10">
+                                            <div className="bg-black/30 rounded-lg p-2 text-center">
+                                                <p className="text-[9px] text-gray-500 uppercase tracking-widest">{t.dashboard.auto_exit.node_trigger}</p>
+                                                <p className="text-xs font-bold text-amber-400">CETES &lt; {reverseThreshold.toFixed(1)}%</p>
+                                            </div>
+                                            <div className="bg-black/30 rounded-lg p-2 text-center">
+                                                <p className="text-[9px] text-gray-500 uppercase tracking-widest">{t.dashboard.auto_exit.node_vault}</p>
+                                                <p className="text-xs font-bold text-white">#{vaultId}</p>
+                                            </div>
+                                        </div>
+                                        <div className="mt-auto pt-3 border-t border-amber-500/10 flex gap-2 relative z-10 items-center justify-between">
+                                            <span className="text-[10px] font-mono text-gray-500">{t.dashboard.auto_exit.node_footer}</span>
+                                            <button
+                                                onClick={handleAutoExitToggle}
+                                                className="bg-red-500/10 hover:bg-red-500/20 text-red-400 text-[10px] px-2.5 py-1.5 rounded-lg border border-red-500/10 transition-colors"
+                                            >
+                                                STOP
+                                            </button>
+                                        </div>
+                                    </motion.div>
+                                )}
                                 {activeStrategies.slice(0, 10).map((strat, i) => {
                                     const baseApy = blendData ? blendData.supplyApy : 0;
                                     const boost = 0.5 + (strat.id.charCodeAt(0) % 30) / 10;
@@ -2433,7 +3118,7 @@ function DashboardContent() {
                                                     </div>
                                                 </div>
                                                 <div className="text-right">
-                                                    <div className="text-stellar-teal font-mono font-bold animate-pulse-slow">{dynamicYield}</div>
+                                                    <div className="text-stellar-teal font-mono font-bold animate-pulse-slow">{dynamicYield} <span className="text-[9px] font-normal text-gray-500">est.</span></div>
                                                     <div className="text-[9px] text-gray-500">{t.dashboard.stats.efficiency}</div>
                                                 </div>
                                             </div>
@@ -2486,7 +3171,7 @@ function DashboardContent() {
                                     💤
                                 </div>
                                 <div className="space-y-1">
-                                    <p className="text-gray-400 font-medium">No helpers running yet.</p>
+                                    <p className="text-gray-400 font-medium">{t.dashboard.no_helpers}</p>
                                     <p className="text-xs text-gray-600 max-w-xs mx-auto">{t.dashboard.onboarding_desc}</p>
                                 </div>
                             </div>
@@ -2497,6 +3182,9 @@ function DashboardContent() {
                     <div className="relative rounded-2xl h-[400px] flex flex-col mt-6 overflow-hidden">
                         <ProtocolRevenue />
                     </div>
+
+                    {/* LIQUIDACIÓN B2B EN TIEMPO REAL — horizontal, below ProtocolRevenue */}
+                    <PaymentStreams horizontal />
                 </motion.div>
 
                 {/* Right Column: Stats & Agent Controls */}
@@ -2514,18 +3202,26 @@ function DashboardContent() {
                         </div>
 
                         <h3 className="text-sm text-gray-400 uppercase tracking-widest mb-4 flex items-center justify-between">
-                            Your Helpers
-                            <span className="text-stellar-teal font-mono text-xs">{activeStrategies.length} ACTIVE</span>
+                            {t.dashboard.your_helpers}
+                            <span className="text-stellar-teal font-mono text-xs">{activeStrategies.length + (autoRebalance ? 1 : 0) + (autoExit ? 1 : 0)} ACTIVE</span>
                         </h3>
 
-                        {activeStrategies.length === 0 ? (
+                        {activeStrategies.length === 0 && !autoRebalance && !autoExit ? (
                             <div className="flex flex-col items-center justify-center py-8 text-center space-y-3 relative z-10">
                                 <div className="w-12 h-12 rounded-full bg-white/5 flex items-center justify-center text-gray-600">
                                     <span className="text-2xl">💤</span>
                                 </div>
                                 <p className="text-sm text-gray-400">{t.dashboard.no_helpers}</p>
-                                <button onClick={handleDeploy} className="text-xs bg-stellar-yellow/10 text-stellar-yellow px-3 py-1.5 rounded-lg border border-stellar-yellow/20 hover:bg-stellar-yellow/20 transition-colors">
-                                    Start My First Helper
+                                <p className="text-[10px] text-gray-600 max-w-[180px]">{t.dashboard.no_helpers_desc}</p>
+                                <button
+                                    onClick={() => {
+                                        // Scroll to vault section to enable auto-rebalance toggle
+                                        document.querySelector('[data-vault-section]')?.scrollIntoView({ behavior: 'smooth' });
+                                        if (!vaultId) toast.info(t.dashboard.no_helpers_desc);
+                                    }}
+                                    className="text-xs bg-stellar-yellow/10 text-stellar-yellow px-3 py-1.5 rounded-lg border border-stellar-yellow/20 hover:bg-stellar-yellow/20 transition-colors"
+                                >
+                                    {t.dashboard.start_first_node}
                                 </button>
                             </div>
                         ) : (
@@ -2572,22 +3268,33 @@ function DashboardContent() {
 
                         {/* Quick Actions at the bottom of the Fleet card */}
                         <div className="mt-6 pt-4 border-t border-white/5 flex flex-col gap-2 relative z-10">
-                            <Link href="/strategies" className="w-full">
-                                <button className="w-full bg-white/5 hover:bg-white/10 text-[11px] font-bold py-2 rounded-xl transition-all border border-white/10 text-gray-300 flex items-center justify-center gap-2">
-                                    <Zap className="w-3 h-3 text-stellar-teal" />
-                                    ADD MORE HELPERS
-                                </button>
-                            </Link>
-                            <Link href="/strategies/builder" className="w-full">
+                            <button
+                                onClick={() => {
+                                    const vaultSection = document.querySelector('[data-vault-section]');
+                                    if (vaultSection) {
+                                        vaultSection.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                                        // Brief highlight
+                                        (vaultSection as HTMLElement).style.transition = 'box-shadow 0.3s';
+                                        (vaultSection as HTMLElement).style.boxShadow = '0 0 0 2px rgba(45,235,232,0.4)';
+                                        setTimeout(() => { (vaultSection as HTMLElement).style.boxShadow = ''; }, 1500);
+                                    }
+                                    if (!vaultId) toast.info(t.dashboard.no_helpers_desc);
+                                }}
+                                className="w-full bg-white/5 hover:bg-white/10 text-[11px] font-bold py-2 rounded-xl transition-all border border-white/10 text-gray-300 flex items-center justify-center gap-2"
+                            >
+                                <Zap className="w-3 h-3 text-stellar-teal" />
+                                {t.dashboard.add_node}
+                            </button>
+                            <Link href="/treasury/builder" className="w-full">
                                 <button className="w-full bg-stellar-yellow/10 hover:bg-stellar-yellow/20 text-[11px] font-bold py-2 rounded-xl transition-all border border-stellar-yellow/20 text-stellar-yellow flex items-center justify-center gap-2">
                                     <Plus className="w-3 h-3" />
-                                    BUILD YOUR OWN
+                                    {t.dashboard.build_node}
                                 </button>
                             </Link>
                         </div>
                     </motion.div>
 
-                    {/* Market Intelligence (Phoenix & Blend) */}
+                    {/* CETES Reference Rate (replaces Blend/Phoenix) */}
                     <motion.div
                         initial={{ opacity: 0, x: 20 }}
                         animate={{ opacity: 1, x: 0 }}
@@ -2595,32 +3302,33 @@ function DashboardContent() {
                         className="glass-panel p-4 rounded-xl border border-white/5"
                     >
                         <h3 className="text-xs text-gray-400 uppercase tracking-widest mb-3">{t.dashboard.payment_streams.market_rates}</h3>
-                        <div className="grid grid-cols-2 gap-3">
-                            <div className="bg-white/5 p-2 rounded border border-white/5 hover:border-stellar-teal/30 transition-colors">
-                                <div className="text-[10px] text-stellar-teal font-bold mb-1 flex items-center gap-1">
-                                    <span className="w-1.5 h-1.5 rounded-full bg-stellar-teal"></span> PHOENIX
-                                </div>
-                                <div className="flex justify-between text-xs mb-1">
-                                    <span className="text-gray-400">{t.dashboard.payment_streams.supply}</span>
-                                    <span className="text-green-400 font-mono">{phoenixData?.supplyApy || '--'}%</span>
-                                </div>
-                                <div className="flex justify-between text-xs">
-                                    <span className="text-gray-400">{t.dashboard.payment_streams.borrow}</span>
-                                    <span className="text-red-400 font-mono">{phoenixData?.borrowApy || '--'}%</span>
-                                </div>
+                        <div className="bg-white/5 p-3 rounded-lg border border-stellar-teal/10 mb-3">
+                            <div className="text-[10px] text-stellar-teal font-bold mb-2 flex items-center gap-1.5">
+                                <span className="w-1.5 h-1.5 rounded-full bg-stellar-teal animate-pulse"></span>
+                                {t.dashboard.payment_streams.cetes_banxico}
                             </div>
-                            <div className="bg-white/5 p-2 rounded border border-white/5 hover:border-blue-400/30 transition-colors">
-                                <div className="text-[10px] text-blue-400 font-bold mb-1 flex items-center gap-1">
-                                    <span className="w-1.5 h-1.5 rounded-full bg-blue-400"></span> BLEND
-                                </div>
-                                <div className="flex justify-between text-xs mb-1">
-                                    <span className="text-gray-400">{t.dashboard.payment_streams.supply}</span>
-                                    <span className="text-green-400 font-mono">{blendData?.supplyApy || '--'}%</span>
-                                </div>
-                                <div className="flex justify-between text-xs">
-                                    <span className="text-gray-400">{t.dashboard.payment_streams.borrow}</span>
-                                    <span className="text-red-400 font-mono">{blendData?.borrowApy || '--'}%</span>
-                                </div>
+                            <div className="flex justify-between items-end">
+                                <span className="text-gray-400 text-xs">{t.dashboard.payment_streams.cetes_rate_label}</span>
+                                <span className="text-stellar-teal font-mono text-xl font-black">
+                                    {(currentMarketState?.etherfuseApy ?? 0) > 0
+                                        ? `${currentMarketState!.etherfuseApy.toFixed(2)}%`
+                                        : '...'}
+                                </span>
+                            </div>
+                            <p className="text-[9px] text-gray-600 mt-1 font-mono">NON-FINANCIAL ADVICE · EST DATA</p>
+                        </div>
+                        <div className="grid grid-cols-2 gap-2">
+                            <div className="bg-white/[0.03] p-2 rounded border border-white/5">
+                                <p className="text-[9px] text-gray-500 uppercase tracking-wider mb-1">{t.dashboard.payment_streams.network_fee}</p>
+                                <p className="text-xs font-mono text-white/70">
+                                    {currentMarketState?.baseFee ? `${currentMarketState.baseFee} stroops` : '100 stroops'}
+                                </p>
+                            </div>
+                            <div className="bg-white/[0.03] p-2 rounded border border-white/5">
+                                <p className="text-[9px] text-gray-500 uppercase tracking-wider mb-1">{t.dashboard.payment_streams.corridors}</p>
+                                <p className="text-xs font-mono text-white/70">
+                                    {currentMarketState?.pathPaymentRoutes?.length ?? 0} XLM→USDC
+                                </p>
                             </div>
                         </div>
                     </motion.div>
@@ -2628,8 +3336,8 @@ function DashboardContent() {
                     {/* Telemetry Network Thought Process */}
                     <TelemetryFeed thoughts={thoughts} />
 
-                    {/* x402 Protocol Revenue & M2M Streams */}
-                    <PaymentStreams />
+                    {/* Immutable IPFS Audit Trail — Deliverable 3 Instaward #1 */}
+                    <AuditTrailViewer />
                 </div>
             </div>
 

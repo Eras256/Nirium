@@ -152,7 +152,7 @@ export function useEloReputation() {
     return {
         tx,
         reset,
-        contractId: CONTRACT_IDS.ELO,
+        contractId: CONTRACT_IDS.PROTOCOL,
         getScore,
         getProfile,
         getTotalSentinels,
@@ -194,11 +194,10 @@ export function useMarketplace() {
     const subscribe = useCallback(async (
         callerAddress: string,
         strategyId: number,
-        usdcTokenAddress: string,
     ) => {
         begin();
         try {
-            const result = await marketplaceSubscribe(callerAddress, strategyId, usdcTokenAddress);
+            const result = await marketplaceSubscribe(callerAddress, strategyId);
             if (result.success && result.txHash) {
                 confirm(result.txHash);
             } else {
@@ -215,7 +214,7 @@ export function useMarketplace() {
     return {
         tx,
         reset,
-        contractId: CONTRACT_IDS.MARKETPLACE,
+        contractId: CONTRACT_IDS.PROTOCOL,
         getStrategy,
         getStrategyCount,
         publishStrategy,

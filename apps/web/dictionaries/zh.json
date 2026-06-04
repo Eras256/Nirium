@@ -22,7 +22,9 @@
         "compliance": "合规",
         "developers": "开发者",
         "pricing": "价格",
-        "launch_app": "进入应用"
+        "launch_app": "进入应用",
+        "coming_soon_nav": "即将推出",
+        "back_to_marketing": "← 首页"
     },
     "footer": {
         "protocol": "协议",
@@ -113,7 +115,7 @@
     "home": {
         "hero_title_1": "让资金",
         "hero_title_2": "自动运行",
-        "hero_subtitle": "以 1.4% 的全包费率发送跨境支付，并自动优化流动性。Stellar 上的机构级软件基础设施。",
+        "hero_subtitle": "通过 Etherfuse 自动配置 CETES。软件许可起价 $299/月 + 按 API 调用计费。Stellar 上的机构级基础设施（测试网）。",
         "hero_disclaimer": "测试网上的纯软件基础设施。参考费用基于当前 Stellar SDEX 市场状况。不提供汇款服务。",
         "launch_dashboard": "查看演示",
         "read_protocol": "阅读指南",
@@ -125,7 +127,7 @@
             "title": "对比",
             "span": "并决策",
             "subtitle": "跨境资金转移的真实成本。Nirium 已包含市场点差。",
-            "disclaimer": "Stellar 测试网参考费用。市场走廊（0.8%）取决于 SDEX 流动性。Nirium 提供软件基础设施 —— 它不是汇款运营商。",
+            "disclaimer": "Stellar 测试网参考费用。Nirium 仅收取固定软件许可费。Etherfuse 执行费用（~0.20%）由 Etherfuse 单独收取。受监管合作方设定金融佣金。",
             "col_provider": "服务商",
             "col_cost": "全包成本",
             "col_speed": "速度",
@@ -300,7 +302,7 @@
         "dual_species_span": "使用方式",
         "dual_species_subtitle": "无论您是业务主管还是软件工程师，都能轻松上手。",
         "dual_species_human_title": "面向业务团队",
-        "dual_species_human_desc": "通过可视化仪表盘管理资金。监控节省成本、执行分红与审批历史。无需区块链背景。",
+        "dual_species_human_desc": "面向DevOps和金融科技工程团队的国库操作工具包——通过SDK实现程序化金库控制、多重签名执行和合规审计。无托管风险。",
         "dual_species_human_cta": "打开仪表盘",
         "dual_species_agent_title": "面向开发者",
         "dual_species_agent_desc": "数分钟内完成集成。支持 TypeScript 和 Python。由我们处理底层协议细节。",
@@ -679,8 +681,13 @@
         "total_profit": "结构性节省 (价差)",
         "ops_console": "机构操作控制台",
         "loading_dashboard": "正在加载仪表盘...",
-        "no_helpers": "没有正在运行的代理。",
-        "onboarding_desc": "创建您的钱包并选择一个助手开始自动赚取。",
+        "no_helpers": "当前无活跃执行节点。",
+        "no_helpers_desc": "初始化金库并委托代理以激活自主再平衡。",
+        "start_first_node": "激活第一个节点",
+        "add_node": "部署执行节点",
+        "build_node": "构建自定义节点",
+        "your_helpers": "活跃执行节点",
+        "onboarding_desc": "初始化您的机构金库并配置 SDK 集成以开始使用。",
         "stats": {
             "reputation": "信誉评分",
             "wallets": "钱包总数",
@@ -711,6 +718,37 @@
             "deposit": "充值",
             "withdraw": "提现"
         },
+        "auto_rebalance": {
+            "label": "自动再平衡 USDC → CETES",
+            "enabled_desc": "Nirium 代理在 CETES > 4% 时自动再平衡 — 非托管",
+            "disabled_desc": "启用后让 Nirium 自动将闲置 USDC 转入 CETES",
+            "node_title": "自动再平衡 USDC→CETES",
+            "node_trigger": "触发条件",
+            "node_trigger_value": "CETES > 4%",
+            "node_vault": "金库",
+            "node_footer": "Soroban 委托 · 非托管",
+            "agent_active": "NIRIUM 代理运行中",
+            "toast_enabled": "自动再平衡已启用 — Nirium 代理将自主再平衡您的金库",
+            "toast_disabled": "自动再平衡已禁用",
+            "toast_error": "自动再平衡切换失败"
+        },
+        "auto_exit": {
+            "label": "自动退出 CETES → USDC",
+            "enabled_desc": "CETES 跌破 3.5% 时代理自动退出至 USDC",
+            "disabled_desc": "利率下降时自动退出至 USDC — 需要委托授权",
+            "delegation_required": "请先启用自动再平衡以注册委托",
+            "node_title": "自动退出 CETES → USDC",
+            "node_trigger": "退出阈值",
+            "node_trigger_value": "CETES < 3.5%",
+            "node_vault": "金库",
+            "node_footer": "Soroban 委托 · 非托管",
+            "agent_active": "NIRIUM 代理运行中",
+            "toast_enabled": "自动退出已启用 — 利率跌破 3.5% 时代理将退出 CETES",
+            "toast_disabled": "自动退出已禁用",
+            "toast_error": "自动退出切换失败"
+        },
+        "xlm_vault_info": "XLM 金库使用跨境通道优化 — 自动再平衡适用于 USDC 金库",
+        "cetes_vault_active": "金库已持有 CETES — 再平衡默认激活",
         "modals": {
             "deploy_title": "部署 {name}？",
             "fee_label": "网络费用",
@@ -745,10 +783,14 @@
             "title": "实时支付流",
             "waiting": "等待代理发起交易...",
             "engine_active": "协议结算引擎已就绪",
-            "market_rates": "当前市场利率",
+            "market_rates": "CETES 参考利率",
             "supply": "存款",
             "borrow": "借款",
-            "target_yield": "FX 执行效率"
+            "target_yield": "FX 执行效率",
+            "cetes_banxico": "CETES（Banxico）",
+            "cetes_rate_label": "参考利率",
+            "network_fee": "网络费用",
+            "corridors": "活跃通道"
         }
     },
     "common": {
@@ -2056,16 +2098,16 @@
     },
     "ramp": {
         "header": {
-            "badge": "法币入金",
-            "title": "从你的银行到 Nirium",
-            "subtitle": "将资金从普通银行账户转入你的 Nirium 钱包。这是由 Etherfuse 驱动的测试版本——暂无真实资金。"
+            "badge": "SPEI → CETES 充值（Etherfuse）",
+            "title": "通过 SPEI 为金库充值",
+            "subtitle": "通过 SPEI 将 MXN 转至 CLABE 账户。Etherfuse（独立受监管运营商）将其以 Banxico 参考利率转换为 Stellar 上的代币化 CETES。需完成 KYC/KYB。测试网运行中——不涉及真实资金。"
         },
         "component": {
-            "title": "机构入金通道",
-            "powered_by": "由 Etherfuse 驱动（测试网）",
-            "select_bond": "选择 CETES 选项",
+            "title": "SPEI → CETES 充值通道",
+            "powered_by": "由 Etherfuse 运营 · Stellar 测试网",
+            "select_bond": "主权债券（CETES — Banxico 参考利率）",
             "errors": {
-                "amount": "沙盒环境金额须在 1 至 500 MXN 之间",
+                "amount": "沙盒环境金额须在 1 至 10,000 MXN 之间",
                 "wallet": "请输入 Stellar 测试网钱包地址（G...）"
             },
             "form": {
@@ -2431,7 +2473,7 @@
             "best_crypto": "当今最佳加密货币",
             "nirium": "Nirium + Etherfuse",
             "total_to_user": "用户总额",
-            "explanation": "通过 Etherfuse 的法定货币 ↔ CETES ↔ USDC 走廊绕过了 SDEX 上昂贵的 XLM/USDC 价差，并将其替换为 ~0.8% 的全包费用（Nirium + Etherfuse）。"
+            "explanation": "通过 Etherfuse 的 USDC ↔ CETES 企业走廊优化了 B2B 资金库。Nirium 提供软件基础设施（固定许可费）。Etherfuse 收取 ~0.20% 的 CETES 执行费。受监管合作方（ITF/券商）独立设定并收取所有金融佣金。"
         },
         "paths": {
             "title": "根据用户的两条路径",
@@ -2483,5 +2525,13 @@
                 "content": "为满足 Instaward 的严格标准，我们的架构执行企业级安全协议、稳健的多重签名授权流程以及完整的链上可追溯性。我们通过维持职责分离、非托管操作和严格的监管意识来优先考虑机构信任。"
             }
         }
+    },
+    "legal": {
+        "disclaimer_short": "Nirium 是在 Stellar Testnet 上运行的实验性软件。不构成财务建议。不保证收益、分红或回报。使用需自行承担风险。",
+        "disclaimer_full": "Nirium 是一款仅部署在 Stellar Testnet 上的实验性软件。所有操作均使用无实际货币价值的测试代币。智能合约尚未经过独立第三方的正式审计（审计计划在融资后的第三个月进行）。Nirium 不提供任何财务建议。它不是一种投资产品。不保证收益、股息、资产增值或任何形式的回报。所显示的基准利率数据（Blend APY、Etherfuse CETES）仅代表协议公开信息，并非收益预测或承诺。XLM 和 Stellar 资产具有波动性。使用需自行承担风险。本项目在 Stellar Community Fund v7.0 框架和 Stellar 行为准则（2026年5月更新）下运营。",
+        "rate_disclaimer": "仅为协议基准利率。非收益预测或担保。",
+        "non_custodial": "非托管。您掌控您的密钥。",
+        "testnet_only": "仅限测试网。无真实资金。",
+        "scf_compliant": "在 SCF v7.0 和 Stellar 行为准则下运营"
     }
 }

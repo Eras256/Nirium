@@ -47,8 +47,8 @@ pnpm dev
 ```
 Nirium/
 ├── apps/web/                  → Next.js 15 Dashboard — 21 routes, i18n (EN/ES/ZH)
-├── packages/sdk/              → TypeScript SDK v0.5.0 (npm: nirium)
-├── packages/sdk-python/       → Python SDK v0.5.0 (PyPI: nirium)
+├── packages/sdk/              → TypeScript SDK v0.6.1 (npm: nirium)
+├── packages/sdk-python/       → Python SDK v0.6.1 (PyPI: nirium)
 ├── packages/contracts/        → Soroban smart contracts (Rust) — 6 contracts
 ├── nirium-soroban-contracts/  → Additional Soroban contracts
 └── .github/workflows/         → CI, release, security-gate

@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: Apache-2.0
+// Copyright 2026 Nirium Protocol Contributors
+
 //! Mock Blend Lending Pool — Synthetic APYs for testnet.
 //!
 //! Returns deterministic lending rates for development and testing.

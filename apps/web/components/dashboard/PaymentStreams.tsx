@@ -1,7 +1,7 @@
 "use client";
 
 import { motion, AnimatePresence } from "framer-motion";
-import { DollarSign, Zap, ArrowUpRight } from "lucide-react";
+import { DollarSign, Zap } from "lucide-react";
 import { useEffect, useState } from "react";
 
 interface PaymentStream {
@@ -15,7 +15,7 @@ interface PaymentStream {
 
 import { useLanguage } from "@/context/LanguageContext";
 
-export default function PaymentStreams() {
+export default function PaymentStreams({ horizontal = false }: { horizontal?: boolean }) {
     const { t } = useLanguage();
     const [streams, setStreams] = useState<PaymentStream[]>([]);
     const treasury = "GC4Q5TWWXI7IHN6DYCBEKCOWJWCKY4JE2NLKLU5SE3YL44IUUFPKUOPC";
@@ -82,60 +82,64 @@ export default function PaymentStreams() {
     }, []);
 
     return (
-        <div className="bg-[#080808] border border-white/5 rounded-2xl p-6">
-            <div className="flex items-center justify-between mb-6">
+        <div className="bg-[#080808] border border-white/5 rounded-2xl p-4">
+            <div className="flex items-center justify-between mb-4">
                 <div className="flex items-center gap-2">
-                    <Zap className="w-5 h-5 text-stellar-teal" />
-                    <h2 className="text-sm font-bold uppercase tracking-widest text-white">{t.dashboard.payment_streams.title}</h2>
+                    <Zap className="w-4 h-4 text-stellar-teal" />
+                    <h2 className="text-xs font-bold uppercase tracking-widest text-white">{t.dashboard.payment_streams.title}</h2>
                 </div>
                 <div className="px-2 py-0.5 rounded bg-stellar-teal/10 text-stellar-teal text-[10px] font-mono border border-stellar-teal/20">
                     REAL-TIME
                 </div>
             </div>
 
-            <div className="space-y-4">
+            {/* Horizontal grid layout */}
+            <div className={horizontal
+                ? "grid grid-cols-2 lg:grid-cols-3 gap-2"
+                : "space-y-3"
+            }>
                 <AnimatePresence initial={false}>
                     {streams.map((stream) => (
                         <motion.a
                             key={stream.id}
-                            initial={{ opacity: 0, x: -20 }}
-                            animate={{ opacity: 1, x: 0 }}
-                            exit={{ opacity: 0, x: 20 }}
+                            initial={{ opacity: 0, scale: 0.95 }}
+                            animate={{ opacity: 1, scale: 1 }}
+                            exit={{ opacity: 0, scale: 0.95 }}
                             href={`https://stellar.expert/explorer/testnet/tx/${stream.id}`}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="flex items-center justify-between p-3 bg-white/5 rounded-xl border border-white/5 hover:border-stellar-teal/30 hover:bg-white/10 transition-all cursor-pointer group"
+                            className="flex items-center justify-between p-2.5 bg-white/5 rounded-xl border border-white/5 hover:border-stellar-teal/30 hover:bg-white/10 transition-all cursor-pointer group"
                         >
-                            <div className="flex items-center gap-3">
-                                <div className={`w-8 h-8 rounded-full flex items-center justify-center ${
+                            <div className="flex items-center gap-2">
+                                <div className={`w-7 h-7 rounded-full flex items-center justify-center shrink-0 ${
                                     stream.type === 'x402' ? 'bg-purple-500/20 text-purple-400' : 'bg-blue-500/20 text-blue-400'
                                 }`}>
-                                    <DollarSign size={14} />
+                                    <DollarSign size={12} />
                                 </div>
-                                <div className="flex flex-col">
-                                    <span className="text-xs font-mono text-gray-400 group-hover:text-white transition-colors">{stream.from}</span>
-                                    <span className="text-[10px] text-gray-600 uppercase tracking-tighter">
-                                        via {stream.type.toUpperCase()} Protocol
+                                <div className="flex flex-col min-w-0">
+                                    <span className="text-[10px] font-mono text-gray-400 truncate">{stream.from}</span>
+                                    <span className="text-[9px] text-gray-600 uppercase tracking-tighter">
+                                        {stream.type.toUpperCase()}
                                     </span>
                                 </div>
                             </div>
-                            <div className="flex flex-col items-end">
-                                <span className="text-sm font-black text-stellar-teal">+{stream.amount} {stream.asset}</span>
-                                <ArrowUpRight size={10} className="text-stellar-teal group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform" />
+                            <div className="flex flex-col items-end shrink-0 ml-2">
+                                <span className="text-xs font-black text-stellar-teal">+{stream.amount}</span>
+                                <span className="text-[9px] text-gray-500">{stream.asset}</span>
                             </div>
                         </motion.a>
                     ))}
                 </AnimatePresence>
 
                 {streams.length === 0 && (
-                    <div className="py-12 text-center">
+                    <div className={`text-center ${horizontal ? 'col-span-full py-6' : 'py-8'}`}>
                         <p className="text-xs text-gray-500 italic">{t.dashboard.payment_streams.waiting}</p>
                     </div>
                 )}
             </div>
 
-            <div className="mt-6 pt-4 border-t border-white/5 flex justify-center">
-                <span className="text-[10px] text-gray-600 uppercase tracking-[0.2em]">{t.dashboard.payment_streams.engine_active}</span>
+            <div className="mt-3 pt-3 border-t border-white/5 flex justify-center">
+                <span className="text-[9px] text-gray-600 uppercase tracking-[0.2em]">{t.dashboard.payment_streams.engine_active}</span>
             </div>
         </div>
     );

@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: Apache-2.0
+// Copyright 2026 Nirium Protocol Contributors
+
 //! Soroswap DEX Interface — Automated Market Maker trait definitions.
 //!
 //! Defines the interface for interacting with Soroswap (or Phoenix) DEX

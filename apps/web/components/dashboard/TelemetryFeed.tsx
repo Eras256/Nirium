@@ -64,7 +64,7 @@ export default function TelemetryFeed({ thoughts = [] }: { thoughts?: any[] }) {
 
                                     <div className="flex-1 pb-4">
                                         <div className="flex items-center gap-2 mb-1.5">
-                                            <span className="text-[10px] font-mono text-white/40 bg-white/5 px-1.5 py-0.5 rounded border border-white/5">
+                                            <span suppressHydrationWarning className="text-[10px] font-mono text-white/40 bg-white/5 px-1.5 py-0.5 rounded border border-white/5">
                                                 {new Date(thought.timestamp).toLocaleTimeString([], { hour12: false, hour: '2-digit', minute: '2-digit', second: '2-digit' })}
                                             </span>
                                             <span className={`text-[9px] font-bold uppercase tracking-wider ${

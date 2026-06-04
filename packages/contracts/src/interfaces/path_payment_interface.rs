@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: Apache-2.0
+// Copyright 2026 Nirium Protocol Contributors
+
 //! Path Payment Interface — Helpers for Stellar's native PathPayment operations.
 //!
 //! PathPaymentStrictReceive and PathPaymentStrictSend are BUILT INTO Stellar's

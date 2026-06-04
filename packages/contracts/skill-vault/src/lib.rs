@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: Apache-2.0
+// Copyright 2026 Nirium Protocol Contributors
+
 //! Nirium Skill Vault — X402 Payment Gate for Autonomous Agents
 //! 
 //! This contract implements a "Proof of Payment" gateway.

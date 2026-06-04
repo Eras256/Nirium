@@ -91,7 +91,7 @@ function createTypeScriptProject(dir: string, name: string, options: { apiKey?: 
             start: 'node dist/index.js',
         },
         dependencies: {
-            '@nirium/sdk': '^0.1.0',
+            'nirium': '^0.6.1',
         },
         devDependencies: {
             tsx: '^4.19.0',
@@ -120,7 +120,7 @@ function createTypeScriptProject(dir: string, name: string, options: { apiKey?: 
 // ${name} — Nirium Autonomous Bot
 // ═══════════════════════════════════════════════════
 
-import { Agent } from '@nirium/sdk';
+import { Agent } from 'nirium';
 
 const agent = new Agent({
   apiKey: '${apiKey}',

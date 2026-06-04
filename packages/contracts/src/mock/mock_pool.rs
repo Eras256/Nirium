@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: Apache-2.0
+// Copyright 2026 Nirium Protocol Contributors
+
 //! Mock Multi-Asset Liquidity Pool (CPMM)
 //! Functional pool for XLM/USDC arbitrage testing on Soroban.
 

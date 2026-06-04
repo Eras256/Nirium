@@ -5,10 +5,10 @@ import { usePathname } from "next/navigation";
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
-    LayoutDashboard, Bot, BarChart2, Wallet, Repeat2,
-    ShoppingBag, Shield, Code2, BookOpen,
+    LayoutDashboard, BarChart2,
+    Shield, Code2, BookOpen,
     Menu, X, ChevronRight, Activity, Zap, Globe,
-    Trophy, Plug, Layers, Cpu
+    Layers, Cpu
 } from "lucide-react";
 import { useFreighter } from "@/hooks/useFreighter";
 import { useLanguage } from "@/context/LanguageContext";
@@ -22,27 +22,30 @@ export function AppSidebar({ onClose }: { onClose?: () => void }) {
         {
             label: "CORE",
             items: [
-                { href: "/dashboard",   label: t.nav.dashboard,      icon: LayoutDashboard, accent: "#2DEBE8" },
-                { href: "/agents",      label: t.nav.agents,         icon: Cpu,             accent: "#FFD700" },
-                { href: "/analytics",   label: t.nav.analytics,      icon: BarChart2,       accent: "#34D399" },
-                { href: "/compliance",  label: t.nav.compliance,     icon: Shield,          accent: "#2DEBE8" },
+                { href: "/dashboard",        label: t.nav.dashboard,   icon: LayoutDashboard, accent: "#2DEBE8" },
+                { href: "/agents",           label: t.nav.agents,      icon: Cpu,             accent: "#FFD700" },
+                { href: "/compliance",       label: t.nav.compliance,  icon: Shield,          accent: "#2DEBE8" },
             ]
         },
         {
             label: "TREASURY",
             items: [
-                { href: "/marketplace", label: t.nav.marketplace,    icon: Layers,          accent: "#F97316" },
-                { href: "/treasury/builder", label: t.nav.builder,   icon: Zap,             accent: "#A78BFA" },
-                { href: "/ramp",        label: t.nav.ramp,           icon: Globe,           accent: "#EC4899" },
+                { href: "/treasury/builder", label: t.nav.builder,    icon: Zap,             accent: "#A78BFA" },
+                { href: "/ramp",             label: t.nav.ramp,        icon: Globe,           accent: "#EC4899" },
             ]
         },
         {
             label: "DEVELOPER",
             items: [
-                { href: "/docs",        label: t.nav.docs,           icon: BookOpen,        accent: "#8B5CF6" },
-                { href: "/developers",  label: t.nav.developers,     icon: Code2,           accent: "#6366F1" },
+                { href: "/docs",             label: t.nav.docs,        icon: BookOpen,        accent: "#8B5CF6" },
+                { href: "/developers",       label: t.nav.developers,  icon: Code2,           accent: "#6366F1" },
             ]
         }
+    ];
+
+    const soonNav = [
+        { href: "/analytics",   label: t.nav.analytics,   icon: BarChart2, badge: "BETA"  },
+        { href: "/marketplace", label: t.nav.marketplace, icon: Layers,    badge: "SOON"  },
     ];
 
     return (
@@ -107,6 +110,29 @@ export function AppSidebar({ onClose }: { onClose?: () => void }) {
                         </ul>
                     </div>
                 ))}
+                {/* SOON section */}
+                <div>
+                    <p className="px-3 mb-2 text-[9px] font-black uppercase tracking-[0.2em] text-white/20">
+                        {t.nav.coming_soon_nav}
+                    </p>
+                    <ul className="space-y-0.5">
+                        {soonNav.map(({ href, label, icon: Icon, badge }) => (
+                            <li key={href}>
+                                <Link
+                                    href={href}
+                                    onClick={onClose}
+                                    className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all group relative text-white/25 hover:text-white/40 hover:bg-white/[0.02]"
+                                >
+                                    <Icon size={15} className="shrink-0" />
+                                    <span className="truncate text-[13px]">{label}</span>
+                                    <span className="ml-auto text-[8px] font-black px-1.5 py-0.5 rounded border border-white/10 text-white/30 uppercase tracking-widest">
+                                        {badge}
+                                    </span>
+                                </Link>
+                            </li>
+                        ))}
+                    </ul>
+                </div>
             </nav>
 
             {/* Status pill */}
@@ -181,6 +207,7 @@ export function AppSidebar({ onClose }: { onClose?: () => void }) {
 export default function AppLayout({ children }: { children: React.ReactNode }) {
     const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
     const pathname = usePathname();
+    const { t } = useLanguage();
 
     useEffect(() => {
         setMobileSidebarOpen(false);
@@ -229,7 +256,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
                     </button>
                     <img src="/brand/NiLo.png" alt="Nirium" className="h-7 w-auto object-contain" />
                     <Link href="/" className="ml-auto text-[9px] font-mono text-white/30 hover:text-white transition-colors uppercase tracking-widest">
-                        ← Marketing
+                        {t.nav.back_to_marketing}
                     </Link>
                 </header>
 

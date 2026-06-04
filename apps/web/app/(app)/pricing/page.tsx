@@ -14,7 +14,7 @@ const FEATURES_FREE: Feature[] = [
     { en: 'Testnet vault (2-of-3 Soroban)', es: 'Vault testnet (2-de-3 Soroban)', zh: '测试网保险库（2-of-3 Soroban）' },
     { en: 'Up to 10 test transactions/day',  es: 'Hasta 10 txs de prueba/día',     zh: '每天最多 10 笔测试交易' },
     { en: 'Audit trail (HMAC-SHA256)',        es: 'Audit trail (HMAC-SHA256)',       zh: '审计追踪（HMAC-SHA256）' },
-    { en: 'SDK access (@nirium/sdk)',         es: 'Acceso SDK (@nirium/sdk)',         zh: 'SDK 访问（@nirium/sdk）' },
+    { en: 'SDK access (npm: nirium)',          es: 'Acceso SDK (npm: nirium)',          zh: 'SDK 访问（npm: nirium）' },
     { en: 'MCP server (Claude/Cursor)',       es: 'MCP server (Claude/Cursor)',       zh: 'MCP 服务器（Claude/Cursor）' },
 ];
 
@@ -26,7 +26,7 @@ const FEATURES_GROWTH: Feature[] = [
     { en: 'IPFS anchoring (Pinata)',             es: 'Anclaje IPFS (Pinata)',               zh: 'IPFS 锚定（Pinata）' },
     { en: 'x402 + MPP agentic payments',        es: 'Pagos agénticos x402 + MPP',          zh: 'x402 + MPP 智能体支付' },
     { en: 'Cross-border USDC transfers',        es: 'Transfers cross-border USDC',         zh: '跨境 USDC 转账' },
-    { en: 'CETES ↔ USDC auto-rebalance',               es: 'Auto-rebalanceo CETES ↔ USDC',                 zh: 'CETES ↔ USDC 自动再平衡' },
+    { en: 'CETES ↔ USDC signal generation',             es: 'Generación de señales CETES ↔ USDC',            zh: 'CETES ↔ USDC 信号生成' },
     { en: 'Visual Strategy Builder (drag & drop)', es: 'Strategy Builder visual (drag & drop)', zh: '可视化策略构建器（拖放）' },
     { en: 'Priority support (48h SLA)',            es: 'Soporte prioritario (48h SLA)',          zh: '优先支持（48h SLA）' },
     { en: 'Dedicated Slack channel',               es: 'Canal Slack dedicado',                  zh: '专属 Slack 频道' },
@@ -34,7 +34,7 @@ const FEATURES_GROWTH: Feature[] = [
 
 const FEATURES_ENTERPRISE: Feature[] = [
     { en: 'Everything in Growth',                           es: 'Todo lo de Growth',                              zh: '包含 Growth 所有功能' },
-    { en: 'Custom fee negotiation',                         es: 'Negociación de fees personalizada',               zh: '自定义费率谈判' },
+    { en: 'Volume API pricing',                              es: 'Precios por volumen de API',                      zh: '批量 API 定价' },
     { en: 'White-label option',                             es: 'Opción white-label',                              zh: '白标选项' },
     { en: 'Custom Soroban vault logic',                     es: 'Lógica de vault Soroban custom',                  zh: '自定义 Soroban 保险库逻辑' },
     { en: 'CNBV audit support',                             es: 'Soporte auditoría CNBV',                          zh: 'CNBV 审计支持' },
@@ -59,7 +59,7 @@ const COMPARISON: ComparisonRow[] = [
     { feature: { en: 'CNBV export',      es: 'Export CNBV',            zh: 'CNBV 导出'        }, free: '✗', growth: '✓', enterprise: '✓' },
     { feature: { en: 'IPFS anchoring',   es: 'Anclaje IPFS',           zh: 'IPFS 锚定'        }, free: '✗', growth: '✓', enterprise: '✓' },
     { feature: { en: 'x402 / MPP',       es: 'x402 / MPP',             zh: 'x402 / MPP'       }, free: '✗', growth: '✓', enterprise: '✓' },
-    { feature: { en: 'Transaction fee',  es: 'Fee por transacción',    zh: '交易费用'         }, free: { en: 'Free (testnet)', es: 'Gratis (testnet)', zh: '免费（测试网）' }, growth: '0.5% TVL + 0.6% swap', enterprise: { en: 'Negotiable', es: 'Negociable', zh: '可协商' } },
+    { feature: { en: 'API pricing',      es: 'Precio API',             zh: 'API 定价'         }, free: { en: 'Free (testnet)', es: 'Gratis (testnet)', zh: '免费（测试网）' }, growth: { en: '$0.01–0.05/call', es: '$0.01–0.05/call', zh: '$0.01–0.05/次' }, enterprise: { en: 'Volume discount', es: 'Descuento por volumen', zh: '批量折扣' } },
     { feature: { en: 'Support',          es: 'Soporte',                zh: '支持'             }, free: '✗', growth: '48h SLA', enterprise: '24/7' },
 ];
 
@@ -140,14 +140,14 @@ export default function PricingPage() {
                             <div className="mb-6">
                                 <div className="text-xs font-mono uppercase tracking-widest text-stellar-teal/60 mb-2">Growth</div>
                                 <div className="text-4xl font-black mb-1">
-                                    $99
+                                    $299
                                     <span className="text-lg text-white/40 font-normal">/mo</span>
                                 </div>
                                 <p className="text-sm text-white/50">
-                                    {lang('+ 0.5% of TVL under management', '+ 0.5% del TVL bajo gestión', '+ 0.5% 锁定总量')}
+                                    {lang('+ $0.01–0.05 per API call', '+ $0.01–0.05 por llamada API', '+ 每次 API 调用 $0.01–0.05')}
                                 </p>
                                 <p className="text-xs text-white/30 mt-1">
-                                    {lang('(+ 0.6% swap fee on CETES/USDC)', '(+ 0.6% fee en swaps CETES/USDC)', '（+ 0.6% CETES/USDC 兑换费）')}
+                                    {lang('Software license — no % of capital', 'Licencia de software — sin % del capital', '软件许可 — 无资本百分比')}
                                 </p>
                             </div>
                             <ul className="space-y-2.5 flex-1 mb-8">
@@ -206,17 +206,19 @@ export default function PricingPage() {
                     <div className="mt-10 space-y-4">
                         {[
                             {
-                                label: lang('Swap operation (USDC → CETES)', 'Operación de swap (USDC → CETES)', '兑换操作（USDC → CETES）'),
+                                label: lang('Nirium Software License', 'Licencia de Software Nirium', 'Nirium 软件许可'),
                                 rows: [
-                                    { who: lang('Total to client (Nirium + Etherfuse)', 'Total cliente (Nirium + Etherfuse)', '客户总费用 (Nirium + Etherfuse)'), fee: '~0.80%', note: lang('All-in software & execution fee', 'Fee all-in de software y ejecución', '软件执行全包费用'), highlight: true, total: true },
+                                    { who: lang('Platform fee (Growth)', 'Cuota plataforma (Growth)', '平台费 (Growth)'), fee: '$299/mo', note: lang('Flat monthly — no % of capital', 'Mensual fijo — sin % del capital', '固定月费 — 无资本百分比'), highlight: true, total: false },
+                                    { who: lang('API calls (execution, market, signals)', 'Llamadas API (ejecución, mercado, señales)', 'API 调用（执行、市场、信号）'), fee: '$0.01–0.05', note: lang('Per call, pay-as-you-go', 'Por llamada, pago por uso', '按调用付费'), highlight: false, total: false },
+                                    { who: lang('x402 premium endpoints', 'Endpoints premium x402', 'x402 高级端点'), fee: '$0.02–0.05', note: lang('USDC micropayment per request', 'Micropago USDC por request', 'USDC 微支付/请求'), highlight: false, total: false },
                                 ],
                             },
                             {
-                                label: lang('Cross-border (USDC → USDC)', 'Cross-border (USDC → USDC)', '跨境（USDC → USDC）'),
+                                label: lang('Regulated Partner Fees (not Nirium)', 'Fees del Partner Regulado (no Nirium)', '受监管合作方费用（非 Nirium）'),
                                 rows: [
-                                    { who: lang('Stellar (gas)', 'Stellar (gas)', 'Stellar（Gas）'), fee: '<$0.01', note: lang('Per transaction', 'Por transacción', '每笔交易'), highlight: false, total: false },
-                                    { who: 'Nirium',                                                  fee: '0.50% AUM', note: lang('Monthly management fee', 'Fee mensual de gestión', '月度管理费'), highlight: true, total: false },
-                                    { who: lang('Total cross-border', 'Total cross-border', '跨境总费用'), fee: '~0.50%', note: lang('vs 1.5% Bridge / 4.5% WU', 'vs 1.5% Bridge / 4.5% WU', '对比 Bridge 1.5% / WU 4.5%'), highlight: false, total: true },
+                                    { who: lang('Etherfuse (CETES execution)', 'Etherfuse (ejecución CETES)', 'Etherfuse（CETES 执行）'), fee: 'etherfuse.com', feeLink: 'https://etherfuse.com', note: lang('Charged by Etherfuse directly — Nirium does not receive or manage this fee', 'Cobrado por Etherfuse directamente — Nirium no recibe ni administra este fee', 'Etherfuse 直接收取 — Nirium 不收取或管理此费用'), highlight: false, total: false },
+                                    { who: lang('Stellar network (gas)', 'Red Stellar (gas)', 'Stellar 网络（Gas）'), fee: '<$0.01', note: lang('Per transaction', 'Por transacción', '每笔交易'), highlight: false, total: false },
+                                    { who: lang('Regulated operator commission', 'Comisión del operador regulado', '受监管运营商佣金'), fee: lang('Set by partner', 'Definida por partner', '由合作方设定'), note: lang('ITF/Casa de bolsa sets their own fee', 'ITF/Casa de bolsa define su propio fee', 'ITF/券商自定费率'), highlight: true, total: false },
                                 ],
                             },
                         ].map((section) => (
@@ -229,7 +231,13 @@ export default function PricingPage() {
                                         {section.rows.map((row) => (
                                             <tr key={row.who} className={row.total ? 'bg-stellar-teal/5' : ''}>
                                                 <td className={`px-4 py-2.5 text-sm ${row.total ? 'font-bold text-stellar-teal' : 'text-white/70'}`}>{row.who}</td>
-                                                <td className={`px-4 py-2.5 text-sm font-mono ${row.total ? 'font-black text-stellar-teal' : row.highlight ? 'text-white' : 'text-white/60'}`}>{row.fee}</td>
+                                                <td className={`px-4 py-2.5 text-sm font-mono ${row.total ? 'font-black text-stellar-teal' : row.highlight ? 'text-white' : 'text-white/60'}`}>
+                                                    {(row as any).feeLink ? (
+                                                        <a href={(row as any).feeLink} target="_blank" rel="noopener noreferrer" className="text-stellar-teal/70 hover:text-stellar-teal underline underline-offset-2 transition-colors">
+                                                            {row.fee} ↗
+                                                        </a>
+                                                    ) : row.fee}
+                                                </td>
                                                 <td className="px-4 py-2.5 text-xs text-white/40 hidden sm:table-cell">{row.note}</td>
                                             </tr>
                                         ))}
@@ -283,11 +291,11 @@ export default function PricingPage() {
                     <div className="mt-10 space-y-4">
                         {[
                             {
-                                q: lang('Is the 0.5% AUM fee monthly or annual?', '¿El 0.5% AUM es mensual o anual?', '0.5% AUM 费是月费还是年费？'),
+                                q: lang('Why flat pricing instead of % of capital?', '¿Por qué precio fijo y no % del capital?', '为什么采用固定价格而不是资本百分比？'),
                                 a: lang(
-                                    'Monthly, on total AUM under management at period start. For $500K AUM = $2,500/month.',
-                                    'Mensual, sobre el AUM total bajo gestión al inicio del período. Para $500K AUM = $2,500/mes.',
-                                    '月费，基于期初管理总资产。$500K AUM = $2,500/月。'
+                                    'Nirium is a software company, not a fund manager. We sell technology licenses — like Bloomberg or Refinitiv. Financial commissions (% of AUM, swap fees) are charged by your Regulated Partner (ITF, casa de bolsa), not by us.',
+                                    'Nirium es una empresa de software, no una administradora de fondos. Vendemos licencias de tecnología — como Bloomberg o Refinitiv. Las comisiones financieras (% del AUM, fees de swap) las cobra tu Partner Regulado (ITF, casa de bolsa), no nosotros.',
+                                    'Nirium 是一家软件公司，不是基金管理公司。我们销售技术许可 — 就像 Bloomberg 或 Refinitiv。金融佣金（AUM 百分比、兑换费）由您的受监管合作方（ITF、券商）收取，不是我们。'
                                 ),
                             },
                             {
@@ -307,19 +315,19 @@ export default function PricingPage() {
                                 ),
                             },
                             {
-                                q: lang('Are Etherfuse fees included?', '¿Los fees de Etherfuse están incluidos?', 'Etherfuse 费用包含在内吗？'),
+                                q: lang('Who charges the financial commissions?', '¿Quién cobra las comisiones financieras?', '谁收取金融佣金？'),
                                 a: lang(
-                                    'Yes. The ~0.80% total all-in fee includes both the Nirium software license and the underlying Etherfuse execution costs (including FX MXN/USD). No hidden Stellar spread.',
-                                    'Sí. El fee total all-in de ~0.80% incluye tanto la licencia de software de Nirium como los costos de ejecución subyacentes de Etherfuse (incluyendo FX MXN/USD). Sin spread oculto de Stellar.',
-                                    '是。~0.80% 的全包费用包含 Nirium 软件许可费和底层 Etherfuse 执行成本（包括 MXN/USD 外汇）。无隐藏 Stellar 点差。'
+                                    'Your Regulated Partner (ITF, casa de bolsa, or licensed fintech) sets and collects all financial fees. Etherfuse — an independent regulated operator — publishes its own fee schedule at etherfuse.com. Nirium only charges software license fees in fiat.',
+                                    'Tu Partner Regulado (ITF, casa de bolsa o fintech licenciada) establece y cobra todos los fees financieros. Etherfuse — operador regulado independiente — publica su propio esquema de tarifas en etherfuse.com. Nirium solo cobra licencias de software en fiat.',
+                                    '您的受监管合作方（ITF、券商或持牌金融科技）设定并收取所有金融费用。Etherfuse（独立受监管运营商）在 etherfuse.com 上公布其自有费率表。Nirium 仅以法币收取软件许可费。'
                                 ),
                             },
                             {
                                 q: lang('Are there volume discounts?', '¿Hay descuentos por volumen?', '有量大优惠吗？'),
                                 a: lang(
-                                    'Yes on Enterprise. For over $5M AUM, the management fee is negotiable. Contact hola@nirium.xyz.',
-                                    'Sí en Enterprise. Para más de $5M AUM, el fee de gestión puede negociarse. Contacta a hola@nirium.xyz.',
-                                    '企业版有。AUM 超过 $500 万时，管理费可协商。联系 hola@nirium.xyz。'
+                                    'Yes on Enterprise. For high API volume or multi-tenant deployments, pricing is negotiable. Contact hola@nirium.xyz.',
+                                    'Sí en Enterprise. Para alto volumen de API o despliegues multi-tenant, los precios son negociables. Contacta a hola@nirium.xyz.',
+                                    '企业版有。对于高 API 调用量或多租户部署，价格可协商。联系 hola@nirium.xyz。'
                                 ),
                             },
                         ].map((faq) => (

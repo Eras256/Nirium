@@ -37,8 +37,8 @@ export async function POST(req: Request) {
         // ── ONBOARDING ─────────────────────────────────────────────────────
         if (action === 'onboarding') {
             const { walletAddress } = body;
-            const customerId = crypto.randomUUID();
-            const bankAccountId = crypto.randomUUID();
+            const customerId = body.customerId || crypto.randomUUID();
+            const bankAccountId = body.bankAccountId || crypto.randomUUID();
 
             const res = await fetch(`${BASE_URL}/ramp/onboarding-url`, {
                 method: 'POST',

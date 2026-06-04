@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: Apache-2.0
+// Copyright 2026 Nirium Protocol Contributors
+
 //! Nirium Vault — Core vault, flash loan, and DeFi orchestration contract.
 //!
 //! Implements non-custodial vaults with agent delegation using Soroban's
@@ -537,6 +540,13 @@ impl NiriumVaultContract {
             &DataKey::AgentDelegation(vault_id, agent_address.clone()),
             &delegation,
         );
+        // SC-TTL-002: Extend TTL on agent delegation — without this, entries expire
+        // after ~4,095 ledgers (min TTL) and executions silently fail.
+        env.storage().persistent().extend_ttl(
+            &DataKey::AgentDelegation(vault_id, agent_address.clone()),
+            TTL_LEDGERS,
+            TTL_LEDGERS,
+        );
 
         env.events().publish(
             (symbol_short!("agent"), symbol_short!("delegate")),
@@ -657,6 +667,11 @@ impl NiriumVaultContract {
         env.storage()
             .persistent()
             .set(&DataKey::Pool(pool_id), &pool);
+        // SC-TTL-003: Extend TTL on pool creation — without this, pool state expires
+        // after ~4,095 ledgers and flash loan operations fail with "pool not found".
+        env.storage()
+            .persistent()
+            .extend_ttl(&DataKey::Pool(pool_id), TTL_LEDGERS, TTL_LEDGERS);
         env.storage().instance().set(&DataKey::PoolCount, &pool_id);
 
         env.events().publish(
@@ -746,20 +761,10 @@ impl NiriumVaultContract {
             panic!("net profit below minimum threshold — transaction reverted");
         }
 
-        // ─── LEVEL 6: METAVERSION 1% MATRIX FEE ───
-        // The protocol captures 1% exclusively from the realized profit.
-        let matrix_fee = net_profit / 100;
-        let user_profit = net_profit.checked_sub(matrix_fee).expect("fee underflow");
-
-        // Update Global Treasury (Fees Collected)
-        let prev_fees: i128 = env
-            .storage()
-            .instance()
-            .get(&DataKey::TotalFeesCollected)
-            .unwrap_or(0);
-        env.storage()
-            .instance()
-            .set(&DataKey::TotalFeesCollected, &(prev_fees + matrix_fee));
+        // No profit tax — Nirium is software-only (SaaS model).
+        // Revenue comes from fixed deployment fees and API access fees, never % of financial gains.
+        let matrix_fee: i128 = 0;
+        let user_profit = net_profit;
 
         // 7. Repay pool (with loan fee included)
         pool.base_balance = pool

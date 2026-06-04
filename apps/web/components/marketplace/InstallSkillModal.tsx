@@ -121,7 +121,7 @@ export default function InstallSkillModal({ skill, isOpen, onClose, onInstall, i
                                     </div>
                                     <div>
                                         <h3 className="text-lg font-black text-white tracking-tight">{localizedSkill.name}</h3>
-                                        <p className="text-[10px] font-mono text-stellar-teal uppercase tracking-widest">v0.5.0</p>
+                                        <p className="text-[10px] font-mono text-stellar-teal uppercase tracking-widest">v0.6.1</p>
                                     </div>
                                 </div>
                                 <button
