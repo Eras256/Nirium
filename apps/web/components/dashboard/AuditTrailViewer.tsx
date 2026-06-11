@@ -82,7 +82,8 @@ export default function AuditTrailViewer() {
         setExpandedCid({ cid, loading: true, data: null, error: null });
 
         try {
-            const res = await fetch(gatewayUrl, { signal: AbortSignal.timeout(10_000) });
+            // Read through our server-side proxy (the public gateway sends no CORS headers).
+            const res = await fetch(`/api/ipfs?cid=${encodeURIComponent(cid)}`, { signal: AbortSignal.timeout(12_000) });
             if (!res.ok) throw new Error(`Gateway returned ${res.status}`);
             const data = await res.json();
             setExpandedCid({ cid, loading: false, data, error: null });

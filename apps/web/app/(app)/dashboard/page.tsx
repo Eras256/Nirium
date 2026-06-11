@@ -978,12 +978,6 @@ function DashboardContent() {
         executeDeploy();
     };
 
-    useEffect(() => {
-        if (account?.address) {
-            writeLog(`Authenticated user: ${account.address.slice(0, 8)}...`, 'system', account.address);
-        }
-    }, [account]);
-
     // --- RESTORE AUTO-REBALANCE STATE FROM LOCALSTORAGE ---
     useEffect(() => {
         if (!account?.address) return;
@@ -1168,7 +1162,6 @@ function DashboardContent() {
                 ws.onopen = () => {
                     if (isUnmounted) return;
                     console.log('[Dashboard] WS Connected Successfully');
-                    writeLog(`📡 Uplink Established (Stable)`, 'system', accountRef.current?.address);
 
                     if (accountRef.current?.address) {
                         ws.send(JSON.stringify({
@@ -1248,9 +1241,7 @@ function DashboardContent() {
         const testConn = async () => {
             const hasTested = sessionStorage.getItem('nirium_diag_v1');
             if (!hasTested) {
-                console.log('🧪 [Diag] Testing Supabase connectivity...');
-                const { writeLog } = await import('@/lib/logger');
-                await writeLog('SYSTEM_DIAGNOSTIC: Dashboard session initialized. Bridge status: OK.', 'system', 'DASHBOARD_UI');
+                console.log('🧪 [Diag] Dashboard session initialized — keeping diagnostics off the public feed.');
                 sessionStorage.setItem('nirium_diag_v1', 'true');
             }
         };
@@ -3178,13 +3169,14 @@ function DashboardContent() {
                         )}
                     </div>
 
-                    {/* x402 Protocol Revenue & M2M Streams */}
+                    {/* x402 / MPP institutional settlement panels hidden for now — the
+                        capability is live but has no real settlement traffic yet (buyers
+                        disabled for stability), so they showed empty $0.00 / "Awaiting
+                        corporate routing". Re-enable once a separate buyer agent feeds them.
                     <div className="relative rounded-2xl h-[400px] flex flex-col mt-6 overflow-hidden">
                         <ProtocolRevenue />
                     </div>
-
-                    {/* LIQUIDACIÓN B2B EN TIEMPO REAL — horizontal, below ProtocolRevenue */}
-                    <PaymentStreams horizontal />
+                    <PaymentStreams horizontal /> */}
                 </motion.div>
 
                 {/* Right Column: Stats & Agent Controls */}

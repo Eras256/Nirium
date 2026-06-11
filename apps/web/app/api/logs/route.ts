@@ -1,6 +1,9 @@
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
+
 const SUPABASE_URL = process.env.SUPABASE_URL || process.env.NEXT_PUBLIC_SUPABASE_URL || '';
 const SUPABASE_KEY = process.env.SUPABASE_ANON_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || '';
 const TREASURY = "GC4Q5TWWXI7IHN6DYCBEKCOWJWCKY4JE2NLKLU5SE3YL44IUUFPKUOPC";
@@ -16,7 +19,7 @@ export async function GET() {
                     apikey: SUPABASE_KEY,
                     Authorization: `Bearer ${SUPABASE_KEY}`,
                 },
-                next: { revalidate: 0 },
+                cache: 'no-store',
             }
         ).then(res => res.ok ? res.json() : []) : Promise.resolve([]);
 
@@ -28,14 +31,14 @@ export async function GET() {
                     apikey: SUPABASE_KEY,
                     Authorization: `Bearer ${SUPABASE_KEY}`,
                 },
-                next: { revalidate: 0 },
+                cache: 'no-store',
             }
         ).then(res => res.ok ? res.json() : []) : Promise.resolve([]);
 
         // 3. Fetch from Horizon (Live On-chain Settlements) — 5s timeout so we never block OpsConsole
         const horizonPromise = fetch(
             `https://horizon-testnet.stellar.org/accounts/${TREASURY}/operations?order=desc&limit=20`,
-            { signal: AbortSignal.timeout(5000) }
+            { signal: AbortSignal.timeout(5000), cache: 'no-store' }
         ).then(res => res.ok ? res.json() : { _embedded: { records: [] } })
          .catch(() => ({ _embedded: { records: [] } }));
 

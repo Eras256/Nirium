@@ -5,6 +5,38 @@ import { Terminal, Maximize2, Brain, CreditCard, Shield, Cpu, Zap } from 'lucide
 import { motion, AnimatePresence } from 'framer-motion';
 import { useLanguage } from '../../context/LanguageContext';
 
+// Render a feed message, turning verifiable identifiers into clickable links:
+// 64-char Stellar tx hashes → stellar.expert testnet, IPFS CIDs (Qm…) → Pinata gateway.
+function renderMessageWithTxLink(text: string) {
+    const re = /\b([a-f0-9]{64})\b|\b(Qm[1-9A-HJ-NP-Za-km-z]{44})\b/g;
+    const parts: React.ReactNode[] = [];
+    let last = 0;
+    let m: RegExpExecArray | null;
+    while ((m = re.exec(text)) !== null) {
+        const token = m[0];
+        const href = m[1]
+            ? `https://stellar.expert/explorer/testnet/tx/${token}`
+            : `https://gateway.pinata.cloud/ipfs/${token}`;
+        parts.push(text.slice(last, m.index));
+        parts.push(
+            <a
+                key={`${token}-${m.index}`}
+                href={href}
+                target="_blank"
+                rel="noopener noreferrer"
+                onClick={(e) => e.stopPropagation()}
+                className="text-stellar-teal underline decoration-stellar-teal/40 hover:decoration-stellar-teal break-all"
+            >
+                {token}
+            </a>
+        );
+        last = m.index + token.length;
+    }
+    if (parts.length === 0) return text;
+    parts.push(text.slice(last));
+    return <>{parts}</>;
+}
+
 const DEMO_LOGS = [
     { agent_id: 'Protocol', message: 'System connection established. Execution network broadcasting on-chain...', level: 'system', created_at: new Date().toISOString() },
     { agent_id: 'Titan', message: 'Vault architecture synchronized — 3 asset classes active', level: 'info', created_at: new Date().toISOString() },
@@ -105,7 +137,13 @@ export default function OpsConsole({ isExpanded, onToggleExpand, walletAddress, 
                     <AnimatePresence mode="popLayout">
                     {logs.map((log, i) => {
                         const rawMsg = (log.message || '');
-                        const mainMsg = (rawMsg.split('|')[0] || '').replace(/IPFS:\s*\S+/gi, '').replace(/\s{2,}/g, ' ').trim();
+                        let mainMsg = (rawMsg.split('|')[0] || '').replace(/IPFS:\s*\S+/gi, '').replace(/\s{2,}/g, ' ').trim();
+                        // El recorte en '|' oculta el CID de los batches IPFS — re-adjuntarlo para que salga clickeable.
+                        const cidMatch = rawMsg.match(/\b(Qm[1-9A-HJ-NP-Za-km-z]{44})\b/);
+                        if (cidMatch && !mainMsg.includes(cidMatch[1])) mainMsg += ` — CID: ${cidMatch[1]}`;
+                        // Igual para el TX hash: la línea "✅ On-chain execution confirmed" lo lleva tras un '|'.
+                        const txMatch = rawMsg.match(/\b([a-f0-9]{64})\b/);
+                        if (txMatch && !mainMsg.includes(txMatch[1])) mainMsg += ` — TX: ${txMatch[1]}`;
 
                         // Detect agent type for branding
                         const isIntelligence = log.agent_id === 'INTELLIGENCE';
@@ -165,7 +203,7 @@ export default function OpsConsole({ isExpanded, onToggleExpand, walletAddress, 
                                     <span className={`leading-relaxed text-[10px] ${
                                         isSettlement ? 'text-stellar-teal font-medium' : 'text-gray-300'
                                     }`}>
-                                        {mainMsg.replace(/Soroban Intelligence: /i, '')}
+                                        {renderMessageWithTxLink(mainMsg.replace(/Soroban Intelligence: /i, ''))}
                                     </span>
                                 </div>
                             </motion.div>
