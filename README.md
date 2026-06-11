@@ -4,7 +4,7 @@
 ![Status](https://img.shields.io/badge/Status-Testnet%20Active-yellow?style=for-the-badge)
 ![API](https://img.shields.io/badge/API-v2.5%20%7C%2055%20Endpoints-blue?style=for-the-badge)
 ![Security](https://img.shields.io/badge/JARGUS%20Audit-83%2F83%20PASS-brightgreen?style=for-the-badge)
-![Instaward](https://img.shields.io/badge/Instaward%20%231-Delivering-blueviolet?style=for-the-badge)
+![Instaward](https://img.shields.io/badge/Instaward%20%231-Delivered-blueviolet?style=for-the-badge)
 ![SCF7](https://img.shields.io/badge/SCF%207.0-Aligned-purple?style=for-the-badge)
 ![x402](https://img.shields.io/badge/x402-In%20Production-teal?style=for-the-badge)
 ![MPP](https://img.shields.io/badge/MPP-In%20Production-teal?style=for-the-badge)
@@ -34,11 +34,15 @@ Our core offering is a high-performance TypeScript/Python SDK and a 55-endpoint 
 
 ---
 
-## Market Traction: From PoC to Active Pilots
+## Market Traction: Developer Adoption & Verifiable On-Chain Activity
 
-While we are in the pre-revenue phase (Testnet only), we are actively transitioning our 6 technical Proof-of-Concepts into **Live Integration Pilots** with regulated entities. We provide the *middleware*—our partners hold the regulatory licenses.
+Nirium is pre-revenue (Testnet only). Our traction is **self-generated and independently verifiable** — it does not depend on third-party announcements:
 
-We are currently structuring API sandbox integrations for active pilots with regional fintechs (names under NDA during Testnet phase), proving that **infrastructure without adoption risk** is achievable by supplying the plumbing for existing institutional volume, rather than acquiring retail users.
+- **Published SDKs** on npm and PyPI (`nirium`, v0.6.1) with recorded downloads across multiple versions.
+- **Live autonomous agent** running 24/7 on Stellar Testnet, with on-chain rebalances verifiable on Stellar Expert.
+- **Open API + free sandbox keys**, so any developer can integrate and exercise the contracts directly.
+
+We provide the middleware; regulated operators (e.g. Etherfuse) hold the licenses and execute settlement. We are open to integration conversations with regional fintechs, but make **no claim of signed pilots** during the Testnet phase.
 
 ---
 
@@ -61,9 +65,9 @@ Fintech / Institution (B2B / A2A)
         |
         v
   [Autonomous Execution Layer]
-        |-- Institutional Execution Nodes (multi-LLM decisions)
-        |-- Execution Cluster (30 nodes, racing mode, 3–12s intervals)
-        |-- Strategy Router (flash-loan, path-arb, cross-dex, blend, soroswap)
+        |-- Autonomous Execution Node (LLM decision + deterministic fallback)
+        |-- Composable framework — up to 10 Execution Nodes per vault
+        |-- Strategy Router (path payment, blend, soroswap, cross-border)
         |
         v
   [Soroban Smart Contracts — Stellar Testnet]
@@ -139,8 +143,8 @@ Designed for regulatory compliance without requiring blockchain expertise from t
 
 | SDK | Package | Version | Install |
 |---|---|---|---|
-| TypeScript | [nirium (npm)](https://www.npmjs.com/package/nirium) | 0.5.0 | `npm install nirium` |
-| Python | [nirium (PyPI)](https://pypi.org/project/nirium/) | 0.5.0 | `pip install nirium` |
+| TypeScript | [nirium (npm)](https://www.npmjs.com/package/nirium) | 0.6.1 | `npm install nirium` |
+| Python | [nirium (PyPI)](https://pypi.org/project/nirium/) | 0.6.1 | `pip install nirium` |
 
 ```typescript
 import { Agent } from 'nirium';
@@ -199,13 +203,13 @@ Live: [nirium.xyz/build](https://nirium.xyz/build)
 ### Run Locally
 ```bash
 pnpm install
-pnpm dev          # starts web (port 3000) + agent API (port 3001) in parallel
+pnpm dev          # starts web (port 3000) + agent API (port 3002) in parallel
 ```
 
 ### Deploy
 ```bash
 pnpm ship         # → vercel --prod (frontend)
-# Agent API deploys to Railway via git push to main
+# Agent API deploys to Fly.io (fly deploy)
 ```
 
 ### SDK Quick Start
@@ -223,7 +227,7 @@ Nirium/                        (public repo)
 ├── apps/web/                  → Next.js 15 Dashboard (nirium.xyz) — 25 routes, i18n (EN/ES/ZH)
 ├── packages/sdk/              → TypeScript SDK v0.6.1 (npm: nirium)
 ├── packages/sdk-python/       → Python SDK v0.6.1 (PyPI: nirium)
-├── packages/contracts/        → Soroban smart contracts (Rust) — 5 modules, 5 fuzz targets
+├── packages/contracts/        → Soroban smart contracts (Rust) — 2 contracts (NiriumVault + NiriumProtocol), 5 fuzz targets
 ├── .github/workflows/         → CI, release, security-gate, desktop release
 │
 ├── packages/agent/            → [private] Express 5 API server — 55 endpoints (54 HTTP + 1 WebSocket)
@@ -242,7 +246,7 @@ Detailed Roadmap: [docs/scf-roadmap.md](docs/scf-roadmap.md)
 
 ### Milestone Summary
 - **M1 (10%):** Compliance Framework & Protocol Hardening — 🚀 Start Month 1
-- **M2 (20%):** Cluster Orchestration & Pilot Integration — 🚀 Start Month 2
+- **M2 (20%):** Cluster Orchestration & Developer Adoption — 🚀 Start Month 2
 - **M3 (30%):** Formal Security Audit & Risk Management — 🚀 Start Month 4
 - **M4 (40%):** Verified Mainnet Launch & LatAm Scaling — 🎯 Month 6
 
@@ -269,7 +273,7 @@ Nirium operates in full alignment with the Stellar Community Fund v7.0 framework
 
 | SCF Requirement | Nirium Status |
 |---|---|
-| Stellar must be **core and valuable** to the project, not auxiliary | ✅ 6 Soroban smart contracts, SDEX, Blend, Soroswap — Stellar is the execution layer |
+| Stellar must be **core and valuable** to the project, not auxiliary | ✅ 2 Soroban smart contracts (NiriumVault + NiriumProtocol), SDEX, Blend, Soroswap — Stellar is the execution layer |
 | Budget covers **development costs only**, integrated with Stellar | ✅ SCF budget: engineering, audit, testnet infrastructure only |
 | No speculation, wash trading, or insider trading with SCF funds | ✅ All contracts on Testnet; SCF funds allocated to development, not trading |
 | No investment advice or yield promises | ✅ Prominent disclaimer; APY displayed as protocol reference data only |
@@ -283,7 +287,7 @@ Nirium operates in full alignment with the Stellar Community Fund v7.0 framework
 | Tranche | Milestone | % | Confirmed Deliverables |
 |---|---|---|---|
 | #1 | Compliance & Hardening | **10%** | Audit Trails (HMAC-SHA256), CNBV-Ready Reporting, Sentinel v1 |
-| #2 | Cluster Orchestration | **20%** | Multi-protocol rebalancing (Blend/Soroswap), Pilot Integrations, SDK v1.0 |
+| #2 | Cluster Orchestration | **20%** | Multi-protocol rebalancing (Blend/Soroswap), SDK v1.0, developer adoption |
 | #3 | Security & Audit | **30%** | Formal Third-Party Audit (SCF Audit Bank), On-chain Circuit Breakers |
 | #4 | Mainnet Launch | **40%** | Mainnet Deployment, Institutional Corridor Activation, LatAm Scaling |
 
@@ -318,10 +322,10 @@ Nirium has received Kickstart funding ($5,000 USD), with full KYC complete (Airt
 | /build — Startup Ideas Hub (12 blueprints) | ✅ Live |
 | MCP Server v0.4.0 — 12 tools (13/13 tests PASS) | ✅ Complete |
 | Etherfuse CETES integration (testnet + SPEI sandbox) | ✅ Complete |
-| Institutional JV — CNBV-regulated operator (Mexico) | 🔄 Commercial terms under renegotiation post-audit |
+| Go-to-market — independent (software-only) | ✅ Active; regulated operators (Etherfuse) execute settlement |
 | Stellar House CDMX 2026 — institutional presentation to SDF | ✅ Completed April 20–23, 2026 |
-| SCF Round 43 Build Award — application submitted | 🔄 In Panel Review (post-deadline Apr 26, 2026) |
-| Etherfuse partnership — $150K grant + technical integration | 🔄 Active negotiation |
+| SCF Build Award — Open Track (Financial Protocols) | 🔄 Preparing submission with verifiable traction |
+| Etherfuse — enterprise KYB onboarding | 🔄 In progress |
 | Sprint M1 — 6 institutional PoCs (90 days) | 🔄 In progress |
 | Formal third-party security audit | Planned — Month 3 (SCF Audit Bank eligible) |
 | Mainnet Deployment | Post formal audit |
@@ -336,7 +340,7 @@ Nirium has received Kickstart funding ($5,000 USD), with full KYC complete (Airt
 - **Stellar Scale / Kickstart** — 83/100 Bootcamp Impact; active graduate with ongoing SDF mentorship
 - **SCF Kickstart $5,000** — Approved; full KYC complete (Airtable + Persona + W-8BEN); funds received
 - **Stellar House CDMX 2026** — Presented to SDF executives, LatAm fintechs, and VCs (invite-only, 3rd edition)
-- **Etherfuse** — Active technical partnership; $150K grant opportunity identified; technical call scheduled
+- **Etherfuse** — Active technical integration (CETES on testnet + SPEI sandbox); enterprise KYB onboarding in progress
 
 ---
 
@@ -395,4 +399,4 @@ This project operates under the [Stellar Community Fund v7.0](https://stellar.gi
 
 ---
 
-*Nirium Protocol — experimental software. Not financial advice. Stellar Testnet only. Updated May 12, 2026.*
+*Nirium Protocol — experimental software. Not financial advice. Stellar Testnet only. Updated June 11, 2026.*
