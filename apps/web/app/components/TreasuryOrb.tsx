@@ -23,7 +23,7 @@ function OrbitalNode({ radius, speed, offset, color, tiltX = 0, tiltZ = 0 }: {
     return (
         <mesh ref={ref}>
             <sphereGeometry args={[0.22, 12, 12]} />
-            <meshStandardMaterial color={color} emissive={color} emissiveIntensity={1.8} roughness={0} metalness={1} />
+            <meshStandardMaterial color={color} emissive={color} emissiveIntensity={4.5} roughness={0} metalness={1} />
         </mesh>
     );
 }
@@ -70,24 +70,24 @@ export function TreasuryOrb() {
                         distort={0.28}
                         radius={1}
                         emissive="#FFC800"
-                        emissiveIntensity={0.5}
-                        roughness={0.2}
-                        metalness={0.8}
+                        emissiveIntensity={1.5}
+                        roughness={0.1}
+                        metalness={0.9}
                         transparent
-                        opacity={0.6}
+                        opacity={0.85}
                     />
                 </Sphere>
             </Float>
 
             {/* ── Soft outer pulse ── */}
             <Sphere ref={pulseRef} args={[7.6, 32, 32]}>
-                <meshBasicMaterial color="#FFC800" transparent opacity={0.04} side={THREE.BackSide} />
+                <meshBasicMaterial color="#FFC800" transparent opacity={0.12} side={THREE.BackSide} />
             </Sphere>
 
             {/* ── Orbit ring 1 — USDC (flat, teal) ── */}
             <group rotation={[Math.PI / 2, 0, 0]}>
                 <Torus args={[10.5, 0.06, 6, 80]}>
-                    <meshBasicMaterial color="#2DEBE8" transparent opacity={0.18} />
+                    <meshBasicMaterial color="#2DEBE8" transparent opacity={0.5} />
                 </Torus>
             </group>
             <OrbitalNode radius={10.5} speed={0.45} offset={0}           color="#2DEBE8" tiltX={Math.PI / 2} />
@@ -96,7 +96,7 @@ export function TreasuryOrb() {
             {/* ── Orbit ring 2 — CETES (tilted 42°, yellow) ── */}
             <group rotation={[Math.PI / 2 - 0.73, 0.4, 0.2]}>
                 <Torus args={[12, 0.055, 6, 80]}>
-                    <meshBasicMaterial color="#FFC800" transparent opacity={0.14} />
+                    <meshBasicMaterial color="#FFC800" transparent opacity={0.4} />
                 </Torus>
             </group>
             <OrbitalNode radius={12} speed={0.28} offset={1.1}   color="#FFC800" tiltX={Math.PI / 2 - 0.73} tiltZ={0.2} />
@@ -108,18 +108,18 @@ export function TreasuryOrb() {
                     <bufferAttribute attach="attributes-position" args={[positions, 3]} />
                 </bufferGeometry>
                 <pointsMaterial
-                    size={0.1}
+                    size={0.16}
                     color="#2DEBE8"
                     transparent
-                    opacity={0.8}
+                    opacity={0.95}
                     sizeAttenuation
                     blending={THREE.AdditiveBlending}
                 />
             </points>
 
             {/* ── Lights — yellow front, teal back, matching original ── */}
-            <pointLight position={[0,  0,  10]} intensity={1}   color="#2DEBE8" />
-            <pointLight position={[0,  0, -10]} intensity={0.5} color="#FFC800" />
+            <pointLight position={[0,  0,  10]} intensity={2.2}   color="#2DEBE8" />
+            <pointLight position={[0,  0, -10]} intensity={1.8} color="#FFC800" />
         </group>
     );
 }

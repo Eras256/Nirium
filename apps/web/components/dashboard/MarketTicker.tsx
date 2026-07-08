@@ -33,8 +33,8 @@ function buildTickers(market: any, prev: any, t: any): TickerItem[] {
     const baseFee = market?.baseFee ?? null;
     const blendApy = market?.blendSupplyApy ?? null;
     const prevBlend = prev?.blendSupplyApy ?? null;
-    const cetesApy = market?.cetesRate ?? market?.cetesApy ?? 3.38;
-    const prevCetes = prev?.cetesApy ?? 3.38;
+    const cetesApy = market?.cetesRate ?? market?.cetesApy ?? 5.57;
+    const prevCetes = prev?.cetesApy ?? 5.57;
 
     return [
         {
@@ -47,7 +47,7 @@ function buildTickers(market: any, prev: any, t: any): TickerItem[] {
         },
         {
             label: "🇲🇽 CETES APY",
-            value: cetesApy != null && cetesApy > 0 ? `${cetesApy.toFixed(2)}%` : '3.38%',
+            value: cetesApy != null && cetesApy > 0 ? `${cetesApy.toFixed(2)}%` : '5.57%',
             change: prevCetes != null && cetesApy != null && cetesApy > 0
                 ? `${cetesApy >= prevCetes ? '+' : ''}${(cetesApy - prevCetes).toFixed(2)}%`
                 : '+0.01%',
@@ -64,7 +64,7 @@ function buildTickers(market: any, prev: any, t: any): TickerItem[] {
         {
             label: "COMPLIANCE",
             value: "NON-FINANCIAL ADVICE // EST DATA",
-            change: "STARK",
+            change: "LCP v1.0",
             trend: 'neutral',
         }
     ];
@@ -79,9 +79,9 @@ const MarketTicker = () => {
     useEffect(() => {
         setTickers([
             { label: "XLM/USDC", value: '$0.1732', change: '+0.045%', trend: 'up' },
-            { label: "🇲🇽 CETES APY", value: '3.38%', change: '+0.01%', trend: 'up' },
+            { label: "🇲🇽 CETES APY", value: '5.57%', change: '+0.01%', trend: 'up' },
             { label: t.common.tickers.sdex_spread, value: '0.81bps', change: '-0.02bps', trend: 'down' },
-            { label: "COMPLIANCE", value: "NON-FINANCIAL ADVICE // EST DATA", change: "STARK", trend: 'neutral' },
+            { label: "COMPLIANCE", value: "NON-FINANCIAL ADVICE // EST DATA", change: "LCP v1.0", trend: 'neutral' },
         ]);
     }, [t]);
 
@@ -104,7 +104,7 @@ const MarketTicker = () => {
                         xlmPrice: 0.1732,
                         sdexSpread: 0.81,
                         baseFee: 100,
-                        cetesApy: 3.38,
+                        cetesApy: 5.57,
                     };
 
                     const volatility = 0.0012; // Sufficient to move 4th decimal
@@ -125,7 +125,7 @@ const MarketTicker = () => {
                 setTickers(built);
             } catch (err) {
                 // Fallback simulation to keep it alive
-                const mockBase = prevMarket.current || { xlmPrice: 0.1732, sdexSpread: 0.81, baseFee: 100, cetesApy: 3.38 };
+                const mockBase = prevMarket.current || { xlmPrice: 0.1732, sdexSpread: 0.81, baseFee: 100, cetesApy: 5.57 };
                 const change = 1 + (Math.random() * 0.001 * 2 - 0.001);
                 const fallbackMarket = {
                     xlmPrice: mockBase.xlmPrice * change,
@@ -149,8 +149,8 @@ const MarketTicker = () => {
             {/* Live Status Label (More Compact) */}
             <div className="flex items-center gap-2 px-4 h-full bg-white/[0.02] border-r border-white/10 min-w-[100px] justify-center shrink-0">
                 <div className="relative">
-                    <div className="w-2 h-2 rounded-full bg-stellar-teal shadow-[0_0_10px_#00ffc3]"></div>
-                    <div className="absolute inset-0 w-2 h-2 rounded-full bg-stellar-teal animate-ping opacity-40"></div>
+                    <div className="w-2 h-2 rounded-full bg-stellar-yellow shadow-[0_0_10px_#FFC800]"></div>
+                    <div className="absolute inset-0 w-2 h-2 rounded-full bg-stellar-yellow animate-ping opacity-40"></div>
                 </div>
                 <span className="text-[9px] font-black tracking-[0.2em] text-white/90">
                     {t.common.tickers.live_feed}

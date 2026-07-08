@@ -12,7 +12,7 @@ export default function FiatRamp() {
     const [status, setStatus] = useState<'idle' | 'onboarding' | 'kyc_pending' | 'quoting' | 'quoted' | 'ordering' | 'wiring' | 'success'>('idle');
 
     const BONDS = [
-        { id: 'CETES', name: 'CETES', ref_rate: '3.38%', tvl: 'MX$476,145,215', cost: 'MX$1.13224', fiat: 'MXN' }
+        { id: 'CETES', name: 'CETES', ref_rate: '5.57%', tvl: 'MX$476,145,215', cost: 'MX$1.13224', fiat: 'MXN' }
     ];
     const [quote, setQuote] = useState<any>(null);
     const [order, setOrder] = useState<any>(null);

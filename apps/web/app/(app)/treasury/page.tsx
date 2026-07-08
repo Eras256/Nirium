@@ -165,7 +165,7 @@ export default function TreasuryPage() {
                             <div className="space-y-2 text-sm text-white/60">
                                 <div className="flex justify-between">
                                     <span>{t.treasury_page.assets.bonds.yield_label}</span>
-                                    <span className="text-white">~3.38% <span className="text-white/40 text-xs">(Banxico ref.)</span></span>
+                                    <span className="text-white">~5.57% <span className="text-white/40 text-xs">(Banxico ref.)</span></span>
                                 </div>
                                 <div className="flex justify-between">
                                     <span>{t.treasury_page.assets.bonds.liquidity_label}</span>

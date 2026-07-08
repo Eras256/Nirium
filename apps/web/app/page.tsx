@@ -23,7 +23,7 @@ const TreasuryCanvas = dynamic(
 );
 
 export default function Home() {
-    const { language } = useLanguage();
+    const { language, t } = useLanguage();
     const lang = (en: string, es: string, zh: string) =>
         language === 'zh' ? zh : language === 'es' ? es : en;
     const [copied, setCopied] = useState(false);
@@ -196,7 +196,7 @@ await agent.start({
                                 </div>
                                 <div className="absolute bottom-[18%] left-[4%] z-10 flex items-center gap-1.5 px-2 py-1 rounded-full border border-stellar-yellow/20 bg-black/60 backdrop-blur-sm">
                                     <span className="w-1.5 h-1.5 rounded-full bg-stellar-yellow animate-pulse" />
-                                    <span className="text-[9px] font-mono text-stellar-yellow/80">CETES 3.38% (Banxico)</span>
+                                    <span className="text-[9px] font-mono text-stellar-yellow/80">CETES 5.57% (Banxico)</span>
                                 </div>
                                 <Suspense fallback={<div className="w-full h-full flex items-center justify-center text-stellar-teal/40 font-mono text-xs animate-pulse">Loading vault...</div>}>
                                     <TreasuryCanvas />
@@ -937,17 +937,18 @@ await agent.start({
                             <div className="w-44 shrink-0 border-r border-white/[0.05] p-3 space-y-1 hidden sm:block">
                                 {[
                                     { category: 'CORE' },
-                                    { label: 'Dashboard',         active: true,  color: '#2DEBE8' },
-                                    { label: 'Nodos de Ejecución', active: false, color: '#FFD700' },
-                                    { label: 'Analytics',         active: false, color: '#34D399' },
-                                    { label: 'Compliance',        active: false, color: '#2DEBE8' },
+                                    { label: t.nav.dashboard,     active: true,  color: '#2DEBE8' },
+                                    { label: t.nav.agents,        active: false, color: '#FFD700' },
+                                    { label: t.nav.analytics,     active: false, color: '#34D399' },
+                                    { label: t.nav.compliance,    active: false, color: '#2DEBE8' },
                                     { category: 'TREASURY', mt: true },
-                                    { label: 'Blueprints',        active: false, color: '#A78BFA' },
-                                    { label: 'Strategy Builder',  active: false, color: '#F97316' },
-                                    { label: 'Fiat Hub',          active: false, color: '#34D399' },
+                                    { label: t.nav.marketplace,   active: false, color: '#A78BFA' },
+                                    { label: t.nav.builder,       active: false, color: '#F97316' },
+                                    { label: t.nav.payroll,       active: false, color: '#EF4444' },
+                                    { label: t.nav.ramp,          active: false, color: '#34D399' },
                                     { category: 'DEVELOPER', mt: true },
-                                    { label: 'Docs',              active: false, color: '#FFFFFF' },
-                                    { label: 'Developers',        active: false, color: '#FFFFFF' },
+                                    { label: t.nav.docs,          active: false, color: '#FFFFFF' },
+                                    { label: t.nav.developers,    active: false, color: '#FFFFFF' },
                                 ].map((item, i) => (
                                     item.category ? (
                                         <div key={item.category} className={`text-[9px] font-black text-white/20 uppercase tracking-[0.2em] px-3 pb-1 ${item.mt ? 'pt-4' : 'pt-2'}`}>
@@ -975,8 +976,8 @@ await agent.start({
                                 {/* Stats row */}
                                 <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
                                     {[
-                                        { label: 'Treasury Balance', value: '$127,430', sub: 'CETES 3.38% (gov. rate)', color: 'text-stellar-teal' },
-                                        { label: 'Active Agents',    value: '3 / 30',  sub: '24/7 Autonomous', color: 'text-stellar-yellow' },
+                                        { label: 'Treasury Balance', value: '$127,430', sub: 'CETES 5.57% (gov. rate)', color: 'text-stellar-teal' },
+                                        { label: 'Active Agents',    value: '1 / 10',  sub: '24/7 Autonomous', color: 'text-stellar-yellow' },
                                         { label: 'USDC → CETES',     value: '82%',     sub: 'Auto-rebalanced', color: 'text-purple-400' },
                                         { label: 'Audit Entries',    value: '1,847',   sub: 'IPFS Immutable',  color: 'text-green-400' },
                                     ].map(({ label, value, sub, color }) => (

@@ -242,7 +242,7 @@ export default function AnalyticsPage() {
                         <h3 className="text-[10px] font-black mb-8 text-gray-500 uppercase tracking-widest">CAPITAL DEPLOYMENT MATRIX</h3>
                         <div className="space-y-4">
                             {[
-                                { asset: 'CETES', name: 'Etherfuse Stablebond', rate: '3.38%', type: 'GOVT BACKED' },
+                                { asset: 'CETES', name: 'Etherfuse Stablebond', rate: '5.57%', type: 'GOVT BACKED' },
                                 { asset: 'USDC', name: 'Operational Liquidity', rate: '0.00%', type: 'STABLE' },
                                 { asset: 'AUDIT', name: 'IPFS Compliance Logs', rate: '100%', type: 'IMMUTABLE' },
                                 { asset: 'XLM', name: 'Gas Reserve', rate: 'Min.', type: 'UTILITY' },

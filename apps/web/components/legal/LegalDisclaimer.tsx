@@ -50,15 +50,15 @@ export default function LegalDisclaimer({
     return (
       <div
         role="alert"
-        className={`relative w-full bg-amber-950/80 border-b border-amber-500/30 text-amber-200 px-4 py-3 ${className}`}
+        className={`relative w-full bg-zinc-950/70 backdrop-blur-md border-b border-stellar-teal/20 text-zinc-300 px-4 py-3 sm:py-2.5 shadow-lg transition-all duration-300 ${className}`}
       >
         <div className="max-w-5xl mx-auto flex items-start gap-3">
-          <AlertTriangle className="w-4 h-4 mt-0.5 shrink-0 text-amber-400" />
+          <AlertTriangle className="w-4 h-4 mt-0.5 shrink-0 text-stellar-teal" />
           <p className="text-[11px] sm:text-xs leading-relaxed flex-1">
             {SHORT[locale]}{" "}
             <Link
               href="/disclaimers"
-              className="underline underline-offset-2 hover:text-white transition-colors font-medium"
+              className="underline underline-offset-2 text-stellar-teal hover:text-stellar-teal/80 transition-colors font-medium"
             >
               {locale === "es" ? "Leer aviso completo" : "Read full disclaimer"}
             </Link>
@@ -67,7 +67,7 @@ export default function LegalDisclaimer({
               href={COC_URL}
               target="_blank"
               rel="noopener noreferrer"
-              className="underline underline-offset-2 hover:text-white transition-colors"
+              className="underline underline-offset-2 text-zinc-400 hover:text-stellar-teal transition-colors"
             >
               Stellar CoC ↗
             </a>
@@ -75,7 +75,7 @@ export default function LegalDisclaimer({
           <button
             onClick={dismiss}
             aria-label="Dismiss disclaimer"
-            className="shrink-0 p-1 rounded hover:bg-amber-500/20 transition-colors"
+            className="shrink-0 p-1 rounded hover:bg-stellar-teal/10 text-zinc-400 hover:text-stellar-teal transition-colors"
           >
             <X className="w-3.5 h-3.5" />
           </button>
@@ -105,11 +105,11 @@ export default function LegalDisclaimer({
   // inline — full block for /disclaimers page
   return (
     <div
-      className={`rounded-2xl border border-amber-500/20 bg-amber-950/20 p-6 ${className}`}
+      className={`rounded-2xl border border-stellar-teal/15 bg-zinc-950/50 backdrop-blur-sm p-6 ${className}`}
     >
       <div className="flex items-center gap-2 mb-4">
-        <AlertTriangle className="w-4 h-4 text-amber-400 shrink-0" />
-        <span className="text-[10px] font-mono font-bold uppercase tracking-widest text-amber-400">
+        <AlertTriangle className="w-4 h-4 text-stellar-teal shrink-0" />
+        <span className="text-[10px] font-mono font-bold uppercase tracking-widest text-stellar-teal">
           {locale === "es" ? "Aviso Legal Obligatorio" : "Mandatory Legal Disclaimer"}
         </span>
       </div>
@@ -120,7 +120,7 @@ export default function LegalDisclaimer({
         href={COC_URL}
         target="_blank"
         rel="noopener noreferrer"
-        className="inline-flex items-center gap-1.5 text-xs text-amber-400 hover:text-amber-300 underline underline-offset-2 transition-colors"
+        className="inline-flex items-center gap-1.5 text-xs text-stellar-teal hover:text-stellar-teal/80 underline underline-offset-2 transition-colors"
       >
         Stellar Code of Conduct (May 2026) ↗
       </a>

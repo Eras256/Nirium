@@ -54,11 +54,8 @@ export function AppSidebar({ onClose }: { onClose?: () => void }) {
             <div className="flex items-center justify-between px-5 py-5 border-b border-white/[0.06] shrink-0">
                 <Link href="/" className="flex items-center gap-2 group">
                     <div className="overflow-hidden flex items-center">
-                        <img src="/brand/NiLo.png" alt="Nirium" className="h-7 w-auto object-contain" />
+                        <img src="/brand/NiLo.png" alt="Nirium" className="h-7 w-auto object-contain invert dark:invert-0" />
                     </div>
-                    <span className="px-1.5 py-0.5 border border-amber-500/30 bg-amber-500/10 text-amber-500 text-[8px] font-black rounded uppercase tracking-widest">
-                        Testnet
-                    </span>
                 </Link>
                 {onClose && (
                     <button onClick={onClose} className="lg:hidden p-1 text-white/30 hover:text-white">
@@ -254,7 +251,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
                     >
                         <Menu size={18} />
                     </button>
-                    <img src="/brand/NiLo.png" alt="Nirium" className="h-7 w-auto object-contain" />
+                    <img src="/brand/NiLo.png" alt="Nirium" className="h-7 w-auto object-contain invert dark:invert-0" />
                     <Link href="/" className="ml-auto text-[9px] font-mono text-white/30 hover:text-white transition-colors uppercase tracking-widest">
                         {t.nav.back_to_marketing}
                     </Link>

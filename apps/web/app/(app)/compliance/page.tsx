@@ -4,7 +4,7 @@
 import Link from "next/link";
 import {
     FileCheck, FileText, ArrowRight, CheckCircle2, Database,
-    Sparkles, Layers, Building2, AlertTriangle, Hash, ShieldCheck, 
+    Sparkles, Layers, Building2, AlertTriangle, Hash, ShieldCheck,
     Download, ExternalLink, Fingerprint
 } from "lucide-react";
 import { Button } from "@/components/ui/Button";
@@ -27,7 +27,7 @@ export default function CompliancePage() {
                 {/* HERO */}
                 <section className="relative pt-12 pb-20">
                     <div className="max-w-5xl mx-auto px-6">
-                        <motion.div 
+                        <motion.div
                             initial={{ opacity: 0, y: 20 }}
                             animate={{ opacity: 1, y: 0 }}
                             className="flex justify-center mb-10"
@@ -38,7 +38,7 @@ export default function CompliancePage() {
                             </div>
                         </motion.div>
 
-                        <motion.h1 
+                        <motion.h1
                             initial={{ opacity: 0, y: 20 }}
                             animate={{ opacity: 1, y: 0 }}
                             transition={{ delay: 0.1 }}
@@ -50,7 +50,7 @@ export default function CompliancePage() {
                                 CNBV-Ready
                             </span>
                         </motion.h1>
-                        <motion.p 
+                        <motion.p
                             initial={{ opacity: 0 }}
                             animate={{ opacity: 1 }}
                             transition={{ delay: 0.2 }}
@@ -217,8 +217,8 @@ export default function CompliancePage() {
                                 </div>
                             </div>
                             <div className="p-8 font-mono text-xs sm:text-sm text-gray-400 overflow-x-auto leading-relaxed bg-[radial-gradient(circle_at_top_right,_rgba(45,235,232,0.03),transparent)]">
-<pre className="text-stellar-teal/80">
-{`{
+                                <pre className="text-stellar-teal/80">
+                                    {`{
   "institution_id": "FINTECH_MX_001",
   "report_type": "TRANSACCIONES_AGENTES_IA",
   "period_start": "2026-04-01T00:00:00Z",
@@ -228,9 +228,9 @@ export default function CompliancePage() {
   "chain_integrity": "VERIFIED",
   "ipfs_cid": "ipfs://QmX7...8yZ9",
   "records": [`}
-</pre>
-<pre className="text-white">
-{`    {
+                                </pre>
+                                <pre className="text-white">
+                                    {`    {
       "folio": "8BFCA5C5",
       "fecha_hora": "2026-04-15T14:30:00Z",
       "tipo_operacion": "REBALANCE_USDC_TO_CETES",
@@ -241,12 +241,12 @@ export default function CompliancePage() {
       "firma_hmac": "f4e2d9c1b8a7...",
       "integridad": "VALIDA"
     }`}
-</pre>
-<pre className="text-gray-600">
-{`    // ...1246 items more
+                                </pre>
+                                <pre className="text-gray-600">
+                                    {`    // ...1246 items more
   ]
 }`}
-</pre>
+                                </pre>
                             </div>
                         </div>
                     </div>

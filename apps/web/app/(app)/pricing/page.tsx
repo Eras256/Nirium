@@ -348,11 +348,11 @@ export default function PricingPage() {
                             <AlertTriangle className="w-5 h-5 text-amber-400 shrink-0 mt-0.5" />
                             <p className="text-sm text-white/70 leading-relaxed">
                                 {language === 'zh' ? (
-                                    <>Nirium 目前运行于 <strong>Stellar 测试网</strong>。主网价格仅供参考，正式上线前可能变更。CETES 利率（~3.38%）为 Banxico 参考利率，非 Nirium 承诺。非金融建议。</>
+                                    <>Nirium 目前运行于 <strong>Stellar 测试网</strong>。主网价格仅供参考，正式上线前可能变更。CETES 利率（~5.57%）为 Banxico 参考利率，非 Nirium 承诺。非金融建议。</>
                                 ) : language === 'es' ? (
-                                    <>Nirium opera actualmente en <strong>Stellar Testnet</strong>. Los precios de mainnet son indicativos y pueden cambiar antes del lanzamiento oficial. La tasa CETES (~3.38%) es una tasa de referencia Banxico, no una garantía de Nirium. No es asesoría financiera.</>
+                                    <>Nirium opera actualmente en <strong>Stellar Testnet</strong>. Los precios de mainnet son indicativos y pueden cambiar antes del lanzamiento oficial. La tasa CETES (~5.57%) es una tasa de referencia Banxico, no una garantía de Nirium. No es asesoría financiera.</>
                                 ) : (
-                                    <>Nirium currently operates on <strong>Stellar Testnet</strong>. Mainnet prices are indicative and may change before official launch. CETES rate (~3.38%) is a Banxico reference rate, not a Nirium guarantee. Not financial advice.</>
+                                    <>Nirium currently operates on <strong>Stellar Testnet</strong>. Mainnet prices are indicative and may change before official launch. CETES rate (~5.57%) is a Banxico reference rate, not a Nirium guarantee. Not financial advice.</>
                                 )}
                             </p>
                         </div>

@@ -19,12 +19,13 @@ export function TreasuryCanvas() {
     if (!mounted) return null;
 
     return (
-        <div className="w-full h-full relative">
+        <div className="w-full h-full relative bg-transparent">
             <CanvasErrorBoundary>
                 <Canvas
                     camera={{ position: [0, 0, 28], fov: 42 }}
                     gl={{ antialias: true, alpha: true }}
                     onCreated={handleContextLoss}
+                    style={{ background: 'transparent' }}
                 >
                     {/* @ts-ignore */}
                     <Suspense fallback={null}>
@@ -34,7 +35,7 @@ export function TreasuryCanvas() {
                                 luminanceThreshold={0.08}
                                 luminanceSmoothing={0.9}
                                 height={300}
-                                intensity={1.1}
+                                intensity={2.4}
                             />
                             <Vignette eskil={false} offset={0.15} darkness={1.0} />
                         </EffectComposer>

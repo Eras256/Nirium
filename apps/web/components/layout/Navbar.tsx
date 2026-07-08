@@ -58,12 +58,9 @@ export default function Navbar() {
                 <Link href="/" className="flex items-center gap-2 group shrink-0">
                     <div className="relative">
                         <div className="absolute inset-0 bg-stellar-teal/10 blur-xl rounded-full group-hover:bg-stellar-teal/30 transition-all" />
-                        <div className="relative bg-black border border-white/5 rounded-xl group-hover:border-stellar-teal/30 transition-all group-hover:scale-105 overflow-hidden w-14 xs:w-20 sm:w-28 h-8 xs:h-10 sm:h-12 flex items-center justify-center p-1">
-                            <img src="/brand/NiLo.png" alt="Nirium" className="w-full h-full object-contain" />
+                        <div className="relative bg-transparent transition-all group-hover:scale-105 overflow-hidden w-14 xs:w-20 sm:w-28 h-8 xs:h-10 sm:h-12 flex items-center justify-center">
+                            <img src="/brand/NiLo.png" alt="Nirium" className="w-full h-full object-contain invert dark:invert-0" />
                         </div>
-                    </div>
-                    <div className="hidden xs:flex px-1.5 py-0.5 border border-amber-500/30 bg-amber-500/10 text-amber-500 text-[8px] font-black rounded uppercase tracking-widest">
-                        Testnet
                     </div>
                 </Link>
 
