@@ -58,8 +58,8 @@ export default function Navbar() {
                 <Link href="/" className="flex items-center gap-2 group shrink-0">
                     <div className="relative">
                         <div className="absolute inset-0 bg-stellar-teal/10 blur-xl rounded-full group-hover:bg-stellar-teal/30 transition-all" />
-                        <div className="relative bg-transparent transition-all group-hover:scale-105 overflow-hidden w-14 xs:w-20 sm:w-28 h-8 xs:h-10 sm:h-12 flex items-center justify-center">
-                            <img src="/brand/NiLo.png" alt="Nirium" className="w-full h-full object-contain invert dark:invert-0" />
+                        <div className="relative bg-black/40 border border-white/5 rounded-lg p-1 transition-all group-hover:scale-105 overflow-hidden w-14 xs:w-20 sm:w-28 h-8 xs:h-10 sm:h-12 flex items-center justify-center">
+                            <img src="/logos/logo.png" alt="Nirium" className="w-full h-full object-contain" />
                         </div>
                     </div>
                 </Link>

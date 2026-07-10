@@ -31,9 +31,9 @@ export const metadata: Metadata = {
         },
     },
     icons: {
-        icon: "/brand/logo.png",
-        shortcut: "/brand/logo.png",
-        apple: "/brand/logo.png",
+        icon: "/logos/logo.png",
+        shortcut: "/logos/logo.png",
+        apple: "/logos/logo.png",
     },
     openGraph: {
         title: "Nirium Protocol | Treasury Automation on Stellar Testnet",

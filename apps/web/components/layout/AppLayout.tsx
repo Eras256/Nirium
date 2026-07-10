@@ -53,8 +53,8 @@ export function AppSidebar({ onClose }: { onClose?: () => void }) {
             {/* Logo */}
             <div className="flex items-center justify-between px-5 py-5 border-b border-white/[0.06] shrink-0">
                 <Link href="/" className="flex items-center gap-2 group">
-                    <div className="overflow-hidden flex items-center">
-                        <img src="/brand/NiLo.png" alt="Nirium" className="h-7 w-auto object-contain invert dark:invert-0" />
+                    <div className="overflow-hidden flex items-center bg-black/40 p-1.5 rounded-lg border border-white/5 shadow-sm">
+                        <img src="/logos/logo.png" alt="Nirium" className="h-7 w-auto object-contain" />
                     </div>
                 </Link>
                 {onClose && (
@@ -251,7 +251,9 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
                     >
                         <Menu size={18} />
                     </button>
-                    <img src="/brand/NiLo.png" alt="Nirium" className="h-7 w-auto object-contain invert dark:invert-0" />
+                    <div className="bg-black/40 p-1 rounded-md border border-white/5">
+                        <img src="/logos/logo.png" alt="Nirium" className="h-7 w-auto object-contain" />
+                    </div>
                     <Link href="/" className="ml-auto text-[9px] font-mono text-white/30 hover:text-white transition-colors uppercase tracking-widest">
                         {t.nav.back_to_marketing}
                     </Link>

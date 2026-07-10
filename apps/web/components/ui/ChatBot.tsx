@@ -261,7 +261,7 @@ const ChatBot = () => {
                         <div className="p-3 border-b border-white/5 flex items-center justify-between bg-white/[0.01]">
                             <div className="flex items-center gap-2">
                                 <div className="w-6 h-6 flex items-center justify-center">
-                                    <img src="/brand/NiLo.png" alt="Nirium Logo" className="w-full h-full object-contain" />
+                                    <img src="/logos/logo.png" alt="Nirium Logo" className="w-full h-full object-contain" />
                                 </div>
                                 <h3 className="text-[11px] font-bold uppercase text-white tracking-tighter">Nirium AI</h3>
                             </div>

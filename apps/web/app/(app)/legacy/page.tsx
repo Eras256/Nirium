@@ -335,7 +335,7 @@ export default function Home() {
                             className="relative"
                         >
                             <img
-                                src="/brand/NiLo.png"
+                                src="/logos/logo.png"
                                 alt="Nirium Logo"
                                 className="w-48 sm:w-64 h-auto object-contain drop-shadow-[0_0_40px_rgba(45,235,232,0.4)]"
                             />
