@@ -52,6 +52,8 @@ Cargo.lock
 !CONTRIBUTING.md
 !NIRIUM_TECHNICAL_PAPER.md
 !DEMO_SCRIPT.md
+# Servable legal docs live under public/ — not internal docs, must ship.
+!apps/web/public/legal/*.md
 !SECURITY.md
 !SECURITY_AUDIT_V2.md
 !claude.md

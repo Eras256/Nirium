@@ -1,0 +1,13 @@
+{
+  "x-status": "draft — v1 terms pending legal review; not binding until finalized",
+  "terms": "https://nirium.xyz/legal/payroll-terms-v1.md",
+  "termsFormat": "text/markdown",
+  "atrHash": "sha-256:a03d9cdd0d239e48e28e3b69782b6662b7ab1e500d6a2c8c6d24a9ebe9643ab1",
+  "acceptanceRequired": false,
+  "disputeResolution": {
+    "clauseId": "ICDR-INTL-STANDARD",
+    "source": "AAA-ICDR",
+    "catalog": "https://www.icdr.org/clauses"
+  },
+  "contact": "legal@nirium.xyz"
+}

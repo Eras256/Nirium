@@ -1,6 +1,93 @@
 {
+    "payroll": {
+            "eyebrow": "Nodo de Ejecución · Liquidación",
+            "title": "Dispersiones / Payouts",
+            "subtitle": "Paga hasta 100 destinatarios — contratistas, freelancers, pagos B2B — desde una tesorería en un solo lote firmado. Nirium arma la transacción, tú la firmas en tu wallet. Cada corrida se ancla a IPFS.",
+            "badges": {
+                "nonCustodial": "Non-custodial",
+                "batch": "≤100 / lote",
+                "ipfs": "Recibo IPFS",
+                "lcp": "LCP · en revisión legal",
+                "testnet": "Testnet",
+                "mainnet": "Mainnet · early access"
+            },
+            "network": {
+                "label": "Red",
+                "testnet": "Testnet",
+                "mainnet": "Mainnet",
+                "earlyAccess": "early access",
+                "freighterHint": "Mainnet mueve fondos reales. Cambia Freighter a la red Pública antes de firmar."
+            },
+            "terms": {
+                "accept": "Acepto los Términos de Payouts — solo pagos por prestación independiente de servicios (contratistas, freelancers, B2B), nunca salario de empleados subordinados; mis obligaciones fiscales y laborales siguen siendo mías.",
+                "link": "Términos de Payouts v1.0"
+            },
+            "clientInfo": {
+                "title": "Identificación del cliente (mainnet)",
+                "note": "Se pide una vez por corrida en mainnet, de cara a la Fracción XVI de LFPIORPI (ley antilavado, vigente 17-ene-2027). Se guarda con la corrida, nunca se muestra públicamente.",
+                "legalNamePlaceholder": "Razón social",
+                "taxIdPlaceholder": "RFC / Tax ID",
+                "repNamePlaceholder": "Representante legal"
+            },
+            "legal": {
+                "label": "Contexto legal · LCP",
+                "terms": "términos aplicables ↗",
+                "dispute": "disputa"
+            },
+            "wallet": {
+                "signer": "Firmante de tesorería",
+                "notConnected": "Sin conectar",
+                "connect": "Conectar wallet"
+            },
+            "batch": {
+                "title": "Dispersión por lote",
+                "walletPlaceholder": "Dirección G del empleado",
+                "add": "+ agregar destinatario",
+                "memoPlaceholder": "Memo (opcional, ≤28 caracteres)",
+                "total": "Total",
+                "recipients": "destinatario(s)"
+            },
+            "actions": {
+                "building": "Armando…",
+                "signing": "Firma en tu wallet…",
+                "settling": "Liquidando…",
+                "buildSign": "Armar y firmar"
+            },
+            "errors": {
+                "needRecipient": "Agrega al menos un destinatario con un monto.",
+                "noPayable": "No hay destinatarios pagables — nada que firmar. Revisa la lista de omitidos.",
+                "notConnected": "Conecta tu wallet primero.",
+                "accountMismatch": "Tu wallet está en otra cuenta distinta a la tesorería conectada. Cambia tu wallet de vuelta a la cuenta de la tesorería y reintenta.",
+                "needTerms": "Acepta los términos de Payouts antes de armar la corrida.",
+                "needClientInfo": "Ingresa razón social, RFC y representante legal antes de correr payouts en mainnet."
+            },
+            "skipped": "destinatario(s) omitido(s) en el pre-chequeo:",
+            "receipt": {
+                "settled": "Liquidado",
+                "paid": "pagados",
+                "tx": "TX",
+                "ipfs": "Recibo IPFS",
+                "boundPre": "Vinculado a",
+                "boundLink": "los términos aplicables",
+                "boundPost": "LCP L2 · SHA-256 verificado"
+            },
+            "onboard": {
+                "title": "Agregar trustline de USDC",
+                "desc": "Cada cuenta administra su propia trustline. Conecta la wallet y agrega su trustline de USDC para poder recibir la nómina — una firma. La cuenta necesita un poco de XLM para la reserva.",
+                "placeholder": "Dirección G del empleado",
+                "button": "Agregar trustline",
+                "working": "Procesando…",
+                "needAddress": "Ingresa la dirección G del empleado."
+            },
+            "runs": {
+                "title": "Corridas recientes",
+                "empty": "Aún no hay corridas.",
+                "recipients": "destinatario(s)"
+            },
+            "footer": "Testnet · Non-custodial · La empresa firma, Nirium nunca custodia fondos"
+        },
     "nav": {
-        "payroll": "Nómina",
+        "payroll": "Dispersiones",
         "home": "Inicio",
         "dashboard": "Dashboard",
         "marketplace": "Blueprints",

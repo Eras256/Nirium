@@ -1,6 +1,93 @@
 {
+    "payroll": {
+            "eyebrow": "执行节点 · 结算",
+            "title": "批量支付 / 发放",
+            "subtitle": "从一个金库在单笔签名批次中向最多 100 位收款人付款——承包商、自由职业者、B2B 付款。Nirium 构建交易，由你在钱包中签名。每次运行都锚定到 IPFS。",
+            "badges": {
+                "nonCustodial": "非托管",
+                "batch": "≤100 / 批",
+                "ipfs": "IPFS 收据",
+                "lcp": "LCP · 法律审查中",
+                "testnet": "测试网",
+                "mainnet": "主网 · 抢先体验"
+            },
+            "network": {
+                "label": "网络",
+                "testnet": "测试网",
+                "mainnet": "主网",
+                "earlyAccess": "抢先体验",
+                "freighterHint": "主网转移真实资金。签名前请将 Freighter 切换到公共网络。"
+            },
+            "terms": {
+                "accept": "我接受 Payouts 条款——仅限独立服务付款（承包商、自由职业者、B2B），绝不用于雇员工资；税务和劳动义务仍由我承担。",
+                "link": "Payouts 条款 v1.0"
+            },
+            "clientInfo": {
+                "title": "客户身份识别（主网）",
+                "note": "主网每次运行需提供一次，以提前应对墨西哥反洗钱法 LFPIORPI 第17条第XVI款（2027年1月17日生效）。信息随运行记录保存，不公开展示。",
+                "legalNamePlaceholder": "公司法定名称",
+                "taxIdPlaceholder": "税号（RFC 或等效）",
+                "repNamePlaceholder": "法定代表人"
+            },
+            "legal": {
+                "label": "法律上下文 · LCP",
+                "terms": "适用条款 ↗",
+                "dispute": "争议"
+            },
+            "wallet": {
+                "signer": "金库签名方",
+                "notConnected": "未连接",
+                "connect": "连接钱包"
+            },
+            "batch": {
+                "title": "批量发放",
+                "walletPlaceholder": "员工 G 地址",
+                "add": "+ 添加收款人",
+                "memoPlaceholder": "备注（可选，≤28 个字符）",
+                "total": "合计",
+                "recipients": "位收款人"
+            },
+            "actions": {
+                "building": "构建中…",
+                "signing": "请在钱包中签名…",
+                "settling": "结算中…",
+                "buildSign": "构建并签名"
+            },
+            "errors": {
+                "needRecipient": "请至少添加一位带金额的收款人。",
+                "noPayable": "没有可支付的收款人——无需签名。请查看被跳过的列表。",
+                "notConnected": "请先连接钱包。",
+                "accountMismatch": "你的钱包当前账户与已连接的金库不一致。请将钱包切回金库账户后重试。",
+                "needTerms": "构建运行前请先接受 Payouts 条款。",
+                "needClientInfo": "在主网运行 payouts 前，请填写公司法定名称、税号和法定代表人。"
+            },
+            "skipped": "位收款人在预检中被跳过：",
+            "receipt": {
+                "settled": "已结算",
+                "paid": "已支付",
+                "tx": "交易",
+                "ipfs": "IPFS 收据",
+                "boundPre": "绑定至",
+                "boundLink": "适用条款",
+                "boundPost": "LCP L2 · SHA-256 已验证"
+            },
+            "onboard": {
+                "title": "添加 USDC 信任线",
+                "desc": "每个账户自行管理其信任线。连接钱包并为其添加 USDC 信任线即可接收工资——一次签名。账户需要少量 XLM 作为储备金。",
+                "placeholder": "员工 G 地址",
+                "button": "添加信任线",
+                "working": "处理中…",
+                "needAddress": "请输入员工的 G 地址。"
+            },
+            "runs": {
+                "title": "最近运行",
+                "empty": "暂无运行。",
+                "recipients": "位收款人"
+            },
+            "footer": "测试网 · 非托管 · 公司签名，Nirium 从不保管资金"
+        },
     "nav": {
-        "payroll": "薪资",
+        "payroll": "批量支付",
         "home": "首页",
         "dashboard": "Dashboard",
         "marketplace": "Marketplace",

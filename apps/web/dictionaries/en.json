@@ -1,6 +1,93 @@
 {
+    "payroll": {
+            "eyebrow": "Execution Node · Settlement",
+            "title": "Payouts / Disbursements",
+            "subtitle": "Pay up to 100 recipients — contractors, freelancers, B2B payouts — from one treasury in a single signed batch. Nirium builds the transaction, you sign it in your wallet. Every run is anchored to IPFS.",
+            "badges": {
+                "nonCustodial": "Non-custodial",
+                "batch": "≤100 / batch",
+                "ipfs": "IPFS receipt",
+                "lcp": "LCP · in legal review",
+                "testnet": "Testnet",
+                "mainnet": "Mainnet · early access"
+            },
+            "network": {
+                "label": "Network",
+                "testnet": "Testnet",
+                "mainnet": "Mainnet",
+                "earlyAccess": "early access",
+                "freighterHint": "Mainnet moves real funds. Switch Freighter to the Public network before signing."
+            },
+            "terms": {
+                "accept": "I accept the Payouts Terms — independent service payments only (contractors, freelancers, B2B), never subordinate-employee salary; tax and labor obligations remain mine.",
+                "link": "Payouts Terms v1.0"
+            },
+            "clientInfo": {
+                "title": "Client identification (mainnet)",
+                "note": "Required once per run on mainnet, ahead of LFPIORPI Fracción XVI (Mexico AML law, effective 2027-01-17). Stored with the run, never shown publicly.",
+                "legalNamePlaceholder": "Company legal name",
+                "taxIdPlaceholder": "Tax ID (RFC or equivalent)",
+                "repNamePlaceholder": "Legal representative"
+            },
+            "legal": {
+                "label": "Legal context · LCP",
+                "terms": "governing terms ↗",
+                "dispute": "dispute"
+            },
+            "wallet": {
+                "signer": "Treasury signer",
+                "notConnected": "Not connected",
+                "connect": "Connect wallet"
+            },
+            "batch": {
+                "title": "Batch payout",
+                "walletPlaceholder": "Employee G-address",
+                "add": "+ add recipient",
+                "memoPlaceholder": "Memo (optional, ≤28 chars)",
+                "total": "Total",
+                "recipients": "recipient(s)"
+            },
+            "actions": {
+                "building": "Building…",
+                "signing": "Sign in wallet…",
+                "settling": "Settling…",
+                "buildSign": "Build & sign"
+            },
+            "errors": {
+                "needRecipient": "Add at least one recipient with an amount.",
+                "noPayable": "No payable recipients — nothing to sign. See the skipped list.",
+                "notConnected": "Connect your wallet first.",
+                "accountMismatch": "Your wallet is on a different account than the connected treasury. Switch your wallet back to the treasury account and retry.",
+                "needTerms": "Accept the Payouts terms before building a run.",
+                "needClientInfo": "Provide company legal name, tax ID, and legal representative before running payouts on mainnet."
+            },
+            "skipped": "recipient(s) skipped in pre-flight:",
+            "receipt": {
+                "settled": "Settled",
+                "paid": "paid",
+                "tx": "TX",
+                "ipfs": "IPFS receipt",
+                "boundPre": "Bound to",
+                "boundLink": "governing terms",
+                "boundPost": "LCP L2 · SHA-256 verified"
+            },
+            "onboard": {
+                "title": "Add a USDC trustline",
+                "desc": "An account manages its own trustlines. Connect the wallet and add its USDC trustline so it can receive payroll — one signature. The account needs a little XLM for the reserve.",
+                "placeholder": "Employee G-address",
+                "button": "Add trustline",
+                "working": "Working…",
+                "needAddress": "Enter the employee's G-address."
+            },
+            "runs": {
+                "title": "Recent runs",
+                "empty": "No runs yet.",
+                "recipients": "recipient(s)"
+            },
+            "footer": "Testnet · Non-custodial · The company signs, Nirium never holds funds"
+        },
     "nav": {
-        "payroll": "Payroll",
+        "payroll": "Payouts",
         "home": "Home",
         "dashboard": "Dashboard",
         "marketplace": "Blueprints",
