@@ -23,8 +23,8 @@ Nirium addresses two markets simultaneously: institutional clients (B2B/A2A) tha
 ```
 Layer 1 — Interface
   Next.js 15 Dashboard (nirium.xyz)
-  TypeScript SDK v0.6.2 (npm: nirium)
-  Python SDK v0.6.2 (pypi: nirium)
+  TypeScript SDK v0.6.3 (npm: nirium)
+  Python SDK v0.6.3 (pypi: nirium)
   MCP Server (Claude Desktop / Cursor)
 
 Layer 2 — Intelligence & API
@@ -305,7 +305,7 @@ SEP-10, SEP-24, SEP-31, SEP-12/Travel Rule, Bug Bounty, Proof of Reserves, Sanct
 
 ## 10. SDKs
 
-Both SDKs verified against live API (July 2026, v0.6.2).
+Both SDKs verified against live API (July 2026, v0.6.3).
 
 ### TypeScript (Node.js ≥ 18)
 ```bash
@@ -382,7 +382,7 @@ All revenue streams are classified as software licensing under LRITF Art. 22, LM
 
 Nirium is the infrastructure layer where institutional DeFi and the agentic economy converge on Stellar. Institutions get automated treasury operations with full auditability and compliance-ready output. AI agents get a protocol they can pay into and execute against without human intermediation.
 
-The protocol's deployment — 66 API endpoints (65 HTTP + 1 WebSocket) across a dual-network stack, a single autonomous execution agent with deterministic fallback, 2 consolidated Soroban contracts, x402/MPP/Payouts payment protocols live in mainnet early access, multi-LLM support, MCP server (12 tools, 13/13 PASS), published SDKs (npm + PyPI, v0.6.2), JARGUS-verified security (83/83 PASS, AAA Grade) — establishes the architectural foundation for the NiriumVault treasury contract's mainnet readiness, pending a formal independent third-party audit.
+The protocol's deployment — 66 API endpoints (65 HTTP + 1 WebSocket) across a dual-network stack, a single autonomous execution agent with deterministic fallback, 2 consolidated Soroban contracts, x402/MPP/Payouts payment protocols live in mainnet early access, multi-LLM support, MCP server (12 tools, 13/13 PASS), published SDKs (npm + PyPI, v0.6.3), JARGUS-verified security (83/83 PASS, AAA Grade) — establishes the architectural foundation for the NiriumVault treasury contract's mainnet readiness, pending a formal independent third-party audit.
 
 ---
 

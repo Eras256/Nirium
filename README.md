@@ -39,7 +39,7 @@ Our core offering is a high-performance TypeScript/Python SDK and a 66-endpoint 
 
 Our traction is **self-generated and independently verifiable** — it does not depend on third-party announcements:
 
-- **Published SDKs** on npm and PyPI (`nirium`, v0.6.2) with recorded downloads across multiple versions.
+- **Published SDKs** on npm and PyPI (`nirium`, v0.6.3) with recorded downloads across multiple versions.
 - **Live autonomous agent** running 24/7 on Stellar Testnet, with on-chain rebalances verifiable on Stellar Expert.
 - **Real mainnet activity**: x402 micropayments settling in production against a verifiable treasury address.
 - **Open API + free sandbox keys**, so any developer can integrate and exercise the contracts directly.
@@ -147,8 +147,8 @@ Designed for regulatory compliance without requiring blockchain expertise from t
 
 | SDK | Package | Version | Install |
 |---|---|---|---|
-| TypeScript | [nirium (npm)](https://www.npmjs.com/package/nirium) | 0.6.2 | `npm install nirium` |
-| Python | [nirium (PyPI)](https://pypi.org/project/nirium/) | 0.6.2 | `pip install nirium` |
+| TypeScript | [nirium (npm)](https://www.npmjs.com/package/nirium) | 0.6.3 | `npm install nirium` |
+| Python | [nirium (PyPI)](https://pypi.org/project/nirium/) | 0.6.3 | `pip install nirium` |
 
 ```typescript
 import { Agent } from 'nirium';
@@ -229,8 +229,8 @@ pip install nirium       # Python SDK
 ```
 Nirium/                        (public repo)
 ├── apps/web/                  → Next.js 15 Dashboard (nirium.xyz) — 27 routes, i18n (EN/ES/ZH)
-├── packages/sdk/              → TypeScript SDK v0.6.2 (npm: nirium)
-├── packages/sdk-python/       → Python SDK v0.6.2 (PyPI: nirium)
+├── packages/sdk/              → TypeScript SDK v0.6.3 (npm: nirium)
+├── packages/sdk-python/       → Python SDK v0.6.3 (PyPI: nirium)
 ├── packages/contracts/        → Soroban smart contracts (Rust) — 2 contracts (NiriumVault + NiriumProtocol), 5 fuzz targets
 ├── .github/workflows/         → CI, release, security-gate, desktop release
 │
@@ -280,7 +280,7 @@ Nirium received Kickstart funding ($5,000 USD) via a regional Stellar Ambassador
 | Milestone | Status |
 |---|---|
 | Core infrastructure + x402/MPP on Testnet | ✅ Complete |
-| Institutional API (66 endpoints) + SDKs v0.6.2 | ✅ Complete |
+| Institutional API (66 endpoints) + SDKs v0.6.3 | ✅ Complete |
 | Internal JARGUS Security Audit v3.0 (AAA Grade - 83/83 PASS) | ✅ Complete |
 | x402-VPN — Institutional Mesh Proxy | ✅ Live |
 | /build — Startup Ideas Hub (12 blueprints) | ✅ Live |
