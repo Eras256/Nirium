@@ -1,6 +1,6 @@
 # Nirium Payouts — Terms of Use (v1.0)
 
-**Effective:** July 10, 2026 · **Jurisdiction:** Mexico · **Stage:** Mainnet early access
+**Effective:** July 10, 2026 · **Last updated:** July 13, 2026 · **Jurisdiction:** Mexico · **Stage:** Mainnet early access
 
 By building or submitting a payout run through the Nirium Payouts / Disbursement node (`POST /api/payroll/run` with `acknowledgeTerms: true`), you (the "Client") accept these terms.
 
@@ -33,11 +33,15 @@ The Client is the **sole responsible party** for:
 - Any labor or social-security obligations that may arise.
 - REPSE compliance where applicable.
 
-## 6. Limitation of liability
+## 6. Client identification (mainnet)
+
+Ahead of the entry into force of LFPIORPI Article 17, Section XVI (Mexico's anti-money-laundering law provision on virtual assets, effective **January 17, 2027**), Nirium requires the Client to provide basic identification before building a run on **mainnet**: legal company name, tax ID (RFC or equivalent), and the name of the Client's legal representative. This information is stored with the run and is not made public. **Testnet runs do not require it.**
+
+## 7. Limitation of liability
 
 Nirium is **not liable** for the Client's decisions, recipient classification, or any tax, labor, regulatory, or financial consequence arising from use of the software. The Client uses the software at its own risk.
 
-## 7. Fees
+## 8. Fees
 
 Nirium charges a **software fee per run** (payable in USDC) — **never a percentage of the amount disbursed.** The Stellar network fee (~$0.02 per 100 recipients) is paid by the Client. Any financial commissions are set and charged by regulated partners, not by Nirium.
 
