@@ -427,7 +427,9 @@ export default function PayrollPage() {
                     )}
                 </section>
 
-                <p className="mt-12 font-mono text-[11px] text-white/25 text-center">{p.footer}</p>
+                <p className="mt-12 font-mono text-[11px] text-white/25 text-center">
+                    {network === "mainnet" ? p.network.mainnet : p.network.testnet} · {p.footerSuffix}
+                </p>
             </div>
         </main>
     );

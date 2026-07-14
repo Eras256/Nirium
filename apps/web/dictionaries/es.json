@@ -84,7 +84,7 @@
                 "empty": "Aún no hay corridas.",
                 "recipients": "destinatario(s)"
             },
-            "footer": "Testnet · Non-custodial · La empresa firma, Nirium nunca custodia fondos"
+            "footerSuffix": "Non-custodial · La empresa firma, Nirium nunca custodia fondos"
         },
     "nav": {
         "payroll": "Dispersiones",

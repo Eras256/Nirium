@@ -84,7 +84,7 @@
                 "empty": "No runs yet.",
                 "recipients": "recipient(s)"
             },
-            "footer": "Testnet · Non-custodial · The company signs, Nirium never holds funds"
+            "footerSuffix": "Non-custodial · The company signs, Nirium never holds funds"
         },
     "nav": {
         "payroll": "Payouts",

@@ -84,7 +84,7 @@
                 "empty": "暂无运行。",
                 "recipients": "位收款人"
             },
-            "footer": "测试网 · 非托管 · 公司签名，Nirium 从不保管资金"
+            "footerSuffix": "非托管 · 公司签名，Nirium 从不保管资金"
         },
     "nav": {
         "payroll": "批量支付",
