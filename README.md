@@ -136,7 +136,7 @@ Designed for regulatory compliance without requiring blockchain expertise from t
 | **XLM/USDC** | Reflector → CoinGecko → Stellar Expert | Multi-tier oracle price feed |
 | **SDEX SPREAD** | Stellar Horizon orderbook | Live XLM/USDC spread in basis points |
 | **BLEND APY** | Blend Protocol on-chain | Liquidity reference rate (~5.12%) |
-| **ETHERFUSE APY** | Etherfuse testnet | Tokenized CETES reference rate (~5.78%) |
+| **ETHERFUSE APY** | Etherfuse testnet | Tokenized CETES reference rate (~5.57%) |
 | **BASE FEE** | Stellar Horizon | Live network base fee |
 
 ### Published SDKs (npm + PyPI)
@@ -385,7 +385,7 @@ wscat -c "wss://nirium-agent.fly.dev/ws/signals" \
 | **x402-VPN** | [x402-vpn.vercel.app](https://x402-vpn.vercel.app) |
 | **X / Twitter** | [@NiriumXYZ](https://x.com/Niriumstellar) |
 | **SCF / Community** | [communityfund.stellar.org](https://communityfund.stellar.org) |
-| **Security** | xvaiosx7@gmail.com |
+| **Security** | niriumprotocol@gmail.com |
 
 ---
 

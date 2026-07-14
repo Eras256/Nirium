@@ -2,9 +2,9 @@
 > Institutional DeFi Infrastructure Powered by Autonomous Agents on Stellar/Soroban
 
 **Version:** 2.4 — June 2026 (Updated Jun 4, 2026 — LLM-driven on-chain execution + clean Supabase sync)
-**Author:** Nirium Protocol Team — Nirium Protocol
+**Author:** Nirium Protocol Team
 **Network:** Stellar Testnet (Mainnet post-audit)
-**Contact:** xvaiosx7@gmail.com
+**Contact:** niriumprotocol@gmail.com
 
 ---
 

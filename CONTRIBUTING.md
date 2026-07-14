@@ -2,7 +2,7 @@
 
 Thank you for your interest in contributing to Nirium Protocol. This document covers setup, conventions, and guidelines for open-source contributors.
 
-> **Note:** Nirium operates under the [Stellar Code of Conduct](CODE_OF_CONDUCT.md). All contributors are expected to uphold these standards, which emphasize **patience with newcomers** and **seeking diverse perspectives**. Violations can be reported to [xvaiosx7@gmail.com](mailto:xvaiosx7@gmail.com) or [community@stellar.org](mailto:community@stellar.org).
+> **Note:** Nirium operates under the [Stellar Code of Conduct](CODE_OF_CONDUCT.md). All contributors are expected to uphold these standards, which emphasize **patience with newcomers** and **seeking diverse perspectives**. Violations can be reported to [niriumprotocol@gmail.com](mailto:niriumprotocol@gmail.com) or [community@stellar.org](mailto:community@stellar.org).
 
 ---
 
@@ -106,7 +106,7 @@ Contract modifications require:
 
 If you discover a security vulnerability, **do not open a public issue.**
 
-Email: **xvaiosx7@gmail.com**
+Email: **niriumprotocol@gmail.com**
 
 Include: description, reproduction steps, potential impact, and any suggested remediation. See [SECURITY.md](SECURITY.md) for the full responsible disclosure policy and expected response timelines.
 

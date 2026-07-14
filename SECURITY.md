@@ -6,7 +6,7 @@ We take the security of Nirium Protocol seriously. If you believe you have found
 
 ### How to Report
 
-**Email:** xvaiosx7@gmail.com
+**Email:** niriumprotocol@gmail.com
 
 Please include:
 - Description of the vulnerability
@@ -98,8 +98,8 @@ We appreciate the security research community's efforts. Reporters of valid secu
 
 ## Contact
 
-- **Security issues:** xvaiosx7@gmail.com
-- **General inquiries:** xvaiosx7@gmail.com
+- **Security issues:** niriumprotocol@gmail.com
+- **General inquiries:** niriumprotocol@gmail.com
 - **Twitter/X:** [@NiriumXYZ](https://x.com/Niriumstellar)
 
 ---
