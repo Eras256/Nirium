@@ -1,13 +1,14 @@
 # Nirium Payroll / Disbursement — Governing Terms (v1)
 
-> **TEMPLATE — TESTNET.** The arbitration language in §7 is the American
-> Arbitration Association's International Centre for Dispute Resolution (AAA-ICDR)
-> **official standard clause**, quoted verbatim. Everything else is a working
-> template. Nirium currently operates on the **Stellar test network**, where
-> assets carry **no monetary value**; these terms are forward-looking scaffolding
-> for mainnet and are **not yet in force**. The founder must have counsel review
-> and finalize this document — in particular the governing law (§6), the seat,
-> language, and number of arbitrators (§7) — before any reliance on mainnet.
+> **INTERIM — PENDING FINAL COUNSEL CONFIRMATION.** The arbitration language in
+> §7 is the American Arbitration Association's International Centre for Dispute
+> Resolution (AAA-ICDR) **official standard clause**, quoted verbatim. The
+> governing law (§6) and the seat, language, and number of arbitrators (§7) are
+> filled in with the ICDR-recommended defaults for an early-stage Mexico-based
+> operator — Mexico, Mexico City, Spanish and English, one arbitrator. These are
+> sensible interim values, **not yet reviewed and confirmed by outside counsel.**
+> Mainnet Payouts runs under these interim terms during early access; the
+> founder must have counsel confirm or adjust §6–§7 before broader reliance.
 >
 > This document is the reference artifact for the Legal Context Protocol
 > (LCP · https://legalcontextprotocol.org). Its SHA-256 is the LCP `atrHash`
@@ -56,8 +57,8 @@ document and its `atrHash` prove *under which terms*.
 ## 6. Governing law
 
 These terms shall be governed by and construed in accordance with the laws of
-**[GOVERNING JURISDICTION — to be finalized with counsel; e.g. Mexico]**, without
-regard to its conflict-of-laws rules.
+**Mexico** (interim value — pending final confirmation by outside counsel),
+without regard to its conflict-of-laws rules.
 
 ## 7. Dispute resolution — AAA-ICDR (official standard clause)
 
@@ -79,21 +80,23 @@ regard to its conflict-of-laws rules.
 > settled by arbitration in accordance with the International Arbitration Rules of
 > the International Centre for Dispute Resolution.
 
-**Supplementary provisions (ICDR-recommended — finalize with counsel):**
+**Supplementary provisions (ICDR-recommended interim values — pending final confirmation by counsel):**
 
-- The number of arbitrators shall be **[one]**.
-- The place (seat) of arbitration shall be **[Mexico City, Mexico]**.
-- The language(s) of the arbitration shall be **[Spanish and English]**.
+- The number of arbitrators shall be **one**.
+- The place (seat) of arbitration shall be **Mexico City, Mexico**.
+- The language(s) of the arbitration shall be **Spanish and English**.
 
 Judgment on the award rendered by the arbitrator(s) may be entered in any court
 having jurisdiction thereof.
 
-## 8. No warranty of value; testnet
+## 8. No warranty of value
 
 Nirium makes no representation as to the market value, convertibility, or yield of
-any asset disbursed. Assets on the Stellar **test network carry no monetary
-value**. The software is provided "as is," without warranties of any kind to the
-maximum extent permitted by law.
+any asset disbursed. On Stellar **testnet**, assets carry **no monetary value**;
+on **mainnet**, disbursed assets carry real monetary value and the Company bears
+full responsibility for the accuracy and authorization of every run. The software
+is provided "as is," without warranties of any kind to the maximum extent
+permitted by law.
 
 ## 9. Changes
 
