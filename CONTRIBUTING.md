@@ -85,6 +85,10 @@ We follow [Conventional Commits](https://www.conventionalcommits.org/):
 | `test:` | Adding or updating tests |
 | `chore:` | Maintenance, tooling, CI |
 
+### AI Assistance Disclosure
+
+Every commit produced with AI assistance carries a `Co-Authored-By: Claude Sonnet 5 <noreply@anthropic.com>` trailer. This is a factual disclosure of how the commit was produced — it is never stripped to make a commit look human-authored, and never added where it doesn't apply to fake the opposite. If you use AI assistance in your own contributions, disclose it the same way.
+
 ### Code Style
 
 - **TypeScript:** strict mode, explicit types for all public APIs
