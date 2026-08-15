@@ -228,7 +228,7 @@ app.use('/premium', x402Serve({
 
 **MPP runs in Charge mode only**, on both networks: the client signs a complete USDC transfer inside the request, the server validates it by simulation and broadcasts it: no external facilitator. MPP's Channel mode is implemented but **disabled**, because its setup phase deploys a channel contract holding a deposit, which is temporary custody and falls under the same audit gate as our own vault.
 
-The MCP server exposes Nirium as **14 tools** for Claude Desktop, Cursor, and any MCP-compatible IDE: 6 free, 2 authenticated, 1 informational, 3 paid over x402, 2 paid over MPP.
+The MCP server exposes Nirium as **25 tools** for Claude Desktop, Cursor, and any MCP-compatible IDE: 10 free, 9 authenticated, 1 informational, 3 paid over x402, 2 paid over MPP.
 
 ### Audit Trail Engine
 
@@ -404,7 +404,7 @@ Nirium received Kickstart funding via a regional Stellar Ambassador chapter, wit
 | Core infrastructure + x402/MPP on testnet | ✅ Complete |
 | Institutional API (86 endpoints) + published SDKs | ✅ Complete |
 | Internal JARGUS security audit v3.0 (83/83 vectors checked) | ✅ Complete |
-| MCP server v0.5.0, 14 tools | ✅ Complete |
+| MCP server v0.6.0, 25 tools | ✅ Complete |
 | Etherfuse CETES integration (testnet + SPEI sandbox) | ✅ Complete |
 | Self-service API keys console (`/keys`, wallet-signed via SEP-53) | ✅ Live |
 | Mainnet receive-only nodes (x402, MPP Charge, Audit Trail, Reporting) | ✅ Live, early access |
@@ -436,7 +436,7 @@ Nirium received Kickstart funding via a regional Stellar Ambassador chapter, wit
 |---|---|
 | [SDKs.md](SDKs.md) | Full TypeScript + Python SDK documentation |
 | [API_DOCUMENTATION_OPENAPI.yaml](API_DOCUMENTATION_OPENAPI.yaml) | OpenAPI specification |
-| [MCP_INTEGRATION_GUIDE.md](MCP_INTEGRATION_GUIDE.md) | MCP v0.5.0, 14 tools for Claude Desktop / Cursor |
+| [MCP_INTEGRATION_GUIDE.md](MCP_INTEGRATION_GUIDE.md) | MCP v0.6.0, 25 tools for Claude Desktop / Cursor |
 | [INTERNAL_SECURITY_AUDIT.md](INTERNAL_SECURITY_AUDIT.md) | Internal JARGUS v3.0 report, 83/83 vectors checked |
 | [NIRIUM_TECHNICAL_PAPER.md](NIRIUM_TECHNICAL_PAPER.md) | Technical whitepaper |
 | [SECURITY.md](SECURITY.md) | Responsible vulnerability disclosure policy |
