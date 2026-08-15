@@ -260,10 +260,10 @@ An invalid signature returns **400 and nothing is anchored**: IPFS has no delete
 
 | SDK | Package | Version | Install |
 |---|---|---|---|
-| TypeScript | [nirium (npm)](https://www.npmjs.com/package/nirium) | 0.10.1 | `npm install nirium` |
+| TypeScript | [nirium (npm)](https://www.npmjs.com/package/nirium) | 0.11.0 | `npm install nirium` |
 | Python | [nirium (PyPI)](https://pypi.org/project/nirium/) | 0.9.0 | `pip install nirium` |
-| MCP server | [nirium-mcp (npm)](https://www.npmjs.com/package/nirium-mcp) | 0.5.0 | `npx nirium-mcp` |
-| Pollar adapter | [nirium-pollar-adapter (npm)](https://www.npmjs.com/package/nirium-pollar-adapter) | 0.3.0 | `npm install nirium-pollar-adapter` |
+| MCP server | [nirium-mcp (npm)](https://www.npmjs.com/package/nirium-mcp) | 0.6.0 | `npx nirium-mcp` |
+| Pollar adapter | [nirium-pollar-adapter (npm)](https://www.npmjs.com/package/nirium-pollar-adapter) | 0.4.0 | `npm install nirium-pollar-adapter` |
 
 ```typescript
 import { Agent } from 'nirium';
@@ -347,16 +347,18 @@ pip install nirium       # Python SDK
 ```
 Nirium/                        (public repo)
 ├── apps/web/                  → Next.js 15 dashboard (nirium.xyz), 27 routes, i18n (EN/ES)
-├── packages/sdk/              → TypeScript SDK v0.10.1 (npm: nirium)
+├── packages/sdk/              → TypeScript SDK v0.11.0 (npm: nirium)
 ├── packages/sdk-python/       → Python SDK v0.9.0 (PyPI: nirium)
 ├── packages/contracts/        → Soroban contracts (Rust), 2 contracts, 5 fuzz targets
 ├── packages/policy-account/   → Soroban policy account (Rust), scopes a key to one vault
-├── packages/pollar-adapter/   → nirium-pollar-adapter v0.3.0, sign x402 with a social login
+├── packages/pollar-adapter/   → nirium-pollar-adapter v0.4.0, sign x402 with a social login
 ├── .github/workflows/         → CI, release, security-gate, desktop release
 │
 ├── packages/agent/            → [private] Express 5 API, 86 endpoints (85 HTTP + 1 WebSocket)
-├── packages/mcp/              → [public] MCP server v0.5.0, 14 tools
-├── packages/cli/              → [public] CLI v1.0.1 (publish pending)
+├── packages/mcp/              → [public] MCP server, not published from here: the real
+│                                 nirium-mcp (v0.6.0, npm) ships from the nirium-sdk repo
+├── packages/cli/              → [public] CLI, not published from here: the real
+│                                 nirium-cli (v1.0.4, npm) ships from the nirium-sdk repo
 ├── packages/desktop/          → [private] Tauri desktop wrapper
 ```
 
@@ -412,7 +414,7 @@ Nirium received Kickstart funding via a regional Stellar Ambassador chapter, wit
 | Treasury node on mainnet over a client-owned DeFindex vault | ✅ Live, invite-only during legal review |
 | Legal opinion on the treasury node (MX + cross-border) | 🔄 In progress: gates opening it beyond invite-only |
 | Etherfuse, enterprise KYB onboarding | 🔄 In progress |
-| Stellar Community Fund Build Award | 🔄 Building verifiable third-party traction before applying |
+| Stellar Community Fund Build Award | 🔄 In progress |
 | Formal independent audit of NiriumVault | Planned, ahead of any NiriumVault mainnet deployment |
 | NiriumVault mainnet deployment (real treasury funds) | Post formal audit |
 
@@ -486,4 +488,4 @@ This project operates under the [Stellar Community Fund](https://stellar.gitbook
 
 ---
 
-*Nirium Protocol: experimental software. Not financial advice. NiriumVault is testnet-only and audit-gated; the mainnet treasury node runs over a client-owned, third-party audited DeFindex vault in a role that cannot withdraw. Updated August 6, 2026.*
+*Nirium Protocol: experimental software. Not financial advice. NiriumVault is testnet-only and audit-gated; the mainnet treasury node runs over a client-owned, third-party audited DeFindex vault in a role that cannot withdraw. Updated August 15, 2026.*
