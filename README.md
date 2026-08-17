@@ -131,6 +131,12 @@ Traction is **self-generated and independently verifiable**. It does not depend 
 - **Live autonomous agent** running 24/7 on Stellar Testnet, every rebalance verifiable on Stellar Expert.
 - **Real mainnet activity**: x402 micropayments settling in production, and a full treasury cycle executed with real funds (hashes above).
 - **Open API + free sandbox keys**, so any developer can integrate and exercise the contracts directly.
+- **Real upstream engagement**: 5 reported issues/PRs across three repos
+  (x402-foundation/x402, stellar/stellar-dev-skill, OpenZeppelin/stellar-contracts) —
+  2 merged by maintainers (x402-foundation/x402#3171, fixed and merged as #3180;
+  stellar/stellar-dev-skill#96), 3 open awaiting response
+  (x402-foundation/x402#3148, stellar/stellar-dev-skill#97,
+  OpenZeppelin/stellar-contracts#840).
 
 We provide the middleware; regulated operators (e.g. Etherfuse) hold the licenses and execute settlement. We are open to integration conversations with regional fintechs, but make **no claim of signed pilots**.
 
