@@ -414,7 +414,7 @@ console.log(await res.json()); // paid for by your agent, settled on-chain`;
                             {
                                 num: '01',
                                 icon: Workflow,
-                                title: lang('Install the SDK', 'Instala el SDK'),
+                                title: lang('Install the package', 'Instala el paquete'),
                                 body: lang(
                                     'Add Nirium to your agent with a single package import. Work in TypeScript or Python, no blockchain knowledge required.',
                                     'Agrega Nirium a tu agente importando un solo paquete. Trabaja en TypeScript o Python sin necesidad de saber de blockchain.'),
@@ -1063,7 +1063,7 @@ console.log(await res.json()); // paid for by your agent, settled on-chain`;
             <section className="py-20 border-t border-white/5">
                 <div className="max-w-5xl mx-auto px-6">
                     <h2 className="text-2xl sm:text-3xl font-bold text-center">
-                        {lang('B2B SDK Pricing', 'Precios del SDK B2B')}
+                        {lang('B2B Pricing', 'Precios B2B')}
                     </h2>
                     <p className="mt-4 text-center text-white/60">
                         {lang('Start on mainnet for free — pay per request, no card. Financial fees are charged by regulated partners.', 'Empieza en mainnet gratis — pagas por request, sin tarjeta. Los fees financieros los cobran partners regulados.')}
@@ -1095,7 +1095,7 @@ console.log(await res.json()); // paid for by your agent, settled on-chain`;
 {lang('Batch payouts — monthly software licence by permitted volume, never a per-payment charge (mainnet early access, invite-only)', 'Payouts en lote — licencia mensual de software por volumen permitido, nunca un cargo por pago (mainnet early access, solo por invitación)')}</li>
                                 <li className="flex gap-2"><Check className="w-4 h-4 text-emerald-400 shrink-0 mt-0.5" />{lang('Treasury vault on DeFindex — deploy, fund and withdraw with your own signature; you pay only the network fee', 'Bóveda de tesorería en DeFindex — desplegar, fondear y retirar con tu propia firma; solo pagas el fee de red')}</li>
                                 <li className="flex gap-2"><Check className="w-4 h-4 text-stellar-teal shrink-0 mt-0.5" />{lang('NiriumVault on testnet (2-of-3 Soroban)', 'NiriumVault en testnet (2-de-3 Soroban)')}</li>
-                                <li className="flex gap-2"><Check className="w-4 h-4 text-stellar-teal shrink-0 mt-0.5" />{lang('SDK — nirium 0.10.1 on npm, 0.9.0 on PyPI · MCP v0.5.0 server', 'SDK — nirium 0.10.1 en npm, 0.9.0 en PyPI · Servidor MCP v0.5.0')}</li>
+                                <li className="flex gap-2"><Check className="w-4 h-4 text-stellar-teal shrink-0 mt-0.5" />{lang('SDK — nirium 0.11.0 on npm, 0.9.0 on PyPI · MCP v0.6.0 server', 'SDK — nirium 0.11.0 en npm, 0.9.0 en PyPI · Servidor MCP v0.6.0')}</li>
                             </ul>
                             <Link href="/dashboard">
                                 <Button variant="outline" className="w-full border-white/20 hover:bg-white/5">
@@ -1167,7 +1167,6 @@ console.log(await res.json()); // paid for by your agent, settled on-chain`;
                         {[
                             lang('Stellar Mainnet — settlement · audit · payouts · reporting LIVE', 'Stellar Mainnet — liquidación · auditoría · payouts · reportería EN VIVO'),
                             lang('SCF Kickstart grantee', 'Beneficiario SCF Kickstart'),
-                            lang('Internal Security Audit — 83/83 vectors PASS', 'Auditoría interna de seguridad — 83/83 vectores PASS'),
                             lang('External audit — pending (gates NiriumVault, not the DeFindex treasury)', 'Auditoría externa — pendiente (gatea NiriumVault, no la tesorería en DeFindex)'),
                             lang('Etherfuse Integration ✓', 'Integración Etherfuse ✓'),
                             lang('Stellar Testnet — NiriumVault (2-of-3 multisig)', 'Stellar Testnet — NiriumVault (multisig 2-de-3)'),
