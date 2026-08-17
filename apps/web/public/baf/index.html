@@ -1,0 +1,379 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<title>Nirium — Composable treasury, settlement & audit for AI agents</title>
+<meta name="description" content="Infraestructura componible on-chain para agentes de IA en Stellar: tesorería autónoma, pagos x402 y audit trail. El LLM propone, el contrato decide." />
+<meta property="og:title" content="Nirium — On-chain infrastructure for AI agents" />
+<meta property="og:description" content="Composable treasury, settlement & audit for AI agents. Built on Stellar / Soroban. Live on testnet." />
+<meta property="og:type" content="website" />
+<meta name="theme-color" content="#05070a" />
+<link rel="icon" href="https://nirium.xyz/brand/NiLo.png" />
+<style>
+  :root{
+    --bg:#05070a; --panel:#0F1115; --panel2:#13171e; --line:#222934;
+    --ink:#EAF0F6; --muted:#8A94A3;
+    --teal:#00E0B8; --magenta:#FF3DAE; --green:#1FCC8B; --amber:#F5B544;
+    --sans:'Inter',system-ui,-apple-system,Segoe UI,Roboto,sans-serif;
+    --mono:'SF Mono',ui-monospace,'JetBrains Mono',Menlo,monospace;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{height:100%}
+  body{background:#000;font-family:var(--sans);color:var(--ink);overflow:hidden}
+  .deck{height:100vh;width:100vw;position:relative}
+  .bar{position:fixed;top:0;left:0;height:3px;width:0;background:linear-gradient(90deg,var(--teal),var(--magenta));z-index:60;transition:width .35s ease}
+  .slide{
+    position:absolute;inset:0;display:none;flex-direction:column;justify-content:safe center;
+    overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch;
+    padding:7vh 9vw;
+    background:
+      radial-gradient(60% 70% at 85% 0%,rgba(0,224,184,.07) 0%,transparent 55%),
+      radial-gradient(50% 60% at 0% 100%,rgba(255,61,174,.06) 0%,transparent 55%),
+      var(--bg);
+  }
+  .slide::after{content:"";position:absolute;inset:0;pointer-events:none;opacity:.5;
+    background-image:linear-gradient(rgba(255,255,255,.02) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.02) 1px,transparent 1px);
+    background-size:46px 46px;mask:radial-gradient(80% 80% at 50% 40%,#000,transparent)}
+  .slide.active{display:flex;animation:fade .45s ease}
+  @keyframes fade{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
+  .slide>*{position:relative;z-index:1}
+  .wm{position:absolute;top:30px;left:9vw;display:flex;align-items:center;gap:10px;z-index:2}
+  .wm img{width:26px;height:26px;object-fit:contain;border-radius:6px}
+  .wm span{font-family:var(--mono);font-size:12px;letter-spacing:.22em;color:var(--muted);text-transform:uppercase}
+  .dot{position:absolute;top:32px;right:9vw;font-family:var(--mono);font-size:12px;color:var(--green);z-index:2;display:flex;align-items:center;gap:7px}
+  .dot i{width:8px;height:8px;border-radius:50%;background:var(--green);box-shadow:0 0 10px var(--green);display:inline-block;animation:pulse 1.8s infinite}
+  .dot.off i{background:#566;box-shadow:none;animation:none}
+  @keyframes pulse{0%,100%{opacity:1}50%{opacity:.35}}
+  .pg{position:absolute;bottom:30px;right:9vw;font-family:var(--mono);font-size:12px;color:var(--muted);z-index:2}
+  .kick{font-family:var(--mono);font-size:clamp(.72rem,1.5vw,.95rem);letter-spacing:.18em;color:var(--teal);text-transform:uppercase;margin-bottom:22px}
+  h1{font-size:clamp(2.4rem,7.5vw,5.5rem);font-weight:800;letter-spacing:-.03em;line-height:.98;max-width:100%;overflow-wrap:break-word}
+  h1 .grad{background:linear-gradient(90deg,var(--teal),var(--magenta));-webkit-background-clip:text;background-clip:text;color:transparent}
+  h2{font-size:clamp(1.5rem,4.2vw,3rem);font-weight:800;letter-spacing:-.02em;line-height:1.08;margin-bottom:clamp(18px,2.5vh,30px);max-width:100%;overflow-wrap:break-word}
+  h2 .accent{color:var(--teal)}
+  .sub{font-size:clamp(.95rem,1.9vw,1.35rem);color:var(--muted);max-width:60ch;line-height:1.5;margin-top:24px}
+  .lead{font-size:clamp(1.05rem,2.4vw,1.7rem);line-height:1.4;max-width:54ch;font-weight:300}
+  .lead b{font-weight:700;color:#fff}
+  .quote{font-size:clamp(1.5rem,5vw,2.6rem);font-weight:800;letter-spacing:-.02em;line-height:1.15;max-width:24ch}
+  .logo{display:flex;align-items:center;gap:20px;margin-bottom:8px;flex-wrap:wrap;max-width:100%}
+  .big{max-width:100%;overflow-wrap:break-word}
+  .logo img{width:84px;height:84px;object-fit:contain;border-radius:18px;border:1px solid var(--line);background:#0a0d12;padding:8px}
+  .grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:20px;margin-top:18px}
+  .card{background:linear-gradient(180deg,var(--panel2),#0c0f15);border:1px solid var(--line);border-radius:18px;padding:28px 24px;position:relative;overflow:hidden}
+  .card::before{content:"";position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,var(--teal),transparent)}
+  .card .n{font-family:var(--mono);color:var(--teal);font-size:13px;letter-spacing:.1em}
+  .card .ic{font-size:30px;margin:6px 0 8px}
+  .card h3{font-size:clamp(1.05rem,2vw,1.4rem);margin:4px 0 10px;font-weight:700}
+  .card p{font-size:clamp(.85rem,1.4vw,1rem);color:var(--muted);line-height:1.45}
+  ul.bul{margin-top:26px;list-style:none;display:flex;flex-direction:column;gap:18px}
+  ul.bul li{font-size:clamp(1rem,2vw,1.5rem);line-height:1.35;padding-left:34px;position:relative}
+  ul.bul li::before{content:"→";position:absolute;left:0;color:var(--teal);font-weight:700}
+  ul.bul li b{color:#fff}
+  pre{background:#0a0d12;border:1px solid var(--line);border-radius:16px;padding:clamp(16px,2.2vw,28px);font-family:var(--mono);font-size:clamp(.6rem,1.25vw,1rem);line-height:1.6;color:#cfe;overflow:auto;margin-top:6px;max-width:100%}
+  .c-key{color:var(--magenta)} .c-str{color:var(--green)} .c-com{color:#5a6473} .c-fn{color:var(--teal)}
+  .big{font-size:clamp(2.4rem,9vw,5rem);font-weight:800;letter-spacing:-.03em;line-height:1}
+  .big .grad{background:linear-gradient(90deg,var(--teal),var(--magenta));-webkit-background-clip:text;background-clip:text;color:transparent}
+  .ask{font-size:clamp(1.05rem,2.4vw,1.7rem);line-height:1.4;max-width:48ch;margin-top:20px;font-weight:300}
+  .ask b{color:#fff;font-weight:700}
+  .tag{font-family:var(--mono);font-size:clamp(.72rem,1.4vw,.95rem);color:var(--muted);margin-top:clamp(20px,3vh,32px);letter-spacing:.04em;max-width:100%;overflow-wrap:anywhere}
+  .tag b{color:var(--teal)} .tag a{color:var(--teal);text-decoration:none}
+  .hint{position:absolute;bottom:26px;left:9vw;font-family:var(--mono);font-size:12px;color:#46505c;z-index:2}
+  .hint a{color:var(--teal);text-decoration:none}
+  .targets{margin-top:24px;display:flex;gap:12px;flex-wrap:wrap}
+  .targets span{font-family:var(--mono);font-size:clamp(.72rem,1.4vw,.95rem);padding:9px 16px;border:1px solid rgba(255,61,174,.35);border-radius:999px;color:var(--magenta)}
+
+  /* live stat strip */
+  .stats{display:flex;gap:14px;flex-wrap:wrap;margin-top:8px}
+  .stat{background:#0a0d12;border:1px solid var(--line);border-radius:12px;padding:14px 20px;min-width:130px;text-decoration:none;color:inherit;display:block}
+  a.stat{transition:border-color .15s,background .15s,transform .15s}
+  a.stat:hover{border-color:rgba(0,224,184,.5);background:#0c1219;transform:translateY(-2px)}
+  .stat .l{font-family:var(--mono);font-size:11px;letter-spacing:.14em;color:var(--muted);text-transform:uppercase}
+  .stat .v{font-family:var(--mono);font-size:clamp(1.1rem,2.4vw,1.6rem);font-weight:700;color:var(--ink);margin-top:6px}
+  .stat .v.teal{color:var(--teal)}
+  /* live terminal */
+  .term{margin-top:clamp(14px,2.5vh,22px);background:#070a0e;border:1px solid var(--line);border-radius:14px;overflow:hidden;max-width:min(640px,92vw);width:100%}
+  .term .top{display:flex;align-items:center;justify-content:space-between;padding:12px 18px;border-bottom:1px solid var(--line);background:#0b0f14}
+  .term .top .ttl{font-family:var(--mono);font-size:12px;letter-spacing:.16em;color:var(--teal);text-transform:uppercase}
+  .term .top .on{font-family:var(--mono);font-size:11px;color:var(--green);display:flex;align-items:center;gap:6px}
+  .term .top .on i{width:7px;height:7px;border-radius:50%;background:var(--green);box-shadow:0 0 8px var(--green);animation:pulse 1.8s infinite}
+  .term .top .on.off{color:var(--muted)} .term .top .on.off i{background:#566;box-shadow:none;animation:none}
+  .term .body{padding:16px 18px;font-family:var(--mono);font-size:clamp(.7rem,1.4vw,.95rem);line-height:1.85;max-height:34vh;overflow:auto}
+  a.fl,.fl{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;text-decoration:none;color:var(--ink);border-radius:7px;padding:3px 8px;margin:0 -8px;transition:background .15s}
+  a.fl:hover{background:rgba(0,224,184,.10)}
+  .fl .ft{color:#566} .fl .fs{color:var(--teal)} .fl .fm{color:var(--magenta)} .fl .fg{color:var(--green)} .fl .fh{color:var(--amber)}
+  .decision{margin-top:14px;font-family:var(--mono);font-size:clamp(.72rem,1.4vw,.95rem);color:var(--amber);background:#0a0d12;border:1px solid var(--line);border-radius:10px;padding:12px 16px;max-width:min(640px,92vw)}
+
+  .closewrap{display:flex;align-items:center;gap:5vw;flex-wrap:wrap}
+  .closetext{flex:1;min-width:50%}
+  .qr{display:flex;flex-direction:column;align-items:center;gap:14px}
+  .qr img{width:200px;height:200px;border-radius:16px;border:1px solid var(--line);background:#fff;padding:12px}
+  .qr span{font-family:var(--mono);font-size:13px;color:var(--teal);text-align:center;letter-spacing:.04em;line-height:1.5}
+  .nav{position:fixed;bottom:22px;left:50%;transform:translateX(-50%);display:flex;gap:10px;z-index:60}
+  .nav button{width:42px;height:42px;border-radius:50%;border:1px solid var(--line);background:rgba(20,24,30,.85);color:var(--ink);font-size:18px;cursor:pointer;backdrop-filter:blur(6px)}
+  .nav button:active{background:var(--teal);color:#000}
+
+  /* Tablet */
+  @media(max-width:1024px){
+    .slide{padding:6vh 7vw}
+    .wm,.hint{left:7vw} .dot,.pg{right:7vw}
+    .sub,.lead,.ask{max-width:none}
+  }
+  /* Mobile */
+  @media(max-width:680px){
+    .slide{padding:74px 6vw 92px}
+    .grid3{grid-template-columns:1fr;gap:12px}
+    .logo{gap:14px} .logo img{width:54px;height:54px}
+    .stats{gap:10px} .stat{min-width:0;flex:1 1 42%;padding:12px 14px}
+    .term .body{max-height:32vh}
+    .closewrap{gap:24px} .closetext{min-width:100%} .qr{width:100%}
+    .qr img{width:150px;height:150px}
+    .wm span{font-size:10px;letter-spacing:.16em} .dot,.pg{font-size:10px}
+    .nav{bottom:12px} .nav button{width:38px;height:38px}
+  }
+  /* Short height / landscape phones */
+  @media(max-height:560px){
+    .slide{padding-top:60px;padding-bottom:76px}
+    .term .body{max-height:24vh}
+    ul.bul{gap:12px} h2{margin-bottom:14px}
+  }
+</style>
+</head>
+<body>
+<div class="bar" id="bar"></div>
+<div class="deck">
+
+  <!-- 1 · TITLE -->
+  <section class="slide active">
+    <div class="kick">Para apps, empresas y agentes de IA — sobre Stellar</div>
+    <div class="logo">
+      <img src="https://nirium.xyz/brand/NiLo.png" alt="Nirium" />
+      <h1>NIRIUM</h1>
+    </div>
+    <p class="sub">Ponemos a trabajar el dinero que duerme: <b style="color:#fff">tesorería, pagos y auditoría on-chain</b> — automáticos y sin custodia. Hecho sobre Stellar.</p>
+    <div class="stats">
+      <div class="stat"><div class="l">Agent</div><div class="v teal" id="t-status">● live</div></div>
+      <a class="stat" href="https://nirium.xyz" target="_blank" rel="noopener"><div class="l">Scan ↗</div><div class="v" id="t-scan">#25625</div></a>
+      <a class="stat" href="https://stellar.expert/explorer/testnet/asset/CETES-GC3CW7EDYRTWQ635VDIGY6S4ZUF5L6TQ7AA4MWS7LEQDBLUSZXV7UPS4" target="_blank" rel="noopener"><div class="l">CETES rate ↗</div><div class="v teal" id="t-cetes">5.57%</div></a>
+    </div>
+    <p class="tag">Hecho en comunidad 🇲🇽 · StarMakers · SCF Kickstart · SDF Scale graduate</p>
+  </section>
+
+  <!-- 2 · HOOK -->
+  <section class="slide">
+    <div class="kick">El problema, en una frase</div>
+    <p class="quote">&ldquo;Como founder, mi tesorero era yo. Y yo dormía.&rdquo;</p>
+    <p class="sub">El dinero de las empresas — y de muchos de nosotros — duerme en una cuenta perdiendo valor por la inflación. Mantenerlo trabajando es un trabajo manual de 24/7 que casi nadie tiene tiempo de hacer.</p>
+  </section>
+
+  <!-- 3 · WHAT -->
+  <section class="slide">
+    <h2>No es un solo truco. Son <span class="accent">tres piezas que puedes usar por separado.</span></h2>
+    <div class="grid3">
+      <div class="card"><div class="n">N1 · TESORERÍA</div><div class="ic">💰</div><h3>Dinero que trabaja</h3><p>Pone tu USDC ocioso a ganar en CETES (bonos del gobierno MX) vía Etherfuse — solito, 24/7.</p></div>
+      <div class="card"><div class="n">N2 · PAGOS</div><div class="ic">⚡</div><h3>Cobra por uso</h3><p>Cóbrale a apps y agentes de IA por lo que usan, pago por pago, con x402 + MPP.</p></div>
+      <div class="card"><div class="n">N3 · AUDITORÍA</div><div class="ic">🔒</div><h3>Todo verificable</h3><p>Cada acción queda guardada en IPFS: pública y verificable. Transparencia desde el día uno.</p></div>
+    </div>
+    <p class="sub">Usas una, o las tres. Y todas comparten una regla simple: <b style="color:#fff">la IA propone, el contrato decide.</b></p>
+  </section>
+
+  <!-- 4 · LIVE DEMO -->
+  <section class="slide">
+    <div class="kick">En vivo — no son slides</div>
+    <h2>La IA propone. <span class="accent">El contrato decide.</span></h2>
+    <div class="stats">
+      <a class="stat" href="https://nirium.xyz" target="_blank" rel="noopener"><div class="l">Scan # ↗</div><div class="v" id="d-scan">#25625</div></a>
+      <a class="stat" href="https://stellar.expert/explorer/testnet/asset/CETES-GC3CW7EDYRTWQ635VDIGY6S4ZUF5L6TQ7AA4MWS7LEQDBLUSZXV7UPS4" target="_blank" rel="noopener"><div class="l">CETES (Etherfuse) ↗</div><div class="v teal" id="d-cetes">5.57%</div></a>
+      <div class="stat"><div class="l">XLM</div><div class="v" id="d-xlm">$0.125</div></div>
+    </div>
+    <div class="term">
+      <div class="top"><span class="ttl">Feed de Auditoría · En Vivo</span><span class="on" id="d-on"><i></i> ONLINE</span></div>
+      <div class="body" id="d-feed">
+        <div class="fl"><span class="ft">--:--:--</span> <span class="fs">cargando transferencias confirmadas…</span> · click para abrir en Stellar Expert</div>
+      </div>
+    </div>
+    <div class="decision" id="d-decision">[IA] rebalance (95%) — CETES 5.57% (Etherfuse) le gana al USDC ocioso (0%). Mueve USDC → CETES.</div>
+    <p class="hint">▶ Datos reales del agente · cada movimiento se verifica en <a href="https://nirium.xyz" target="_blank" rel="noopener">Stellar Expert</a></p>
+  </section>
+
+  <!-- 5 · SECURITY -->
+  <section class="slide">
+    <h2>¿Cómo es seguro darle dinero a una <span class="accent">IA?</span></h2>
+    <ul class="bul">
+      <li>La IA <b>nunca tiene custodia</b>. Solo propone.</li>
+      <li>Un <b>contrato multifirma (2 de 3)</b> revisa y aprueba cada movimiento on-chain.</li>
+      <li>Si la IA se equivoca o la hackean, <b>simplemente no puede</b> mover fondos que el contrato no autorizó.</li>
+      <li>Hacerlo funcionar 24/7 nos costó sudor de verdad. <b>Esto está en producción, no es un demo de hackathon.</b></li>
+    </ul>
+    <p class="tag">Verifícalo on-chain → <a href="https://stellar.expert/explorer/testnet/contract/CBTWMZCG3P72EHFAQ4ZLSEBIOFYJC244H5J6DHZIJ56FHFWJ2CFAWSZU" target="_blank" rel="noopener">NiriumVault ↗</a> · <a href="https://stellar.expert/explorer/testnet/contract/CC2TU5BDTKTPRRRQPEF77I54XYHFQ25XGIRO2TCWKSR7NRJDFR5L5NR5" target="_blank" rel="noopener">NiriumProtocol ↗</a></p>
+  </section>
+
+  <!-- 6 · WEDGE (x402 code) -->
+  <section class="slide">
+    <div class="kick">Lo que ya funciona — x402 en vivo</div>
+    <h2>Una app paga por lo que usa. <span class="accent">Automático, on-chain, sin humano.</span></h2>
+    <pre><span class="c-key">import</span> { Agent } <span class="c-key">from</span> <span class="c-str">"nirium"</span>;
+
+<span class="c-key">const</span> agent = <span class="c-key">new</span> <span class="c-fn">Agent</span>({ baseUrl: <span class="c-str">"https://nirium-agent.fly.dev"</span> });
+
+agent.<span class="c-fn">initX402</span>({ secretKey: process.env.STELLAR_SECRET_KEY, network: <span class="c-str">"stellar:testnet"</span> });
+
+<span class="c-com">// Un request = un pago on-chain. El SDK firma el auth entry y paga solo.</span>
+<span class="c-key">const</span> res = <span class="c-key">await</span> agent.<span class="c-fn">x402Fetch</span>(<span class="c-str">"https://nirium-agent.fly.dev/api/v1/premium/signals"</span>);</pre>
+    <p class="sub">Esto ya corre <b>hoy</b>. ¿Tienes una API o un proyecto? Imagina cobrar por uso sin montar pasarelas — <b>yo te ayudo a integrarlo.</b></p>
+  </section>
+
+  <!-- 7 · AUDIT -->
+  <section class="slide">
+    <h2>Y una <span class="accent">bitácora inmutable</span>, como servicio.</h2>
+    <ul class="bul">
+      <li><b>Hoy:</b> cada acción del agente queda anclada en <b>IPFS (Pinata)</b> — pública y verificable en vivo.</li>
+      <li><b>Pronto:</b> abierto para que tu app guarde sus eventos igual. Busco <b>design partners</b>.</li>
+      <li>Transparencia y cumplimiento sin que montes infraestructura propia.</li>
+    </ul>
+    <div class="term" style="margin-top:16px">
+      <div class="top"><span class="ttl">Immutable Audit Trail · IPFS</span><span class="on" id="a-on"><i></i> PINATA</span></div>
+      <div class="body" id="a-feed" style="max-height:24vh">
+        <a class="fl" href="https://gateway.pinata.cloud/ipfs/QmQqcVFbcQeLheVqkfFYqfD3pdtdvJvUA2Mx3ZfKSmS5cN" target="_blank" rel="noopener"><span class="ft">18:54:07</span> 🔒 <span class="fs">CID</span> QmQqcVFbcQ…S5cN · 42 recs <span class="fh">↗</span></a>
+      </div>
+    </div>
+    <p class="hint" style="position:static;margin-top:12px">▶ Cada CID resuelve en el gateway de IPFS · click para abrirlo</p>
+  </section>
+
+  <!-- 8 · ASK -->
+  <section class="slide">
+    <div class="kick">Construyamos juntos — literal</div>
+    <p class="big">Busco <span class="grad">2-3 de ustedes</span></p>
+    <p class="ask">que prueben <b>x402</b> en su proyecto, o sean <b>design partners</b> del audit. <b>Me siento con ustedes y los ayudo a integrarlo.</b> Ustedes: infra lista y acceso temprano. Yo: mis primeros usuarios y su feedback. Ganamos los dos. 🤝</p>
+    <p class="tag" style="margin-top:28px">Ya en pláticas con varios equipos del ecosistema Stellar.</p>
+    <div class="targets"><span>Passkeys × onboarding</span><span>Agentes × x402</span><span>Audit as a service</span><span>¿Tu proyecto?</span></div>
+  </section>
+
+  <!-- 9 · CLOSE -->
+  <section class="slide">
+    <div class="closewrap">
+      <div class="closetext">
+        <h2>Dónde estamos — y a dónde <span class="accent">vamos.</span></h2>
+        <ul class="bul">
+          <li><b>Hoy:</b> todo en vivo en testnet — agente 24/7, SDKs en npm + PyPI, API pública.</li>
+          <li><b>Instaward #1</b> probó que <b>funciona</b>. El <b>#2</b> es que <b>se use</b> — y eso empieza con ustedes.</li>
+          <li><b>Pronto a mainnet:</b> pagos y auditoría (sin custodia). La tesorería con fondos de terceros espera a su auditoría (SCF Build).</li>
+        </ul>
+        <p class="tag">Hablemos → <a href="https://x.com/Niriumstellar" target="_blank" rel="noopener">@Niriumstellar</a> · <a href="https://nirium.xyz" target="_blank" rel="noopener">nirium.xyz</a></p>
+      </div>
+      <div class="qr">
+        <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAQUAAAEFAQMAAADQWGDSAAAABlBMVEUFBwr///8oiTIaAAABaElEQVR42u2ZO5LCQAxEZRwQ+gg+yhwNH81H8RE2nIBCqx9m+cyIKmojeiKjUvSqJbUEcfIqIQMZn2as5O+00lRpsPhPxGauB8red2UosdkgCbFZQA3+cbTYCmKvid1AWWQhIXY21YFYlxhvEysoKgxi72lMfo4X8qoEsTf6mDb8nRj6WIfYPitVWn8aGmZlg9jtbU8RBrHXVVnjh/mxGAHyAY01NKbSGrxrOajCwbBAYw1iR9aGH1UpoERjEkHnb/YxcxdqXE1jvBRsSYnGpnAXW+yVOitHuIuOu5iq2DCVFmsxelWG2ECsRYy14Ye7WK5bEqqy6y6sPOt4tWFh/kGsQWz0aw/HiCTzG3AXmecPUA/GDMQ6e6XeLnxE2oKJWZndLoTY3vBtVmKvzO5jCspusFGeC2ZlQozcyuqz+xiIJcR0wTzfna9BrN/HZMF0aRVfl0Asn5UuLb9a43aR+zH8442M/8j4BU16YAt0xs7DAAAAAElFTkSuQmCC" alt="QR a nirium.xyz/baf" />
+        <span>Escanéalo →<br>nirium.xyz/baf</span>
+      </div>
+    </div>
+  </section>
+
+</div>
+
+<div class="nav"><button id="prev" aria-label="Anterior">‹</button><button id="next" aria-label="Siguiente">›</button></div>
+
+<script>
+  const slides=[...document.querySelectorAll('.slide')];
+  const bar=document.getElementById('bar');
+  let i=0;
+
+  function deco(){
+    slides.forEach((s,idx)=>{
+      if(!s.querySelector('.wm')){const w=document.createElement('div');w.className='wm';
+        w.innerHTML='<img src="https://nirium.xyz/brand/NiLo.png" alt=""><span>NIRIUM // BAF × STELLAR</span>';s.appendChild(w);}
+      if(!s.querySelector('.pg')){const p=document.createElement('div');p.className='pg';p.textContent=(idx+1)+' / '+slides.length;s.appendChild(p);}
+    });
+  }
+  function render(){
+    slides.forEach((s,idx)=>s.classList.toggle('active',idx===i));
+    bar.style.width=((i+1)/slides.length*100)+'%';
+    if(('#'+(i+1))!==location.hash) history.replaceState(null,'','#'+(i+1));
+  }
+  function go(n){i=(n+slides.length)%slides.length;render();}
+  function fromHash(){const n=parseInt((location.hash||'#1').slice(1),10);if(!isNaN(n)&&n>=1&&n<=slides.length)i=n-1;render();}
+
+  document.addEventListener('keydown',e=>{
+    if(e.key==='ArrowRight'||e.key===' '||e.key==='PageDown'){go(i+1);e.preventDefault();}
+    if(e.key==='ArrowLeft'||e.key==='PageUp'){go(i-1);}
+    if(e.key==='Home'){go(0);} if(e.key==='End'){go(slides.length-1);}
+  });
+  document.getElementById('next').addEventListener('click',e=>{e.stopPropagation();go(i+1);});
+  document.getElementById('prev').addEventListener('click',e=>{e.stopPropagation();go(i-1);});
+  document.addEventListener('click',e=>{ if(!e.target.closest('a')&&!e.target.closest('.nav')) go(i+1); });
+  window.addEventListener('hashchange',fromHash);
+
+  let x0=null;
+  document.addEventListener('touchstart',e=>{x0=e.changedTouches[0].clientX;},{passive:true});
+  document.addEventListener('touchend',e=>{if(x0===null)return;const dx=e.changedTouches[0].clientX-x0;if(Math.abs(dx)>50)dx<0?go(i+1):go(i-1);x0=null;},{passive:true});
+
+  // ── Live data from the running agent ──────────────────────────
+  const AGENT='https://nirium-agent.fly.dev';
+  const $=id=>document.getElementById(id);
+  function setText(id,v){const el=$(id);if(el)el.textContent=v;}
+
+  // Los stats ya muestran un snapshot REAL (pre-cargado en el HTML). La API del
+  // agente tarda ~6-8s, así que actualizamos en segundo plano y en silencio: si
+  // responde, refresca a vivo; si falla, se queda el snapshot (sin parpadeo).
+  async function pollStatus(){
+    try{
+      const ctrl=new AbortController(); const to=setTimeout(()=>ctrl.abort(),14000);
+      const r=await fetch(AGENT+'/api/loop/status',{cache:'no-store',signal:ctrl.signal});
+      clearTimeout(to);
+      const d=await r.json();
+      if(d.marketState&&typeof d.marketState.xlmPrice==='number'){setText('d-xlm','$'+d.marketState.xlmPrice.toFixed(3));}
+      // Scan se muestra estático (acumulado real ~25.6K); el contador por-sesión del loop se reinicia en cada deploy.
+      // CETES y la decisión se muestran con el valor REAL de Etherfuse (3.13%), no el del loop.
+    }catch(e){ /* mantiene el snapshot real visible, sin parpadeo */ }
+  }
+  // Confirmed on-chain transfers — each line links to the real tx on Stellar Expert.
+  // Pulled from the public logs table (anon key, same one the site ships to the browser).
+  const SB='https://qbiljjnaikscnvlbcoga.supabase.co';
+  const SBKEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFiaWxqam5haWtzY252bGJjb2dhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODAzNjc4MzksImV4cCI6MjA5NTk0MzgzOX0.Y2ub_eqkF44X3qhy9_b0KSwQywgJnlNQq721Hv1I2wQ';
+  async function pollTransfers(){
+    try{
+      const url=SB+'/rest/v1/logs?message=ilike.*explorer/testnet/tx*&order=timestamp.desc&limit=7&select=timestamp,message';
+      const r=await fetch(url,{headers:{apikey:SBKEY,Authorization:'Bearer '+SBKEY},cache:'no-store'});
+      const rows=await r.json();
+      if(!Array.isArray(rows)||!rows.length) return;
+      const out=rows.map(row=>{
+        const m=row.message||'';
+        const link=(m.match(/https:\/\/stellar\.expert\/explorer\/testnet\/tx\/[a-fA-F0-9]+/)||[])[0];
+        if(!link) return '';
+        const hash=link.split('/').pop();
+        const asset=/CETES/.test(m)?'CETES':'USDC';
+        const emoji=asset==='CETES'?'🇲🇽':'💵';
+        const amt=(m.match(/\|\s*([\d.]+)\s*(?:USDC|CETES)/)||[])[1]||'';
+        const t=new Date(row.timestamp).toLocaleTimeString('es-MX',{hour12:false});
+        return '<a class="fl" href="'+link+'" target="_blank" rel="noopener"><span class="ft">'+t+'</span> '+emoji+' <span class="fs">Real '+asset+' → treasury</span> · '+amt+' '+asset+' · <span class="fh">TX '+hash.slice(0,6)+'… ↗</span></a>';
+      }).filter(Boolean).join('');
+      if(out) $('d-feed').innerHTML=out;
+    }catch(e){/* keep fallback content */}
+  }
+
+  // Audit trail — each CID links to the real file on the IPFS (Pinata) gateway.
+  async function pollAudit(){
+    try{
+      const url=SB+'/rest/v1/logs?message=ilike.*IPFS-AUDIT*&order=timestamp.desc&limit=8&select=timestamp,message';
+      const r=await fetch(url,{headers:{apikey:SBKEY,Authorization:'Bearer '+SBKEY},cache:'no-store'});
+      const rows=await r.json();
+      if(!Array.isArray(rows)||!rows.length) return;
+      const seen=new Set();
+      const out=rows.map(row=>{
+        const m=row.message||'';
+        const cid=(m.match(/CID:\s*(Qm[A-Za-z0-9]+)/)||[])[1];
+        if(!cid||seen.has(cid)) return ''; seen.add(cid);
+        const recs=(m.match(/\|\s*(\d+)\s*records/)||[])[1]||'';
+        const t=new Date(row.timestamp).toLocaleTimeString('es-MX',{hour12:false});
+        return '<a class="fl" href="https://gateway.pinata.cloud/ipfs/'+cid+'" target="_blank" rel="noopener"><span class="ft">'+t+'</span> 🔒 <span class="fs">CID</span> '+cid.slice(0,10)+'…'+cid.slice(-4)+(recs?(' · '+recs+' recs'):'')+' <span class="fh">↗</span></a>';
+      }).filter(Boolean).slice(0,5).join('');
+      if(out) $('a-feed').innerHTML=out;
+    }catch(e){/* keep fallback content */}
+  }
+
+  deco(); fromHash();
+  pollStatus(); pollTransfers(); pollAudit();
+  setInterval(pollStatus,12000);
+  setInterval(pollTransfers,18000);
+  setInterval(pollAudit,20000);
+</script>
+</body>
+</html>

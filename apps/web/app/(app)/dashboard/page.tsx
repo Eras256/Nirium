@@ -235,8 +235,8 @@ function DashboardContent() {
     const [autoExit, setAutoExit] = useState<boolean>(false);
     const [autoExitLoading, setAutoExitLoading] = useState<boolean>(false);
     const [delegationTxHash, setDelegationTxHash] = useState<string | null>(null);
-    const [rebalanceThreshold, setRebalanceThreshold] = useState<number>(4.0);
-    const [reverseThreshold, setReverseThreshold] = useState<number>(3.5);
+    const [rebalanceThreshold, setRebalanceThreshold] = useState<number>(2.5);
+    const [reverseThreshold, setReverseThreshold] = useState<number>(2.0);
     const [ownerCapId, setOwnerCapId] = useState<string | null>(null);
     const [amountInput, setAmountInput] = useState<string>("0.1");
     const [installedSkills, setInstalledSkills] = useState<any[]>([]);
@@ -2629,7 +2629,7 @@ function DashboardContent() {
                                         onClick={confirmConfig.onConfirm}
                                         className={`flex-1 px-4 py-2.5 rounded-lg font-bold text-[10px] transition-all shadow-xl flex items-center justify-center gap-1.5 group ${confirmConfig.type === 'danger'
                                             ? 'bg-red-600 hover:bg-red-500 text-white shadow-red-900/20'
-                                            : 'bg-stellar-teal hover:bg-stellar-teal/80 text-black shadow-cyan-900/20'
+                                            : 'bg-stellar-teal hover:bg-stellar-teal/80 text-[#0b0b0b] shadow-cyan-900/20'
                                             }`}
                                     >
                                         {confirmConfig.confirmText}
@@ -2832,7 +2832,7 @@ function DashboardContent() {
                                 {!vaultId ? (
                                     <button
                                         onClick={handleCreateVault}
-                                        className="w-full sm:w-auto bg-stellar-yellow text-black font-bold text-xs px-6 py-3 rounded-xl hover:bg-stellar-yellow/80 transition-all shadow-[0_0_20px_rgba(255,200,0,0.3)] animate-pulse"
+                                        className="w-full sm:w-auto bg-stellar-yellow text-[#0b0b0b] font-bold text-xs px-6 py-3 rounded-xl hover:bg-stellar-yellow/80 transition-all shadow-[0_0_20px_rgba(255,200,0,0.3)] animate-pulse"
                                     >
                                         {t.dashboard.vault_control.create_vault}
                                     </button>
@@ -2863,7 +2863,7 @@ function DashboardContent() {
                                     <div className="bg-white/[0.03] rounded-xl p-3 border border-white/5">
                                         <div className="flex items-center justify-between mb-2">
                                             <p className="text-[10px] text-gray-400 font-mono uppercase tracking-widest">
-                                                {language === 'es' ? 'Mover cuando CETES supere' : language === 'zh' ? '当 CETES 超过时移动' : 'Move when CETES exceeds'}
+                                                {language === 'es' ? 'Mover cuando CETES supere' : 'Move when CETES exceeds'}
                                             </p>
                                             <span className="text-xs font-black text-stellar-teal font-mono">{rebalanceThreshold.toFixed(1)}%</span>
                                         </div>
@@ -2915,7 +2915,7 @@ function DashboardContent() {
                                     <div className="bg-white/[0.03] rounded-xl p-3 border border-white/5">
                                         <div className="flex items-center justify-between mb-2">
                                             <p className="text-[10px] text-gray-400 font-mono uppercase tracking-widest">
-                                                {language === 'es' ? 'Salir a USDC si CETES baja de' : language === 'zh' ? '当 CETES 低于时退出至 USDC' : 'Exit to USDC if CETES drops below'}
+                                                {language === 'es' ? 'Salir a USDC si CETES baja de' : 'Exit to USDC if CETES drops below'}
                                             </p>
                                             <span className="text-xs font-black text-amber-400 font-mono">{reverseThreshold.toFixed(1)}%</span>
                                         </div>
@@ -3243,7 +3243,7 @@ function DashboardContent() {
                                             <div className="flex-1 min-w-[120px] flex items-center justify-center gap-1.5 px-2 py-1 rounded bg-stellar-blue/5 border border-stellar-blue/20">
                                                 <Shield size={10} className="text-stellar-blue" />
                                                 <span className="text-[8px] font-bold text-stellar-blue whitespace-nowrap uppercase tracking-tighter">
-                                                    {t.common.atomic_execution} — AUDITED
+                                                    {t.common.atomic_execution} — VERIFIED
                                                 </span>
                                             </div>
                                             <button

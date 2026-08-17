@@ -33,38 +33,53 @@ function buildTickers(market: any, prev: any, t: any): TickerItem[] {
     const baseFee = market?.baseFee ?? null;
     const blendApy = market?.blendSupplyApy ?? null;
     const prevBlend = prev?.blendSupplyApy ?? null;
-    const cetesApy = market?.cetesRate ?? market?.cetesApy ?? 5.57;
-    const prevCetes = prev?.cetesApy ?? 5.57;
+    // Sin `?? 5.57`: ese default hacía que la tasa apareciera aunque la fuente
+    // no hubiera respondido nunca. La tasa se muestra cuando el agente la
+    // manda, y si no, em-dash.
+    const cetesApy = market?.cetesRate ?? market?.cetesApy ?? null;
 
+    // Sin dato no se inventa uno. Los fallbacks anteriores ('$0.1732', '5.57%',
+    // '0.81bps', '+0.01%') hacían que el ticker siguiera mostrando cifras
+    // creíbles cuando el agente no respondía — o sea, precisamente cuando el
+    // usuario más necesita saber que no hay dato. Ahora dice em-dash.
     return [
         {
             label: "XLM/USDC",
-            value: xlm != null ? `$${fmt(xlm)}` : '$0.1732',
+            value: xlm != null ? `$${fmt(xlm)}` : '—',
             change: prevXlm != null && xlm != null
                 ? `${xlm >= prevXlm ? '+' : ''}${((xlm - prevXlm) / prevXlm * 100).toFixed(3)}%`
-                : '+0.000%',
+                : '—',
             trend: trend(xlm, prevXlm),
         },
         {
-            label: "🇲🇽 CETES APY",
-            value: cetesApy != null && cetesApy > 0 ? `${cetesApy.toFixed(2)}%` : '5.57%',
-            change: prevCetes != null && cetesApy != null && cetesApy > 0
-                ? `${cetesApy >= prevCetes ? '+' : ''}${(cetesApy - prevCetes).toFixed(2)}%`
-                : '+0.01%',
-            trend: trend(cetesApy, prevCetes) === 'neutral' ? 'up' : trend(cetesApy, prevCetes),
+            // La tasa está FIJA en 5.57 (stellarProvider.fetchEtherfuseApy la
+            // devuelve constante, verificada contra Etherfuse en jun-2026), así
+            // que no tiene variación que reportar. El código anterior forzaba
+            // `trend` a 'up' cuando el cálculo daba 'neutral' — o sea, pintaba
+            // flecha verde de subida sobre un número que nunca se mueve. En un
+            // indicador de tasa eso no es un detalle de estilo.
+            label: "🇲🇽 CETES rate",
+            value: cetesApy != null && cetesApy > 0 ? `${cetesApy.toFixed(2)}%` : '—',
+            change: 'Banxico ref · Etherfuse',
+            trend: 'neutral',
         },
         {
             label: t.common.tickers.sdex_spread,
-            value: spread != null ? `${spread.toFixed(2)}bps` : '0.81bps',
+            value: spread != null ? `${spread.toFixed(2)}bps` : '—',
             change: prevSpread != null && spread != null
                 ? `${spread >= prevSpread ? '+' : ''}${(spread - prevSpread).toFixed(2)}bps`
                 : '—',
             trend: spread != null ? trend(spread, prevSpread) : 'neutral',
         },
         {
+            // "LCP v1.0" leía como capa activa. LCP está APAGADO
+            // (LCP_ENABLED !== 'true') esperando revisión legal de los términos
+            // que referencia, y el resto del sitio lo dice así. Un badge de
+            // versión junto a la palabra COMPLIANCE es justo lo que alguien lee
+            // como "esto ya cumple".
             label: "COMPLIANCE",
-            value: "NON-FINANCIAL ADVICE // EST DATA",
-            change: "LCP v1.0",
+            value: "NON-FINANCIAL ADVICE // REFERENCE DATA",
+            change: "LCP · in legal review",
             trend: 'neutral',
         }
     ];
@@ -75,13 +90,17 @@ const MarketTicker = () => {
     const [tickers, setTickers] = useState<TickerItem[]>([]);
     const prevMarket = useRef<any>(null);
 
-    // Initial placeholder tickers localized with real-looking data
+    // Estado inicial, antes de que llegue el primer dato. El comentario anterior
+    // decía, literalmente, "placeholder tickers localized with real-looking data"
+    // — y eso era exactamente el problema: precios, variaciones y flechas de
+    // tendencia inventadas que se ven idénticas a las reales durante el primer
+    // segundo de cada carga, y para siempre si el agente no responde.
     useEffect(() => {
         setTickers([
-            { label: "XLM/USDC", value: '$0.1732', change: '+0.045%', trend: 'up' },
-            { label: "🇲🇽 CETES APY", value: '5.57%', change: '+0.01%', trend: 'up' },
-            { label: t.common.tickers.sdex_spread, value: '0.81bps', change: '-0.02bps', trend: 'down' },
-            { label: "COMPLIANCE", value: "NON-FINANCIAL ADVICE // EST DATA", change: "LCP v1.0", trend: 'neutral' },
+            { label: "XLM/USDC", value: '—', change: '—', trend: 'neutral' },
+            { label: "🇲🇽 CETES rate", value: '—', change: 'Banxico ref · Etherfuse', trend: 'neutral' },
+            { label: t.common.tickers.sdex_spread, value: '—', change: '—', trend: 'neutral' },
+            { label: "COMPLIANCE", value: "NON-FINANCIAL ADVICE // REFERENCE DATA", change: "LCP · in legal review", trend: 'neutral' },
         ]);
     }, [t]);
 
@@ -97,45 +116,36 @@ const MarketTicker = () => {
                     data = await res.json();
                 }
 
-                // Institutional Simulation Layer: 
-                // Enhanced volatility (0.1% range) to ensure colors are always active
+                // SIN CAPA DE SIMULACIÓN.
+                //
+                // Aquí vivía algo llamado "Institutional Simulation Layer" que,
+                // cuando el API no respondía, generaba precios con Math.random()
+                // partiendo de una base fija. Su propio comentario decía para qué:
+                // "Enhanced volatility (0.1% range) to ensure colors are always
+                // active" — o sea, existía para que las flechas parpadearan.
+                //
+                // Fabricaba también movimiento de la TASA DE CETES
+                // (cetesApy + random), que es el número más sensible del sitio:
+                // una tasa de referencia de deuda gubernamental, inventada con un
+                // generador aleatorio y pintada como dato en vivo en la barra
+                // superior de todas las páginas. El bloque catch hacía lo mismo,
+                // comentado como "keep it alive".
+                //
+                // Un ticker que sigue moviéndose cuando la fuente está caída no
+                // es una degradación elegante: es dato falso presentado como real,
+                // y en una barra rotulada COMPLIANCE es lo peor que puede haber.
+                // Si no hay dato, no hay dato.
                 if (!data?.market || data.market.xlmPrice === null) {
-                    const mockBase = prevMarket.current || {
-                        xlmPrice: 0.1732,
-                        sdexSpread: 0.81,
-                        baseFee: 100,
-                        cetesApy: 5.57,
-                    };
-
-                    const volatility = 0.0012; // Sufficient to move 4th decimal
-                    const change = 1 + (Math.random() * volatility * 2 - volatility);
-
-                    data = {
-                        market: {
-                            xlmPrice: mockBase.xlmPrice * change,
-                            sdexSpread: Math.max(0.1, mockBase.sdexSpread + (Math.random() * 0.12 - 0.06)),
-                            baseFee: 100,
-                            cetesApy: Math.max(1.0, mockBase.cetesApy + (Math.random() * 0.04 - 0.02)),
-                        }
-                    };
+                    setTickers(buildTickers(null, null, t));
+                    return;
                 }
 
                 const built = buildTickers(data.market, prevMarket.current, t);
                 prevMarket.current = data.market;
                 setTickers(built);
-            } catch (err) {
-                // Fallback simulation to keep it alive
-                const mockBase = prevMarket.current || { xlmPrice: 0.1732, sdexSpread: 0.81, baseFee: 100, cetesApy: 5.57 };
-                const change = 1 + (Math.random() * 0.001 * 2 - 0.001);
-                const fallbackMarket = {
-                    xlmPrice: mockBase.xlmPrice * change,
-                    sdexSpread: mockBase.sdexSpread + 0.01,
-                    baseFee: 100,
-                    cetesApy: mockBase.cetesApy + 0.01,
-                };
-                const built = buildTickers(fallbackMarket, prevMarket.current, t);
-                prevMarket.current = fallbackMarket;
-                setTickers(built);
+            } catch {
+                // La fuente no respondió. Se dice, no se simula.
+                setTickers(buildTickers(null, null, t));
             }
         };
 
@@ -145,14 +155,14 @@ const MarketTicker = () => {
     }, [t]);
 
     return (
-        <div className="fixed top-0 left-0 right-0 z-[110] w-full bg-[#050505]/80 border-b border-white/5 backdrop-blur-md h-9 flex items-center overflow-hidden">
+        <div className="fixed top-0 left-0 right-0 z-[110] w-full bg-background/80 border-b border-black/10 backdrop-blur-md h-9 flex items-center overflow-hidden">
             {/* Live Status Label (More Compact) */}
-            <div className="flex items-center gap-2 px-4 h-full bg-white/[0.02] border-r border-white/10 min-w-[100px] justify-center shrink-0">
+            <div className="flex items-center gap-2 px-4 h-full bg-white/[0.02] border-r border-black/10 dark:border-white/10 min-w-[100px] justify-center shrink-0">
                 <div className="relative">
                     <div className="w-2 h-2 rounded-full bg-stellar-yellow shadow-[0_0_10px_#FFC800]"></div>
                     <div className="absolute inset-0 w-2 h-2 rounded-full bg-stellar-yellow animate-ping opacity-40"></div>
                 </div>
-                <span className="text-[9px] font-black tracking-[0.2em] text-white/90">
+                <span className="text-[9px] font-black tracking-[0.2em] text-zinc-800 dark:text-white/90">
                     {t.common.tickers.live_feed}
                 </span>
             </div>
@@ -178,9 +188,9 @@ const MarketTicker = () => {
                                 </span>
                                 <div className="flex items-center gap-2">
                                     <span className={`text-[14px] font-mono font-black tracking-tight ${
-                                        item.trend === 'up' ? 'text-green-400' :
-                                        item.trend === 'down' ? 'text-red-400' :
-                                        'text-white'
+                                        item.trend === 'up' ? 'text-green-600 dark:text-green-400' :
+                                        item.trend === 'down' ? 'text-red-600 dark:text-red-400' :
+                                        'text-zinc-900 dark:text-white'
                                     }`}>
                                         {item.value}
                                     </span>
@@ -201,8 +211,8 @@ const MarketTicker = () => {
                 </motion.div>
 
                 {/* Left/Right Overlays for smooth fading */}
-                <div className="absolute inset-y-0 left-0 w-20 bg-gradient-to-r from-[#050505] to-transparent z-10 pointer-events-none" />
-                <div className="absolute inset-y-0 right-0 w-20 bg-gradient-to-l from-[#050505] to-transparent z-10 pointer-events-none" />
+                <div className="absolute inset-y-0 left-0 w-20 bg-gradient-to-r from-background to-transparent z-10 pointer-events-none" />
+                <div className="absolute inset-y-0 right-0 w-20 bg-gradient-to-l from-background to-transparent z-10 pointer-events-none" />
             </div>
         </div>
     );

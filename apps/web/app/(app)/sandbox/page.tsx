@@ -86,7 +86,7 @@ export default function SandboxPage() {
     if (!mounted) return null;
 
     return (
-        <main className="min-h-screen pt-8 sm:pt-8 md:pt-8 lg:pt-8 pb-20 relative bg-[#080808]">
+        <main className="min-h-screen pt-8 sm:pt-8 md:pt-8 lg:pt-8 pb-20 relative bg-black">
 <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full h-[600px] bg-gradient-to-b from-stellar-teal/5 to-transparent pointer-events-none" />
             
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
@@ -256,7 +256,7 @@ export default function SandboxPage() {
 
                                         <div className="mt-4 pt-8 border-t border-white/5 flex items-center justify-center gap-2 text-[9px] text-gray-600 uppercase tracking-widest font-mono italic">
                                             <Shield size={10} className="text-stellar-teal" />
-                                            <span>Aligned with Stellar Code of Conduct (April 2026)</span>
+                                            <span>Aligned with the Stellar Code of Conduct</span>
                                         </div>
                                     </form>
                                 </motion.div>

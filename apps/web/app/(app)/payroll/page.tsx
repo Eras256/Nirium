@@ -9,7 +9,7 @@
 // run gets an IPFS receipt bound to LCP legal terms. Dual-network: testnet
 // (Box A) por default; MAINNET early access (Box B) mueve fondos reales y
 // exige aceptación explícita de los términos de payouts (gate 403 del agente).
-// i18n via the shared dictionaries (en/es/zh).
+// i18n via the shared dictionaries (en/es).
 // ───────────────────────────────────────────────────────────────
 
 import { useCallback, useEffect, useState } from "react";
@@ -55,7 +55,8 @@ async function signXdr(
 
 export default function PayrollPage() {
     const { address, isConnected, connect, signTransaction, getAddress } = useFreighter();
-    const { t } = useLanguage();
+    const { t, language } = useLanguage();
+    const lang = (en: string, es: string) => (language === 'es' ? es : en);
     const p = t.payroll;
 
     const [asset, setAsset] = useState<"USDC" | "XLM">("USDC");
@@ -212,6 +213,20 @@ export default function PayrollPage() {
                     ))}
                 </div>
 
+                {/* Precio — LICENCIA MENSUAL POR CAPACIDAD, $0 durante la Beta.
+                    Era "por destinatario" y contradecía los propios términos que
+                    el cliente acepta dos recuadros más abajo (§9: nunca un cargo
+                    por pago). Cobrar por pago procesado es como cobra un
+                    procesador de pagos, y la tesis entera es que no lo somos. */}
+                <div className="mb-6 rounded-xl border border-white/10 bg-white/[0.02] px-4 py-3">
+                    <p className="text-[11px] font-mono uppercase tracking-widest text-white/40 mb-2">{p.pricing.label}</p>
+                    <div className="flex flex-wrap gap-x-6 gap-y-1 font-mono text-[11px] text-white/60">
+                        <span><span className="text-stellar-teal font-bold">$99</span>{p.pricing.tier1}</span>
+                        <span><span className="text-stellar-teal font-bold">$249</span>{p.pricing.tier2}</span>
+                    </div>
+                    <p className="text-[11px] text-white/35 mt-2 leading-relaxed">{p.pricing.note}</p>
+                </div>
+
                 {/* LCP legal context — published discovery file */}
                 {legal && (
                     <div className="mb-10 rounded-xl border border-white/10 bg-white/[0.02] px-4 py-3 flex flex-wrap items-center gap-x-4 gap-y-1 font-mono text-[11px] text-white/50">
@@ -270,6 +285,9 @@ export default function PayrollPage() {
                         <p className="mb-4 rounded-lg border border-emerald-400/20 bg-emerald-400/[0.05] px-3 py-2 font-mono text-[11px] text-emerald-300/90">
                             {p.badges.mainnet} · {p.network.freighterHint}
                         </p>
+                        <p className="mb-4 rounded-lg border border-amber-400/20 bg-amber-400/[0.05] px-3 py-2 font-mono text-[11px] text-amber-300/90">
+                            {p.network.privateAccessNote}
+                        </p>
                         <div className="mb-5 rounded-lg border border-white/10 bg-white/[0.02] p-4">
                             <p className="text-xs font-mono text-white/60 mb-3">{p.clientInfo.title}</p>
                             <p className="text-[11px] text-white/40 mb-3 leading-relaxed">{p.clientInfo.note}</p>
@@ -325,8 +343,23 @@ export default function PayrollPage() {
                             {p.terms.accept}{" "}
                             <a href="/legal/payouts-terms-v1.md" target="_blank" rel="noreferrer"
                                 className="underline decoration-white/25 text-white/70 hover:text-stellar-teal">{p.terms.link} ↗</a>
+                            {" · "}
+                            <a href="/legal/restricted-jurisdictions-v1.md" target="_blank" rel="noreferrer"
+                                className="underline decoration-white/25 text-white/70 hover:text-stellar-teal">
+                                {lang('Restricted Jurisdictions & Sanctions Policy', 'Política de Jurisdicciones Restringidas y Sanciones')} ↗
+                            </a>
                         </span>
                     </label>
+
+                    {/* La representación del usuario es la protección jurídica REAL — el
+                        bloqueo por IP se salta con una VPN, una declaración no. Va junto al
+                        botón que construye la corrida, no enterrada en un PDF, porque una
+                        declaración que nadie leyó no declara nada. */}
+                    <p className="text-[11px] text-white/35 leading-relaxed mb-5 -mt-3">
+                        {lang(
+                            'By continuing you represent, on this and every occasion of use, that you are not located in or a resident of a prohibited jurisdiction, that you are not a sanctioned person or acting for one, and that Payouts is not offered where you are (today this excludes the EEA, the UK and the US). Nirium relies on this.',
+                            'Al continuar declaras, en esta y en cada ocasión de uso, que no te encuentras ni resides en una jurisdicción prohibida, que no eres una persona sancionada ni actúas por cuenta de una, y que Payouts no se ofrece donde estás (hoy quedan fuera el EEE, el Reino Unido y Estados Unidos). Nirium confía en esta declaración.')}
+                    </p>
 
                     <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
                         <p className="font-mono text-sm text-white/50">

@@ -29,15 +29,15 @@ The following components are in scope for security reports:
 
 | Component | Status | Notes |
 |-----------|--------|-------|
-| **NiriumVault** (Soroban) | ✅ JARGUS PASS — formal audit pending | Treasury, flash loans, 2-of-3 multisig pause |
-| **Protocol Reputation / ELO** (Soroban) | ✅ JARGUS PASS — formal audit pending | Agent ELO scoring (base 1200, K=32) |
-| **Strategy Marketplace** (Soroban) | ✅ JARGUS PASS — formal audit pending | CID registry, token-spoofing fix applied |
-| **Protocol Sentinel** (Soroban) | ✅ JARGUS PASS — formal audit pending | Agent performance reporting contract |
-| **Settlement Hub** (Soroban) | ✅ JARGUS PASS — formal audit pending | MPP session escrow contract |
-| **Skill Vault** (Soroban) | ✅ JARGUS PASS — formal audit pending | x402 per-request payment gate |
-| **Frontend** (Next.js 15) | ✅ JARGUS PASS — Pillar 4 (FE01-FE12) | Dashboard at nirium.xyz — 25 routes |
-| **API endpoints** (Express 5) | ✅ JARGUS PASS — Pillars 2 & 3 | 55 endpoints at nirium-agent.fly.dev |
-| **Agent scripts** | ✅ JARGUS PASS — Pillars 3 & 5 | master.ts, swarm, indexer, buyer agents |
+| **NiriumVault** (Soroban) | ✅ Internal review — formal audit pending | Treasury, flash loans, 2-of-3 multisig pause |
+| **Protocol Reputation / ELO** (Soroban) | ✅ Internal review — formal audit pending | Agent ELO scoring (base 1200, K=32) |
+| **Strategy Marketplace** (Soroban) | ✅ Internal review — formal audit pending | CID registry, token-spoofing fix applied |
+| **Protocol Sentinel** (Soroban) | ✅ Internal review — formal audit pending | Agent performance reporting contract |
+| **Settlement Hub** (Soroban) | ✅ Internal review — formal audit pending | MPP session escrow contract |
+| **Skill Vault** (Soroban) | ✅ Internal review — formal audit pending | x402 per-request payment gate |
+| **Frontend** (Next.js 15) | ✅ Internal review passed | Dashboard at nirium.xyz — 25 routes |
+| **API endpoints** (Express 5) | ✅ Internal review passed | 55 endpoints at nirium-agent.fly.dev |
+| **Agent scripts** | ✅ Internal review passed | master.ts, swarm, indexer, buyer agents |
 
 ### Out of Scope
 
@@ -52,7 +52,7 @@ The following components are in scope for security reports:
 
 The protocol is currently deployed on **Stellar Testnet only** and uses test tokens with no monetary value. A formal third-party audit is planned for Month 3 of operations (Soroban layer via SCF Audit Bank; API/server layer independently funded).
 
-**JARGUS Internal Audit v3.0 (May 2026):** AAA Grade — 83/83 vectors PASS, 0 critical, 0 high. This is a rigorous self-assessment, not a third-party certification. Full report: [INTERNAL_SECURITY_AUDIT.md](INTERNAL_SECURITY_AUDIT.md).
+**Internal security review (May 2026):** 83/83 vectors PASS, 0 critical, 0 high. This is a self-assessment, not a third-party certification. Full report: [INTERNAL_SECURITY_AUDIT.md](INTERNAL_SECURITY_AUDIT.md).
 
 ### Security Measures Currently in Place
 

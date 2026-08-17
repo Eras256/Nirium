@@ -1,0 +1,82 @@
+/* ───────────────────────────────────────────────────────────────
+   Ajustes al modal de login de Pollar para que encaje en Nirium.
+   Se importa DESPUÉS de @pollar/react/styles.css para poder ganarle.
+
+   1) z-index. Pollar publica su overlay en z-index 50, pero nuestro chrome
+      va más alto: barra de tickers 110, navbar 100, botón de chat 100, y un
+      contenedor de contenido en 60. Resultado: el modal se dibujaba DEBAJO
+      del navbar y el logo/cerrar quedaban tapados — se veía cortado, no
+      scrolleado. Lo subimos por encima de todo lo nuestro.
+
+   2) Alturas cortas. Su contenido pide ~634px (logo 64 + header + email +
+      divisor + 3 botones + pie). En laptops chicas, móvil horizontal o con
+      zoom alto del navegador la tarjeta se queda en ~508px y obliga a
+      scrollear dentro de una caja apretada. Apretamos solo lo decorativo
+      —logo y espaciados— antes de sacrificar usabilidad.
+   ─────────────────────────────────────────────────────────────── */
+
+.pollar-overlay {
+    /* Por encima de la barra de tickers (110), que es nuestro techo actual. */
+    z-index: 300 !important;
+}
+
+@media (max-height: 720px) {
+    .pollar-modal-card {
+        padding: 20px !important;
+    }
+    .pollar-header {
+        margin-bottom: 12px !important;
+    }
+    .pollar-logo-wrap {
+        margin-bottom: 8px !important;
+    }
+    .pollar-logo {
+        height: 40px !important;
+        width: auto !important;
+    }
+    .pollar-divider {
+        margin-top: 12px !important;
+        margin-bottom: 12px !important;
+    }
+    .pollar-email-section {
+        margin-bottom: 10px !important;
+    }
+}
+
+/* Umbral para que quepa sin scroll en móviles chicos (iPhone SE, 320x568):
+   el contenido pedía 546px con 536px disponibles. El logo es decorativo — el
+   título ya dice el nombre de la app — así que se va antes de obligar a
+   scrollear. */
+@media (max-height: 620px) {
+    .pollar-logo-wrap {
+        display: none !important;
+    }
+}
+
+/* Móvil en horizontal (~375px de alto): aquí no hay forma de que quepan email
+   + submit + tres proveedores. Se acepta scroll interno, pero se le da a la
+   tarjeta todo el alto posible y se aprietan los botones. */
+@media (max-height: 430px) {
+    .pollar-overlay {
+        padding: 8px !important;
+    }
+    .pollar-modal-card {
+        padding: 14px !important;
+        max-height: calc(100dvh - 16px) !important;
+    }
+    .pollar-header {
+        margin-bottom: 8px !important;
+    }
+    .pollar-social-list {
+        gap: 6px !important;
+    }
+    .pollar-social-btn {
+        min-height: 38px !important;
+        padding-top: 6px !important;
+        padding-bottom: 6px !important;
+    }
+    .pollar-divider {
+        margin-top: 8px !important;
+        margin-bottom: 8px !important;
+    }
+}

@@ -17,7 +17,7 @@ export default function PrivacyPage() {
           <h1 className="text-4xl sm:text-5xl font-black text-white tracking-tight mb-4">
             Aviso de Privacidad
           </h1>
-          <p className="text-sm font-mono text-zinc-500">Última actualización / Last updated: 13 de julio de 2026</p>
+          <p className="text-sm font-mono text-zinc-500">Última actualización / Last updated: 15 de agosto de 2026</p>
         </div>
 
         <div className="prose prose-invert prose-zinc max-w-none">
@@ -50,7 +50,7 @@ export default function PrivacyPage() {
 
           <h2 className="text-white font-bold text-2xl mt-10 mb-4 border-b border-white/10 pb-2">6. Derechos ARCO y cómo ejercerlos</h2>
           <p>Usted tiene derecho a conocer qué datos personales tenemos de usted (Acceso). Asimismo, es su derecho solicitar la corrección de su información personal si está desactualizada, sea inexacta o incompleta (Rectificación); que la eliminemos de nuestros registros (Cancelación); así como oponerse al uso de sus datos personales para fines específicos (Oposición). Para ejercer cualquiera de los derechos ARCO, deberá enviar la solicitud respectiva al correo electrónico: <strong>niriumprotocol@gmail.com</strong>.</p>
-          <p>Responderemos a su solicitud en un plazo máximo de 20 días hábiles de conformidad con la Ley Federal de Protección de Datos Personales en Posesión de los Particulares (LFPDPPP).</p>
+          <p>Responderemos a su solicitud en un plazo máximo de 20 días hábiles de conformidad con la Ley Federal de Protección de Datos Personales en Posesión de los Particulares (LFPDPPP), conforme a la reforma publicada en el Diario Oficial de la Federación el 20 de marzo de 2025 (vigente desde el 21 de marzo de 2025). A partir de dicha reforma, el Instituto Nacional de Transparencia, Acceso a la Información y Protección de Datos Personales (INAI) fue extinguido, y la autoridad garante en la materia es la Secretaría Anticorrupción y Buen Gobierno.</p>
 
           <h2 className="text-white font-bold text-2xl mt-10 mb-4 border-b border-white/10 pb-2">7. Uso de cookies y tecnologías similares</h2>
           <p>Le informamos que en nuestra página de internet utilizamos cookies de sesión exclusivamente para mantener la autenticación del usuario y garantizar el funcionamiento de la plataforma. No utilizamos cookies de rastreo publicitario ni píxeles de terceros con fines de marketing.</p>
@@ -67,7 +67,7 @@ export default function PrivacyPage() {
             </h2>
             <p className="text-sm"><em>Note: This English translation is provided for convenience. In case of legal dispute, the Spanish Aviso de Privacidad above, complying with Mexican LFPDPPP, prevails.</em></p>
             <p className="text-sm mt-4">"Nirium Protocol" is the commercial name under which its founders operate; they are responsible for the processing of personal data collected. The Project is an open-source software tool and does not yet operate under an incorporated legal entity. We only collect hashed API keys, webhook URLs, and usage metrics for authentication, rate limiting, and security purposes. We do not collect PII, sensitive data, biometrics, or financial data, nor do we custody user funds.</p>
-            <p className="text-sm mt-2">Data is only shared with essential infrastructure providers (Supabase, Fly.io) under data processing agreements. We do not sell data. We use essential session cookies only, no marketing tracking. You may exercise your ARCO rights (Access, Rectification, Cancellation, Opposition) by contacting <strong>niriumprotocol@gmail.com</strong>. We will respond within 20 business days.</p>
+            <p className="text-sm mt-2">Data is only shared with essential infrastructure providers (Supabase, Fly.io) under data processing agreements. We do not sell data. We use essential session cookies only, no marketing tracking. You may exercise your ARCO rights (Access, Rectification, Cancellation, Opposition) by contacting <strong>niriumprotocol@gmail.com</strong>. We will respond within 20 business days, per the LFPDPPP as amended on March 20, 2025 (in force since March 21, 2025) — under which Mexico's former data protection authority (INAI) was dissolved and its functions transferred to the Secretaría Anticorrupción y Buen Gobierno.</p>
           </div>
         </div>
       </div>

@@ -12,8 +12,8 @@ The entire Nirium Protocol ecosystem, including the core protocol and the commer
 |---------|-------------|
 | `apps/web/` | nirium.xyz SaaS dashboard & Interface |
 | `packages/contracts/` | Soroban smart contracts (NiriumVault, NiriumProtocol) |
-| `packages/agent/` | Agent API — 55 endpoints, autonomous execution logic |
-| `packages/mcp/` | MCP Server — 12 tools for Claude, GPT, Cursor integration |
+| `packages/agent/` | Agent API — 66 endpoints, autonomous execution logic |
+| `packages/mcp/` | MCP Server — 11 tools for Claude, GPT, Cursor integration |
 | `packages/sdk/` | TypeScript SDK (`npm install nirium`) |
 | `packages/sdk-python/` | Python SDK (`pip install nirium`) |
 | `packages/cli/` | CLI tooling |

@@ -17,7 +17,7 @@ export default function TelemetryFeed({ thoughts = [] }: { thoughts?: any[] }) {
                         <h3 className="text-sm font-bold text-white uppercase tracking-widest">{t.dashboard.telemetry_feed.title}</h3>
                         <div className="flex items-center gap-1.5 mt-0.5">
                             <span className="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse"></span>
-                            <span className="text-[10px] text-green-500/80 font-mono font-medium tracking-wide">ACTIVE_TELEMETRY_v0.5.2</span>
+                            <span className="text-[10px] text-green-500/80 font-mono font-medium tracking-wide">ACTIVE_TELEMETRY_v0.10.2</span>
                         </div>
                     </div>
                 </div>

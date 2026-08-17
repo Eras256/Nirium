@@ -36,7 +36,7 @@ export default function HowToUsePage() {
                         <div className="flex flex-col items-center lg:items-start text-center lg:text-left">
                             <div className="inline-flex items-center gap-2 px-3 py-1 bg-stellar-teal/10 border border-stellar-teal/30 rounded-full text-stellar-teal text-xs font-mono mb-6 self-center lg:self-start">
                                 <BookOpen size={14} />
-                                OPERATIONS MANUAL v0.6.1
+                                OPERATIONS MANUAL v0.10.2
                             </div>
                             <h1 className="text-4xl md:text-7xl font-black tracking-tighter mb-6 leading-none uppercase">
                                 HOW TO <span className="text-gradient">OPERATE</span>
@@ -137,7 +137,7 @@ export default function HowToUsePage() {
                         <div className="flex flex-wrap justify-center gap-6">
                             <Link
                                 href="/strategies"
-                                className="bg-stellar-yellow text-black font-bold px-10 py-4 rounded-full hover:shadow-[0_0_30px_rgba(255,200,0,0.4)] transition-all flex items-center gap-2"
+                                className="bg-stellar-yellow text-[#0b0b0b] font-bold px-10 py-4 rounded-full hover:shadow-[0_0_30px_rgba(255,200,0,0.4)] transition-all flex items-center gap-2"
                             >
                                 <Zap size={20} /> Deploy Now
                             </Link>

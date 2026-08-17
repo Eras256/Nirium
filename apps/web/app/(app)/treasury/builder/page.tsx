@@ -86,23 +86,42 @@ function StrategyBuilderInner() {
     const marketplace = useMarketplace();
     const router = useRouter();
 
+    // PALETA RECONSTRUIDA SOBRE LO QUE CORRE (7-ago-2026).
+    //
+    // Se retiraron cinco bloques, y cuatro no por estar sin construir sino
+    // porque contradecían la posición legal que el sitio publica:
+    //
+    //   SPEI_DEPOSIT     — Nirium no toca fiat, nunca. Es restricción dura.
+    //   KYC_VERIFY       — no somos Sujeto Obligado y no hacemos KYC. Ofrecerlo
+    //                      es declararse ejecutor de una función regulada.
+    //   OFAC_SCREENING   — la política dice, con todas sus letras, que solo se
+    //                      screenean las direcciones operativas propias y NUNCA
+    //                      usuarios finales, "porque esto no es una institución
+    //                      financiera y no debe actuar como una".
+    //   SOROSWAP_HEDGE / DEX_SWAP — los swaps se retiraron del nodo de tesorería
+    //                      el 6-ago por la fracc. XVI de la LFPIORPI. Seguir
+    //                      ofreciéndolos en el lienzo reintroduce el verbo.
+    //
+    // Ponerlos tras el plan de $299 sería peor, no mejor: pasaría de anunciar
+    // una función regulada a cobrarla.
+    //
+    // Lo que queda es el flujo real de DeFindex, que además es mejor demo.
     const NODE_TEMPLATES = [
         {
             category: t.treasury.sidebar.categories.bank,
             color: 'from-blue-400 to-cyan-500',
             items: [
-                { type: 'trigger', label: 'SPEI_DEPOSIT', icon: 'Landmark' },
-                { type: 'action', label: 'ETHERFUSE_ONRAMP', icon: 'RefreshCw' },
-                { type: 'action', label: 'X402_SETTLEMENT', icon: 'Coins' },
+                { type: 'trigger', label: 'X402_SETTLEMENT', icon: 'Coins' },
+                { type: 'trigger', label: 'MPP_CHARGE', icon: 'RefreshCw' },
             ]
         },
         {
             category: t.treasury.sidebar.categories.triggers,
             color: 'from-stellar-teal to-blue-500',
             items: [
-                { type: 'trigger', label: 'FX_TARGET', icon: 'Activity' },
-                { type: 'trigger', label: 'BATCH_WINDOW', icon: 'Clock' },
-                { type: 'trigger', label: 'RESERVE_THRESH', icon: 'Database' },
+                { type: 'trigger', label: 'RATE_THRESHOLD', icon: 'Activity' },
+                { type: 'trigger', label: 'IDLE_MINIMUM', icon: 'Database' },
+                { type: 'trigger', label: 'SCHEDULE', icon: 'Clock' },
                 { type: 'trigger', label: 'BALANCE_CHECK', icon: 'LayoutGrid' },
             ]
         },
@@ -110,21 +129,20 @@ function StrategyBuilderInner() {
             category: t.treasury.sidebar.categories.actions,
             color: 'from-emerald-400 to-green-600',
             items: [
-                { type: 'action', label: 'ALLOCATE_CETES', icon: 'TrendingUp' },
-                { type: 'action', label: 'BLEND_RESERVE', icon: 'Zap' },
-                { type: 'action', label: 'SOROSWAP_HEDGE', icon: 'Repeat' },
-                { type: 'action', label: 'DEX_SWAP', icon: 'ArrowLeftRight' },
-                { type: 'action', label: 'MPP_FUNDING', icon: 'History' },
+                { type: 'action', label: 'VAULT_DEPLOY', icon: 'Box' },
+                { type: 'action', label: 'VAULT_DEPOSIT', icon: 'TrendingUp' },
+                { type: 'action', label: 'INVEST', icon: 'Zap' },
+                { type: 'action', label: 'UNWIND', icon: 'History' },
+                { type: 'action', label: 'MPP_FUNDING', icon: 'Send' },
             ]
         },
         {
             category: t.treasury.sidebar.categories.safety,
             color: 'from-purple-500 to-indigo-600',
             items: [
-                { type: 'condition', label: 'KYC_VERIFY', icon: 'Shield' },
+                { type: 'condition', label: 'CLIENT_SIGNATURE', icon: 'Shield' },
                 { type: 'condition', label: 'TEAM_APPROVAL', icon: 'CheckSquare' },
-                { type: 'condition', label: 'OFAC_SCREENING', icon: 'Fingerprint' },
-                { type: 'action', label: 'ONCHAIN_AUDIT', icon: 'Box' },
+                { type: 'action', label: 'ONCHAIN_AUDIT', icon: 'Fingerprint' },
             ]
         },
         {
@@ -134,7 +152,7 @@ function StrategyBuilderInner() {
                 { type: 'action', label: 'TELEGRAM_ALERTS', icon: 'Send' },
                 { type: 'action', label: 'EMAIL_REPORT', icon: 'Mail' },
             ]
-        }
+        },
     ];
 
     useEffect(() => { setMounted(true); }, []);
@@ -659,7 +677,7 @@ function StrategyBuilderInner() {
                             <div className="flex-1 min-w-0">
                                 <div className="inline-flex items-center gap-1.5 px-2 py-0.5 mb-1.5 bg-stellar-yellow/10 border border-stellar-yellow/20 rounded-full text-stellar-yellow text-[8px] font-black uppercase tracking-widest">
                                     <Clock className="w-2.5 h-2.5" />
-                                    {language === "es" ? "BETA · FUNCIONALIDAD EN AUDITORÍA DE CUMPLIMIENTO" : language === "zh" ? "BETA · 功能正在进行合规审计" : "BETA · FEATURE UNDERGOING COMPLIANCE AUDIT"}
+                                    {language === "es" ? "BETA · FUNCIONALIDAD EN AUDITORÍA DE CUMPLIMIENTO" : "BETA · FEATURE UNDERGOING COMPLIANCE AUDIT"}
                                 </div>
                                 <input
                                     value={strategyName}
@@ -845,7 +863,7 @@ export default function StrategyBuilderPro() {
     const { t } = useLanguage();
 
     return (
-        <main className="h-screen w-screen bg-[#080808] text-white flex flex-col font-sans selection:bg-stellar-teal/30 overflow-hidden">
+        <main className="h-screen w-screen bg-black text-white flex flex-col font-sans selection:bg-stellar-teal/30 overflow-hidden">
 <div className="h-9 w-full shrink-0"></div>
 
             {/* Growth plan preview banner */}
@@ -858,7 +876,7 @@ export default function StrategyBuilderPro() {
                 </div>
                 <Link
                     href="/pricing"
-                    className="shrink-0 flex items-center gap-1 text-[10px] font-black uppercase tracking-wider text-black bg-stellar-yellow px-2.5 py-1 rounded-full hover:bg-stellar-yellow/90 transition-colors"
+                    className="shrink-0 flex items-center gap-1 text-[10px] font-black uppercase tracking-wider text-[#0b0b0b] bg-stellar-yellow px-2.5 py-1 rounded-full hover:bg-stellar-yellow/90 transition-colors"
                 >
                     {t.strategy_builder.upgrade_banner.upgrade}
                     <ArrowRight className="w-3 h-3" />
@@ -880,7 +898,7 @@ export default function StrategyBuilderPro() {
                         </span>
                         <Link
                             href="/pricing"
-                            className="flex items-center gap-1.5 text-[10px] font-black uppercase tracking-widest text-black bg-stellar-yellow px-3 py-1.5 rounded-full hover:bg-stellar-yellow/90 transition-colors"
+                            className="flex items-center gap-1.5 text-[10px] font-black uppercase tracking-widest text-[#0b0b0b] bg-stellar-yellow px-3 py-1.5 rounded-full hover:bg-stellar-yellow/90 transition-colors"
                         >
                             {t.strategy_builder.deploy_gate.plan}
                             <ArrowRight className="w-3 h-3" />

@@ -1,10 +1,10 @@
-/** Nirium Compliance — Audit trail + IPFS + CNBV-ready **/
+/** Nirium Compliance — Audit trail + IPFS + audit-ready **/
 'use client';
 
 import Link from "next/link";
 import {
     FileCheck, FileText, ArrowRight, CheckCircle2, Database,
-    Sparkles, Layers, Building2, AlertTriangle, Hash, ShieldCheck,
+    Sparkles, Layers, Building2, AlertTriangle, Hash, ShieldCheck, 
     Download, ExternalLink, Fingerprint
 } from "lucide-react";
 import { Button } from "@/components/ui/Button";
@@ -16,7 +16,7 @@ export default function CompliancePage() {
     const { t } = useLanguage();
 
     return (
-        <main className="min-h-screen bg-[#030303] text-white antialiased selection:bg-stellar-teal/30">
+        <main className="min-h-screen bg-black text-white antialiased selection:bg-stellar-teal/30">
             {/* Background FX */}
             <div className="fixed inset-0 z-0 pointer-events-none">
                 <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full h-full bg-[radial-gradient(ellipse_at_top,_rgba(45,235,232,0.08),transparent_70%)]" />
@@ -27,7 +27,7 @@ export default function CompliancePage() {
                 {/* HERO */}
                 <section className="relative pt-12 pb-20">
                     <div className="max-w-5xl mx-auto px-6">
-                        <motion.div
+                        <motion.div 
                             initial={{ opacity: 0, y: 20 }}
                             animate={{ opacity: 1, y: 0 }}
                             className="flex justify-center mb-10"
@@ -38,7 +38,7 @@ export default function CompliancePage() {
                             </div>
                         </motion.div>
 
-                        <motion.h1
+                        <motion.h1 
                             initial={{ opacity: 0, y: 20 }}
                             animate={{ opacity: 1, y: 0 }}
                             transition={{ delay: 0.1 }}
@@ -47,10 +47,10 @@ export default function CompliancePage() {
                             {t.compliance_page.hero.title}
                             <br />
                             <span className="bg-gradient-to-r from-stellar-teal via-white to-stellar-yellow bg-clip-text text-transparent drop-shadow-[0_0_30px_rgba(45,235,232,0.3)]">
-                                CNBV-Ready
+                                Audit-Ready
                             </span>
                         </motion.h1>
-                        <motion.p
+                        <motion.p 
                             initial={{ opacity: 0 }}
                             animate={{ opacity: 1 }}
                             transition={{ delay: 0.2 }}
@@ -105,13 +105,21 @@ export default function CompliancePage() {
                                     body: t.compliance_page.layers.cnbv.desc,
                                     accent: 'from-stellar-yellow/20'
                                 },
-                            ].map((item, idx) => (
+                                {
+                                    num: '05',
+                                    icon: FileCheck,
+                                    title: t.compliance_page.layers.lcp.title,
+                                    body: t.compliance_page.layers.lcp.desc,
+                                    accent: 'from-emerald-500/20',
+                                    span: 'md:col-span-2',
+                                },
+                            ].map((item: any, idx) => (
                                 <motion.div
                                     key={item.num}
                                     initial={{ opacity: 0, x: idx % 2 === 0 ? -20 : 20 }}
                                     whileInView={{ opacity: 1, x: 0 }}
                                     viewport={{ once: true }}
-                                    className="group relative p-8 rounded-3xl border border-white/10 bg-white/[0.02] hover:bg-white/[0.04] transition-all duration-500"
+                                    className={`group relative p-8 rounded-3xl border border-white/10 bg-white/[0.02] hover:bg-white/[0.04] transition-all duration-500 ${item.span || ''}`}
                                 >
                                     <div className={`absolute inset-0 bg-gradient-to-br ${item.accent} to-transparent opacity-0 group-hover:opacity-100 transition-opacity rounded-3xl`} />
                                     <div className="relative z-10">
@@ -161,7 +169,7 @@ export default function CompliancePage() {
 
                             <div className="grid grid-cols-2 gap-4">
                                 <div className="p-6 rounded-2xl border border-white/5 bg-white/[0.02] text-center">
-                                    <div className="text-3xl font-black text-stellar-teal mb-1">67+</div>
+                                    <div className="text-3xl font-black text-stellar-teal mb-1">86</div>
                                     <div className="text-[10px] text-gray-500 uppercase tracking-widest font-black leading-tight">
                                         {t.compliance_page.fintech_law.stats.fintechs}
                                     </div>
@@ -196,7 +204,7 @@ export default function CompliancePage() {
                             <h2 className="text-3xl sm:text-5xl font-black uppercase italic tracking-tighter mb-4">
                                 {t.compliance_page.preview.title}
                             </h2>
-                            <p className="text-gray-500 font-mono text-sm uppercase tracking-widest">cnbv-report-2026-04.json</p>
+                            <p className="text-gray-500 font-mono text-sm uppercase tracking-widest">audit-report-2026-07.json</p>
                         </div>
 
                         <div className="rounded-3xl border border-white/10 bg-[#080808] shadow-2xl overflow-hidden group">
@@ -216,37 +224,46 @@ export default function CompliancePage() {
                                     </span>
                                 </div>
                             </div>
-                            <div className="p-8 font-mono text-xs sm:text-sm text-gray-400 overflow-x-auto leading-relaxed bg-[radial-gradient(circle_at_top_right,_rgba(45,235,232,0.03),transparent)]">
-                                <pre className="text-stellar-teal/80">
-                                    {`{
-  "institution_id": "FINTECH_MX_001",
-  "report_type": "TRANSACCIONES_AGENTES_IA",
-  "period_start": "2026-04-01T00:00:00Z",
-  "period_end": "2026-04-30T23:59:59Z",
-  "record_count": 1247,
-  "total_volume_usdc": 2400000.00,
+                            <div className="p-8 font-mono text-xs sm:text-sm text-black dark:text-gray-400 overflow-x-auto leading-relaxed bg-[radial-gradient(circle_at_top_right,_rgba(45,235,232,0.03),transparent)]">
+<pre className="text-teal-950 dark:text-stellar-teal/80">
+{`{
+  "_comment": "EJEMPLO DE FORMATO — no son datos reales de ningún cliente",
+  "institution_id": "<tu-id>",
+  "report_type": "AGENT_TRANSACTIONS",
+  "period_start": "2026-07-01T00:00:00Z",
+  "period_end": "2026-07-31T23:59:59Z",
+  "record_count": "<n>",
+  "total_volume_usdc": "<suma del periodo>",
   "chain_integrity": "VERIFIED",
-  "ipfs_cid": "ipfs://QmX7...8yZ9",
+  "ipfs_cid": "ipfs://<cid>",
+  "lcp_bound": false,
   "records": [`}
-                                </pre>
-                                <pre className="text-white">
-                                    {`    {
-      "folio": "8BFCA5C5",
-      "fecha_hora": "2026-04-15T14:30:00Z",
+</pre>
+<pre className="text-black dark:text-white">
+{`    {
+      "folio": "<folio>",
+      "fecha_hora": "2026-07-05T14:30:00Z",
       "tipo_operacion": "REBALANCE_USDC_TO_CETES",
-      "agente": "Nirium-Agent-001",
-      "monto_usdc": 50000.00,
+      "agente": "<agent-id>",
+      "monto_usdc": "<monto>",
       "red_blockchain": "Stellar",
       "hash_transaccion": "8bfca5c5a7909d75817a7ede963...",
       "firma_hmac": "f4e2d9c1b8a7...",
+      "content_sha256": "a03d9cdd0d239e48e28e3b6978...",
+      "legal_context": {
+        "standard": "lcp",
+        "atr_hash": "sha-256:a03d9cdd0d239e48...9643ab1",
+        "terms": "nirium.xyz/legal/payroll-terms-v1.md",
+        "dispute_resolution": "AAA-ICDR"
+      },
       "integridad": "VALIDA"
     }`}
-                                </pre>
-                                <pre className="text-gray-600">
-                                    {`    // ...1246 items more
+</pre>
+<pre className="text-zinc-500 dark:text-gray-600">
+{`    // ...1246 items more
   ]
 }`}
-                                </pre>
+</pre>
                             </div>
                         </div>
                     </div>

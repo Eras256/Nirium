@@ -3,7 +3,7 @@ import { NextResponse } from 'next/server';
 const AGENT_URL = process.env.AGENT_INTERNAL_URL ?? 'https://nirium-agent.fly.dev';
 
 const FALLBACK = {
-    cetesRate: 5.78,
+    cetesRate: 5.57,
     xlmPrice: 0.1732,
     baseFee: 100,
     sdexSpread: 0.84,

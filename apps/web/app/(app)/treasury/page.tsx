@@ -308,7 +308,7 @@ export default function TreasuryPage() {
                                 href: '/security',
                             },
                             {
-                                label: 'Audit Trail + IPFS',
+                                label: 'Audit Trail + IPFS + LCP',
                                 desc: t.treasury_page.links.compliance,
                                 href: '/compliance',
                             },

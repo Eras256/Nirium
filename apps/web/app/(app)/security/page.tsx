@@ -12,8 +12,8 @@ import SecurityDisclaimer from "@/components/shared/SecurityDisclaimer";
 
 export default function SecurityPage() {
     const { language } = useLanguage();
-    const lang = (en: string, es: string, zh: string) =>
-        language === 'zh' ? zh : language === 'es' ? es : en;
+    const lang = (en: string, es: string) =>
+        language === 'es' ? es : en;
 
     return (
         <main className="min-h-screen bg-black text-white antialiased">
@@ -24,19 +24,17 @@ export default function SecurityPage() {
                     <div className="flex justify-center mb-6">
                         <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-stellar-teal/20 bg-stellar-teal/5 text-stellar-teal text-xs font-mono">
                             <Sparkles className="w-3 h-3" />
-                            {lang('Custody layer', 'Capa de custodia', '托管层')}
+                            {lang('Custody layer', 'Capa de custodia')}
                         </div>
                     </div>
 
                     <h1 className="text-center text-4xl sm:text-6xl font-black leading-[1.05] tracking-tight">
-                        {lang('100% non-custodial', '100% non-custodial', '100% 非托管')}
+                        {lang('100% non-custodial', '100% non-custodial')}
                     </h1>
                     <p className="mt-6 text-center text-lg text-white/60 max-w-2xl mx-auto leading-relaxed">
                         {lang(
                             'Soroban 2-of-3 vault. The client holds the keys. Nirium can never move your funds. Period.',
-                            'Vault Soroban 2-de-3. El cliente controla las llaves. Nirium nunca puede mover tus fondos. Punto.',
-                            'Soroban 2-of-3 保险库。客户持有密钥。Nirium 永远无法移动您的资金。'
-                        )}
+                            'Vault Soroban 2-de-3. El cliente controla las llaves. Nirium nunca puede mover tus fondos. Punto.')}
                     </p>
                 </div>
             </section>
@@ -45,29 +43,27 @@ export default function SecurityPage() {
             <section className="py-16 border-t border-white/5">
                 <div className="max-w-5xl mx-auto px-6">
                     <h2 className="text-2xl sm:text-3xl font-bold text-center">
-                        {lang('Three keys. Two signatures.', 'Tres llaves. Dos firmas.', '三把密钥。两个签名。')}
+                        {lang('Three keys. Two signatures.', 'Tres llaves. Dos firmas.')}
                     </h2>
                     <p className="mt-4 text-center text-white/60 max-w-2xl mx-auto">
                         {lang(
                             'Any critical vault operation requires 2 of 3 signatures. No one can move funds alone.',
-                            'Para cualquier operación crítica del vault se necesitan 2 de 3 firmas. Nadie puede mover los fondos solo.',
-                            '任何关键保险库操作都需要 3 个签名中的 2 个。任何人都无法单独转移资金。'
-                        )}
+                            'Para cualquier operación crítica del vault se necesitan 2 de 3 firmas. Nadie puede mover los fondos solo.')}
                     </p>
 
                     <div className="mt-12 grid md:grid-cols-3 gap-6">
                         {[
                             {
                                 role: 'Owner',
-                                desc: lang('Founder, CEO or primary decider', 'Founder, CEO o decisor principal', '创始人、CEO 或主要决策者'),
+                                desc: lang('Founder, CEO or primary decider', 'Founder, CEO o decisor principal'),
                             },
                             {
                                 role: 'Cosigner 1',
-                                desc: lang('CTO, Operations or Admin', 'CTO, Operations o Admin', 'CTO、运营或管理员'),
+                                desc: lang('CTO, Operations or Admin', 'CTO, Operations o Admin'),
                             },
                             {
                                 role: 'Cosigner 2',
-                                desc: lang('Legal, Board or external advisor', 'Legal, Board o asesor externo', '法务、董事会或外部顾问'),
+                                desc: lang('Legal, Board or external advisor', 'Legal, Board o asesor externo'),
                             },
                         ].map((key) => (
                             <div
@@ -89,34 +85,32 @@ export default function SecurityPage() {
             <section className="py-16 border-t border-white/5">
                 <div className="max-w-5xl mx-auto px-6">
                     <h2 className="text-2xl sm:text-3xl font-bold text-center">
-                        {lang('What requires 2-of-3 multisig', 'Qué requiere multisig 2-de-3', '哪些操作需要 2-of-3 多签')}
+                        {lang('What requires 2-of-3 multisig', 'Qué requiere multisig 2-de-3')}
                     </h2>
 
                     <div className="mt-12 grid md:grid-cols-2 gap-6">
                         <div className="p-6 rounded-xl border border-emerald-500/20 bg-emerald-500/[0.03]">
                             <div className="flex items-center gap-2 mb-4">
                                 <CheckCircle2 className="w-5 h-5 text-emerald-400" />
-                                <h3 className="text-lg font-bold">{lang('Automatic operations', 'Operaciones automáticas', '自动操作')}</h3>
+                                <h3 className="text-lg font-bold">{lang('Automatic operations', 'Operaciones automáticas')}</h3>
                             </div>
                             <p className="text-sm text-white/60 mb-4">
                                 {lang(
                                     'The agent can execute without additional signature under preconfigured limits:',
-                                    'El agente puede ejecutar sin firma adicional bajo límites preconfigurados:',
-                                    '在预配置限额内，智能体无需额外签名即可执行：'
-                                )}
+                                    'El agente puede ejecutar sin firma adicional bajo límites preconfigurados:')}
                             </p>
                             <ul className="space-y-2 text-sm text-white/70">
                                 <li className="flex items-start gap-2">
                                     <CheckCircle2 className="w-4 h-4 text-emerald-400/80 shrink-0 mt-0.5" />
-                                    {lang('USDC ↔ CETES rebalancing under daily threshold', 'Rebalanceo USDC ↔ CETES bajo umbral diario', 'USDC ↔ CETES 再平衡（低于日限额）')}
+                                    {lang('Move idle capital in and out of the strategy, inside your own vault', 'Mover capital ocioso hacia la estrategia y de regreso, dentro de tu propia bóveda')}
                                 </li>
                                 <li className="flex items-start gap-2">
                                     <CheckCircle2 className="w-4 h-4 text-emerald-400/80 shrink-0 mt-0.5" />
-                                    {lang('Routine operations < $10K USDC', 'Operaciones rutinarias < $10K USDC', '常规操作 < $10K USDC')}
+                                    {lang('Up to the max_execution_amount the owner set when delegating', 'Hasta el max_execution_amount que el dueño fijó al delegar')}
                                 </li>
                                 <li className="flex items-start gap-2">
                                     <CheckCircle2 className="w-4 h-4 text-emerald-400/80 shrink-0 mt-0.5" />
-                                    {lang('Reports and queries (read-only)', 'Reportes y consultas (read-only)', '报告和查询（只读）')}
+                                    {lang('Reports and queries (read-only)', 'Reportes y consultas (read-only)')}
                                 </li>
                             </ul>
                         </div>
@@ -124,31 +118,29 @@ export default function SecurityPage() {
                         <div className="p-6 rounded-xl border border-amber-500/20 bg-amber-500/[0.03]">
                             <div className="flex items-center gap-2 mb-4">
                                 <Shield className="w-5 h-5 text-amber-400" />
-                                <h3 className="text-lg font-bold">{lang('Critical operations', 'Operaciones críticas', '关键操作')}</h3>
+                                <h3 className="text-lg font-bold">{lang('Critical operations', 'Operaciones críticas')}</h3>
                             </div>
                             <p className="text-sm text-white/60 mb-4">
                                 {lang(
                                     'These require 2 human signatures, no exceptions:',
-                                    'Estas requieren 2 firmas humanas obligatoriamente:',
-                                    '以下操作必须有 2 个人工签名，无例外：'
-                                )}
+                                    'Estas requieren 2 firmas humanas obligatoriamente:')}
                             </p>
                             <ul className="space-y-2 text-sm text-white/70">
                                 <li className="flex items-start gap-2">
                                     <Shield className="w-4 h-4 text-amber-400/80 shrink-0 mt-0.5" />
-                                    {lang('Withdrawals > $10K USDC', 'Retiros > $10K USDC', '提款 > $10K USDC')}
+                                    {lang('Any withdrawal — only the vault owner can sign it', 'Cualquier retiro — solo lo firma el dueño de la bóveda')}
                                 </li>
                                 <li className="flex items-start gap-2">
                                     <Shield className="w-4 h-4 text-amber-400/80 shrink-0 mt-0.5" />
-                                    {lang('Cosigner changes', 'Cambio de cosignatarios', '更换共签人')}
+                                    {lang('Cosigner changes', 'Cambio de cosignatarios')}
                                 </li>
                                 <li className="flex items-start gap-2">
                                     <Shield className="w-4 h-4 text-amber-400/80 shrink-0 mt-0.5" />
-                                    {lang('Emergency vault pause', 'Pausa de emergencia del vault', '紧急暂停保险库')}
+                                    {lang('Emergency vault pause', 'Pausa de emergencia del vault')}
                                 </li>
                                 <li className="flex items-start gap-2">
                                     <Shield className="w-4 h-4 text-amber-400/80 shrink-0 mt-0.5" />
-                                    {lang('Vault closure', 'Cierre del vault', '关闭保险库')}
+                                    {lang('Vault closure', 'Cierre del vault')}
                                 </li>
                             </ul>
                         </div>
@@ -160,24 +152,22 @@ export default function SecurityPage() {
             <section className="py-16 border-t border-white/5">
                 <div className="max-w-3xl mx-auto px-6">
                     <h2 className="text-2xl sm:text-3xl font-bold text-center">
-                        {lang('What Nirium CANNOT do', 'Lo que Nirium NO puede hacer', 'Nirium 无法做的事')}
+                        {lang('What Nirium CANNOT do', 'Lo que Nirium NO puede hacer')}
                     </h2>
                     <p className="mt-4 text-center text-white/60">
                         {lang(
                             'Not a legal disclaimer — a technical impossibility at the Soroban contract level.',
-                            'No es un disclaimer legal — es una imposibilidad técnica al nivel del contrato Soroban.',
-                            '这不是法律免责声明——而是 Soroban 合约层面的技术性不可能。'
-                        )}
+                            'No es un disclaimer legal — es una imposibilidad técnica al nivel del contrato Soroban.')}
                     </p>
 
                     <div className="mt-10 space-y-3">
                         {[
-                            lang('Move your funds without your signature', 'Mover tus fondos sin tu firma', '在没有您签名的情况下转移资金'),
-                            lang('Change your cosigners', 'Cambiar tus cosignatarios', '更改您的共签人'),
-                            lang('Withdraw funds to a Nirium wallet', 'Retirar fondos a una wallet de Nirium', '将资金提取至 Nirium 钱包'),
-                            lang('Access your private keys', 'Acceder a tus llaves privadas', '访问您的私钥'),
-                            lang('Unilaterally pause your vault', 'Pausar tu vault unilateralmente', '单方面暂停您的保险库'),
-                            lang('Modify vault code once deployed', 'Modificar el código del vault una vez deployado', '合约部署后修改保险库代码'),
+                            lang('Move your funds without your signature', 'Mover tus fondos sin tu firma'),
+                            lang('Change your cosigners', 'Cambiar tus cosignatarios'),
+                            lang('Withdraw funds to a Nirium wallet', 'Retirar fondos a una wallet de Nirium'),
+                            lang('Access your private keys', 'Acceder a tus llaves privadas'),
+                            lang('Unilaterally pause your vault', 'Pausar tu vault unilateralmente'),
+                            lang('Modify vault code once deployed', 'Modificar el código del vault una vez deployado'),
                         ].map((item) => (
                             <div
                                 key={item}
@@ -195,14 +185,12 @@ export default function SecurityPage() {
             <section className="py-16 border-t border-white/5">
                 <div className="max-w-4xl mx-auto px-6">
                     <h2 className="text-2xl sm:text-3xl font-bold text-center">
-                        {lang('The real contract', 'El contrato real', '真实合约')}
+                        {lang('The real contract', 'El contrato real')}
                     </h2>
                     <p className="mt-4 text-center text-white/60">
                         {lang(
                             'NiriumVault is deployed on Stellar Testnet and is verifiable.',
-                            'NiriumVault está deployado en Stellar Testnet y es verificable.',
-                            'NiriumVault 已部署在 Stellar 测试网上，可公开验证。'
-                        )}
+                            'NiriumVault está deployado en Stellar Testnet y es verificable.')}
                     </p>
 
                     <div className="mt-8 p-5 rounded-xl border border-white/10 bg-white/[0.02]">
@@ -221,7 +209,7 @@ export default function SecurityPage() {
                                 className="inline-flex items-center gap-2 text-xs text-stellar-teal hover:underline"
                             >
                                 <FileSearch className="w-3.5 h-3.5" />
-                                {lang('View on Stellar Expert', 'Ver en Stellar Expert', '在 Stellar Expert 上查看')}
+                                {lang('View on Stellar Expert', 'Ver en Stellar Expert')}
                             </a>
                             <Link
                                 href="https://github.com/Eras256/Nirium"
@@ -230,7 +218,7 @@ export default function SecurityPage() {
                                 className="inline-flex items-center gap-2 text-xs text-stellar-teal hover:underline"
                             >
                                 <FileSearch className="w-3.5 h-3.5" />
-                                {lang('View source code', 'Ver código fuente', '查看源代码')}
+                                {lang('View source code', 'Ver código fuente')}
                             </Link>
                         </div>
                     </div>
@@ -241,23 +229,15 @@ export default function SecurityPage() {
             <section className="py-16 border-t border-white/5">
                 <div className="max-w-3xl mx-auto px-6">
                     <h2 className="text-2xl sm:text-3xl font-bold text-center">
-                        {lang('Audit', 'Auditoría', '审计')}
+                        {lang('Audit', 'Auditoría')}
                     </h2>
-                    <div className="mt-10 grid sm:grid-cols-2 gap-4">
-                        <div className="p-5 rounded-xl border border-emerald-500/20 bg-emerald-500/[0.03]">
-                            <CheckCircle2 className="w-5 h-5 text-emerald-400 mb-3" />
-                            <div className="text-sm font-bold mb-2">{lang('JARGUS Audit v2 (internal)', 'JARGUS Audit v2 (interno)', 'JARGUS 审计 v2（内部）')}</div>
-                            <div className="text-2xl font-black text-emerald-400 mb-1">78/78</div>
-                            <p className="text-xs text-white/50">
-                                {lang('Vectors PASS · 0 critical · proprietary framework', 'Vectores PASS · 0 críticos · framework propio', '向量全通过 · 0 高危 · 自研框架')}
-                            </p>
-                        </div>
+                    <div className="mt-10 max-w-sm mx-auto">
                         <div className="p-5 rounded-xl border border-amber-500/20 bg-amber-500/[0.03]">
                             <AlertTriangle className="w-5 h-5 text-amber-400 mb-3" />
-                            <div className="text-sm font-bold mb-2">{lang('External audit', 'Auditoría externa', '外部审计')}</div>
-                            <div className="text-2xl font-black text-amber-400 mb-1">{lang('Pending', 'Pendiente', '待进行')}</div>
+                            <div className="text-sm font-bold mb-2">{lang('External audit', 'Auditoría externa')}</div>
+                            <div className="text-2xl font-black text-amber-400 mb-1">{lang('Pending', 'Pendiente')}</div>
                             <p className="text-xs text-white/50">
-                                {lang('Mainnet blocker · funded by SCF Build', 'Bloquea mainnet · financiada por SCF Build', '主网上线前提 · SCF Build 资助')}
+                                {lang('Mainnet gate for the vault', 'Bloquea el mainnet del vault')}
                             </p>
                         </div>
                     </div>
@@ -270,18 +250,18 @@ export default function SecurityPage() {
             <section className="py-24 border-t border-white/5">
                 <div className="max-w-3xl mx-auto px-6 text-center">
                     <h2 className="text-3xl sm:text-5xl font-black tracking-tight">
-                        {lang('Your keys, your funds', 'Tus llaves, tus fondos', '您的密钥，您的资金')}
+                        {lang('Your keys, your funds', 'Tus llaves, tus fondos')}
                     </h2>
                     <div className="mt-10 flex flex-col sm:flex-row gap-3 justify-center">
                         <Link href="/sandbox">
                             <Button size="lg" variant="premium">
-                                {lang('Create testnet vault', 'Crear vault en testnet', '创建测试网保险库')}
+                                {lang('Create testnet vault', 'Crear vault en testnet')}
                                 <ArrowRight className="ml-2 w-4 h-4" />
                             </Button>
                         </Link>
                         <Link href="/treasury">
                             <Button size="lg" variant="outline" className="border-white/20 hover:bg-white/5">
-                                {lang('View the product', 'Ver el producto', '查看产品')}
+                                {lang('View the product', 'Ver el producto')}
                             </Button>
                         </Link>
                     </div>

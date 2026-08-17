@@ -91,7 +91,11 @@ export default function ExperimentalLabs() {
                         <div className="flex gap-3">
                             <AlertCircle className="w-5 h-5 text-purple-400 shrink-0 mt-0.5" />
                             <div className="text-sm text-gray-400 leading-relaxed">
-                                <span className="font-bold text-purple-300 uppercase tracking-tight">Legacy Telemetry Disclaimer:</span> This page visualizes the historical "Swarm" architecture (26 experimental agents). These nodes are no longer part of the institutional production core but remain active for testnet spread-condition research and algorithmic stress testing. Use production-grade nodes for institutional treasury operations.
+                                {/* Decía que estos nodos "remain active for testnet research".
+                                    No corren: el orquestador (master.ts) dejó de lanzar el
+                                    swarm y el script quedó sin invocar. Es una reconstrucción
+                                    histórica, y la telemetría de abajo es simulada. */}
+                                <span className="font-bold text-purple-300 uppercase tracking-tight">Retired architecture:</span> This page is a historical reconstruction of the &ldquo;Swarm&rdquo; design (26 experimental agents). It was retired — the orchestrator no longer launches it, and none of these nodes run on any network today. The telemetry below is simulated, kept only as a record of the design. Production runs a single autonomous node; see the Execution Node catalog.
                             </div>
                         </div>
                     </div>

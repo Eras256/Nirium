@@ -226,7 +226,7 @@ export default function ApiKeyManager() {
                     </button>
 
                     <div className="pt-4 mt-2 border-t border-white/5 text-[9px] text-gray-700 text-center uppercase tracking-[0.2em] font-mono italic">
-                        Aligned with SCF 7.0 & Stellar Code of Conduct (April 2026)
+                        Aligned with the Stellar Code of Conduct
                     </div>
                 </div>
             )}

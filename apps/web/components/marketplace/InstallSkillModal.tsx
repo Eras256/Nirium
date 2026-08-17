@@ -121,7 +121,7 @@ export default function InstallSkillModal({ skill, isOpen, onClose, onInstall, i
                                     </div>
                                     <div>
                                         <h3 className="text-lg font-black text-white tracking-tight">{localizedSkill.name}</h3>
-                                        <p className="text-[10px] font-mono text-stellar-teal uppercase tracking-widest">v0.6.1</p>
+                                        <p className="text-[10px] font-mono text-stellar-teal uppercase tracking-widest">v0.7.0</p>
                                     </div>
                                 </div>
                                 <button
@@ -205,7 +205,7 @@ export default function InstallSkillModal({ skill, isOpen, onClose, onInstall, i
                                             {selectedAgent === 'global' ? t.marketplace.modal.security_desc_global : t.marketplace.modal.security_desc_specific}
                                         </span>
                                         <span className="text-[9px] mt-2 block text-gray-600 font-mono uppercase tracking-tighter italic">
-                                            // Verified under Stellar Code of Conduct (April 2026)
+                                            // Verified under the Stellar Code of Conduct
                                         </span>
                                     </p>
                                 </div>

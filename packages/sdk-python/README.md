@@ -91,6 +91,39 @@ response = await agent.mpp_fetch("https://nirium-agent.fly.dev/api/v1/mpp/signal
 | **x402 Premium** | `/api/v1/premium/signals` ($0.02 USDC), `/api/v1/premium/market` ($0.05 USDC) |
 | **MPP** | `/api/v1/mpp/signals`, `/api/v1/mpp/market` |
 
+## Payouts
+
+Batch disbursement, non-custodial: the node builds an **unsigned** transaction, you sign it with your own wallet and broadcast it. Nirium never holds funds and never sees your keys.
+
+```python
+run = await agent.create_payout_run(
+    recipients=[{"wallet": "GABC...", "amount": "250.00"}],
+    acknowledge_terms=True,   # required on every network — 403 without it
+)
+
+signed_xdr = sign_with_your_wallet(run["xdr"])
+settled = await agent.submit_payout(run["runId"], signed_xdr)
+print(settled["txHash"], settled["cid"])   # on-chain hash + IPFS receipt
+```
+
+Licensed for **independent service payments only** — contractors, freelancers, B2B. Not for subordinate-employee salary. Read `get_payout_terms()` before integrating; classifying recipients and meeting tax and labor obligations is the client's responsibility.
+
+Mainnet is invite-only during early access and additionally requires `client_info`.
+
+## Audit Trail
+
+Anchor evidence to IPFS and get back a CID — an integrity seal, not notarization.
+
+```python
+anchor = await agent.anchor_audit_record(
+    hash="sha-256:9f86d081...",   # hash of your own file or event
+    tag="invoice-batch-jul",
+)
+print(anchor["cid"])
+```
+
+Anchor a **hash** rather than the data itself: IPFS content cannot be deleted, so raw personal data would outlive any erasure request.
+
 ## API Coverage
 
 | Category | Methods |
@@ -104,6 +137,10 @@ response = await agent.mpp_fetch("https://nirium-agent.fly.dev/api/v1/mpp/signal
 | Webhooks | `register_webhook()`, `get_webhooks()`, `delete_webhook()`, `test_webhook()` |
 | Auth | `get_auth_token()`, `create_auth_key()`, `get_auth_keys()`, `revoke_auth_key()` |
 | Revenue | `get_revenue()`, `get_info()` |
+| Nodes | `get_nodes()` |
+| Payouts | `create_payout_run()`, `submit_payout()`, `onboard_payout_recipient()`, `submit_payout_onboard()`, `get_payout_runs()`, `get_payout_terms()`, `get_payout_info()` |
+| Audit Trail | `anchor_audit_record()`, `get_audit_info()` |
+| Reporting | `get_reporting_summary()`, `get_reporting_export()` |
 | Admin | `configure_llm()` |
 | WebSocket | `subscribe()`, `on()` decorator |
 | x402 Payments | `init_x402()`, `x402_fetch()` |

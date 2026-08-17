@@ -2,7 +2,14 @@
 @import "tailwindcss/components";
 @import "tailwindcss/utilities";
 
-:root {
+:root, :root[data-theme="dark"] {
+  color-scheme: dark;
+  /* Theme-aware RGB triplets consumed by Tailwind (black / white / background). */
+  --nx-black: 0 0 0;
+  --nx-white: 255 255 255;
+  --nx-bg: 5 5 5;
+  --nx-obsidian: 2 2 2;
+
   --background: #050505;
   --foreground: #ffffff;
   --stellar-teal: #00f0ff;
@@ -11,6 +18,135 @@
   --glass-border: rgba(255, 255, 255, 0.1);
   --glass-bg: rgba(255, 255, 255, 0.03);
   --obsidian: #0A0A0A;
+}
+
+/* ── Light theme ── bg-black -> light surface, text-white -> near-black, etc. */
+:root[data-theme="light"] {
+  color-scheme: light;
+  --nx-black: 255 255 255;   /* pure-black surfaces -> white */
+  --nx-white: 24 24 27;      /* white text -> near-black (zinc-900) */
+  --nx-bg: 248 249 250;      /* app background -> soft off-white (#f8f9fa) */
+  --nx-obsidian: 248 249 250; /* dashboard background -> soft off-white */
+
+  --background: #f8f9fa;
+  --foreground: #18181b;
+  --glass-border: rgba(24, 24, 27, 0.08);
+  --glass-bg: rgba(255, 255, 255, 0.9);
+  --obsidian: #f8f9fa;
+}
+
+/* ─────────────────────────────────────────────────────────────
+   Light-theme systemic polish.
+   ───────────────────────────────────────────────────────────── */
+
+/* 1) Card surfaces: make transparent black/white cards into solid white with soft borders and shadows */
+:root[data-theme="light"] .glass-panel,
+:root[data-theme="light"] [class*="bg-white/"][class*="rounded"],
+:root[data-theme="light"] [class*="bg-black/"][class*="rounded"] {
+  background-color: #ffffff !important;
+  border-color: rgba(24, 24, 27, 0.08) !important;
+  box-shadow: 0 1px 3px rgba(16, 24, 40, 0.02), 0 8px 24px rgba(16, 24, 40, 0.04) !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+}
+
+/* 2) Hardcoded dark backgrounds: override them to clean white in light mode */
+:root[data-theme="light"] [class*="bg-[#050505]"],
+:root[data-theme="light"] [class*="bg-[#0A0A0A]"],
+:root[data-theme="light"] [class*="bg-[#080808]"],
+:root[data-theme="light"] [class*="bg-[#111]"],
+:root[data-theme="light"] [class*="bg-[#121212]"],
+:root[data-theme="light"] [class*="bg-[#0f0f13]"] {
+  background-color: #ffffff !important;
+  border-color: rgba(24, 24, 27, 0.08) !important;
+  box-shadow: 0 1px 3px rgba(16, 24, 40, 0.02), 0 8px 24px rgba(16, 24, 40, 0.04) !important;
+}
+
+/* 3) Code Blocks & Preformatted Blocks: give them a soft gray background with dark text */
+:root[data-theme="light"] pre,
+:root[data-theme="light"] code,
+:root[data-theme="light"] [class*="font-mono"][class*="rounded"],
+:root[data-theme="light"] [class*="bg-black/60"][class*="rounded"] {
+  background-color: #f4f4f6 !important;
+  color: #18181b !important;
+  border-color: rgba(24, 24, 27, 0.08) !important;
+  box-shadow: none !important;
+}
+
+/* 4) Input elements: distinct light gray background with border, dark text, and soft placeholders */
+:root[data-theme="light"] input,
+:root[data-theme="light"] select,
+:root[data-theme="light"] textarea {
+  background-color: #f4f4f6 !important;
+  color: #18181b !important;
+  border-color: rgba(24, 24, 27, 0.12) !important;
+}
+:root[data-theme="light"] input::placeholder,
+:root[data-theme="light"] textarea::placeholder {
+  color: rgba(24, 24, 27, 0.4) !important;
+}
+
+/* 5) Secondary / muted text contrast fix: force intense black for all gray/white text in light mode */
+:root[data-theme="light"] [class*="text-gray-"],
+:root[data-theme="light"] [class*="text-zinc-"],
+:root[data-theme="light"] [class*="text-slate-"],
+:root[data-theme="light"] [class*="text-white"] {
+  color: #000000 !important; /* Intense black */
+}
+
+/* 5.1) High contrast for colored text in light mode */
+:root[data-theme="light"] [class*="text-stellar-teal"] {
+  color: #005a5a !important; /* Dark teal */
+}
+:root[data-theme="light"] [class*="text-stellar-yellow"] {
+  color: #996600 !important; /* Dark golden */
+}
+:root[data-theme="light"] [class*="text-green-"] {
+  color: #006600 !important; /* Dark green */
+}
+:root[data-theme="light"] [class*="text-amber-"] {
+  color: #994400 !important; /* Dark amber/brown */
+}
+:root[data-theme="light"] [class*="text-red-"] {
+  color: #aa0000 !important; /* Dark red */
+}
+:root[data-theme="light"] [class*="text-stellar-blue"] {
+  color: #0033aa !important; /* Dark blue */
+}
+
+/* 6) Non-rounded subtle surfaces (like list rows, dividers) get a very light tint */
+:root[data-theme="light"] [class*="bg-white/"]:not([class*="rounded"]),
+:root[data-theme="light"] [class*="bg-black/"]:not([class*="rounded"]) {
+  background-color: rgba(24, 24, 27, 0.025) !important;
+}
+
+/* 7) Decorative glows and washes: dim them down so they don't look like cream stains */
+:root[data-theme="light"] [class*="radial-gradient"],
+:root[data-theme="light"] [class*="linear-gradient"] {
+  opacity: 0.12 !important;
+}
+
+/* 8) Overrides specifically for the strategy detail dialogs which have hardcoded #0f0a1f */
+:root[data-theme="light"] [class*="bg-[#0f0a1f]"] {
+  background-color: #ffffff !important;
+  border-color: rgba(112, 0, 255, 0.15) !important;
+  box-shadow: 0 20px 50px rgba(112, 0, 255, 0.08) !important;
+}
+
+/* 9) Dark gradient colors: override to light gray */
+:root[data-theme="light"] [class*="from-gray-900"],
+:root[data-theme="light"] [class*="to-gray-900"],
+:root[data-theme="light"] [class*="from-[#0"],
+:root[data-theme="light"] [class*="to-[#0"] {
+  --tw-gradient-from: #f0f0f4 var(--tw-gradient-from-position) !important;
+  --tw-gradient-to: rgba(240, 240, 244, 0) var(--tw-gradient-to-position) !important;
+}
+
+/* Smooth theme switch. */
+@media (prefers-reduced-motion: no-preference) {
+  body, header, nav, aside, section, main, footer, a, button {
+    transition: background-color 0.25s ease, border-color 0.25s ease, color 0.25s ease;
+  }
 }
 
 body {

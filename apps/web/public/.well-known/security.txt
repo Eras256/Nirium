@@ -1,7 +1,7 @@
 # Nirium Protocol — Security Disclosure Policy
 # https://securitytxt.org (RFC 9116)
 
-Contact: mailto:institutional@nirium.xyz
+Contact: mailto:niriumprotocol@gmail.com
 Expires: 2027-04-01T00:00:00.000Z
 Preferred-Languages: en, es
 Canonical: https://nirium.xyz/.well-known/security.txt
@@ -9,6 +9,6 @@ Policy: https://nirium.xyz/security-policy
 Acknowledgments: https://nirium.xyz/security-acknowledgments
 
 # We welcome responsible disclosure of security vulnerabilities.
-# Please report findings to institutional@nirium.xyz with subject
+# Please report findings to niriumprotocol@gmail.com with subject
 # "SECURITY:" before public disclosure. We target a 72-hour
 # acknowledgment and 30-day remediation window.

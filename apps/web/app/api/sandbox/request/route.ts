@@ -198,7 +198,7 @@ export async function POST(request: Request) {
 export async function GET() {
     return NextResponse.json({
         name: 'Nirium Sandbox Program',
-        description: 'Testnet sandbox accounts for developers. Institutional/enterprise access requires manual approval — contact xvaiosx7@gmail.com.',
+        description: 'Testnet sandbox accounts for developers. Institutional/enterprise access requires manual approval — contact niriumprotocol@gmail.com.',
         tiers: {
             sandbox: {
                 requestsPerMinute: 60,
@@ -211,12 +211,12 @@ export async function GET() {
                 requestsPerMinute: 300,
                 requestsPerDay: 10000,
                 maxStrategiesPerDay: 500,
-                provisioning: 'manual — contact xvaiosx7@gmail.com'
+                provisioning: 'manual — contact niriumprotocol@gmail.com'
             },
             enterprise: {
                 requestsPerMinute: 1000,
                 requestsPerDay: 'unlimited',
-                provisioning: 'manual — contact xvaiosx7@gmail.com'
+                provisioning: 'manual — contact niriumprotocol@gmail.com'
             }
         },
         features: [

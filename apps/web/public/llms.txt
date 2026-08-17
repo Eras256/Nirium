@@ -4,7 +4,7 @@
 
 ## Protocol Core
 **Name:** Nirium Protocol
-**Version:** v0.5.0
+**Version:** v0.7.0
 **Chain:** Stellar Network / Soroban Smart Contracts
 **Focus:** Institutional DeFi infrastructure + autonomous agent orchestration
 **Website:** https://nirium.xyz
@@ -17,7 +17,7 @@
 - **Cross-Border FX:** MXN→USDC routing via Stellar PathPayment (sub-5s settlement)
 - **NiriumVault (Soroban):** Non-custodial multi-asset vaults with agent delegation — `CAU2XBJTQUBTMPAUFRX7GMZ337I5WLBI4GYPWHZEVXTMJ66D3CP6DEL4`
 - **ELO Reputation Engine:** On-chain agent scoring (Silver / Gold / Matrix tiers)
-- **SDK:** TypeScript (`npm install nirium`) and Python (`pip install nirium`) — v0.5.0, 33 verified endpoints
+- **SDK & MCP:** TypeScript (`npm install nirium`), Python (`pip install nirium`) — v0.7.0; MCP Server (`npx nirium-mcp`) — v0.5.0, 65+ verified endpoints
 
 ## Execution Modes
 - **Copilot Mode:** Human operator signs transaction payload via Freighter wallet.

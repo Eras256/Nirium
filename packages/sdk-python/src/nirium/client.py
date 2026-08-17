@@ -1,5 +1,7 @@
 # ═══════════════════════════════════════════════════════════════
-# Nirium Python SDK v0.6.1 — Official Client (x402 + MPP)
+# Nirium Python SDK — Official Client (x402 + MPP)
+# Versión: solo en pyproject.toml / setup.py / __init__.__version__ (no aquí:
+# un número en un comentario se desincroniza y ya mintió antes).
 # Synced with backend API (real Horizon data, Soroban execution)
 # ═══════════════════════════════════════════════════════════════
 import asyncio
@@ -9,6 +11,15 @@ import aiohttp  # type: ignore
 import websockets  # type: ignore
 from typing import Callable, Dict, Any, List, Optional
 from stellar_sdk import Keypair, Network, Server, TransactionBuilder, Asset  # type: ignore
+from stellar_sdk import Account, Address, SorobanServer, scval  # type: ignore
+from stellar_sdk.xdr import SorobanTransactionData  # type: ignore
+from stellar_sdk.auth import authorize_entry  # type: ignore
+import base64 as _b64
+import math as _math
+
+# Cuenta nula: la transacción de pago es una plantilla y el facilitador la
+# re-emite con su propia cuenta y secuencia al pagar el fee de red.
+_X402_NULL_ACCOUNT = "GAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAWHF"
 
 logger = logging.getLogger("nirium.client")
 
@@ -60,10 +71,16 @@ class Agent:
 
     # ─── HTTP Helpers ─────────────────────────────────────────
 
-    async def _get(self, path: str, extra_headers: Optional[Dict[str, str]] = None) -> Any:
+    async def _get(
+        self,
+        path: str,
+        extra_headers: Optional[Dict[str, str]] = None,
+        params: Optional[Dict[str, Any]] = None,
+    ) -> Any:
         headers = {**self.headers, **(extra_headers or {})}
+        query = {k: str(v) for k, v in (params or {}).items() if v is not None}
         async with aiohttp.ClientSession(headers=headers) as session:
-            async with session.get(f"{self.api_url}{path}") as resp:
+            async with session.get(f"{self.api_url}{path}", params=query or None) as resp:
                 resp.raise_for_status()
                 return await resp.json()
 
@@ -251,6 +268,297 @@ class Agent:
         """Get protocol info (endpoints, LLM provider, version)."""
         return await self._get("/api/info")
 
+    # ─── Execution Nodes ─────────────────────────────────────
+
+    async def get_nodes(self) -> Dict[str, Any]:
+        """List execution nodes with live status, custody model and network."""
+        return await self._get("/api/nodes")
+
+    # ─── Payouts / Disbursements ─────────────────────────────
+    #
+    # Non-custodial by construction: the node builds an unsigned XDR, you sign
+    # it with your own wallet and broadcast it via submit_payout. Nirium never
+    # holds funds and never sees your keys.
+    #
+    # Licensed for independent service payments only (contractors, freelancers,
+    # B2B) — never for subordinate-employee salary. See get_payout_terms().
+
+    async def create_payout_run(
+        self,
+        recipients: List[Dict[str, Any]],
+        acknowledge_terms: bool,
+        asset: Optional[str] = None,
+        memo: Optional[str] = None,
+        run_id: Optional[str] = None,
+        treasury: Optional[str] = None,
+        client_info: Optional[Dict[str, str]] = None,
+    ) -> Dict[str, Any]:
+        """Build a batch payout (up to 100 recipients) and get back an unsigned XDR.
+
+        ``acknowledge_terms`` must be True on every network — the node replies 403
+        without it. On mainnet the node is invite-only (institutional tier) and
+        additionally requires ``client_info`` with legalName, taxId and repName.
+        """
+        payload: Dict[str, Any] = {
+            "recipients": recipients,
+            "acknowledgeTerms": acknowledge_terms,
+        }
+        for key, value in (
+            ("asset", asset), ("memo", memo), ("runId", run_id),
+            ("treasury", treasury), ("clientInfo", client_info),
+        ):
+            if value is not None:
+                payload[key] = value
+        return await self._post("/api/payroll/run", payload)
+
+    async def submit_payout(self, run_id: str, signed_xdr: str) -> Dict[str, Any]:
+        """Broadcast the payout XDR after signing it with your own wallet."""
+        return await self._post("/api/payroll/submit", {"runId": run_id, "signedXdr": signed_xdr})
+
+    async def onboard_payout_recipient(
+        self,
+        employee: str,
+        asset: Optional[str] = None,
+        sponsor: Optional[str] = None,
+        limit: Optional[str] = None,
+    ) -> Dict[str, Any]:
+        """Build a self-signed USDC trustline so a new recipient can receive payouts."""
+        payload: Dict[str, Any] = {"employee": employee}
+        for key, value in (("asset", asset), ("sponsor", sponsor), ("limit", limit)):
+            if value is not None:
+                payload[key] = value
+        return await self._post("/api/payroll/onboard", payload)
+
+    async def submit_payout_onboard(self, signed_xdr: str) -> Dict[str, Any]:
+        """Broadcast the signed trustline XDR from onboard_payout_recipient."""
+        return await self._post("/api/payroll/onboard/submit", {"signedXdr": signed_xdr})
+
+    async def get_payout_runs(self) -> Dict[str, Any]:
+        """Payout history for the current network, with tx hashes and IPFS receipt CIDs."""
+        return await self._get("/api/payroll/runs")
+
+    async def get_payout_terms(self) -> Dict[str, Any]:
+        """Payouts Terms v1.0 — the text ``acknowledge_terms`` accepts."""
+        return await self._get("/api/payroll/terms")
+
+    async def get_payout_info(self) -> Dict[str, Any]:
+        """Payouts node metadata: pricing tiers, mainnet access, legal notice."""
+        return await self._get("/api/payroll/info")
+
+    # ─── Audit Trail ─────────────────────────────────────────
+
+    async def anchor_audit_record(
+        self,
+        hash: Optional[str] = None,
+        record: Optional[Dict[str, Any]] = None,
+        tx_hash: Optional[str] = None,
+        network: Optional[str] = None,
+        tag: Optional[str] = None,
+        agent: Optional[Dict[str, Any]] = None,
+    ) -> Dict[str, Any]:
+        """Anchor evidence to IPFS and get back a CID.
+
+        This is an integrity seal, not notarization and not legal proof of content.
+        Anchor a ``hash`` of your data rather than the data itself: IPFS content
+        cannot be deleted, so raw personal data would outlive any erasure request.
+
+        Pass ``agent`` as ``{"key": "G...", "signature": "<base64>", "id": "..."}``
+        to attest *who* produced the evidence: sign the exact string
+        ``nirium-audit-v1:<content_sha256>`` with that ed25519 key. An invalid
+        signature is rejected with 400 and nothing is anchored.
+        """
+        if hash is None and record is None:
+            raise ValueError("provide `hash` (sha-256 of your evidence) or `record` (JSON object)")
+        payload: Dict[str, Any] = {}
+        for key, value in (
+            ("hash", hash), ("record", record), ("txHash", tx_hash),
+            ("network", network), ("tag", tag), ("agent", agent),
+        ):
+            if value is not None:
+                payload[key] = value
+        return await self._post("/api/audit/log", payload)
+
+    async def get_audit_info(self) -> Dict[str, Any]:
+        """Audit Trail node metadata: limits, pricing and disclaimer."""
+        return await self._get("/api/audit/info")
+
+    # ─── Reporting ───────────────────────────────────────────
+
+    async def get_reporting_summary(
+        self,
+        from_date: Optional[str] = None,
+        to_date: Optional[str] = None,
+        network: Optional[str] = None,
+    ) -> Dict[str, Any]:
+        """Institutional-format summary of payouts, x402/MPP receipts and anchors.
+
+        Not certified regulatory reporting — what you file remains your responsibility.
+        """
+        return await self._get(
+            "/api/reporting/summary",
+            params={"from": from_date, "to": to_date, "network": network},
+        )
+
+    async def get_reporting_export(
+        self,
+        type: str,
+        from_date: Optional[str] = None,
+        to_date: Optional[str] = None,
+        network: Optional[str] = None,
+        limit: Optional[int] = None,
+    ) -> Dict[str, Any]:
+        """Export rows as JSON. ``type`` is one of: payroll | payments | anchors."""
+        return await self._get(
+            "/api/reporting/export",
+            params={
+                "type": type, "format": "json", "from": from_date,
+                "to": to_date, "network": network, "limit": limit,
+            },
+        )
+
+    # ─── Treasury (DeFindex) ───────────────────────────────────
+    #
+    # Nirium never holds these funds. It holds the RebalanceManager role of a
+    # DeFindex vault the client deploys and owns — every write below returns
+    # an UNSIGNED XDR; you decide whether and when to sign it and call
+    # ``submit_treasury_tx``. ``rebalance()`` never takes a destination
+    # address, so withdrawal is not something the role can express.
+
+    async def get_treasury_info(self) -> Dict[str, Any]:
+        """Treasury node metadata: role, custody model, fees, security notes."""
+        return await self._get("/api/treasury/info")
+
+    async def get_treasury_vault(self, vault_id: str, holder: Optional[str] = None) -> Dict[str, Any]:
+        """Read a vault's roles, assets and managed funds.
+
+        Pass ``holder`` to also get its balance in the vault's asset.
+        """
+        return await self._get(f"/api/treasury/vault/{vault_id}", params={"holder": holder})
+
+    async def get_treasury_vaults(self, manager: Optional[str] = None) -> Dict[str, Any]:
+        """List vaults Nirium has deployed or read, on the current network."""
+        return await self._get("/api/treasury/vaults", params={"manager": manager})
+
+    async def get_treasury_strategy_asset(self, strategy_id: str) -> Dict[str, Any]:
+        """Read which asset a strategy manages, as declared by the strategy itself — pairs it correctly before you deploy."""
+        return await self._get(f"/api/treasury/strategy/{strategy_id}")
+
+    async def deploy_treasury_vault(
+        self,
+        manager: str,
+        caller: str,
+        assets: List[Dict[str, Any]],
+        name: str,
+        symbol: str,
+        emergency_manager: Optional[str] = None,
+        fee_receiver: Optional[str] = None,
+        rebalance_manager: Optional[str] = None,
+    ) -> Dict[str, Any]:
+        """Build an unsigned XDR to deploy a DeFindex vault.
+
+        ``manager`` keeps control (rescue, pause, revoke); Nirium only ever
+        holds ``rebalance_manager``, which cannot withdraw or change roles.
+        ``assets`` is ``[{"address": "C...", "strategies": [{"address": "C...", "name": "..."}]}]``.
+        Sign the returned XDR with ``caller`` and submit via
+        ``submit_treasury_tx``.
+        """
+        payload: Dict[str, Any] = {
+            "manager": manager, "caller": caller, "assets": assets,
+            "name": name, "symbol": symbol,
+        }
+        for key, value in (
+            ("emergencyManager", emergency_manager), ("feeReceiver", fee_receiver),
+            ("rebalanceManager", rebalance_manager),
+        ):
+            if value is not None:
+                payload[key] = value
+        return await self._post("/api/treasury/deploy", payload)
+
+    async def deposit_to_treasury_vault(
+        self,
+        vault: str,
+        from_: str,
+        amounts: List[Any],
+        invest: Optional[bool] = None,
+        max_slippage_bps: Optional[int] = None,
+    ) -> Dict[str, Any]:
+        """Build an unsigned deposit XDR.
+
+        ``amounts`` is one amount per vault asset, in stroops, as strings —
+        an i128 does not survive a JSON number. Sign with ``from_`` and
+        submit via ``submit_treasury_tx``.
+        """
+        payload: Dict[str, Any] = {"vault": vault, "from": from_, "amounts": [str(a) for a in amounts]}
+        if invest is not None:
+            payload["invest"] = invest
+        if max_slippage_bps is not None:
+            payload["maxSlippageBps"] = max_slippage_bps
+        return await self._post("/api/treasury/deposit", payload)
+
+    async def withdraw_from_treasury_vault(
+        self,
+        vault: str,
+        from_: str,
+        shares: Optional[Any] = None,
+        max_slippage_bps: Optional[int] = None,
+    ) -> Dict[str, Any]:
+        """Build an unsigned withdraw XDR. Omit ``shares`` to withdraw everything.
+
+        Sign with ``from_`` and submit via ``submit_treasury_tx``.
+        """
+        payload: Dict[str, Any] = {"vault": vault, "from": from_}
+        if shares is not None:
+            payload["shares"] = str(shares)
+        if max_slippage_bps is not None:
+            payload["maxSlippageBps"] = max_slippage_bps
+        return await self._post("/api/treasury/withdraw", payload)
+
+    async def set_treasury_rebalance_manager(
+        self, vault: str, manager: str, rebalance_manager: str,
+    ) -> Dict[str, Any]:
+        """Build an unsigned XDR handing the RebalanceManager role to a new address.
+
+        Only the vault's current Manager can sign it — the same door that
+        grants Nirium the role also revokes it.
+        """
+        return await self._post("/api/treasury/set-rebalance-manager", {
+            "vault": vault, "manager": manager, "rebalanceManager": rebalance_manager,
+        })
+
+    async def build_treasury_rebalance(
+        self, vault: str, instructions: List[Dict[str, Any]], caller: Optional[str] = None,
+    ) -> Dict[str, Any]:
+        """Build an unsigned rebalance XDR.
+
+        ``instructions`` is
+        ``[{"kind": "Unwind" | "Invest", "strategy": "C...", "amount": "1000000"}]``
+        — the vault's own strategies only, no other instruction is
+        expressible. Sign with the vault's RebalanceManager and submit via
+        ``submit_treasury_tx``. To have Nirium sign with its own key instead,
+        see ``execute_treasury_rebalance``.
+        """
+        payload: Dict[str, Any] = {"vault": vault, "instructions": instructions}
+        if caller is not None:
+            payload["caller"] = caller
+        return await self._post("/api/treasury/rebalance", payload)
+
+    async def execute_treasury_rebalance(
+        self, vault: str, instructions: List[Dict[str, Any]], caller: Optional[str] = None,
+    ) -> Dict[str, Any]:
+        """Sign and submit a rebalance with Nirium's own RebalanceManager key and wait for confirmation.
+
+        Only available where that key actually lives — mainnet's
+        receive-only box returns 501 by design, not a broken 500.
+        """
+        payload: Dict[str, Any] = {"vault": vault, "instructions": instructions}
+        if caller is not None:
+            payload["caller"] = caller
+        return await self._post("/api/treasury/rebalance/execute", payload)
+
+    async def submit_treasury_tx(self, xdr: str) -> Dict[str, Any]:
+        """Broadcast an XDR you already signed (deploy/deposit/withdraw/rebalance/set-rebalance-manager) and wait for confirmation."""
+        return await self._post("/api/treasury/submit", {"xdr": xdr})
+
     # ─── Admin ───────────────────────────────────────────────
 
     async def configure_llm(
@@ -290,36 +598,100 @@ class Agent:
 
     # ─── x402 Protocol ───────────────────────────────────────
 
-    def init_x402(self, secret_key: str, network: str = "stellar:testnet"):
+    def init_x402(self, secret_key: str, network: str = "stellar:testnet", rpc_url: str = ""):
         """
-        Initialize x402 pay-per-request client.
+        Initialize the x402 pay-per-request client (protocol v2).
 
-        Python SDK implements the x402 HTTP flow directly:
-        1. GET resource -> receive 402 + payment requirements
-        2. Build Soroban SAC USDC transfer auth entry
-        3. Retry with X-PAYMENT header containing signed auth entry
+        The payer signs a Soroban auth entry; the facilitator submits the
+        transaction and sponsors the network fee, so the payer needs no XLM.
 
         Args:
-            secret_key: Stellar secret key (S...) for signing
-            network: CAIP-2 network ID ('stellar:testnet' or 'stellar:pubnet')
+            secret_key: Stellar secret key (S...) used to sign the auth entry.
+            network: CAIP-2 network ID ('stellar:testnet' or 'stellar:pubnet').
+            rpc_url: Soroban RPC override. Defaults per network.
         """
+        is_testnet = "testnet" in network
         self._x402_keypair = Keypair.from_secret(secret_key)
         self._x402_network = network
         self._x402_passphrase = (
-            Network.TESTNET_NETWORK_PASSPHRASE if "testnet" in network
+            Network.TESTNET_NETWORK_PASSPHRASE if is_testnet
             else Network.PUBLIC_NETWORK_PASSPHRASE
         )
-        self._x402_horizon = Server(
-            "https://horizon-testnet.stellar.org" if "testnet" in network
-            else "https://horizon.stellar.org"
+        self._x402_rpc_url = rpc_url or (
+            "https://soroban-testnet.stellar.org" if is_testnet
+            # El SDF no corre RPC público de mainnet; gateway.fm es el mismo
+            # default que usan el SDK de TypeScript y @stellar/mpp.
+            else "https://soroban-rpc.mainnet.stellar.gateway.fm"
         )
+
+    def _x402_build_transaction(self, accepted: Dict[str, Any]) -> str:
+        """
+        Build the signed payment transaction for one payment requirement.
+
+        Mirrors the canonical @x402/stellar client. Three details are what make
+        it settle, each verified against a TypeScript-generated reference:
+
+        1. The source account is the NULL account, not the payer. The
+           facilitator replaces it with its own when it submits and pays the
+           fee. Using the payer's account makes the simulator emit
+           source-account credentials, which the facilitator cannot honour.
+        2. The auth entry must therefore carry ADDRESS credentials, signed with
+           an expiration ledger.
+        3. The transaction must be re-simulated AFTER signing: the signature
+           adds bytes, and the resource fee computed before it is too low.
+        """
+        extra = accepted.get("extra") or {}
+        if not extra.get("areFeesSponsored"):
+            raise RuntimeError("x402 exact scheme requires areFeesSponsored to be true")
+
+        soroban = SorobanServer(self._x402_rpc_url)
+        timeout = int(accepted.get("maxTimeoutSeconds", 300))
+        # ~5 s por ledger, el mismo supuesto del cliente canónico.
+        max_ledger = soroban.get_latest_ledger().sequence + _math.ceil(timeout / 5)
+
+        tx = (
+            TransactionBuilder(
+                source_account=Account(_X402_NULL_ACCOUNT, 0),
+                network_passphrase=self._x402_passphrase,
+                base_fee=100,
+            )
+            .append_invoke_contract_function_op(
+                contract_id=accepted["asset"],
+                function_name="transfer",
+                parameters=[
+                    Address(self._x402_keypair.public_key).to_xdr_sc_val(),  # from
+                    Address(accepted["payTo"]).to_xdr_sc_val(),              # to
+                    scval.to_int128(int(accepted["amount"])),                # amount
+                ],
+            )
+            .set_timeout(timeout)
+            .build()
+        )
+
+        prepared = soroban.prepare_transaction(tx)
+        op = prepared.transaction.operations[0]
+        op.auth = [
+            authorize_entry(e, self._x402_keypair, max_ledger, self._x402_passphrase)
+            for e in (op.auth or [])
+        ]
+
+        sim = soroban.simulate_transaction(prepared)
+        if getattr(sim, "error", None):
+            raise RuntimeError(f"x402 payment simulation failed: {sim.error}")
+        data = sim.transaction_data
+        prepared.transaction.soroban_data = (
+            SorobanTransactionData.from_xdr(data) if isinstance(data, str) else data
+        )
+        prepared.transaction.fee = 100 + int(sim.min_resource_fee)
+        return prepared.to_xdr()
 
     async def x402_fetch(self, url: str, method: str = "GET") -> Dict[str, Any]:
         """
-        Fetch a paid resource via x402 protocol.
+        Fetch a paid resource via x402 (protocol v2).
 
-        Sends the initial request, receives 402 with payment requirements,
-        builds and signs a USDC payment, retries with the payment proof.
+        Reads the payment requirements from the ``payment-required`` response
+        header, signs a Soroban auth entry for the exact amount, and retries
+        with the ``PAYMENT-SIGNATURE`` header.
 
         Returns the JSON payload from the paid resource.
         """
@@ -327,40 +699,47 @@ class Agent:
             raise RuntimeError("x402 client not initialized. Call agent.init_x402() first.")
 
         async with aiohttp.ClientSession() as session:
-            # Step 1: Initial request — expect 402
             async with session.request(method, url) as resp:
                 if resp.status != 402:
                     return await resp.json()
+                # v2 entrega los requirements en un header base64; el body va vacío.
+                raw = resp.headers.get("payment-required")
 
-                requirements = await resp.json()
-
-            # Step 2: Build USDC payment from requirements
-            pay_req = requirements.get("paymentRequirements", [{}])[0]
-            dest = pay_req.get("receiver") or pay_req.get("destination", "")
-            amount = pay_req.get("maxAmountRequired") or pay_req.get("amount", "0.01")
-            usdc_issuer = "GBBD47IF6LWK7P7MDEVSCWR7DPUWV3NY3DTQEVFL4NAT4AQH3ZLLFLA5"
-            usdc_asset = Asset("USDC", usdc_issuer)
-
-            account = self._x402_horizon.load_account(self._x402_keypair.public_key)
-            tx = (
-                TransactionBuilder(
-                    source_account=account,
-                    network_passphrase=self._x402_passphrase,
-                    base_fee=100,
+            if not raw:
+                raise RuntimeError(
+                    "402 response carried no `payment-required` header — the server "
+                    "may not be an x402 v2 endpoint."
                 )
-                .append_payment_op(dest, usdc_asset, str(amount))
-                .set_timeout(30)
-                .build()
-            )
-            tx.sign(self._x402_keypair)
-            xdr = tx.to_xdr()
 
-            # Step 3: Retry with payment proof
-            payment_header = json.dumps({"transaction": xdr})
-            headers = {"X-PAYMENT": payment_header, "Content-Type": "application/json"}
-            async with session.request(method, url, headers=headers) as resp:
-                resp.raise_for_status()
-                return await resp.json()
+            challenge = json.loads(_b64.b64decode(raw).decode("utf-8"))
+            accepts = challenge.get("accepts") or []
+            if not accepts:
+                raise RuntimeError("x402 challenge listed no acceptable payment methods")
+
+            accepted = next(
+                (a for a in accepts if a.get("network") == self._x402_network), accepts[0]
+            )
+            if accepted.get("scheme") != "exact":
+                raise RuntimeError(f"unsupported x402 scheme: {accepted.get('scheme')}")
+
+            payment = {
+                "x402Version": challenge.get("x402Version", 2),
+                "accepted": accepted,
+                "payload": {"transaction": self._x402_build_transaction(accepted)},
+            }
+            header = _b64.b64encode(json.dumps(payment).encode("utf-8")).decode("ascii")
+
+            # v2 usa PAYMENT-SIGNATURE. X-PAYMENT es de v1: mandarlo hace que el
+            # servidor ignore el pago por completo y reemita el 402 sin explicar.
+            async with session.request(
+                method, url, headers={"PAYMENT-SIGNATURE": header}
+            ) as paid:
+                if paid.status >= 400:
+                    body = await paid.text()
+                    raise RuntimeError(
+                        f"x402 payment rejected (HTTP {paid.status}): {body[:300]}"
+                    )
+                return await paid.json()
 
     # ─── MPP Protocol (Charge Mode) ─────────────────────────
 

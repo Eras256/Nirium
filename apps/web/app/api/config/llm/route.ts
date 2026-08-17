@@ -77,7 +77,7 @@ export async function POST(request: NextRequest) {
         if (ollamaUrl) config.ollamaUrl = ollamaUrl;
 
         // Sync provider+model to Supabase so the agent picks it up dynamically.
-        // API key is intentionally excluded — the agent uses its own Railway env vars.
+        // API key is intentionally excluded — the agent uses its own Fly.io env vars.
         await syncToSupabase(provider, model);
 
         const response = NextResponse.json({

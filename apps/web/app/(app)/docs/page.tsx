@@ -7,14 +7,14 @@ import {
     GitBranch, FileCode, Rocket, CheckCircle, AlertTriangle,
     Terminal, Globe, Lock, TrendingUp, ChevronRight, ChevronLeft, ExternalLink,
     Play, Settings, Users, Workflow, Key, Lightbulb, HardDrive, FileCheck, BookOpen, Activity, Heart, Clock,
-    Handshake, ShieldCheck, Package
+    Handshake, ShieldCheck, Package, Send
 } from "lucide-react";
 import { SectionBrandLogo } from "@/components/ui/SectionBrandLogo";
 import { useLanguage } from "@/context/LanguageContext";
 import ApiKeyManager from "@/components/docs/ApiKeyManager";
 import { ComplianceBanner } from "@/components/ui/ComplianceBanner";
 
-type TabId = 'overview' | 'architecture' | 'contracts' | 'agent' | 'frontend' | 'api' | 'security' | 'blueprints' | 'builder';
+type TabId = 'overview' | 'architecture' | 'contracts' | 'agent' | 'frontend' | 'api' | 'security' | 'blueprints' | 'builder' | 'payroll';
 
 function DocsContent() {
     const { t } = useLanguage();
@@ -30,6 +30,7 @@ function DocsContent() {
         { id: 'builder' as TabId, label: t.docs.nav.builder, icon: Workflow },
         { id: 'frontend' as TabId, label: t.docs.nav.frontend, icon: Globe },
         { id: 'security' as TabId, label: t.docs.nav.security, icon: Shield },
+        { id: 'payroll' as TabId, label: t.docs.nav.payroll, icon: Send },
     ];
     const isValidTab = (tab: string | null): tab is TabId => tabs.some(t => t.id === tab);
 
@@ -74,7 +75,7 @@ function DocsContent() {
                                     <div className="flex items-center gap-3">
                                         <h1 className="text-3xl sm:text-5xl md:text-7xl font-black font-mono tracking-tighter uppercase leading-none">{t.docs.overview.title}</h1>
                                         <span className="px-2 py-0.5 bg-green-500/20 text-green-400 text-xs font-mono rounded-full border border-green-500/30 animate-pulse">
-                                            v0.6.1
+                                            v0.10.2
                                         </span>
                                     </div>
                                 </div>
@@ -145,6 +146,7 @@ function DocsContent() {
                         {activeTab === 'frontend' && <FrontendSection />}
                         {activeTab === 'api' && <ApiSection />}
                         {activeTab === 'security' && <SecuritySection />}
+                        {activeTab === 'payroll' && <PayrollSection />}
                     </div>
 
                     {/* Sequential Navigation Footer */}
@@ -219,10 +221,10 @@ function OverviewSection() {
             {/* Hero Stats */}
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-5 gap-4">
                 {[
-                    { label: t.docs.overview.hero.version, value: 'v0.6.1', color: 'text-stellar-teal' },
+                    { label: t.docs.overview.hero.version, value: 'v0.10.2', color: 'text-stellar-teal' },
                     { label: t.docs.overview.hero.contracts, value: '2 Testnet', color: 'text-green-400' },
-                    { label: t.docs.overview.hero.helpers, value: '30+', color: 'text-purple-400' },
-                    { label: t.docs.overview.hero.fee, value: '$0.01/call', color: 'text-amber-400' },
+                    { label: t.docs.overview.hero.helpers, value: '6', color: 'text-purple-400' },
+                    { label: t.docs.overview.hero.fee, value: '$0.02–0.25', color: 'text-amber-400' },
                     { label: t.docs.overview.hero.coins, value: 'XLM · USDC · CETES', color: 'text-blue-400' },
                 ].map((stat) => (
                     <div key={stat.label} className="bg-white/5 border border-white/10 rounded-xl p-4">
@@ -323,6 +325,7 @@ function OverviewSection() {
                         { icon: TrendingUp, title: t.docs.overview.features.dashboard.title, desc: t.docs.overview.features.dashboard.desc, color: 'text-green-400' },
                         { icon: Lock, title: t.docs.overview.features.wallets.title, desc: t.docs.overview.features.wallets.desc, color: 'text-amber-400' },
                         { icon: HardDrive, title: t.docs.overview.features.ipfs.title, desc: t.docs.overview.features.ipfs.desc, color: 'text-pink-400' },
+                        { icon: Send, title: t.docs.overview.features.payroll.title, desc: t.docs.overview.features.payroll.desc, color: 'text-stellar-teal' },
                     ].map((feature) => (
                         <div key={feature.title} className="bg-white/5 border border-white/10 rounded-xl p-5 hover:bg-white/10 transition-colors">
                             <feature.icon className={`w-6 h-6 ${feature.color} mb-3`} />
@@ -343,6 +346,7 @@ function OverviewSection() {
                     <table className="w-full text-left">
                         <thead>
                             <tr className="border-b border-white/10 text-gray-400 text-sm">
+                                <th className="py-3 px-4">{t.docs.overview.tx_table.network}</th>
                                 <th className="py-3 px-4">{t.docs.overview.tx_table.tx}</th>
                                 <th className="py-3 px-4">{t.docs.overview.tx_table.amount}</th>
                                 <th className="py-3 px-4">{t.docs.overview.tx_table.fee}</th>
@@ -351,12 +355,22 @@ function OverviewSection() {
                             </tr>
                         </thead>
                         <tbody className="text-sm">
+                            {/* Cada fila etiquetada por red — regla de honestidad del copy:
+                                nunca mezclar métricas de mainnet y testnet sin decir cuál es cuál.
+                                Los tres hashes están verificados en Horizon (resuelven y son SUCCESS). */}
                             {[
-                                { hash: '7389da0b46ff7437…5328158', label: 'revoke_agent(1218)', amount: 'Soroban', fee: '0.0009446 XLM', link: 'https://stellar.expert/explorer/testnet/tx/7389da0b46ff743702847a0e15d1829ed84c4e6a621c36193d5c95d6e5328158' },
-                                { hash: '5X6TDFkYvjvCb2LS…NanG', label: 'create_vault()', amount: 'Soroban', fee: '0.0003 XLM', link: 'https://stellar.expert/explorer/testnet/tx/5X6TDFkYvjvCb2LSE37DC7qNFs7UDgNy9izTs7amNanG' },
-                                { hash: 'ExYe8kirfrUVkehc…VESP', label: 'deposit()', amount: '0.05 XLM', fee: '0.0001 XLM', link: 'https://stellar.expert/explorer/testnet/tx/ExYe8kirfrUVkehcz63NvDzSzZPz2gAoLoVyCpUcVESP' },
+                                { net: 'mainnet' as const, hash: '3134a51c66091fd7…cb7558bc', label: 'x402 · 0.02 USDC', fee: '0.0023579 XLM', link: 'https://stellar.expert/explorer/public/tx/3134a51c66091fd7fbd85b38a4a6ec6cd432bb92c2450eac84ea7855cb7558bc' },
+                                { net: 'mainnet' as const, hash: '4813645165d15af1…7c83795e', label: 'x402 · 0.02 USDC', fee: '0.0023579 XLM', link: 'https://stellar.expert/explorer/public/tx/4813645165d15af1e503d66ef84d826e83fff235d4f98c3f6eba8a4e7c83795e' },
+                                { net: 'testnet' as const, hash: 'c53d474658898af7…7552ed3', label: 'DeFindex vault · Invest firmado por el agente', fee: '0.0053800 XLM', link: 'https://stellar.expert/explorer/testnet/tx/c53d474658898af7ebbb84d17845902572147cfe1fb72965833e3d4cf7552ed3' },
                             ].map((tx) => (
                                 <tr key={tx.hash} className="border-b border-white/5">
+                                    <td className="py-3 px-4">
+                                        <span className={`px-2 py-0.5 rounded-full text-[10px] font-mono font-bold uppercase ${tx.net === 'mainnet'
+                                            ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20'
+                                            : 'bg-amber-500/10 text-amber-400 border border-amber-500/20'}`}>
+                                            {tx.net}
+                                        </span>
+                                    </td>
                                     <td className="py-3 px-4 font-mono text-stellar-teal text-xs">{tx.hash}</td>
                                     <td className="py-3 px-4 text-gray-300 text-xs font-mono">{tx.label}</td>
                                     <td className="py-3 px-4 text-gray-400 text-xs">{tx.fee}</td>
@@ -371,9 +385,18 @@ function OverviewSection() {
                         </tbody>
                     </table>
                 </div>
-                <div className="mt-4 text-sm text-gray-400">
-                    <strong>Operator Wallet:</strong> <code className="text-stellar-teal">GC7FWETCRCBY4UC4XNLE3WD5X25EPHUKRKUJZ2XHVBJN7RGHTHZDTJ5Y</code>
-                    <span className="ml-3 text-xs text-amber-400">⚠ Testnet — no real funds at risk</span>
+                <div className="mt-5 space-y-2 text-sm text-gray-400">
+                    <div>
+                        <span className="text-emerald-400 font-bold text-xs uppercase font-mono">mainnet</span>{' '}
+                        <span className="text-xs">{t.docs.overview.mainnet_treasury}</span>{' '}
+                        <code className="text-stellar-teal text-xs">GCLBBPON256CV7ATEHM5B54BOKNC7GX53MBINJ42MHVXGDMMZ3ZWKBHP</code>
+                    </div>
+                    <div>
+                        <span className="text-amber-400 font-bold text-xs uppercase font-mono">testnet</span>{' '}
+                        <span className="text-xs">{t.docs.overview.operator_wallet}</span>{' '}
+                        <code className="text-stellar-teal text-xs">GC4Q5TWWXI7IHN6DYCBEKCOWJWCKY4JE2NLKLU5SE3YL44IUUFPKUOPC</code>
+                    </div>
+                    <p className="text-xs text-gray-500 pt-1">{t.docs.overview.network_scope}</p>
                 </div>
             </section>
         </div>
@@ -527,7 +550,7 @@ function ContractsSection() {
         <div className="space-y-12">
             {/* Deployed Contracts */}
             <section>
-                <h2 className="text-2xl font-bold mb-6">{t.docs.api.contracts_title} (Testnet v0.6.1)</h2>
+                <h2 className="text-2xl font-bold mb-6">{t.docs.api.contracts_title} (Testnet v0.10.2)</h2>
                 <div className="overflow-x-auto">
                     <table className="w-full text-left border-collapse">
                         <thead>
@@ -614,7 +637,6 @@ pub struct EloScore {
                                 { fn: 'revoke_agent', sig: 'pub fn revoke_account(env, vault_id: u64, account: Address)', desc: t.docs.contracts.functions.revoke_agent },
                                 { fn: 'close_vault', sig: 'pub fn close_vault(env, vault_id: u64)', desc: t.docs.contracts.functions.close_vault },
                                 { fn: 'publish_strategy', sig: 'pub fn publish_strategy(env, creator, name, ipfs_cid, fee: i128)', desc: t.docs.contracts.functions.publish_strategy },
-                                { fn: 'open_session', sig: 'pub fn open_session(env, caller, agent, budget: i128, duration: u64)', desc: t.docs.contracts.functions.open_session },
                                 { fn: 'unlock_skill', sig: 'pub fn unlock_skill(env, caller, skill_id: String)', desc: t.docs.contracts.functions.unlock_skill },
                             ].map((item) => (
                                 <tr key={item.fn} className="border-b border-white/5 hover:bg-white/5">
@@ -648,7 +670,7 @@ pub struct EloScore {
                         </div>
                     ))}
                     <div className="mt-4 pt-4 border-t border-white/10 text-green-400">
-                        Test result: OK. Total tests: 32; passed: 32; failed: 0
+                        Test result: OK. Total tests: 67; passed: 67; failed: 0
                     </div>
                 </div>
             </section>
@@ -680,7 +702,7 @@ function AgentSection() {
                         </div>
                         <p className="text-sm text-gray-400 mt-2">
                             x402 service: <code className="text-stellar-teal">{t.docs.agent.status_running}</code><br/>
-                            Payment streams: <code className="text-amber-500">{t.docs.agent.status_running}</code>
+                            MPP Charge: <code className="text-amber-500">{t.docs.agent.status_running}</code>
                         </p>
                     </div>
                 </div>
@@ -691,16 +713,17 @@ function AgentSection() {
                 <div className="bg-[#0A0A0A] border border-white/10 rounded-xl p-4 font-mono text-[10px] xs:text-xs sm:text-sm overflow-x-auto scrollbar-thin scrollbar-thumb-white/10">
                     <pre className="text-gray-400 whitespace-pre">
                         {`packages/
-├── mcp/                      # Model Context Protocol service
-├── memory-mcp/               # Persistent AI memory context
-└── agent/                    # Base ElizaOS implementation
+├── mcp/                      # Model Context Protocol server (14 tools)
+├── sdk/                      # TypeScript SDK  (npm: nirium)
+├── sdk-python/               # Python SDK      (pip: nirium)
+└── agent/                    # Express 5 runtime — 86 endpoints
 
-scripts/
-├── x402_server.ts            # Microbilling REST/Webhook layer
-├── x402_agent_bot.ts         # Autonomous X402 client swarm
-├── mpp_server.ts             # Money streaming protocol core
-├── mpp_agent_bot.ts          # Continuous streaming worker
-└── protocol_reasoner_bot.ts  # Central coordinator & parser`}
+packages/agent/src/scripts/
+├── master.ts                 # Orchestrator: proxy + agent + indexer
+├── nirium_indexer.ts         # Soroban events -> Supabase
+├── x402_buyer_agent.ts       # x402 client      (off by default)
+├── mpp_buyer_agent.ts        # MPP Charge client (off by default)
+└── smoke-test.ts             # End-to-end check`}
                     </pre>
                 </div>
             </section>
@@ -723,20 +746,23 @@ scripts/
             </section>
 
             {/* Usage */}
-            <section className="bg-[#0A0A0A] border border-white/10 rounded-xl overflow-hidden">
+            <section className="bg-black border border-white/10 rounded-xl overflow-hidden">
                 <div className="px-4 py-2 bg-white/5 border-b border-white/10 flex items-center gap-2">
                     <Terminal className="w-4 h-4 text-green-400" />
                     <span className="text-sm font-mono text-gray-400">Usage</span>
                 </div>
                 <pre className="p-4 text-sm font-mono text-gray-300">
-                    {`# Run Settlement Subsystems
-pnpm run start:x402-server
-pnpm run start:mpp-server
+                    {`# El agente arranca completo con un solo proceso — x402 y MPP viven
+# dentro del servidor Express, no en subsistemas aparte.
+pnpm --filter @nirium/agent dev          # desarrollo
+pnpm --filter @nirium/agent start        # producción
 
-# Deploy Protocol Agents
-pnpm run start:protocol-reasoner
-pnpm run start:x402-agent
-pnpm run start:mpp-agent
+# Indexador de eventos Soroban (proceso aparte, opcional)
+pnpm --filter @nirium/agent start:indexer
+
+# Clientes compradores de referencia (apagados por defecto)
+pnpm --filter @nirium/agent x402:buy
+pnpm --filter @nirium/agent mpp:buy
 
 # Expected output (X402 Agent):
 [X402 Agent] Starting X402 payment flow...
@@ -941,10 +967,13 @@ function ApiSection() {
                     </p>
                     <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
                         {[
-                            { label: 'Uptime SLA', val: '99.5%', icon: Activity, color: 'text-stellar-teal' },
-                            { label: 'Latencia P95', val: '< 500ms', icon: Clock, color: 'text-stellar-yellow' },
-                            { label: 'Endpoints', val: '44', icon: Layers, color: 'text-purple-400' },
-                            { label: 'Security', val: 'AES-256', icon: Shield, color: 'text-green-400' },
+                            // Sin SLA publicado: no hay contrato de nivel de servicio con nadie,
+                            // y prometer 99.5% sin instrumentación que lo mida es una cifra inventada.
+                            // Lo que sí se puede afirmar es lo que se puede verificar.
+                            { label: 'Redes', val: 'Testnet + Mainnet', icon: Activity, color: 'text-stellar-teal' },
+                            { label: 'Latencia', val: 'medida en /health', icon: Clock, color: 'text-stellar-yellow' },
+                            { label: 'Endpoints', val: '86', icon: Layers, color: 'text-purple-400' },
+                            { label: 'Custodia', val: 'Ninguna', icon: Shield, color: 'text-green-400' },
                         ].map((stat) => (
                             <div key={stat.label} className="bg-white/5 border border-white/10 rounded-xl p-4 hover:border-white/20 transition-colors">
                                 <div className="flex items-center gap-2 mb-1">
@@ -1156,7 +1185,7 @@ ws.on('message', (payload) => {
             <section id="endpoints-directory">
                 <div className="flex items-center gap-3 mb-8">
                     <Workflow className="text-stellar-teal w-6 h-6" />
-                    <h3 className="text-2xl font-bold uppercase tracking-tighter">{t.docs.api.explorer_title} (44)</h3>
+                    <h3 className="text-2xl font-bold uppercase tracking-tighter">{t.docs.api.explorer_title} (50+)</h3>
                 </div>
 
                 <EndpointExplorer />
@@ -1273,10 +1302,10 @@ function EndpointExplorer() {
             isPremium: false
         })),
         compliance: t.docs.api.endpoints.compliance.map((e: any, i: number) => ({
-            method: ['POST', 'POST', 'POST', 'GET'][i],
-            path: ['/v1/compliance/audit', '/v1/compliance/export', '/v1/compliance/ipfs', '/v1/compliance/verify/:cid'][i],
+            method: ['POST', 'GET', 'GET', 'GET', 'GET'][i],
+            path: ['/api/audit/log', '/api/audit/info', '/api/reporting/summary', '/api/reporting/export', '/api/reporting/info'][i],
             desc: e.desc,
-            isPremium: true
+            isPremium: false
         })),
         premium: t.docs.api.endpoints.premium.map((e: any, i: number) => ({
             method: ['GET', 'GET', 'GET', 'GET'][i],
@@ -1499,24 +1528,24 @@ function SecuritySection() {
                         </p>
                         <div className="flex items-center gap-2 px-3 py-2 bg-black/40 rounded-lg border border-white/5">
                             <Clock className="w-4 h-4 text-gray-500" />
-                            <span className="text-[10px] font-mono text-gray-500 uppercase">Last Verification: April 30, 2026</span>
+                            <span className="text-[10px] font-mono text-gray-500 uppercase">Last Verification: July 10, 2026</span>
                         </div>
                     </div>
                 </div>
             </section>
 
-            {/* Audit Trail & CNBV Readiness */}
+            {/* Audit Trail & audit-readiness */}
             <section className="space-y-8">
                 <div className="bg-stellar-teal/5 border border-stellar-teal/20 rounded-3xl p-8">
                     <div className="max-w-3xl mb-12">
-                        <h2 className="text-3xl font-black text-white mb-4">{(t.docs.security as any).audit_trail.title}</h2>
+                        <h2 className="text-3xl font-black text-white mb-4">{(t.docs.security as any).stellar_coc.audit_trail.title}</h2>
                         <p className="text-gray-400 text-lg leading-relaxed">
-                            {(t.docs.security as any).audit_trail.subtitle}
+                            {(t.docs.security as any).stellar_coc.audit_trail.subtitle}
                         </p>
                     </div>
 
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                        {(t.docs.security as any).audit_trail.layers.map((layer: any) => (
+                        {(t.docs.security as any).stellar_coc.audit_trail.layers.map((layer: any) => (
                             <div key={layer.id} className="bg-black/40 border border-white/10 rounded-2xl p-6 hover:border-stellar-teal/30 transition-all group">
                                 <div className="text-stellar-teal font-mono text-xs mb-2 opacity-50">{layer.id}</div>
                                 <h3 className="text-white font-bold mb-3 flex items-center gap-2">
@@ -1535,7 +1564,7 @@ function SecuritySection() {
                             <ShieldCheck className="text-stellar-yellow w-5 h-5" />
                         </div>
                         <p className="text-xs text-gray-400 italic">
-                            {(t.docs.security as any).audit_trail.fintech_law}
+                            {(t.docs.security as any).stellar_coc.audit_trail.fintech_law}
                         </p>
                     </div>
                 </div>
@@ -1550,7 +1579,7 @@ function SecuritySection() {
                             Institutional Integrity & Governance
                         </h2>
                         <p className="text-gray-400 leading-relaxed mb-6">
-                            Nirium Protocol operates under the highest integrity standards of the Stellar ecosystem. Our architecture is designed to satisfy institutional audits and international regulatory frameworks (KYC/AML/SEP-12) within the April 2026 compliance landscape.
+                            Nirium Protocol operates under the highest integrity standards of the Stellar ecosystem. Our architecture is designed to satisfy institutional audits and international regulatory frameworks (KYC/AML/SEP-12) within the July 2026 compliance landscape.
                         </p>
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                             <div className="bg-black/40 p-4 rounded-xl border border-white/5">
@@ -1569,8 +1598,8 @@ function SecuritySection() {
                         </div>
                         <div className="text-white font-bold mb-1">Audit-Ready v0.5</div>
                         <p className="text-[10px] text-gray-400 leading-tight">Every byte of telemetry is cryptographically signed and independently verifiable.</p>
-                        <div className="mt-4 px-3 py-1 bg-stellar-teal text-black text-[10px] font-black rounded-full uppercase tracking-tighter">
-                            ALINEADO A SCF 7.0 & ECOSISTEMA SDF
+                        <div className="mt-4 px-3 py-1 bg-stellar-teal text-[#0b0b0b] text-[10px] font-black rounded-full uppercase tracking-tighter">
+                            SCF KICKSTART · ECOSISTEMA SDF
                         </div>
                     </div>
                 </div>
@@ -1652,6 +1681,65 @@ function IdeasSection() {
                     );
                 })}
             </div>
+        </div>
+    );
+}
+
+function PayrollSection() {
+    const { t } = useLanguage();
+    return (
+        <div className="space-y-16 animate-in fade-in slide-in-from-bottom-4 duration-700">
+            <div>
+                <h1 className="text-3xl sm:text-5xl font-black uppercase italic tracking-tighter mb-4">{t.docs.payroll?.title || 'Payroll Integration'}</h1>
+                <p className="text-lg text-gray-400">{t.docs.payroll?.desc || 'Non-custodial batch disbursement using the x402 and MPP standards.'}</p>
+            </div>
+
+            <section>
+                <h2 className="text-2xl font-bold mb-6">{t.docs.payroll?.endpoints_title || 'Payroll Endpoints'}</h2>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    {[
+                        { m: 'POST', p: '/api/payroll/run', d: 'Build a batch payout (unsigned XDR)' },
+                        { m: 'POST', p: '/api/payroll/submit', d: 'Broadcast company-signed payout' },
+                        { m: 'POST', p: '/api/payroll/onboard', d: 'Add a USDC trustline (self-signed)' },
+                        { m: 'POST', p: '/api/payroll/onboard/submit', d: 'Broadcast self-signed trustline XDR' },
+                        { m: 'GET',  p: '/api/payroll/runs', d: 'Payout history + IPFS/LCP receipts' },
+                        { m: 'GET',  p: '/api/payroll/terms', d: 'Payouts Terms v1.1 + acknowledgement requirement' },
+                        { m: 'GET',  p: '/api/payroll/info', d: 'Node metadata: capacity-banded monthly licence, mainnet access' },
+                    ].map((ep, i) => (
+                        <div key={i} className="p-4 rounded-xl border border-white/5 bg-[#0A0A0A] hover:border-stellar-teal/30 transition-all min-w-0">
+                            <div className="flex items-center gap-3 mb-2 min-w-0">
+                                <span className={`text-[10px] font-black px-2 py-0.5 rounded shrink-0 ${ep.m === 'GET' ? 'bg-emerald-500/10 text-emerald-400' : 'bg-stellar-blue/10 text-stellar-blue'}`}>
+                                    {ep.m}
+                                </span>
+                                <code className="text-xs text-white font-mono truncate">{ep.p}</code>
+                            </div>
+                            <p className="text-sm text-gray-500">{ep.d}</p>
+                        </div>
+                    ))}
+                </div>
+            </section>
+
+            <section>
+                <h2 className="text-2xl font-bold mb-6">{t.docs.payroll?.flow_title || 'Disbursement Flow'}</h2>
+                <div className="relative rounded-2xl border border-white/10 bg-[#080808] overflow-hidden w-full">
+                    <div className="flex items-center px-4 py-2.5 border-b border-white/5 bg-white/[0.02]">
+                        <div className="flex gap-1.5">
+                            <div className="w-2.5 h-2.5 rounded-full bg-red-500/20 border border-red-500/40" />
+                            <div className="w-2.5 h-2.5 rounded-full bg-yellow-500/20 border border-yellow-500/40" />
+                            <div className="w-2.5 h-2.5 rounded-full bg-green-500/20 border border-green-500/40" />
+                        </div>
+                    </div>
+                    <div className="p-4 sm:p-6 font-mono text-xs sm:text-sm leading-relaxed overflow-x-auto text-gray-300">
+                        <pre>
+                            {t.docs.payroll?.code_example || `// Initialize the Payroll Batch Node
+const result = await agent.post('/api/payroll/run', {
+  recipients: payroll_list,
+  asset: 'USDC'
+});`}
+                        </pre>
+                    </div>
+                </div>
+            </section>
         </div>
     );
 }

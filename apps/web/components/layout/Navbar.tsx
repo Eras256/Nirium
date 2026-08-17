@@ -5,23 +5,32 @@ import { usePathname } from "next/navigation";
 import { useFreighter } from "@/hooks/useFreighter";
 import {
     Menu, X, Zap, Shield, Activity,
-    LogOut, CreditCard, Building2, Code2, ArrowUpRight
+    LogOut, CreditCard, Building2, Code2, ArrowUpRight, Newspaper, KeyRound, Mail
 } from "lucide-react";
 import { useState, useEffect, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useLanguage } from "../../context/LanguageContext";
+import { useNetwork } from "../../context/NetworkContext";
+import { usePollarBridge } from "../../context/PollarBridge";
 import { Globe, Brain, Home } from "lucide-react";
+import { ThemeToggle } from "@/components/ui/ThemeToggle";
 import AISettingsModal from "./AISettingsModal";
 import { aiService } from "@/lib/aiService";
 
 export default function Navbar() {
     const pathname = usePathname();
     const { address, isConnected, connect, disconnect } = useFreighter();
+    const pollar = usePollarBridge();
+    // La identidad es la dirección, no la wallet: cualquiera de las dos puertas
+    // sirve para las pantallas que solo necesitan saber quién eres.
+    const activeAddress = address ?? pollar.address;
+    const hasIdentity = !!activeAddress;
     const [isScrolled, setIsScrolled] = useState(false);
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
     const [isAIModalOpen, setIsAIModalOpen] = useState(false);
     const [aiConfig, setAIConfig] = useState<any>({ provider: 'nirium', model: 'nirium-core-v1' });
     const { language, setLanguage, t } = useLanguage();
+    const { network, setNetwork } = useNetwork();
 
     useEffect(() => {
         setAIConfig(aiService.getConfig());
@@ -35,14 +44,16 @@ export default function Navbar() {
         return () => window.removeEventListener("scroll", handleScroll);
     }, [handleScroll]);
 
-    // Marketing nav — 5 clean links (SCF-optimised)
+    // Marketing nav — clean links (SCF-optimised)
     // Logo → / | "Launch app" → /dashboard
     const navLinks = [
         { name: t.nav.home,       href: "/"           },
-        { name: t.nav.treasury,   href: "/treasury"   },
-        { name: t.nav.security,   href: "/security"   },
         { name: t.nav.developers, href: "/developers" },
+        { name: t.nav.docs,       href: "/docs"       },
+        { name: t.nav.api,        href: "/keys"       },
+        { name: t.nav.payroll,    href: "/payroll"    },
         { name: t.nav.pricing,    href: "/pricing"    },
+        { name: t.nav.blog,       href: "/blog"       },
     ];
 
     return (
@@ -58,8 +69,8 @@ export default function Navbar() {
                 <Link href="/" className="flex items-center gap-2 group shrink-0">
                     <div className="relative">
                         <div className="absolute inset-0 bg-stellar-teal/10 blur-xl rounded-full group-hover:bg-stellar-teal/30 transition-all" />
-                        <div className="relative bg-black/40 border border-white/5 rounded-lg p-1 transition-all group-hover:scale-105 overflow-hidden w-14 xs:w-20 sm:w-28 h-8 xs:h-10 sm:h-12 flex items-center justify-center">
-                            <img src="/logos/logo.png" alt="Nirium" className="w-full h-full object-contain" />
+                        <div className="relative bg-transparent transition-all group-hover:scale-105 overflow-hidden w-14 xs:w-20 sm:w-28 h-8 xs:h-10 sm:h-12 flex items-center justify-center">
+                            <img src="/brand/logo.png" alt="Nirium" className="w-full h-full object-contain" />
                         </div>
                     </div>
                 </Link>
@@ -88,10 +99,10 @@ export default function Navbar() {
                 <div className="hidden lg:flex xl:hidden items-center gap-1 mx-2">
                     {[
                         { href: "/",           Icon: Home,       name: t.nav.home       },
-                        { href: "/treasury",   Icon: Building2,  name: t.nav.treasury   },
-                        { href: "/security",   Icon: Shield,     name: t.nav.security   },
                         { href: "/developers", Icon: Code2,      name: t.nav.developers },
+                        { href: "/keys",       Icon: KeyRound,   name: t.nav.api        },
                         { href: "/pricing",    Icon: CreditCard, name: t.nav.pricing    },
+                        { href: "/blog",       Icon: Newspaper,  name: t.nav.blog       },
                     ].map(({ href, Icon, name }) => (
                         <Link
                             key={href}
@@ -121,8 +132,31 @@ export default function Navbar() {
                         >
                             <option value="en" className="bg-[#0A0A0A] text-white">EN</option>
                             <option value="es" className="bg-[#0A0A0A] text-white">ES</option>
-                            <option value="zh" className="bg-[#0A0A0A] text-white">ZH</option>
                         </select>
+                    </div>
+
+                    {/* Network Switcher */}
+                    <div className="flex items-center gap-1 bg-white/[0.03] border border-white/10 rounded-lg p-1 hover:bg-white/[0.06] transition-colors select-none">
+                        <button
+                            onClick={() => setNetwork("testnet")}
+                            className={`px-1.5 py-0.5 rounded text-[8px] sm:text-[9px] font-bold tracking-wider uppercase transition-all ${
+                                network === "testnet"
+                                    ? "bg-amber-400/20 text-amber-400 border border-amber-400/30"
+                                    : "text-white/40 hover:text-white/70"
+                            }`}
+                        >
+                            Test
+                        </button>
+                        <button
+                            onClick={() => setNetwork("mainnet")}
+                            className={`px-1.5 py-0.5 rounded text-[8px] sm:text-[9px] font-bold tracking-wider uppercase transition-all ${
+                                network === "mainnet"
+                                    ? "bg-emerald-400/20 text-emerald-400 border border-emerald-400/30"
+                                    : "text-white/40 hover:text-white/70"
+                            }`}
+                        >
+                            Main
+                        </button>
                     </div>
 
                     {/* AI config — subtle dot indicator */}
@@ -145,15 +179,15 @@ export default function Navbar() {
                         />
                     </button>
 
-                    {/* Wallet */}
-                    {isConnected ? (
+                    {/* Wallet — dos puertas: Freighter (extensión) o Pollar (cuenta) */}
+                    {hasIdentity ? (
                         <div className="hidden sm:flex h-8 items-center gap-1.5 pl-3 pr-1 bg-white/[0.03] border border-white/10 rounded-full">
                             <Activity className="w-2.5 h-2.5 text-stellar-teal animate-pulse" />
                             <span className="text-[10px] font-mono font-bold text-white/70">
-                                {address?.slice(0, 4)}<span className="text-white/20">…</span>{address?.slice(-4)}
+                                {activeAddress?.slice(0, 4)}<span className="text-white/20">…</span>{activeAddress?.slice(-4)}
                             </span>
                             <button
-                                onClick={() => disconnect()}
+                                onClick={() => (isConnected ? disconnect() : pollar.logout())}
                                 className="w-6 h-6 rounded-full bg-white/5 flex items-center justify-center hover:bg-red-500/20 text-white/30 hover:text-red-400 transition-all"
                                 title={t.nav.disconnect}
                             >
@@ -161,13 +195,25 @@ export default function Navbar() {
                             </button>
                         </div>
                     ) : (
-                        <button
-                            onClick={() => connect()}
-                            className="hidden sm:flex items-center gap-1.5 h-8 px-3 sm:px-4 bg-white/[0.03] text-white/60 border border-white/10 rounded-full text-[10px] font-bold hover:bg-white/[0.06] hover:text-white transition-all uppercase tracking-tight"
-                        >
-                            <Zap className="w-3 h-3" />
-                            {t.nav.login_session}
-                        </button>
+                        <div className="hidden sm:flex items-center gap-1.5">
+                            <button
+                                onClick={() => connect()}
+                                className="flex items-center gap-1.5 h-8 px-3 sm:px-4 bg-white/[0.03] text-white/60 border border-white/10 rounded-full text-[10px] font-bold hover:bg-white/[0.06] hover:text-white transition-all uppercase tracking-tight"
+                            >
+                                <Zap className="w-3 h-3" />
+                                {t.nav.login_session}
+                            </button>
+                            {pollar.available && (
+                                <button
+                                    onClick={pollar.openLogin}
+                                    className="flex items-center gap-1.5 h-8 px-3 bg-white/[0.03] text-white/60 border border-white/10 rounded-full text-[10px] font-bold hover:bg-white/[0.06] hover:text-white transition-all uppercase tracking-tight"
+                                    title={t.nav.no_wallet_hint}
+                                >
+                                    <Mail className="w-3 h-3" />
+                                    {t.nav.no_wallet}
+                                </button>
+                            )}
+                        </div>
                     )}
 
                     {/* ── Launch app — primary CTA ── */}
@@ -178,6 +224,9 @@ export default function Navbar() {
                         {t.nav.launch_app}
                         <ArrowUpRight className="w-3 h-3" />
                     </Link>
+
+                    {/* Theme toggle — desktop + mobile */}
+                    <ThemeToggle className="!w-8 !h-8" />
 
                     {/* Mobile toggle */}
                     <button
@@ -197,7 +246,11 @@ export default function Navbar() {
                         animate={{ opacity: 1, y: 0 }}
                         exit={{ opacity: 0, y: -8 }}
                         transition={{ duration: 0.18 }}
-                        className="fixed inset-x-0 top-0 mt-[60px] sm:mt-[72px] mx-3 sm:mx-5 rounded-2xl bg-black/98 backdrop-blur-3xl z-[150] lg:hidden p-5 border border-white/10 shadow-[0_20px_50px_rgba(0,0,0,0.6)]"
+                        // El panel es fixed: sin tope de altura ni scroll propio, en
+                        // teléfonos chicos (320x568) se corta en "Blog" y todo lo de
+                        // abajo — Launch App, las dos puertas de wallet — queda
+                        // inalcanzable, porque scrollear la página no lo mueve.
+                        className="fixed inset-x-0 top-0 mt-[60px] sm:mt-[72px] mx-3 sm:mx-5 max-h-[calc(100dvh-76px)] sm:max-h-[calc(100dvh-88px)] overflow-y-auto overscroll-contain rounded-2xl bg-black/98 backdrop-blur-3xl z-[150] lg:hidden p-5 border border-white/10 shadow-[0_20px_50px_rgba(0,0,0,0.6)]"
                     >
                         <div className="flex flex-col gap-2">
                             {/* Close */}
@@ -231,34 +284,45 @@ export default function Navbar() {
                             <Link
                                 href="/dashboard"
                                 onClick={() => setIsMobileMenuOpen(false)}
-                                className="mt-2 flex items-center justify-center gap-2 px-4 py-4 rounded-xl bg-stellar-yellow text-black text-sm font-black uppercase tracking-tight"
+                                className="mt-2 flex items-center justify-center gap-2 px-4 py-4 rounded-xl bg-stellar-yellow text-[#0b0b0b] text-sm font-black uppercase tracking-tight"
                             >
                                 {t.nav.launch_app}
                                 <ArrowUpRight className="w-4 h-4" />
                             </Link>
 
-                            {/* Wallet connect (mobile) */}
-                            {isConnected ? (
+                            {/* Wallet connect (mobile) — las mismas dos puertas que en desktop */}
+                            {hasIdentity ? (
                                 <button
-                                    onClick={() => { disconnect(); setIsMobileMenuOpen(false); }}
+                                    onClick={() => { isConnected ? disconnect() : pollar.logout(); setIsMobileMenuOpen(false); }}
                                     className="flex items-center justify-center gap-2 px-4 py-3 rounded-xl bg-red-500/10 text-red-400 border border-red-500/20 text-sm font-bold"
                                 >
                                     <LogOut className="w-4 h-4" />
                                     {t.nav.disconnect_session}
                                 </button>
                             ) : (
-                                <button
-                                    onClick={() => { connect(); setIsMobileMenuOpen(false); }}
-                                    className="flex items-center justify-center gap-2 px-4 py-3 rounded-xl bg-white/[0.03] text-white/60 border border-white/10 text-sm font-bold hover:bg-white/[0.06]"
-                                >
-                                    <Zap className="w-4 h-4" />
-                                    {t.nav.login_session}
-                                </button>
+                                <>
+                                    <button
+                                        onClick={() => { connect(); setIsMobileMenuOpen(false); }}
+                                        className="flex items-center justify-center gap-2 px-4 py-3 rounded-xl bg-white/[0.03] text-white/60 border border-white/10 text-sm font-bold hover:bg-white/[0.06]"
+                                    >
+                                        <Zap className="w-4 h-4" />
+                                        {t.nav.login_session}
+                                    </button>
+                                    {pollar.available && (
+                                        <button
+                                            onClick={() => { pollar.openLogin(); setIsMobileMenuOpen(false); }}
+                                            className="flex items-center justify-center gap-2 px-4 py-3 rounded-xl bg-white/[0.03] text-white/60 border border-white/10 text-sm font-bold hover:bg-white/[0.06]"
+                                        >
+                                            <Mail className="w-4 h-4" />
+                                            {t.nav.no_wallet}
+                                        </button>
+                                    )}
+                                </>
                             )}
 
                             {/* Status strip */}
                             <div className="mt-3 pt-4 border-t border-white/5 flex items-center justify-between text-[9px] font-mono text-white/20 uppercase tracking-widest">
-                                <span>{t.nav.uplink_ready.replace('{v}', 'v0.6.1')}</span>
+                                <span>{t.nav.uplink_ready.replace('{v}', 'v0.7.0')}</span>
                                 <div className="flex items-center gap-1 text-stellar-teal/60">
                                     <Shield className="w-2.5 h-2.5" />
                                     {t.footer.scf_verified}

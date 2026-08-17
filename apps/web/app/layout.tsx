@@ -11,11 +11,11 @@ const inconsolata = Inconsolata({ subsets: ["latin"], variable: "--font-inconsol
 export const metadata: Metadata = {
     metadataBase: new URL('https://nirium.xyz'),
     title: {
-        default: "Nirium Protocol | Autonomous Treasury Infrastructure on Stellar (Testnet)",
-        template: "%s | Nirium Protocol"
+        default: "Nirium | Live on Stellar Mainnet — payment & audit rails for AI agents",
+        template: "%s | Nirium"
     },
-    description: "Institutional DeFi infrastructure powered by autonomous agents on Stellar/Soroban. x402 micropayments, MPP session budgets, cross-border FX (MXN-USDC), multi-asset vaults. SDK v0.6.1. Testnet — not financial advice.",
-    keywords: ["Stellar ecosystem", "AI Agents", "DeFi infrastructure", "Soroban", "Smart Contracts", "Nirium", "Treasury Automation", "x402", "MPP", "Stellar Testnet", "cross-border FX", "MXN USDC"],
+    description: "Non-custodial payment & audit rails for the agent economy, live on Stellar mainnet. x402 per-request billing, MPP Charge settlement, immutable IPFS receipts and institutional reporting. npm install nirium. Not financial advice.",
+    keywords: ["Stellar", "x402", "MPP", "AI agents", "agent economy", "machine payments", "Soroban", "Nirium", "audit trail", "non-custodial", "Stellar mainnet", "micropayments"],
     authors: [{ name: "Nirium Core" }],
     creator: "Nirium",
     publisher: "Nirium Protocol",
@@ -31,21 +31,21 @@ export const metadata: Metadata = {
         },
     },
     icons: {
-        icon: "/logos/logo.png",
-        shortcut: "/logos/logo.png",
-        apple: "/logos/logo.png",
+        icon: "/brand/logo.png",
+        shortcut: "/brand/logo.png",
+        apple: "/brand/logo.png",
     },
     openGraph: {
-        title: "Nirium Protocol | Treasury Automation on Stellar Testnet",
-        description: "Experimental infrastructure for automated treasury operations and cross-border FX on Stellar Testnet. Powered by autonomous AI agents and Soroban Smart Contracts. Not financial advice.",
+        title: "Nirium | Live on Stellar Mainnet",
+        description: "Non-custodial payment & audit rails for AI agents — live on Stellar mainnet. Real x402 payments settled on-chain, immutable receipts, institutional reporting. The LLM proposes, the contract decides.",
         url: "https://nirium.xyz",
-        siteName: "Nirium Protocol",
+        siteName: "Nirium",
         images: [
             {
                 url: "/og-image.png",
                 width: 1200,
                 height: 630,
-                alt: "Nirium Protocol Platform Capabilities Overview",
+                alt: "Nirium — payment & audit rails for AI agents, live on Stellar mainnet",
             }
         ],
         locale: "en_US",
@@ -53,9 +53,9 @@ export const metadata: Metadata = {
     },
     twitter: {
         card: "summary_large_image",
-        title: "Nirium Protocol | Treasury Infrastructure on Stellar Testnet",
-        description: "Experimental DeFi infrastructure on Stellar Testnet. Autonomous AI agents for treasury automation and cross-border FX. Not financial advice.",
-        creator: "@NiriumXYZ",
+        title: "Nirium | Live on Stellar Mainnet",
+        description: "Non-custodial payment & audit rails for AI agents, live on Stellar mainnet. Real x402 payments settled on-chain — verify it yourself. npm install nirium.",
+        creator: "@Niriumstellar",
         images: ["/og-image.png"],
     },
 };
@@ -76,7 +76,7 @@ export default function RootLayout({
         "applicationCategory": "FinanceApplication",
         "operatingSystem": "Web",
         "url": "https://nirium.xyz",
-        "description": "Nirium is an experimental autonomous infrastructure protocol on the Stellar Testnet. It provides agentic workflows via Soroban smart contracts. Currently in development — not financial advice.",
+        "description": "Nirium provides non-custodial payment and audit rails for AI agents on Stellar — x402 per-request settlement, immutable IPFS receipts and reporting, live on mainnet. Software-only, not financial advice.",
         "creator": {
             "@type": "Organization",
             "name": "Nirium Core"
@@ -91,13 +91,20 @@ export default function RootLayout({
                     "http://schema.org/MobileWebPlatform"
                 ]
             },
-            "name": "Explore Nirium Dashboard on Stellar Testnet"
+            "name": "Explore Nirium on Stellar"
         }
     };
 
     return (
         <html lang="en" suppressHydrationWarning>
-            <body className={`${inter.variable} ${inconsolata.variable} font-sans bg-[#050505] text-white min-h-screen selection:bg-stellar-teal/30 scroll-smooth overflow-x-hidden`}>
+            <head>
+                <script
+                    dangerouslySetInnerHTML={{
+                        __html: `(function(){try{var t=localStorage.getItem('nirium_theme')||'dark';document.documentElement.setAttribute('data-theme',t);}catch(e){document.documentElement.setAttribute('data-theme','dark');}})();`,
+                    }}
+                />
+            </head>
+            <body className={`${inter.variable} ${inconsolata.variable} font-sans bg-background text-zinc-900 dark:text-white min-h-screen selection:bg-stellar-teal/30 scroll-smooth overflow-x-hidden`}>
                 <script
                     type="application/ld+json"
                     dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
@@ -107,12 +114,12 @@ export default function RootLayout({
                     <MarketTicker />
                     {/* Background Layers */}
                     <div className="fixed inset-0 z-[-1] bg-[url('/noise.svg')] opacity-[0.03] pointer-events-none"></div>
-                    <div className="fixed inset-0 z-[-2] bg-gradient-to-br from-[#050505] via-[#0A0A0A] to-[#050505] pointer-events-none"></div>
+                    <div className="fixed inset-0 z-[-2] bg-gradient-to-br from-zinc-50 via-white to-zinc-100 dark:from-[#050505] dark:via-[#0A0A0A] dark:to-[#050505] pointer-events-none transition-colors duration-500"></div>
                     <div className="fixed inset-0 z-[-3] bg-[radial-gradient(circle_at_50%_50%,rgba(138,43,226,0.05),transparent_50%)] pointer-events-none"></div>
 
                     {children}
                     <ChatBot />
-                    <Toaster position="bottom-right" theme="dark" />
+                    <Toaster position="bottom-right" theme="system" />
                 </Providers>
                 <Analytics />
             </body>

@@ -7,7 +7,7 @@
 //  - Domain lock: only accept requests from nirium.xyz origins
 //  - Per-IP rate limiting (sliding window via KV-style Map)
 //  - Request validation: block known malicious patterns
-//  - Hides the real Railway backend URL from the browser
+//  - Hides the real Fly.io backend URL from the browser
 //  - Adds X-Nirium-Request-ID for distributed tracing
 //  - Strips sensitive response headers before forwarding
 //

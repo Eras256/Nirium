@@ -10,6 +10,8 @@
     },
     "dependencies": {
         "@creit.tech/stellar-wallets-kit": "^2.0.0",
+        "@pollar/core": "^0.11.2",
+        "@pollar/react": "^0.11.2",
         "@radix-ui/react-slot": "^1.2.4",
         "@react-three/drei": "^10.7.7",
         "@react-three/postprocessing": "^3.0.4",
@@ -25,6 +27,7 @@
         "framer-motion": "^11.18.2",
         "lucide-react": "^0.563.0",
         "next": "^15.1.7",
+        "nirium-pollar-adapter": "^0.3.0",
         "pinata": "^2.5.5",
         "react": "^19.0.0",
         "react-dom": "^19.0.0",

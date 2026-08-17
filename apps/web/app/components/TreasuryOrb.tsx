@@ -70,18 +70,18 @@ export function TreasuryOrb() {
                         distort={0.28}
                         radius={1}
                         emissive="#FFC800"
-                        emissiveIntensity={1.5}
+                        emissiveIntensity={3.0}
                         roughness={0.1}
                         metalness={0.9}
                         transparent
-                        opacity={0.85}
+                        opacity={0.95}
                     />
                 </Sphere>
             </Float>
 
             {/* ── Soft outer pulse ── */}
-            <Sphere ref={pulseRef} args={[7.6, 32, 32]}>
-                <meshBasicMaterial color="#FFC800" transparent opacity={0.12} side={THREE.BackSide} />
+            <Sphere ref={pulseRef} args={[8.2, 32, 32]}>
+                <meshBasicMaterial color="#FFC800" transparent opacity={0.65} side={THREE.BackSide} />
             </Sphere>
 
             {/* ── Orbit ring 1 — USDC (flat, teal) ── */}

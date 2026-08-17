@@ -3,6 +3,8 @@
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { ReactNode } from 'react';
 import { LanguageProvider } from '../context/LanguageContext';
+import { NetworkProvider } from '../context/NetworkContext';
+import { PollarBridgeProvider } from '../context/PollarBridge';
 
 const queryClient = new QueryClient();
 
@@ -23,9 +25,14 @@ export function Providers({ children }: { children: ReactNode }) {
     return (
         <QueryClientProvider client={queryClient}>
             <LanguageProvider>
-                <LegalWrapper>
-                    {children}
-                </LegalWrapper>
+                <NetworkProvider>
+                    {/* Dentro de NetworkProvider: elige la app de Pollar por red. */}
+                    <PollarBridgeProvider>
+                        <LegalWrapper>
+                            {children}
+                        </LegalWrapper>
+                    </PollarBridgeProvider>
+                </NetworkProvider>
             </LanguageProvider>
         </QueryClientProvider>
     );

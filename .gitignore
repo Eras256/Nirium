@@ -52,8 +52,6 @@ Cargo.lock
 !CONTRIBUTING.md
 !NIRIUM_TECHNICAL_PAPER.md
 !DEMO_SCRIPT.md
-# Servable legal docs live under public/ — not internal docs, must ship.
-!apps/web/public/legal/*.md
 !SECURITY.md
 !SECURITY_AUDIT_V2.md
 !claude.md
@@ -65,6 +63,8 @@ Cargo.lock
 !Playbook_Stellar_House_CDMX.md
 !SCF_Pitch_Deck_Completo.md
 !Elevator_Pitches.md
+# Servable legal docs live under public/ — not internal docs, must ship.
+!apps/web/public/legal/*.md
 !CODE_OF_CONDUCT.md
 !LICENSING.md
 !SCF_Pitch_Deck_REFINED.md
@@ -77,6 +77,12 @@ implementation_plan.json
 # Internal product strategy docs (not committed)
 nodos.md
 qapitch.md
+instaward2-plan.md
+propuesta-remzy.md
+contrato-remzy-msa.md
+SDF.md
+boxb-mainnet.md
+NiriumMainnet.md
 
 # Secrets
 .env
@@ -114,3 +120,48 @@ compliance/out-of-scope-findings.md
 # Working/throwaway dirs (local only)
 scratch/
 .vercel-backup/
+.vercel.bak/
+.env*
+pitch-deploy/
+
+# Salida generada por scripts/rebuild-public-repo.sh — nunca trackear
+nirium-public-rebuilt/
+
+# Python bytecode
+__pycache__/
+*.pyc
+
+# Preparación de consulta legal — interno, no va al repo público
+legal-preguntas-tesoreria.md
+
+# ---------------------------------------------
+# Contexto de estrategia SCF — SOLO en el privado
+# ---------------------------------------------
+# Instalado el 7-ago-2026 con stellar-build. Nada de esto va al repo público
+# (Eras256/Nirium) ni al de la organización (nirium-protocol/nirium-sdk).
+#
+# Por qué importa aunque hoy viva fuera del repo: ECOSYSTEM.md es el catálogo
+# de LumenLoop con los 728 proyectos y sus montos de award, y las notas de
+# estrategia dicen contra quién competimos y qué track vamos a usar. Publicar
+# eso es regalarle a otro postulante el análisis que nos costó construir — y
+# `*.md` ya lo cubre, pero un `!ECOSYSTEM.md` distraído lo desharía en un
+# segundo. La redundancia aquí es a propósito.
+ECOSYSTEM.md
+PROMPT-nirium-audit.md
+PROMPT-periplo-build.md
+submission-*.md
+dossier-*.html
+correo-scf-*.md
+scheme_upto_stellar.md
+
+# Referencias de terceros clonadas para consulta (viven en ~/stellar-ref).
+# Si alguna vez se copian aquí, no se versionan: la mayoría no publica licencia,
+# y la que sí la publica se consume como dependencia de npm/crates, no vendorizada.
+stellar-ref/
+stellar-build/
+.stellar-build/
+
+# Catálogo y skills instalados por stellar-build (viven en ~/.claude/skills).
+# Se ignoran por si alguien los copia al repo para "tenerlos a mano".
+**/skills/data/lumenloop/
+**/projects.json

@@ -16,7 +16,7 @@ info:
     As of Apr 1, 2026, Nirium Protocol adheres to the highest institutional standards:
     - **Data Residency**: Fully compliant with Mexico's LFPDPPP and California's DFAL.
     - **Smart Contract Audits**: Zero critical vulnerabilities. Fuzz-tested with `cargo-fuzz`.
-    - **API Security**: 100% compliant with OWASP API Security Top 10. Full-spectrum JARGUS penetration audit passed.
+    - **API Security**: 100% compliant with OWASP API Security Top 10. Full-spectrum internal penetration review passed.
     - **JWT**: HS256 algorithm locked — `alg:none` / algorithm-confusion attacks blocked.
     - **Prototype Pollution**: All request bodies stripped of `__proto__`/`constructor`/`prototype` keys before routing.
     - **Host Header Injection**: Incoming `Host` header validated against `nirium.xyz` allowlist on the Edge proxy.

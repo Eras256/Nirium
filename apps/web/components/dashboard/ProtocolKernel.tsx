@@ -6,6 +6,8 @@ import { Canvas, useFrame } from '@react-three/fiber';
 import { Sphere, MeshDistortMaterial, Float, FloatProps } from '@react-three/drei';
 import * as THREE from 'three';
 
+const AGENT_URL = process.env.NEXT_PUBLIC_AGENT_API_URL || 'https://nirium-agent.fly.dev';
+
 const Orb = ({ activity = 0.5 }: { activity?: number }) => {
     const meshRef = useRef<THREE.Mesh>(null);
 
@@ -42,12 +44,24 @@ import { useLanguage } from '@/context/LanguageContext';
 
 const ProtocolKernel = ({ activity = 0.5 }: { activity?: number }) => {
     const { t } = useLanguage();
-    const [latency, setLatency] = React.useState<number>(20.5);
+    // Latencia MEDIDA, no simulada. Antes era 20 + Math.random() * 5 cada dos
+    // segundos, con el comentario "to feel alive" — un número que se movía
+    // solo para parecer vivo. La misma corrección se hizo en /analytics, que
+    // tenía un 142 hardcodeado; este componente se quedó atrás.
+    const [latency, setLatency] = React.useState<number | null>(null);
 
     React.useEffect(() => {
-        setLatency(20 + Math.random() * 5);
-        // Refresh latency subtly to feel alive
-        const int = setInterval(() => setLatency(20 + Math.random() * 5), 2000);
+        const measure = async () => {
+            const t0 = performance.now();
+            try {
+                await fetch(`${AGENT_URL}/health`, { cache: 'no-store' });
+                setLatency(performance.now() - t0);
+            } catch {
+                setLatency(null);   // sin respuesta, sin número
+            }
+        };
+        measure();
+        const int = setInterval(measure, 30_000);
         return () => clearInterval(int);
     }, []);
 
@@ -70,7 +84,7 @@ const ProtocolKernel = ({ activity = 0.5 }: { activity?: number }) => {
             <div className="absolute bottom-4 left-1/2 -translate-x-1/2 text-center pointer-events-none">
                 <div className="text-[10px] font-mono tracking-[0.3em] text-stellar-blue/60 uppercase">{t.common.sync}</div>
                 <div className="text-[8px] font-mono text-white/30 mt-1 uppercase">
-                    {t.common.latency}: {latency.toFixed(1)}ms | {t.common.load}: {(activity * 100).toFixed(0)}%
+                    {t.common.latency}: {latency != null ? `${latency.toFixed(0)}ms` : '—'} | {t.common.load}: {(activity * 100).toFixed(0)}%
                 </div>
             </div>
         </div>

@@ -61,7 +61,7 @@ export default function BuildPage() {
     const ah = t.home.institutional_use_cases.api_hub;
 
     return (
-        <div className="min-h-screen bg-[#050505] text-white selection:bg-stellar-teal/30 overflow-x-hidden">
+        <div className="min-h-screen bg-black text-white selection:bg-stellar-teal/30 overflow-x-hidden">
 {/* ── HERO ──────────────────────────────────────────────────────── */}
             <section className="relative pt-8 sm:pt-8 pb-16 sm:pb-20 overflow-hidden">
                 {/* Grid texture */}
@@ -106,7 +106,7 @@ export default function BuildPage() {
                                 href="https://nirium-agent.fly.dev/docs"
                                 target="_blank"
                                 rel="noopener noreferrer"
-                                className="inline-flex items-center justify-center gap-2 px-7 py-3.5 rounded-full bg-stellar-yellow text-black font-black text-sm uppercase tracking-tight hover:bg-stellar-yellow/90 transition-all shadow-[0_10px_30px_rgba(255,215,0,0.25)]"
+                                className="inline-flex items-center justify-center gap-2 px-7 py-3.5 rounded-full bg-stellar-yellow text-[#0b0b0b] font-black text-sm uppercase tracking-tight hover:bg-stellar-yellow/90 transition-all shadow-[0_10px_30px_rgba(255,215,0,0.25)]"
                             >
                                 <Code2 className="w-4 h-4" />
                                 {si.cta_button}
@@ -387,7 +387,7 @@ nirium.events.<span className="text-cyan-400">on</span>(<span className="text-gr
                             href="https://nirium-agent.fly.dev/docs"
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="inline-flex items-center justify-center gap-2 px-6 py-3 rounded-full bg-stellar-teal text-black font-black text-xs sm:text-sm uppercase tracking-tight hover:bg-stellar-teal/90 transition-all shadow-[0_10px_30px_rgba(45,235,232,0.2)]"
+                            className="inline-flex items-center justify-center gap-2 px-6 py-3 rounded-full bg-stellar-teal text-[#0b0b0b] font-black text-xs sm:text-sm uppercase tracking-tight hover:bg-stellar-teal/90 transition-all shadow-[0_10px_30px_rgba(45,235,232,0.2)]"
                         >
                             <Code2 className="w-4 h-4" />
                             {ah.cta_docs}
@@ -438,7 +438,7 @@ nirium.events.<span className="text-cyan-400">on</span>(<span className="text-gr
                             <div className="flex flex-col sm:flex-row gap-3 w-full lg:w-auto shrink-0">
                                 <Link
                                     href="/docs?tab=blueprints"
-                                    className="inline-flex items-center justify-center gap-2 px-7 py-3.5 rounded-full bg-stellar-yellow text-black font-black text-sm uppercase tracking-tight hover:bg-stellar-yellow/90 transition-all shadow-[0_10px_30px_rgba(255,215,0,0.2)]"
+                                    className="inline-flex items-center justify-center gap-2 px-7 py-3.5 rounded-full bg-stellar-yellow text-[#0b0b0b] font-black text-sm uppercase tracking-tight hover:bg-stellar-yellow/90 transition-all shadow-[0_10px_30px_rgba(255,215,0,0.2)]"
                                 >
                                     <Code2 className="w-4 h-4" />
                                     {si.cta_button}

@@ -17,7 +17,7 @@ export default function RiskDisclosurePage() {
     const icons = [Activity, Shield, Scale, Cpu, AlertTriangle];
 
     return (
-        <div className="min-h-screen pt-8 pb-24 px-4 md:px-8 relative bg-[#050505] overflow-x-hidden">
+        <div className="min-h-screen pt-8 pb-24 px-4 md:px-8 relative bg-black overflow-x-hidden">
             {/* Background Decorative Elements */}
             <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-red-500/5 blur-[150px] rounded-full pointer-events-none" />
             <div className="absolute bottom-0 left-0 w-[400px] h-[400px] bg-red-900/5 blur-[150px] rounded-full pointer-events-none" />

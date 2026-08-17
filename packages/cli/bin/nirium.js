@@ -1,32 +1,31 @@
 #!/usr/bin/env node
 
 // ═══════════════════════════════════════════════════════════════
-// Nirium — Autonomous Agent CLI (v1.0.1)
+// Nirium — Autonomous Agent CLI (v1.0.4)
 // ═══════════════════════════════════════════════════════════════
 
 import { Command } from 'commander';
 import fs from 'fs';
 import path from 'path';
 import { execSync } from 'child_process';
-import { v4 as uuidv4 } from 'uuid';
 
 const program = new Command();
 
 program
     .name('nirium')
     .description('Nirium protocol development tool')
-    .version('1.0.1');
+    .version('1.0.4');
 
 // --- COMMAND: create bot ---
 program
     .command('create')
-    .argument('<type>', 'What to create (bot, skill, kernel)')
+    .argument('<type>', 'What to create: x402 (a server that charges) or bot (a signal listener)')
     .option('-n, --name <name>', 'Name of the project', 'nirium-bot-v1')
-    .option('-t, --template <template>', 'Language template (ts, py)', 'ts')
+    .option('-t, --template <template>', 'Language template (ts, py) — bot only', 'ts')
     .description('Scaffold a new Nirium project')
     .action(async (type, options) => {
-        if (type !== 'bot') {
-            console.error('❌ Error: Currently only "bot" creation is supported.');
+        if (type !== 'bot' && type !== 'x402') {
+            console.error('❌ Error: type must be "x402" (charge for your API) or "bot" (listen to signals).');
             process.exit(1);
         }
 
@@ -37,11 +36,15 @@ program
             process.exit(1);
         }
 
-        console.log(`\n🧬 [Scaffold] Creating ${options.template === 'ts' ? 'TypeScript' : 'Python'} bot: ${options.name}...`);
+        console.log(type === 'x402'
+            ? `\n💸 [Scaffold] Creating x402 paid API: ${options.name}...`
+            : `\n🧬 [Scaffold] Creating ${options.template === 'ts' ? 'TypeScript' : 'Python'} bot: ${options.name}...`);
 
         fs.mkdirSync(targetDir, { recursive: true });
 
-        if (options.template === 'ts') {
+        if (type === 'x402') {
+            scaffoldX402(targetDir, options.name);
+        } else if (options.template === 'ts') {
             scaffoldTS(targetDir, options.name);
         } else {
             scaffoldPY(targetDir, options.name);
@@ -61,6 +64,73 @@ program
         }
     });
 
+// Un servidor que COBRA, no uno que escucha. Es el camino corto de
+// "instalé algo" a "me pagaron": levantas esto, le pegas con un cliente
+// x402 y el pago se liquida on-chain antes de que salga la respuesta.
+function scaffoldX402(dir, name) {
+    const pkgJson = {
+        name,
+        version: '0.1.0',
+        private: true,
+        type: 'module',
+        scripts: { dev: 'tsx watch src/server.ts', build: 'tsc' },
+        dependencies: {
+            nirium: '^0.10.0',
+            express: '^5.1.0',
+            '@x402/express': '^2.17.0',
+            '@x402/core': '^2.17.0',
+            '@x402/stellar': '^2.17.0',
+            tsx: '^4.19.0',
+            typescript: '^5.7.0',
+            dotenv: '^16.4.5',
+        },
+        devDependencies: { '@types/node': '^20.19.0', '@types/express': '^5.0.0' },
+    };
+    fs.writeFileSync(path.join(dir, 'package.json'), JSON.stringify(pkgJson, null, 2));
+
+    fs.mkdirSync(path.join(dir, 'src'), { recursive: true });
+    fs.writeFileSync(path.join(dir, 'src', 'server.ts'), `
+import express from 'express';
+import { x402Serve } from 'nirium';
+import 'dotenv/config';
+
+const app = express();
+
+// Todo lo que va debajo de /premium cobra antes de responder.
+// El pago se liquida on-chain: si no pagaron, tu handler nunca corre.
+app.use('/premium', x402Serve({
+  payTo: process.env.STELLAR_PAY_TO!,            // tu cuenta G...
+  facilitatorApiKey: process.env.X402_FACILITATOR_API_KEY!,
+  network: (process.env.STELLAR_NETWORK === 'mainnet' ? 'stellar:pubnet' : 'stellar:testnet'),
+  routes: {
+    'GET /signals': '$0.02',
+  },
+}));
+
+app.get('/premium/signals', (_req, res) => {
+  res.json({ signals: [{ pair: 'USDC/CETES', edge: '0.42%' }] });
+});
+
+app.listen(3000, () => console.log('💸 cobrando en http://localhost:3000/premium/signals'));
+`.trimStart());
+
+    fs.writeFileSync(path.join(dir, '.env'),
+        'STELLAR_PAY_TO=\n'
+        + '# Llave GRATIS y POR RED — una de mainnet da 401 contra testnet:\n'
+        + '#   testnet  https://channels.openzeppelin.com/testnet/gen\n'
+        + '#   mainnet  https://channels.openzeppelin.com/gen\n'
+        + 'X402_FACILITATOR_API_KEY=\n'
+        + 'STELLAR_NETWORK=testnet\n');
+
+    fs.writeFileSync(path.join(dir, 'tsconfig.json'), JSON.stringify({
+        compilerOptions: {
+            target: 'ES2022', module: 'ESNext', moduleResolution: 'bundler',
+            strict: true, esModuleInterop: true, skipLibCheck: true, outDir: 'dist',
+        },
+        include: ['src'],
+    }, null, 2));
+}
+
 function scaffoldTS(dir, name) {
     const pkgJson = {
         name,
@@ -71,7 +141,7 @@ function scaffoldTS(dir, name) {
             "build": "tsc"
         },
         dependencies: {
-            "nirium": "^0.6.2",
+            "nirium": "^0.10.0",
             "tsx": "^4.19.0",
             "typescript": "^5.7.0",
             "dotenv": "^16.4.5"
@@ -89,7 +159,7 @@ import { Agent } from 'nirium';
 import 'dotenv/config';
 
 const agent = new Agent({
-  baseUrl: process.env.NIRIUM_API_URL || 'http://localhost:3001',
+  baseUrl: process.env.NIRIUM_API_URL || 'https://nirium-agent.fly.dev',
   apiKey: process.env.NIRIUM_API_KEY
 });
 
@@ -101,7 +171,7 @@ agent.subscribe((signal) => {
 console.log('✅ Listening for Nirium signals...');
 `;
     fs.writeFileSync(path.join(dir, 'src', 'index.ts'), indexSrc);
-    fs.writeFileSync(path.join(dir, '.env'), 'NIRIUM_API_URL=http://localhost:3001\nNIRIUM_API_KEY=');
+    fs.writeFileSync(path.join(dir, '.env'), 'NIRIUM_API_URL=https://nirium-agent.fly.dev\nNIRIUM_API_KEY=');
     fs.writeFileSync(path.join(dir, 'tsconfig.json'), JSON.stringify({
         compilerOptions: {
             target: "es2022",
@@ -114,7 +184,7 @@ console.log('✅ Listening for Nirium signals...');
 }
 
 function scaffoldPY(dir, name) {
-    const reqs = "nirium>=0.6.2\npython-dotenv>=1.0.0";
+    const reqs = "nirium>=0.9.0\npython-dotenv>=1.0.0";
     fs.writeFileSync(path.join(dir, 'requirements.txt'), reqs);
 
     const mainSrc = `
@@ -127,7 +197,7 @@ load_dotenv()
 
 async def main():
     agent = Agent(
-        api_url=os.getenv("NIRIUM_API_URL", "http://localhost:3001"),
+        api_url=os.getenv("NIRIUM_API_URL", "https://nirium-agent.fly.dev"),
         api_key=os.getenv("NIRIUM_API_KEY")
     )
 
@@ -145,7 +215,7 @@ if __name__ == "__main__":
     asyncio.run(main())
 `;
     fs.writeFileSync(path.join(dir, 'main.py'), mainSrc);
-    fs.writeFileSync(path.join(dir, '.env'), 'NIRIUM_API_URL=http://localhost:3001\nNIRIUM_API_KEY=');
+    fs.writeFileSync(path.join(dir, '.env'), 'NIRIUM_API_URL=https://nirium-agent.fly.dev\nNIRIUM_API_KEY=');
 }
 
 program.parse();

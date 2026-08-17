@@ -6,9 +6,10 @@ import {
     Code2, Terminal, Zap, ArrowRight, CheckCircle2,
     Copy, Sparkles, Package, Cpu, Globe, ChevronRight,
     Server, Boxes, Layers, Shield, ExternalLink, Activity, 
-    Lock, TrendingUp, Layers as LayersIcon
+    Lock, TrendingUp, Layers as LayersIcon, Send
 } from "lucide-react";
 import { ComplianceBanner } from "@/components/ui/ComplianceBanner";
+import { PollarPayCard } from "@/components/shared/PollarPayCard";
 import { Button } from "@/components/ui/Button";
 import { useLanguage } from "@/context/LanguageContext";
 import { useState } from "react";
@@ -17,7 +18,7 @@ import { motion } from "framer-motion";
 function CodeBlock({ code, lang: langLabel = "typescript" }: { code: string; lang?: string }) {
     const [copied, setCopied] = useState(false);
     return (
-        <div className="relative rounded-2xl border border-white/10 bg-[#080808] overflow-hidden group">
+        <div className="relative rounded-2xl border border-white/10 bg-[#080808] overflow-hidden group w-full">
             <div className="flex items-center justify-between px-4 py-2.5 border-b border-white/5 bg-white/[0.02]">
                 <div className="flex gap-1.5">
                     <div className="w-2.5 h-2.5 rounded-full bg-red-500/20 border border-red-500/40" />
@@ -44,41 +45,68 @@ function CodeBlock({ code, lang: langLabel = "typescript" }: { code: string; lan
 
 const INSTALL_CODE = `npm install nirium`;
 
-const QUICKSTART_CODE = `import { NiriumAgent } from "nirium";
+const QUICKSTART_CODE = `import { Agent } from "nirium";
 
-const agent = new NiriumAgent({ apiKey: process.env.NIRIUM_API_KEY });
-
-// Rebalance: keep 60% in CETES (gov. rate), 40% USDC (liquid)
-await agent.rebalance({ cetes: 60, usdc: 40 });
-
-// Send cross-border: USD → MXN receiver gets USDC instantly
-await agent.transfer({ to: "G...", amount: 1000, asset: "USDC" });`;
-
-const X402_CODE = `import { NiriumAgent } from "nirium";
-
-const agent = new NiriumAgent({ apiKey: process.env.NIRIUM_API_KEY });
-
-// x402: per-call payment — agent pays $0.05 per API call automatically
-const result = await agent.callPaidEndpoint({
-  url: "https://api.example.com/data",
-  maxFee: "0.05",          // USD, reject if server asks more
-  asset: "USDC",
-});`;
-
-const MPP_CODE = `import { NiriumAgent } from "nirium";
-
-const agent = new NiriumAgent({ apiKey: process.env.NIRIUM_API_KEY });
-
-// MPP session: pre-authorize $10 budget, pay per use
-const session = await agent.openMPPSession({
-  vendor: "G...",          // vendor Stellar address
-  budget: "10",            // USDC budget
-  maxPerCall: "0.05",
+const agent = new Agent({
+  apiKey: process.env.NIRIUM_API_KEY,
+  baseUrl: "https://nirium-agent.fly.dev",
 });
 
-await session.call("/analyze");   // deducts $0.05
-await session.call("/summarize"); // deducts $0.05
-await session.settle();           // returns unspent balance
+// Live market data — rates attributed to their source
+const market = await agent.getMarket();
+
+// The node catalog: what runs, on which network
+const nodes = await agent.getNodes();
+
+// Anchor evidence to IPFS and get a verifiable CID back
+const { cid } = await agent.anchorAuditRecord({ hash: "<sha256>" });`;
+
+const X402_CODE = `import { Agent } from "nirium";
+
+const agent = new Agent({ baseUrl: "https://nirium-agent-mainnet.fly.dev" });
+
+// PAY for someone else's API. The 402, the signature and the retry
+// happen underneath — you just await a fetch.
+agent.initX402({
+  secretKey: process.env.STELLAR_SECRET_KEY,   // or { signer } from a wallet
+  network: "stellar:pubnet",
+});
+
+const res = await agent.x402Fetch(
+  "https://nirium-agent-mainnet.fly.dev/api/v1/premium/market",   // $0.05 USDC
+);
+const data = await res.json();
+
+// ─────────────────────────────────────────────────────────────
+// CHARGE for YOUR OWN API. Same rail, other side of the counter.
+// Funds go payer → you. They never touch Nirium.
+import { x402Serve } from "nirium";
+
+app.use("/premium", x402Serve({
+  payTo: "G...",                                  // your Stellar address
+  routes: { "GET /signals": "$0.02" },
+  facilitatorApiKey: process.env.X402_FACILITATOR_API_KEY,
+}));`;
+
+const MPP_CODE = `import { Agent } from "nirium";
+
+const agent = new Agent({ baseUrl: "https://nirium-agent-mainnet.fly.dev" });
+
+// MPP Charge: the client signs a full USDC transfer inside each request.
+// No external facilitator — the server validates by simulation and submits.
+agent.initMpp({
+  secretKey: process.env.STELLAR_SECRET_KEY,
+  network: "stellar:pubnet",
+});
+
+// $0.05 USDC — charges and delivers on mainnet
+const res = await agent.mppFetch(
+  "https://nirium-agent-mainnet.fly.dev/api/v1/mpp/market",
+);
+
+// Note: /signals and /execute are testnet-only. Signals come from the
+// autonomous loop and execution needs a signing key; the mainnet box has
+// neither by design, so it answers 501 without charging you.
 `;
 
 const MCP_CODE = `// Claude Desktop config (~/.claude/claude_desktop_config.json)
@@ -86,7 +114,7 @@ const MCP_CODE = `// Claude Desktop config (~/.claude/claude_desktop_config.json
   "mcpServers": {
     "nirium": {
       "command": "npx",
-      "args": ["@nirium/mcp-server"],
+      "args": ["-y", "nirium-mcp"],
       "env": {
         "NIRIUM_API_KEY": "your_key_here"
       }
@@ -94,45 +122,71 @@ const MCP_CODE = `// Claude Desktop config (~/.claude/claude_desktop_config.json
   }
 }`;
 
+// Cada ruta de esta tabla existe y fue probada contra la API viva: 200 donde es
+// pública, 401 donde pide credencial, 402 donde pide pago x402, 400 donde faltan
+// parámetros — ninguna 404. La tabla anterior listaba `/v1/vault/*`,
+// `/v1/x402/*` y `/v1/compliance/*`, que nunca existieron: copiar cualquiera de
+// esas filas devolvía 404 en la página que un desarrollador abre primero.
 const ENDPOINTS = [
-    { method: 'POST', path: '/v1/agent/rebalance',       desc_en: 'Trigger USDC↔CETES rebalance',          desc_es: 'Dispara rebalanceo USDC↔CETES',           desc_zh: '触发 USDC↔CETES 再平衡' },
-    { method: 'POST', path: '/v1/agent/transfer',        desc_en: 'Cross-border USDC transfer',            desc_es: 'Transferencia USDC cross-border',         desc_zh: '跨境 USDC 转账' },
-    { method: 'GET',  path: '/v1/vault/status',          desc_en: 'Get vault balances + rates',            desc_es: 'Balances y tasas del vault',              desc_zh: '获取保险库余额 + 利率' },
-    { method: 'POST', path: '/v1/vault/create',          desc_en: 'Deploy new 2-of-3 Soroban vault',       desc_es: 'Deploya vault Soroban 2-de-3',            desc_zh: '部署新的 2-of-3 Soroban 保险库' },
-    { method: 'POST', path: '/v1/vault/pause',           desc_en: 'Emergency pause (2-of-3 required)',     desc_es: 'Pausa de emergencia (requiere 2-de-3)',    desc_zh: '紧急暂停（需 2-of-3 签名）' },
-    { method: 'POST', path: '/v1/vault/withdraw',        desc_en: 'Withdraw >$10K (2-of-3 required)',      desc_es: 'Retiro >$10K (requiere 2-de-3)',           desc_zh: '提款 >$10K（需 2-of-3 签名）' },
-    { method: 'POST', path: '/v1/x402/challenge',        desc_en: 'Create x402 payment challenge',         desc_es: 'Crea challenge de pago x402',             desc_zh: '创建 x402 支付挑战' },
-    { method: 'POST', path: '/v1/x402/verify',           desc_en: 'Verify x402 payment proof',             desc_es: 'Verifica prueba de pago x402',            desc_zh: '验证 x402 支付证明' },
-    { method: 'POST', path: '/v1/mpp/session',           desc_en: 'Open MPP payment session',              desc_es: 'Abre sesión de pago MPP',                 desc_zh: '开启 MPP 支付会话' },
-    { method: 'POST', path: '/v1/mpp/charge',            desc_en: 'Charge within MPP session',             desc_es: 'Cobra dentro de sesión MPP',              desc_zh: '在 MPP 会话内扣费' },
-    { method: 'POST', path: '/v1/mpp/settle',            desc_en: 'Settle and close MPP session',          desc_es: 'Liquida y cierra sesión MPP',             desc_zh: '结算并关闭 MPP 会话' },
-    { method: 'POST', path: '/v1/compliance/audit',      desc_en: 'Generate HMAC-signed audit entry',      desc_es: 'Genera entrada de auditoría HMAC-firmada',desc_zh: '生成 HMAC 签名审计条目' },
-    { method: 'POST', path: '/v1/compliance/export',     desc_en: 'Export CNBV-format JSON report',        desc_es: 'Exporta reporte JSON formato CNBV',       desc_zh: '导出 CNBV 格式 JSON 报告' },
-    { method: 'POST', path: '/v1/compliance/ipfs',       desc_en: 'Pin report to IPFS (Pinata)',           desc_es: 'Ancla reporte en IPFS (Pinata)',           desc_zh: '将报告固定至 IPFS（Pinata）' },
-    { method: 'GET',  path: '/v1/compliance/verify/:cid',desc_en: 'Verify IPFS report integrity',          desc_es: 'Verifica integridad del reporte IPFS',    desc_zh: '验证 IPFS 报告完整性' },
-    { method: 'GET',  path: '/v1/market/rates',          desc_en: 'Get live CETES rate + USDC rates',     desc_es: 'Tasa CETES + USDC en tiempo real',       desc_zh: '获取实时 CETES 利率 + USDC 利率' },
+    // Público
+    { method: 'GET',  path: '/health',                    desc_en: 'Liveness probe',                          desc_es: 'Sonda de disponibilidad' },
+    { method: 'GET',  path: '/api/info',                  desc_en: 'Agent metadata, network and version',     desc_es: 'Metadatos del agente, red y versión' },
+    { method: 'GET',  path: '/api/tickers',               desc_en: 'CETES + Blend reference rates',           desc_es: 'Tasas de referencia CETES + Blend' },
+    { method: 'GET',  path: '/api/nodes',                 desc_en: 'Execution Node catalog (status + custody)', desc_es: 'Catálogo de Execution Nodes (estado + custodia)' },
+    { method: 'GET',  path: '/api/loop/status',           desc_en: 'Autonomous loop state + last decision',   desc_es: 'Estado del loop autónomo + última decisión' },
+    { method: 'POST', path: '/api/execute-demo',          desc_en: 'Run a demo rebalance — no key required',  desc_es: 'Corre un rebalanceo demo — sin llave' },
+
+    // Auth
+    { method: 'POST', path: '/api/auth/token',            desc_en: 'Exchange credentials for a JWT',          desc_es: 'Cambia credenciales por un JWT' },
+    { method: 'POST', path: '/api/auth/keys',             desc_en: 'Issue an API key (also GET / DELETE)',    desc_es: 'Emite una API key (también GET / DELETE)' },
+
+    // x402 — pago por request
+    { method: 'GET',  path: '/api/v1/premium/signals',    desc_en: 'Premium signals — $0.02 USDC (x402)',     desc_es: 'Señales premium — $0.02 USDC (x402)' },
+    { method: 'GET',  path: '/api/v1/premium/market',     desc_en: 'Enriched market state — $0.05 USDC (x402)', desc_es: 'Estado de mercado — $0.05 USDC (x402)' },
+    { method: 'POST', path: '/api/v1/premium/execute',    desc_en: 'Paid strategy execution — $0.25 USDC (x402)', desc_es: 'Ejecución pagada — $0.25 USDC (x402)' },
+
+    // MPP Charge
+    { method: 'GET',  path: '/api/v1/mpp/signals',        desc_en: 'Premium signals — $0.02 USDC per call',  desc_es: 'Señales premium — $0.02 USDC por llamada' },
+    { method: 'GET',  path: '/api/v1/mpp/market',         desc_en: 'Enriched market state — $0.05 USDC',     desc_es: 'Estado de mercado enriquecido — $0.05 USDC' },
+    { method: 'POST', path: '/api/v1/mpp/execute',        desc_en: 'Paid strategy execution — $0.25 USDC',   desc_es: 'Ejecución de estrategia pagada — $0.25 USDC' },
+    { method: 'GET',  path: '/api/v1/mpp/info',           desc_en: 'Active mode, routes and pricing',        desc_es: 'Modo activo, rutas y precios' },
+
+    // Audit Trail
+    { method: 'POST', path: '/api/audit/log',             desc_en: 'Anchor a record to IPFS — optional agent signature', desc_es: 'Ancla un registro en IPFS — firma de agente opcional' },
+    { method: 'GET',  path: '/api/audit/info',            desc_en: 'Audit node metadata and limits',          desc_es: 'Metadatos y límites del nodo de auditoría' },
+
+    // Reporting
+    { method: 'GET',  path: '/api/reporting/summary',     desc_en: 'Consolidated summary by period and network', desc_es: 'Sumario consolidado por periodo y red' },
+    { method: 'GET',  path: '/api/reporting/export',      desc_en: 'Institutional-format export (CSV / JSON)', desc_es: 'Export en formato institucional (CSV / JSON)' },
+
+    // Payouts
+    { method: 'POST', path: '/api/payroll/run',          desc_en: 'Build a batch payout (unsigned XDR)',   desc_es: 'Arma un pago batch (XDR sin firmar)' },
+    { method: 'POST', path: '/api/payroll/submit',       desc_en: 'Broadcast company-signed payout',       desc_es: 'Transmite el pago firmado por la empresa' },
+    { method: 'POST', path: '/api/payroll/onboard',      desc_en: 'Add a USDC trustline (self-signed)',    desc_es: 'Agrega trustline USDC (self-signed)' },
+    { method: 'GET',  path: '/api/payroll/runs',         desc_en: 'Payout history + IPFS/LCP receipts',    desc_es: 'Historial de pagos + recibos IPFS/LCP' },
 ];
 
 const MCP_TOOLS = [
-    { name: 'nirium_get_vault_status',  desc_en: 'Get balances, rates, and pending operations',      desc_es: 'Balances, tasas y operaciones pendientes',  desc_zh: '获取余额、利率和待处理操作' },
-    { name: 'nirium_rebalance',         desc_en: 'Rebalance USDC↔CETES with target allocation',     desc_es: 'Rebalancea USDC↔CETES con asignación objetivo', desc_zh: '按目标配置再平衡 USDC↔CETES' },
-    { name: 'nirium_transfer',          desc_en: 'Send cross-border payment to any Stellar address', desc_es: 'Envía pago cross-border a dirección Stellar', desc_zh: '向任意 Stellar 地址发送跨境支付' },
-    { name: 'nirium_get_rates',         desc_en: 'Get live CETES rate and USDC lending rates',      desc_es: 'Tasa CETES y lending USDC en tiempo real',  desc_zh: '获取实时 CETES 利率和 USDC 借贷利率' },
-    { name: 'nirium_audit_log',         desc_en: 'Query audit trail (last N records)',               desc_es: 'Consulta audit trail (últimos N registros)', desc_zh: '查询审计追踪（最近 N 条记录）' },
-    { name: 'nirium_export_cnbv',       desc_en: 'Export CNBV-format compliance report',             desc_es: 'Exporta reporte compliance formato CNBV', desc_zh: '导出 CNBV 格式合规报告' },
-    { name: 'nirium_create_vault',      desc_en: 'Deploy new Soroban multisig vault',                desc_es: 'Deploya nuevo vault multisig Soroban', desc_zh: '部署新的 Soroban 多签保险库' },
-    { name: 'nirium_pause_vault',       desc_en: 'Emergency vault pause (requires 2-of-3)',          desc_es: 'Pausa de emergencia (requiere 2-de-3)', desc_zh: '紧急暂停保险库（需 2-of-3 签名）' },
-    { name: 'nirium_open_mpp_session',  desc_en: 'Open MPP budget session with vendor',              desc_es: 'Abre sesión MPP con proveedor', desc_zh: '与供应商开启 MPP 预算会话' },
-    { name: 'nirium_x402_pay',          desc_en: 'Pay x402 challenge from agent wallet',             desc_es: 'Paga challenge x402 desde wallet del agente', desc_zh: '从智能体钱包支付 x402 挑战' },
-    { name: 'nirium_simulate_tx',       desc_en: 'Simulate Soroban transaction before signing',      desc_es: 'Simula tx Soroban antes de firmar', desc_zh: '签名前模拟 Soroban 交易' },
-    { name: 'nirium_get_contract_state',desc_en: 'Read NiriumVault contract storage',                desc_es: 'Lee almacenamiento del contrato NiriumVault', desc_zh: '读取 NiriumVault 合约存储' },
+    { name: 'get_market_state',        desc_en: 'Get live tickers: XLM/USDC price, base fee, Blend supply rate', desc_es: 'Tasas en vivo: precio XLM/USDC, base fee y tasa de suministro de Blend' },
+    { name: 'get_loop_status',         desc_en: 'Check autonomous loop status, scan count, and uptime', desc_es: 'Estado del lazo autónomo: scans, uptime y telemetría' },
+    { name: 'start_loop',              desc_en: 'Start the autonomous market scanning loop (Auth)',      desc_es: 'Inicia el lazo autónomo de escaneo de mercado (Auth)' },
+    { name: 'stop_loop',               desc_en: 'Stop the autonomous market scanning loop (Auth)',       desc_es: 'Detiene el lazo autónomo de escaneo de mercado (Auth)' },
+    { name: 'execute_demo',            desc_en: 'Simulate a strategy via Soroban dry-run (Free)',        desc_es: 'Simula una estrategia vía Soroban dry-run (Gratis)' },
+    { name: 'get_premium_signals',     desc_en: 'Market signals from the autonomous loop, testnet only — factual data, not a recommendation ($0.02 USDC)',   desc_es: 'Señales del loop autónomo, solo testnet — datos, no recomendación ($0.02 USDC)' },
+    { name: 'get_premium_market',      desc_en: 'Market state with reference rates attributed to their source, via x402 ($0.05 USDC)',       desc_es: 'Estado de mercado con tasas de referencia y su fuente, vía x402 ($0.05 USDC)' },
+    { name: 'execute_paid_strategy',   desc_en: 'Execute strategy on-chain via x402 ($0.25 USDC)',       desc_es: 'Ejecuta estrategia on-chain vía x402 ($0.25 USDC)' },
+    { name: 'get_wallet_info',         desc_en: 'Show wallet address and session tools (Free)',          desc_es: 'Muestra la wallet y herramientas de la sesión (Gratis)' },
+    { name: 'get_mpp_signals',         desc_en: 'Get premium signals settled via MPP ($0.02 USDC)',      desc_es: 'Señales premium liquidadas vía MPP ($0.02 USDC)' },
+    { name: 'get_mpp_market',          desc_en: 'Get enriched market state settled via MPP ($0.05 USDC)',  desc_es: 'Estado de mercado enriquecido vía MPP ($0.05 USDC)' },
 ];
 
 export default function DevelopersPage() {
     const { t, language } = useLanguage();
+    const lang = (en: string, es: string) =>
+        language === "es" ? es : en;
 
     return (
-        <main className="min-h-screen bg-[#030303] text-white antialiased">
+        <main className="min-h-screen bg-black text-white antialiased">
             {/* Background FX */}
             <div className="fixed inset-0 z-0 pointer-events-none">
                 <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full h-full bg-[radial-gradient(ellipse_at_top,_rgba(45,235,232,0.08),transparent_70%)]" />
@@ -226,7 +280,7 @@ export default function DevelopersPage() {
                         </div>
 
                         <div className="grid lg:grid-cols-2 gap-10">
-                            <div className="group p-8 rounded-3xl border border-white/10 bg-white/[0.02] hover:bg-white/[0.04] transition-all">
+                            <div className="group p-5 sm:p-8 rounded-3xl border border-white/10 bg-white/[0.02] hover:bg-white/[0.04] transition-all min-w-0 overflow-hidden">
                                 <div className="flex items-center gap-4 mb-6">
                                     <div className="p-3 rounded-2xl bg-stellar-yellow/10 border border-stellar-yellow/20">
                                         <Zap className="w-6 h-6 text-stellar-yellow" />
@@ -241,9 +295,14 @@ export default function DevelopersPage() {
                                     <span className="px-2 py-0.5 rounded border border-white/10">No Custodian</span>
                                     <span className="px-2 py-0.5 rounded border border-white/10">Atomic On-chain</span>
                                 </div>
+                                {/* Vive junto al ejemplo de x402 y no en /keys: quien llega
+                                    a /keys viene por credenciales, quien llega aquí viene a
+                                    decidir si esto sirve — y un pago que ocurre de verdad
+                                    convence más que el bloque de código de arriba. */}
+                                <PollarPayCard lang={lang} />
                             </div>
 
-                            <div className="group p-8 rounded-3xl border border-white/10 bg-white/[0.02] hover:bg-white/[0.04] transition-all">
+                            <div className="group p-5 sm:p-8 rounded-3xl border border-white/10 bg-white/[0.02] hover:bg-white/[0.04] transition-all min-w-0 overflow-hidden">
                                 <div className="flex items-center gap-4 mb-6">
                                     <div className="p-3 rounded-2xl bg-purple-500/10 border border-purple-500/20">
                                         <Package className="w-6 h-6 text-purple-400" />
@@ -289,6 +348,10 @@ export default function DevelopersPage() {
                                 </tbody>
                             </table>
                         </div>
+                        {/* La tabla compara protocolos, no inventario: Channel está apagado en ambos boxes. */}
+                        <p className="mt-4 text-[11px] leading-relaxed text-gray-500">
+                            {t.developers_page.agentic_payments.table.note}
+                        </p>
                     </div>
                 </section>
 
@@ -296,12 +359,12 @@ export default function DevelopersPage() {
                 <section className="py-24 border-t border-white/5 bg-white/[0.01]">
                     <div className="max-w-6xl mx-auto px-6">
                         <div className="grid lg:grid-cols-2 gap-16 items-center">
-                            <div>
+                            <div className="min-w-0">
                                 <div className="inline-flex items-center gap-3 px-4 py-1.5 rounded-full border border-stellar-teal/30 bg-stellar-teal/10 text-stellar-teal text-[10px] font-black uppercase tracking-widest mb-8">
                                     <Server className="w-3.5 h-3.5" />
                                     {t.developers_page.mcp.title}
                                 </div>
-                                <h2 className="text-4xl sm:text-6xl font-black uppercase italic tracking-tighter text-white mb-6">
+                                <h2 className="text-3xl sm:text-6xl font-black uppercase italic tracking-tighter text-white mb-6 break-words">
                                     MCP Server<br />
                                     <span className="text-stellar-teal">Claude & Cursor</span>
                                 </h2>
@@ -320,20 +383,20 @@ export default function DevelopersPage() {
                                     </h3>
                                     <div className="grid gap-3">
                                         {MCP_TOOLS.slice(0, 8).map((tool) => (
-                                            <div key={tool.name} className="flex items-start gap-3 p-3 rounded-2xl bg-white/[0.02] border border-white/5 hover:border-stellar-teal/30 transition-all group">
-                                                <div className="p-1.5 rounded-lg bg-white/5 group-hover:bg-stellar-teal/10">
+                                            <div key={tool.name} className="flex items-start gap-3 p-3 rounded-2xl bg-white/[0.02] border border-white/5 hover:border-stellar-teal/30 transition-all group min-w-0">
+                                                <div className="p-1.5 rounded-lg bg-white/5 group-hover:bg-stellar-teal/10 shrink-0">
                                                     <ChevronRight className="w-3 h-3 text-gray-500 group-hover:text-stellar-teal" />
                                                 </div>
-                                                <div>
-                                                    <code className="text-[10px] text-stellar-teal font-black font-mono block mb-0.5">{tool.name}</code>
-                                                    <p className="text-[10px] text-gray-500 uppercase tracking-tight">
-                                                        {language === 'zh' ? tool.desc_zh : language === 'es' ? tool.desc_es : tool.desc_en}
+                                                <div className="min-w-0 flex-1">
+                                                    <code className="text-[10px] sm:text-[11px] text-stellar-teal font-black font-mono block mb-0.5 break-all">{tool.name}</code>
+                                                    <p className="text-[9px] sm:text-[10px] text-gray-500 uppercase tracking-tight line-clamp-2">
+                                                        {language === 'es' ? tool.desc_es : tool.desc_en}
                                                     </p>
                                                 </div>
                                             </div>
                                         ))}
                                         <div className="text-center pt-2">
-                                            <span className="text-[10px] font-black text-gray-600 uppercase tracking-widest">+ 4 MORE TOOLS IN DOCUMENTATION</span>
+                                            <span className="text-[10px] font-black text-gray-600 uppercase tracking-widest">+ 3 MORE TOOLS IN DOCUMENTATION</span>
                                         </div>
                                     </div>
                                 </div>
@@ -356,7 +419,7 @@ export default function DevelopersPage() {
                                 className="mb-6 px-4 py-1.5 rounded-full bg-stellar-teal/10 border border-stellar-teal/30 flex items-center gap-2"
                             >
                                 <Activity className="w-3 h-3 text-stellar-teal animate-pulse" />
-                                <span className="text-[10px] font-black text-stellar-teal uppercase tracking-[0.2em]">Live Protocol Surface v0.6.1</span>
+                                <span className="text-[10px] font-black text-stellar-teal uppercase tracking-[0.2em]">Live Protocol Surface v0.10.2</span>
                             </motion.div>
                             
                             <h2 className="text-4xl sm:text-7xl font-black uppercase italic tracking-tighter text-white mb-6 leading-none">
@@ -370,7 +433,7 @@ export default function DevelopersPage() {
                         {/* CORE HIGHLIGHTS — PREMIUM CARDS */}
                         <div className="mb-32">
                             <div className="flex items-center gap-6 mb-12">
-                                <h3 className="text-sm font-black text-white uppercase tracking-[0.4em] italic whitespace-nowrap">
+                                <h3 className="text-xs sm:text-sm font-black text-white uppercase tracking-widest sm:tracking-[0.4em] italic">
                                     {t.developers_page.hub.infrastructure}
                                 </h3>
                                 <div className="h-px w-full bg-gradient-to-r from-white/10 to-transparent" />
@@ -383,7 +446,7 @@ export default function DevelopersPage() {
                                         initial={{ opacity: 0, y: 20 }}
                                         whileInView={{ opacity: 1, y: 0 }}
                                         transition={{ delay: i * 0.05 }}
-                                        className="group p-5 rounded-2xl border border-white/5 bg-white/[0.02] hover:bg-white/[0.05] hover:border-stellar-teal/30 transition-all cursor-default"
+                                        className="group p-5 rounded-2xl border border-white/5 bg-white/[0.02] hover:bg-white/[0.05] hover:border-stellar-teal/30 transition-all cursor-default min-w-0"
                                     >
                                         <div className="flex items-center justify-between mb-4">
                                             <span className={`text-[10px] font-black px-2 py-0.5 rounded ${ep.method === 'GET' ? 'bg-emerald-500/10 text-emerald-400' : 'bg-stellar-blue/10 text-stellar-blue'}`}>
@@ -396,7 +459,7 @@ export default function DevelopersPage() {
                                         </div>
                                         <code className="text-[11px] text-white font-mono block mb-3 truncate group-hover:text-stellar-teal transition-colors">{ep.path}</code>
                                         <p className="text-[10px] text-gray-500 uppercase tracking-tighter leading-relaxed line-clamp-2">
-                                            {language === 'zh' ? ep.desc_zh : language === 'es' ? ep.desc_es : ep.desc_en}
+                                            {language === 'es' ? ep.desc_es : ep.desc_en}
                                         </p>
                                     </motion.div>
                                 ))}
@@ -410,7 +473,7 @@ export default function DevelopersPage() {
                                     <div className="p-3 rounded-xl bg-white/5 border border-white/10">
                                         <Terminal className="w-5 h-5 text-gray-400" />
                                     </div>
-                                    <h3 className="text-xl font-black text-white uppercase italic tracking-tight">
+                                    <h3 className="text-lg sm:text-xl font-black text-white uppercase italic tracking-tight break-words">
                                         {t.developers_page.hub.explorer}
                                     </h3>
                                 </div>
@@ -429,7 +492,7 @@ export default function DevelopersPage() {
                             <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
                                 {[
                                     { 
-                                        cat: language === 'zh' ? '安全与认证' : language === 'es' ? 'Seguridad y Auth' : 'Auth & Security', 
+                                        cat: language === 'es' ? 'Seguridad y Auth' : 'Auth & Security', 
                                         icon: Lock,
                                         eps: [
                                             { m: 'POST', p: '/api/auth/token', d: 'JWT session generation', s: 'CORE' },
@@ -439,7 +502,7 @@ export default function DevelopersPage() {
                                         ]
                                     },
                                     { 
-                                        cat: language === 'zh' ? '国库引擎' : language === 'es' ? 'Motor de Tesorería' : 'Treasury Engine', 
+                                        cat: language === 'es' ? 'Motor de Tesorería' : 'Treasury Engine', 
                                         icon: Cpu,
                                         eps: [
                                             { m: 'POST', p: '/api/loop/start', d: 'Autonomous rebalance trigger', s: 'PREMIUM' },
@@ -449,23 +512,33 @@ export default function DevelopersPage() {
                                         ]
                                     },
                                     { 
-                                        cat: language === 'zh' ? '合规与 IPFS' : language === 'es' ? 'Compliance e IPFS' : 'Compliance & IPFS', 
+                                        cat: language === 'es' ? 'Compliance e IPFS' : 'Compliance & IPFS', 
                                         icon: Shield,
                                         eps: [
-                                            { m: 'POST', p: '/v1/compliance/audit', d: 'HMAC-SHA256 audit log entry', s: 'PRO' },
-                                            { m: 'POST', p: '/v1/compliance/ipfs', d: 'Inmutable Pinata CID pinning', s: 'PRO' },
-                                            { m: 'POST', p: '/v1/compliance/export', d: 'CNBV Art. 80 JSON generator', s: 'PRO' },
-                                            { m: 'GET', p: '/v1/compliance/verify/:cid', d: 'Decentralized proof verify', s: 'LIVE' },
+                                            { m: 'POST', p: '/api/audit/log', d: 'Anchor a record to IPFS, optionally agent-signed', s: 'LIVE' },
+                                            { m: 'GET', p: '/api/audit/info', d: 'Audit node metadata and limits', s: 'LIVE' },
+                                            { m: 'GET', p: '/api/reporting/summary', d: 'Consolidated summary by period and network', s: 'LIVE' },
+                                            { m: 'GET', p: '/api/reporting/export', d: 'Institutional-format export (CSV / JSON)', s: 'LIVE' },
                                         ]
                                     },
                                     { 
-                                        cat: language === 'zh' ? '市场情报' : language === 'es' ? 'Inteligencia de Mercado' : 'Market Intelligence', 
+                                        cat: language === 'es' ? 'Inteligencia de Mercado' : 'Market Intelligence', 
                                         icon: TrendingUp,
                                         eps: [
-                                            { m: 'GET', p: '/api/market', d: 'High-frequency orderbook', s: 'LIVE' },
+                                            { m: 'GET', p: '/api/market', d: 'Live market state and reference rates', s: 'LIVE' },
                                             { m: 'GET', p: '/api/tickers', d: 'Cross-asset price feeds', s: 'LIVE' },
                                             { m: 'GET', p: '/api/strategies', d: 'Strategy marketplace', s: 'LIVE' },
-                                            { m: 'GET', p: '/api/signals/recent', d: 'AI-generated trade signals', s: 'PREMIUM' },
+                                            { m: 'GET', p: '/api/signals/recent', d: 'Recent signals from the autonomous loop (testnet)', s: 'PREMIUM' },
+                                        ]
+                                    },
+                                    {
+                                        cat: language === 'es' ? 'Dispersión y Nodos' : 'Disbursement & Nodes',
+                                        icon: Send,
+                                        eps: [
+                                            { m: 'GET', p: '/api/nodes', d: 'Execution Node catalog', s: 'LIVE' },
+                                            { m: 'POST', p: '/api/payroll/run', d: 'Build batch payout (unsigned)', s: 'CORE' },
+                                            { m: 'POST', p: '/api/payroll/submit', d: 'Broadcast signed payout + LCP receipt', s: 'CORE' },
+                                            { m: 'POST', p: '/api/payroll/onboard', d: 'Self-signed USDC trustline', s: 'CORE' },
                                         ]
                                     },
                                 ].map((group, gIdx) => (
@@ -473,7 +546,7 @@ export default function DevelopersPage() {
                                         key={group.cat}
                                         initial={{ opacity: 0, x: gIdx % 2 === 0 ? -20 : 20 }}
                                         whileInView={{ opacity: 1, x: 0 }}
-                                        className="relative p-8 rounded-[2rem] border border-white/5 bg-white/[0.01] hover:bg-white/[0.02] transition-all overflow-hidden group/card"
+                                        className="relative p-5 sm:p-8 rounded-[2rem] border border-white/5 bg-white/[0.01] hover:bg-white/[0.02] transition-all overflow-hidden group/card min-w-0"
                                     >
                                         <div className="absolute top-0 right-0 p-8 opacity-5 group-hover/card:opacity-10 transition-opacity">
                                             <group.icon className="w-24 h-24 text-white" />
@@ -535,7 +608,7 @@ export default function DevelopersPage() {
                 </section>
 
                 {/* CONTRACTS — INSTITUTIONAL NODES */}
-                <section className="py-32 border-t border-white/5 bg-[#050505]">
+                <section className="py-32 border-t border-white/5 bg-black">
                     <div className="max-w-5xl mx-auto px-6">
                         <div className="flex flex-col md:flex-row md:items-end justify-between gap-8 mb-20">
                             <div>
@@ -543,7 +616,7 @@ export default function DevelopersPage() {
                                     <div className="w-1.5 h-6 bg-stellar-teal rounded-full" />
                                     <span className="text-xs font-black text-stellar-teal uppercase tracking-[0.3em]">Soroban Mainnet Readiness</span>
                                 </div>
-                                <h2 className="text-4xl sm:text-6xl font-black uppercase italic tracking-tighter text-white">
+                                <h2 className="text-3xl sm:text-6xl font-black uppercase italic tracking-tighter text-white break-words">
                                     {t.developers_page.nodes.title}
                                 </h2>
                             </div>
@@ -554,24 +627,24 @@ export default function DevelopersPage() {
 
                         <div className="grid gap-4">
                             {[
-                                { name: 'NiriumVault', id: 'CBTWMZCG3P72EHFAQ4ZLSEBIOFYJC244H5J6DHZIJ56FHFWJ2CFAWSZU', desc_en: 'Core treasury: vaults, agent delegation, strategy execution, 2-of-3 multisig', desc_es: 'Tesorería core: vaults, delegación de agentes, ejecución de estrategias, multisig 2-de-3', desc_zh: '核心金库：保险库、代理委托、策略执行、2/3多签' },
-                                { name: 'NiriumProtocol', id: 'CC2TU5BDTKTPRRRQPEF77I54XYHFQ25XGIRO2TCWKSR7NRJDFR5L5NR5', desc_en: 'Unified registry: ELO reputation, strategy marketplace, agent scoring, skill gate', desc_es: 'Registro unificado: reputación ELO, marketplace, scoring de agentes, skill gate', desc_zh: '统一注册表：ELO声誉、策略市场、代理评分、技能门控' },
-                                { name: 'CETES (Mexican Bonds)', id: 'CC72F57YTPX76HAA64JQOEGHQAPSADQWSY5DWVBR66JINPFDLNCQYHIC', desc_en: 'Government Bond Asset (Etherfuse)', desc_es: 'Activo de Bonos (Etherfuse)', desc_zh: '政府债券资产 (Etherfuse)' },
-                                { name: 'USDC (Stellar Testnet SAC)', id: 'CBIELTK6YBZJU5UP2WWQEUCYKLPU6AUNZ2BQ4WWFEIE3USCIHMXQDAMA', desc_en: 'Primary liquidity asset', desc_es: 'Activo de liquidez principal', desc_zh: '主要流动性资产' },
+                                { name: 'NiriumVault', id: 'CBTWMZCG3P72EHFAQ4ZLSEBIOFYJC244H5J6DHZIJ56FHFWJ2CFAWSZU', desc_en: 'Core treasury: vaults, agent delegation, strategy execution, 2-of-3 multisig', desc_es: 'Tesorería core: vaults, delegación de agentes, ejecución de estrategias, multisig 2-de-3' },
+                                { name: 'NiriumProtocol', id: 'CC2TU5BDTKTPRRRQPEF77I54XYHFQ25XGIRO2TCWKSR7NRJDFR5L5NR5', desc_en: 'Unified registry: ELO reputation, strategy marketplace, agent scoring, skill gate', desc_es: 'Registro unificado: reputación ELO, marketplace, scoring de agentes, skill gate' },
+                                { name: 'CETES (Mexican Bonds)', id: 'CC72F57YTPX76HAA64JQOEGHQAPSADQWSY5DWVBR66JINPFDLNCQYHIC', desc_en: 'Government Bond Asset (Etherfuse)', desc_es: 'Activo de Bonos (Etherfuse)' },
+                                { name: 'USDC (Stellar Testnet SAC)', id: 'CBIELTK6YBZJU5UP2WWQEUCYKLPU6AUNZ2BQ4WWFEIE3USCIHMXQDAMA', desc_en: 'Primary liquidity asset', desc_es: 'Activo de liquidez principal' },
                             ].map((contract) => (
-                                <div key={contract.name} className="p-8 rounded-3xl border border-white/10 bg-black/40 backdrop-blur-md group hover:border-stellar-teal/40 transition-all">
-                                    <div className="flex items-start justify-between gap-6">
-                                        <div className="flex-1 overflow-hidden">
-                                            <div className="flex items-center gap-3 mb-4">
-                                                <span className="text-2xl font-black uppercase italic text-white tracking-tight">{contract.name}</span>
-                                                <div className="h-px flex-1 bg-white/5" />
-                                                <span className="text-[10px] text-gray-500 uppercase tracking-widest font-mono shrink-0">
-                                                    {language === 'zh' ? contract.desc_zh : language === 'es' ? contract.desc_es : contract.desc_en}
+                                <div key={contract.name} className="p-5 sm:p-8 rounded-3xl border border-white/10 bg-black/40 backdrop-blur-md group hover:border-stellar-teal/40 transition-all min-w-0">
+                                    <div className="flex items-start justify-between gap-4 sm:gap-6 min-w-0">
+                                        <div className="flex-1 overflow-hidden min-w-0">
+                                            <div className="flex flex-col lg:flex-row lg:items-center gap-2 lg:gap-3 mb-4">
+                                                <span className="text-xl sm:text-2xl font-black uppercase italic text-white tracking-tight break-words">{contract.name}</span>
+                                                <div className="hidden lg:block h-px flex-1 bg-white/5" />
+                                                <span className="text-[10px] text-gray-500 uppercase tracking-widest font-mono">
+                                                    {language === 'es' ? contract.desc_es : contract.desc_en}
                                                 </span>
                                             </div>
                                             <code className="text-[10px] sm:text-xs text-stellar-teal/70 font-mono break-all bg-stellar-teal/5 px-3 py-2 rounded-lg select-all hover:text-stellar-teal transition-colors block border border-stellar-teal/10">{contract.id}</code>
                                         </div>
-                                        <div className="p-3 rounded-2xl bg-white/5 group-hover:bg-stellar-teal/10 transition-colors">
+                                        <div className="hidden sm:block p-3 rounded-2xl bg-white/5 group-hover:bg-stellar-teal/10 transition-colors shrink-0">
                                             <Shield className="w-6 h-6 text-white/20 group-hover:text-stellar-teal" />
                                         </div>
                                     </div>
@@ -586,11 +659,11 @@ export default function DevelopersPage() {
                     <div className="max-w-6xl mx-auto px-6">
                         <div className="grid md:grid-cols-3 gap-6">
                             {[
-                                { icon: Package,  title: 'NPM SDK',     desc_en: 'Official Node.js SDK', desc_es: 'SDK oficial para Node.js', desc_zh: 'Node.js 官方 SDK',                    href: 'https://www.npmjs.com/package/nirium' },
-                                { icon: Terminal, title: 'PyPI SDK',    desc_en: 'Official Python SDK', desc_es: 'SDK oficial para Python', desc_zh: 'Python 官方 SDK',                      href: 'https://pypi.org/project/nirium/' },
-                                { icon: Globe,    title: 'Stellar RPC',  desc_en: 'Node RPC and testnet endpoints', desc_es: 'Node RPC y testnet endpoints', desc_zh: 'Node RPC 和测试网端点',    href: 'https://developers.stellar.org/docs/data/rpc' },
-                                { icon: Code2,    title: 'Soroban SDK',  desc_en: 'Official Rust + JS docs', desc_es: 'Docs oficiales Rust + JS', desc_zh: '官方 Rust + JS 文档',                href: 'https://developers.stellar.org/docs/smart-contracts' },
-                                { icon: Terminal, title: 'Stellar CLI', desc_en: 'Local deploy and test', desc_es: 'Deploy y test local', desc_zh: '本地部署和测试',                              href: 'https://developers.stellar.org/docs/tools/developer-tools/cli/stellar-cli' },
+                                { icon: Package,  title: 'NPM SDK',     desc_en: 'Official Node.js SDK', desc_es: 'SDK oficial para Node.js',                    href: 'https://www.npmjs.com/package/nirium' },
+                                { icon: Terminal, title: 'PyPI SDK',    desc_en: 'Official Python SDK', desc_es: 'SDK oficial para Python',                      href: 'https://pypi.org/project/nirium/' },
+                                { icon: Globe,    title: 'Stellar RPC',  desc_en: 'Node RPC and testnet endpoints', desc_es: 'Node RPC y testnet endpoints',    href: 'https://developers.stellar.org/docs/data/rpc' },
+                                { icon: Code2,    title: 'Soroban SDK',  desc_en: 'Official Rust + JS docs', desc_es: 'Docs oficiales Rust + JS',                href: 'https://developers.stellar.org/docs/smart-contracts' },
+                                { icon: Terminal, title: 'Stellar CLI', desc_en: 'Local deploy and test', desc_es: 'Deploy y test local',                              href: 'https://developers.stellar.org/docs/tools/developer-tools/cli/stellar-cli' },
                             ].map((res) => {
                                 const Icon = res.icon;
                                 return (
@@ -606,7 +679,7 @@ export default function DevelopersPage() {
                                         </div>
                                         <h3 className="text-xl font-black uppercase italic text-white mb-2 tracking-tight">{res.title}</h3>
                                         <p className="text-sm text-gray-500 mb-6">
-                                            {language === 'zh' ? res.desc_zh : language === 'es' ? res.desc_es : res.desc_en}
+                                            {language === 'es' ? res.desc_es : res.desc_en}
                                         </p>
                                         <div className="flex items-center gap-2 text-[10px] font-black text-stellar-teal uppercase tracking-widest opacity-50 group-hover:opacity-100 transition-opacity">
                                             {t.developers_page.resources.view_docs}
@@ -629,7 +702,7 @@ export default function DevelopersPage() {
                         >
                             {t.developers_page.cta.title}
                         </motion.h2>
-                        <p className="text-xl text-gray-400 font-mono uppercase tracking-widest mb-12">
+                        <p className="text-xs sm:text-xl text-gray-400 font-mono uppercase tracking-wider sm:tracking-widest mb-12 px-2 sm:px-0 break-words">
                             {t.developers_page.cta.subtitle}
                         </p>
                         <div className="flex flex-col sm:flex-row gap-4 justify-center">

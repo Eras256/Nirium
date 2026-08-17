@@ -63,15 +63,22 @@ function generateHistory(points: number, hoursBack: number) {
     });
 }
 
-const ANALYTICS_LOGS = [
-    { time: '00:25:44', source: 'REBALANCE_AGENT', type: 'info', msg: 'Checking spread: CETES (Banxico) vs USDC (Vault)...' },
-    { time: '00:25:46', source: 'REBALANCE_AGENT', type: 'success', msg: 'Threshold exceeded. Initiating swap: 5,000 USDC -> CETES via Etherfuse.' },
-    { time: '00:25:48', source: 'COMPLIANCE', type: 'audit', msg: 'Decision signed HMAC-SHA256: 0x8f2... anchored to IPFS.', tx: '2fe93a70d9385fba2b29a77a0620607b72c2740e80ecfc6702e7d0c473f1530e' },
-    { time: '00:30:12', source: 'MPP_ENGINE', type: 'payment', msg: 'Batch Payroll detected. Preparing MPP for 42 recipients (Total: 12,450 USDC).' },
-    { time: '00:30:15', source: 'MPP_ENGINE', type: 'success', msg: 'Atomic transaction confirmed on Stellar. All 42 transfers executed in 4.2s.', tx: 'f7ca365e3925fc63e81599780d76bdf72961e9fad0e827337f4490125b09b1db' },
-    { time: '00:35:00', source: 'INTELLIGENCE', type: 'info', msg: 'Agent Nexus active. Scanning for network efficiency delta...' },
-    { time: '00:35:02', source: 'INTELLIGENCE', type: 'info', msg: 'Agent Void active. Monitoring vault multi-sig integrity...' },
-    { time: '00:35:04', source: 'AUDIT_NODE', type: 'success', msg: 'Verification complete: On-chain state matches IPFS registry 100%.', tx: '7b8224830c7a9122b95cd5005cc197b934a1cee273199b29dd6138ae27d9f68c' },
+// Muestra ilustrativa de la FORMA de las entradas del feed — el feed vivo está
+// en el dashboard. Ningún hash colgado aquí: antes estas líneas traían tx
+// reales bajo leyendas inventadas (montos de 5,000 USDC cuando el rebalanceo
+// mueve 1.0, nóminas de 42 destinatarios, agentes "Nexus" y "Void" que no
+// existen). El texto de abajo sí describe lo que el sistema hace de verdad.
+type AnalyticsLog = { time: string; source: string; type: string; msg: string; tx?: string };
+
+const ANALYTICS_LOGS: AnalyticsLog[] = [
+    { time: '00:25:44', source: 'REBALANCE_NODE', type: 'info', msg: 'Scan — CETES 5.57% (Etherfuse reference) vs idle USDC | base fee 100 stroops.' },
+    { time: '00:25:46', source: 'REBALANCE_NODE', type: 'success', msg: 'Threshold exceeded (>2.5%). Moving 1.0 USDC to vault treasury — conversion is executed off-chain by Etherfuse, not by a DEX.' },
+    { time: '00:25:48', source: 'AUDIT_NODE', type: 'audit', msg: 'Transaction confirmed on-chain before logging, then included in the daily anchored digest.' },
+    { time: '00:30:12', source: 'PAYOUTS_NODE', type: 'payment', msg: 'Batch prepared: unsigned XDR built server-side. The client signs it with their own wallet — Nirium never holds the key.' },
+    { time: '00:30:15', source: 'PAYOUTS_NODE', type: 'success', msg: 'Batch submitted. One signature, every transfer in a single Stellar transaction.' },
+    { time: '00:35:00', source: 'SETTLEMENT', type: 'info', msg: 'x402 challenge issued — 0.02 USDC for /signals.' },
+    { time: '00:35:02', source: 'SETTLEMENT', type: 'success', msg: 'Payment verified and settled on-chain before the response was returned.' },
+    { time: '00:35:04', source: 'AUDIT_NODE', type: 'success', msg: 'Daily digest anchored to IPFS — one CID covering the confirmed executions of the day.' },
 ];
 
 export default function AnalyticsPage() {
@@ -79,8 +86,26 @@ export default function AnalyticsPage() {
     const { address: accountStr, isConnected } = useFreighter();
     const [timeRange, setTimeRange] = useState<'24H' | '7D' | '30D'>('24H');
     const [chartData, setChartData] = useState<any[]>([]);
-    const latency = 142;
+    // Antes era `const latency = 142` — un número inventado bajo un panel
+    // titulado "Infrastructure Status". Se mide de verdad contra /health.
+    const [latency, setLatency] = useState<number | null>(null);
     const logContainerRef = useRef<HTMLDivElement>(null);
+
+    useEffect(() => {
+        let cancelled = false;
+        const measure = async () => {
+            const started = performance.now();
+            try {
+                await fetch('https://nirium-agent.fly.dev/health', { cache: 'no-store' });
+                if (!cancelled) setLatency(Math.round(performance.now() - started));
+            } catch {
+                if (!cancelled) setLatency(null);
+            }
+        };
+        measure();
+        const id = setInterval(measure, 30_000);
+        return () => { cancelled = true; clearInterval(id); };
+    }, []);
 
     // ── Live on-chain stats ──────────────────────────────────────────────────
     const [vaultCount, setVaultCount] = useState<string>('—');
@@ -127,12 +152,12 @@ export default function AnalyticsPage() {
                         <div>
                             <div className="inline-flex items-center gap-1.5 px-3 py-1 mb-4 bg-stellar-yellow/10 border border-stellar-yellow/20 rounded-full text-stellar-yellow text-[10px] font-black uppercase tracking-widest">
                                 <Clock className="w-3.5 h-3.5" />
-                                {language === "es" ? "BETA · FUNCIONALIDAD EN AUDITORÍA DE CUMPLIMIENTO" : language === "zh" ? "BETA · 功能正在进行合规审计" : "BETA · FEATURE UNDERGOING COMPLIANCE AUDIT"}
+                                {language === "es" ? "BETA · FUNCIONALIDAD EN AUDITORÍA DE CUMPLIMIENTO" : "BETA · FEATURE UNDERGOING COMPLIANCE AUDIT"}
                             </div>
                             <h1 className="text-4xl md:text-6xl font-black tracking-tighter uppercase italic text-white flex items-center gap-4">
                                 TREASURY TELEMETRY
                                 <span className="text-[10px] not-italic font-black bg-white/5 text-gray-400 border border-white/10 px-3 py-1 rounded-full uppercase tracking-widest">
-                                    v1.0.0-SCF
+                                    v1.0.0
                                 </span>
                             </h1>
                             <p className="text-gray-500 font-mono text-xs mt-2 uppercase tracking-widest">
@@ -161,9 +186,9 @@ export default function AnalyticsPage() {
                         status="LIVE"
                     />
                     <StatCard
-                        title="Vaults On-Chain"
+                        title="Vaults Created (testnet)"
                         value={vaultCount}
-                        change="SOROBAN"
+                        change="TESTNET · incl. our own tests"
                         icon={Server}
                         color="text-stellar-yellow"
                         status="LIVE"
@@ -177,9 +202,9 @@ export default function AnalyticsPage() {
                         status="LIVE"
                     />
                     <StatCard
-                        title="Fees Collected"
+                        title="Deployment Fees (testnet)"
                         value={feesCollected}
-                        change="PROTOCOL"
+                        change="TESTNET XLM · no monetary value"
                         icon={Database}
                         color="text-blue-400"
                         status="LIVE"
@@ -200,6 +225,12 @@ export default function AnalyticsPage() {
                             <div className="flex items-center gap-3">
                                 <BarChart3 className="text-stellar-teal" size={20} />
                                 <h3 className="text-sm font-black uppercase tracking-widest">TREASURY DEPLOYMENT HISTORY</h3>
+                                {/* La serie viene de generateHistory() — es ilustrativa.
+                                    Los KPIs de arriba sí son on-chain; sin esta etiqueta
+                                    la gráfica se lee como si también lo fuera. */}
+                                <span className="px-2 py-0.5 rounded-full text-[8px] font-black uppercase tracking-widest border border-amber-400/30 bg-amber-400/10 text-amber-400">
+                                    {language === 'es' ? 'Datos de muestra' : 'Sample data'}
+                                </span>
                             </div>
                             <div className="flex p-1 bg-black/40 rounded-xl border border-white/5">
                                 {['24H', '7D', '30D'].map(r => (
@@ -246,7 +277,7 @@ export default function AnalyticsPage() {
                                 { asset: 'USDC', name: 'Operational Liquidity', rate: '0.00%', type: 'STABLE' },
                                 { asset: 'AUDIT', name: 'IPFS Compliance Logs', rate: '100%', type: 'IMMUTABLE' },
                                 { asset: 'XLM', name: 'Gas Reserve', rate: 'Min.', type: 'UTILITY' },
-                                { asset: 'MPP', name: 'Batch Payout Engine', rate: '100 TX/BATCH', type: 'ACTIVE' },
+                                { asset: 'PAYROLL', name: 'Bulk Payroll Node', rate: '100 TX/BATCH', type: 'ACTIVE' },
                             ].map((item, i) => (
                                 <div key={i} className="flex items-center justify-between p-4 bg-black/40 rounded-2xl border border-white/5 hover:border-stellar-teal/30 transition-all cursor-pointer group">
                                     <div className="flex items-center gap-4">
@@ -254,6 +285,7 @@ export default function AnalyticsPage() {
                                             item.asset === 'USDC' ? 'bg-stellar-yellow/10 text-stellar-yellow border-stellar-yellow/20' :
                                             item.asset === 'AUDIT' ? 'bg-rose-500/10 text-rose-400 border-rose-500/20' :
                                             item.asset === 'CETES' ? 'bg-green-500/10 text-green-400 border-green-500/20' :
+                                            item.asset === 'PAYROLL' ? 'bg-stellar-teal/10 text-stellar-teal border-stellar-teal/20' :
                                             'bg-blue-500/10 text-blue-400 border-blue-500/20'
                                         }`}>{item.asset}</span>
                                         <span className="font-black text-xs text-gray-400 group-hover:text-white transition-colors uppercase italic tracking-tighter">{item.name}</span>
@@ -283,9 +315,14 @@ export default function AnalyticsPage() {
                         
                         <div className="bg-[#0A0A0A] border border-white/5 rounded-3xl overflow-hidden shadow-2xl flex flex-col h-[600px]">
                             <div className="bg-black/40 p-4 border-b border-white/5 flex items-center justify-between font-mono text-[10px] text-gray-500">
+                                {/* Antes decía AGENT_UPLINK_LIVE con un ledger sequence
+                                    inventado. El feed real y en vivo está en el dashboard;
+                                    esto es una muestra de la forma que tienen las entradas. */}
                                 <div className="flex items-center gap-4">
-                                    <span className="text-stellar-teal">AGENT_UPLINK_LIVE</span>
-                                    <span>LEDGER_SEQUENCE: 5412891</span>
+                                    <span className="text-amber-400">SAMPLE_TRACE</span>
+                                    <span>
+                                        {language === 'es' ? 'Feed en vivo en el dashboard' : 'Live feed in the dashboard'}
+                                    </span>
                                 </div>
                                 <Clock size={14} />
                             </div>
@@ -333,7 +370,7 @@ export default function AnalyticsPage() {
                             
                             <div className="flex items-center justify-center gap-3 mb-8">
                                 <span className="text-[9px] bg-blue-500/10 text-blue-400 px-3 py-1 rounded-lg border border-blue-500/20 font-black uppercase">IPFS Anchored</span>
-                                <span className="text-[9px] bg-stellar-yellow/10 text-stellar-yellow px-3 py-1 rounded-lg border border-stellar-yellow/20 font-black uppercase">CNBV Ready</span>
+                                <span className="text-[9px] bg-stellar-yellow/10 text-stellar-yellow px-3 py-1 rounded-lg border border-stellar-yellow/20 font-black uppercase">Audit-Ready</span>
                             </div>
 
                             <div className="space-y-3">
@@ -352,36 +389,54 @@ export default function AnalyticsPage() {
                         </div>
 
                         <div className="bg-[#121212] border border-white/5 rounded-3xl p-8 shadow-xl">
-                            <h3 className="text-[10px] font-black mb-8 text-gray-500 uppercase tracking-[0.3em]">IMMUTABLE AUDIT LOGS</h3>
+                            <h3 className="text-[10px] font-black mb-8 text-gray-500 uppercase tracking-[0.3em]">Verified On-chain Evidence</h3>
+                            {/* Hashes reales, etiquetados por red y verificados en Horizon
+                                (los tres resuelven y son SUCCESS). Antes esta lista traía
+                                leyendas inventadas colgadas de tx reales — el peor error
+                                posible en la única página cuyo argumento es "verifícalo". */}
                             <div className="space-y-4 max-h-[400px] overflow-y-auto pr-2 custom-scrollbar">
                                 {[
-                                    { id: 'C4C60723', tx: '2fe93a70d9385fba2b29a77a0620607b72c2740e80ecfc6702e7d0c473f1530e', msg: 'REBALANCE: USDC -> CETES (Threshold: 5k)' },
-                                    { id: '3819C3D7', tx: 'f7ca365e3925fc63e81599780d76bdf72961e9fad0e827337f4490125b09b1db', msg: 'MPP: Payroll L1-Batch (42 recipients)' },
-                                    { id: 'CCF194D4', tx: '7b8224830c7a9122b95cd5005cc197b934a1cee273199b29dd6138ae27d9f68c', msg: 'AUDIT: Hash anchored to IPFS via Pinata' },
-                                    { id: 'C222D0E5', tx: 'c475a291b51d3c687fd6af57d58331364a2cef218bd86a8ea51c1044689a4cb4', msg: 'REBALANCE: Monitoring spread... No action' },
-                                    { id: '01709C4B', tx: '8681921122f8fca35ef044722a17cf8ca23764c13fa0c9b532a170b3101f484f', msg: 'X402: Automated gas replenishment' },
-                                ].map((log, i) => (
-                                    <div key={i} className="p-4 bg-black/40 border border-white/5 rounded-2xl font-mono text-[10px] space-y-2 group hover:border-stellar-teal/30 transition-all">
-                                        <div className="flex justify-between text-gray-600">
-                                            <span>EVENT_ID: {log.id}</span>
-                                            <span>2026-04-30</span>
+                                    { net: 'mainnet' as const, date: '2026-07-09', tx: '3134a51c66091fd7fbd85b38a4a6ec6cd432bb92c2450eac84ea7855cb7558bc', msg: 'x402 settlement — 0.02 USDC to treasury' },
+                                    { net: 'mainnet' as const, date: '2026-07-27', tx: '4813645165d15af1e503d66ef84d826e83fff235d4f98c3f6eba8a4e7c83795e', msg: 'x402 settlement — 0.02 USDC, signed via Pollar adapter' },
+                                    // Se retiró la tx del 19-abr etiquetada 'NiriumVault — revoke_agent(1218)'.
+                                    // El hash era real y la cuenta fue nuestra, pero el contrato invocado era
+                                    // CAU2XBJT… — el vault VIEJO, retirado en la consolidación a 2 contratos de
+                                    // mayo. O sea: la etiqueta nombraba un contrato que no es el que publicamos,
+                                    // y quien hiciera clic para verificar encontraría una dirección que no cuadra.
+                                    // En su lugar va la evidencia más fuerte que tenemos, y es de agosto:
+                                    // el agente invirtiendo fondos ajenos dentro de una bóveda de la que no
+                                    // puede sacarlos.
+                                    { net: 'testnet' as const, date: '2026-08-05', tx: 'c53d474658898af7ebbb84d17845902572147cfe1fb72965833e3d4cf7552ed3', msg: 'DeFindex vault — Invest signed by the agent, not the owner' },
+                                ].map((log) => (
+                                    <div key={log.tx} className="p-4 bg-black/40 border border-white/5 rounded-2xl font-mono text-[10px] space-y-2 group hover:border-stellar-teal/30 transition-all">
+                                        <div className="flex justify-between items-center text-gray-600">
+                                            <span className={`px-2 py-0.5 rounded-full text-[8px] font-black uppercase border ${
+                                                log.net === 'mainnet'
+                                                    ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20'
+                                                    : 'bg-amber-500/10 text-amber-400 border-amber-500/20'
+                                            }`}>
+                                                {log.net}
+                                            </span>
+                                            <span>{log.date}</span>
                                         </div>
                                         <p className="text-gray-400">{log.msg}</p>
                                         <div className="flex items-center justify-between">
-                                            <a 
-                                                href={`https://stellar.expert/explorer/testnet/tx/${log.tx}`}
+                                            <a
+                                                href={`https://stellar.expert/explorer/${log.net === 'mainnet' ? 'public' : 'testnet'}/tx/${log.tx}`}
                                                 target="_blank"
                                                 rel="noopener noreferrer"
                                                 className="text-stellar-teal font-black hover:underline flex items-center gap-1"
                                             >
-                                                VERIFIED_ON_CHAIN
+                                                VERIFY_ON_EXPLORER
                                                 <ExternalLink size={8} />
                                             </a>
-                                            <span className="text-gray-600">TX: ...{log.tx.slice(-4)}</span>
+                                            <span className="text-gray-600">TX: {log.tx.slice(0, 6)}…{log.tx.slice(-4)}</span>
                                         </div>
                                     </div>
                                 ))}
-                                <p className="text-center text-gray-700 text-[8px] uppercase font-black py-2">End of recent logs</p>
+                                <p className="text-center text-gray-700 text-[8px] uppercase font-black py-2">
+                                    Full audit trail in the dashboard
+                                </p>
                             </div>
                         </div>
                     </div>
@@ -407,11 +462,11 @@ export default function AnalyticsPage() {
                         </div>
                         <div className="space-y-2">
                             <p className="text-[9px] text-gray-500 uppercase font-black tracking-widest">Audit Sync Latency</p>
-                            <span className="text-xs font-mono font-black text-stellar-teal">{latency}ms</span>
+                            <span className="text-xs font-mono font-black text-stellar-teal">{latency === null ? '—' : `${latency}ms`}</span>
                         </div>
                         <div className="space-y-2">
                             <p className="text-[9px] text-gray-500 uppercase font-black tracking-widest">Network Protocol</p>
-                            <span className="text-xs font-mono font-black text-white">v21 (Mainnet Ready)</span>
+                            <span className="text-xs font-mono font-black text-white">Protocol 23</span>
                         </div>
                     </div>
                 </div>

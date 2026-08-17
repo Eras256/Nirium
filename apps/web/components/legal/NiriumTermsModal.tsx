@@ -49,25 +49,45 @@ export default function NiriumTermsModal({ walletAddress }: NiriumTermsProps) {
 
         try {
             const message = "I accept Nirium Terms of Service & Risk Disclosure. Authorization ID: " + Date.now();
-            const signedMessage = await signMessage(message);
+            const signed = await signMessage(message);
 
-            if (!signedMessage) throw new Error("Signature failed or was rejected");
+            if (!signed) throw new Error("Signature failed or was rejected");
 
-            // Store cryptographically signed consent locally for zero-latency verifications
-            // Production sync to immutable storage occurs asynchronously
+            // Freighter devuelve string u objeto según versión — normalizamos a texto para la columna TEXT.
+            const signatureHash = typeof signed === 'string' ? signed : JSON.stringify(signed);
+
             const signatureData = {
                 wallet_address: walletAddress,
-                signature_hash: signedMessage,
+                signature_hash: signatureHash,
                 message_signed: message,
+                // FIJO a propósito, no lo cambies al selector de red: el legal shield
+                // del agente consulta `network = 'stellar:testnet'` literal
+                // (packages/agent/src/middleware/legalShield.ts). Escribir
+                // 'stellar:pubnet' para usuarios de mainnet dejaría su firma
+                // invisible para el agente → 403 LEGAL_CONSENT_REQUIRED. Si algún día
+                // el consentimiento debe ser por red, hay que cambiar AMBOS lados.
                 network: 'stellar:testnet',
                 accepted_at: new Date().toISOString()
             };
 
+            // El agente valida el consentimiento server-side contra la tabla user_signatures.
+            // La persistencia en el backend es la fuente de verdad — el localStorage es solo cache.
+            const res = await fetch('/api/legal/sign', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(signatureData)
+            });
+
+            if (!res.ok) {
+                const err = await res.json().catch(() => ({}));
+                throw new Error(err.error || `Consent could not be saved (HTTP ${res.status})`);
+            }
+
+            // Cache local para verificaciones de UI sin latencia en cargas posteriores.
             try {
                 localStorage.setItem(`nirium-terms-signed-${walletAddress}`, JSON.stringify(signatureData));
-                console.log('[Terms] Signature stored in localStorage:', signatureData);
             } catch (e) {
-                console.warn('[Terms] Failed to store signature in localStorage:', e);
+                console.warn('[Terms] Failed to cache signature in localStorage:', e);
             }
 
             setHasSigned(true);
@@ -94,7 +114,7 @@ export default function NiriumTermsModal({ walletAddress }: NiriumTermsProps) {
                 >
                     {/* Language Selector Overlay */}
                     <div className="absolute top-4 right-4 z-20 flex gap-2">
-                        {['en', 'es', 'zh'].map((lang) => (
+                        {['en', 'es'].map((lang) => (
                             <button
                                 key={lang}
                                 onClick={() => setLanguage(lang as any)}
@@ -171,7 +191,7 @@ export default function NiriumTermsModal({ walletAddress }: NiriumTermsProps) {
                             <button
                                 onClick={handleSignTerms}
                                 disabled={isSigning}
-                                className="w-full py-4 bg-stellar-teal text-black font-black text-xs tracking-widest rounded-xl hover:translate-y-[-2px] active:translate-y-[0px] shadow-[0_4px_20px_rgba(45,235,232,0.2)] transition-all disabled:opacity-50 disabled:cursor-not-allowed uppercase flex items-center justify-center gap-2 group"
+                                className="w-full py-4 bg-stellar-teal text-[#0b0b0b] font-black text-xs tracking-widest rounded-xl hover:translate-y-[-2px] active:translate-y-[0px] shadow-[0_4px_20px_rgba(45,235,232,0.2)] transition-all disabled:opacity-50 disabled:cursor-not-allowed uppercase flex items-center justify-center gap-2 group"
                             >
                                 {isSigning ? (
                                     <>

@@ -1,16 +1,16 @@
 Metadata-Version: 2.4
 Name: nirium
-Version: 0.6.1
+Version: 0.9.0
 Summary: Official Python SDK for Nirium autonomous agents on Stellar (x402 + MPP)
 Author: Nirium Team
-Author-email: Nirium Protocol <xvaiosx7@gmail.com>
-License-Expression: MIT
+Author-email: Nirium Protocol <niriumprotocol@gmail.com>
+License-Expression: Apache-2.0
 Project-URL: Homepage, https://nirium.xyz
-Project-URL: Repository, https://github.com/nirium/nirium
+Project-URL: Repository, https://github.com/nirium-protocol/nirium-sdk
 Project-URL: Documentation, https://nirium.xyz/docs
-Project-URL: Bug Tracker, https://github.com/nirium/nirium/issues
+Project-URL: Bug Tracker, https://github.com/nirium-protocol/nirium-sdk/issues
 Keywords: nirium,stellar,soroban,defi,sdk,agent,autonomous,treasury,x402,mpp,agentic-payments,usdc,cetes,etherfuse,rwa
-Requires-Python: >=3.9
+Requires-Python: >=3.10
 Description-Content-Type: text/markdown
 Requires-Dist: aiohttp>=3.9.0
 Requires-Dist: websockets>=13.0
@@ -111,6 +111,39 @@ response = await agent.mpp_fetch("https://nirium-agent.fly.dev/api/v1/mpp/signal
 | **x402 Premium** | `/api/v1/premium/signals` ($0.02 USDC), `/api/v1/premium/market` ($0.05 USDC) |
 | **MPP** | `/api/v1/mpp/signals`, `/api/v1/mpp/market` |
 
+## Payouts
+
+Batch disbursement, non-custodial: the node builds an **unsigned** transaction, you sign it with your own wallet and broadcast it. Nirium never holds funds and never sees your keys.
+
+```python
+run = await agent.create_payout_run(
+    recipients=[{"wallet": "GABC...", "amount": "250.00"}],
+    acknowledge_terms=True,   # required on every network — 403 without it
+)
+
+signed_xdr = sign_with_your_wallet(run["xdr"])
+settled = await agent.submit_payout(run["runId"], signed_xdr)
+print(settled["txHash"], settled["cid"])   # on-chain hash + IPFS receipt
+```
+
+Licensed for **independent service payments only** — contractors, freelancers, B2B. Not for subordinate-employee salary. Read `get_payout_terms()` before integrating; classifying recipients and meeting tax and labor obligations is the client's responsibility.
+
+Mainnet is invite-only during early access and additionally requires `client_info`.
+
+## Audit Trail
+
+Anchor evidence to IPFS and get back a CID — an integrity seal, not notarization.
+
+```python
+anchor = await agent.anchor_audit_record(
+    hash="sha-256:9f86d081...",   # hash of your own file or event
+    tag="invoice-batch-jul",
+)
+print(anchor["cid"])
+```
+
+Anchor a **hash** rather than the data itself: IPFS content cannot be deleted, so raw personal data would outlive any erasure request.
+
 ## API Coverage
 
 | Category | Methods |
@@ -124,6 +157,10 @@ response = await agent.mpp_fetch("https://nirium-agent.fly.dev/api/v1/mpp/signal
 | Webhooks | `register_webhook()`, `get_webhooks()`, `delete_webhook()`, `test_webhook()` |
 | Auth | `get_auth_token()`, `create_auth_key()`, `get_auth_keys()`, `revoke_auth_key()` |
 | Revenue | `get_revenue()`, `get_info()` |
+| Nodes | `get_nodes()` |
+| Payouts | `create_payout_run()`, `submit_payout()`, `onboard_payout_recipient()`, `submit_payout_onboard()`, `get_payout_runs()`, `get_payout_terms()`, `get_payout_info()` |
+| Audit Trail | `anchor_audit_record()`, `get_audit_info()` |
+| Reporting | `get_reporting_summary()`, `get_reporting_export()` |
 | Admin | `configure_llm()` |
 | WebSocket | `subscribe()`, `on()` decorator |
 | x402 Payments | `init_x402()`, `x402_fetch()` |
@@ -141,8 +178,8 @@ response = await agent.mpp_fetch("https://nirium-agent.fly.dev/api/v1/mpp/signal
 - [Developer Sandbox](https://nirium.xyz/sandbox)
 - [API Reference](https://nirium.xyz/docs/api)
 - [MCP Server Integration](https://nirium.xyz/docs/mcp)
-- [GitHub](https://github.com/nirium/nirium)
+- [GitHub](https://github.com/nirium-protocol/nirium-sdk)
 
 ## License
 
-MIT — Nirium Protocol
+Apache 2.0 — Nirium Protocol

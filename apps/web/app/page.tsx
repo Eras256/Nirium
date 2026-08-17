@@ -1,14 +1,14 @@
-/** Nirium Protocol — Autonomous Treasury for LatAm Fintechs (April 2026) **/
+/** Nirium Protocol — Autonomous Treasury for LatAm Fintechs (July 2026) **/
 'use client';
 
 import Link from "next/link";
-import { useState, Suspense } from "react";
+import { useState, useEffect, Suspense } from "react";
 import dynamic from "next/dynamic";
 import { motion } from "framer-motion";
 import {
     ArrowRight, Bot, FileCheck,
     Check, ExternalLink, Sparkles, TrendingUp, Lock,
-    Building2, Workflow, ChevronRight, Zap, Layers
+    Building2, Workflow, ChevronRight, Zap, Layers, Send
 } from "lucide-react";
 import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
@@ -16,28 +16,74 @@ import OpsConsole from "@/components/layout/OpsConsole";
 import { Button } from "@/components/ui/Button";
 import { useLanguage } from "@/context/LanguageContext";
 import LegalDisclaimer from "@/components/legal/LegalDisclaimer";
+import { MAINNET_API_URL, PROOF_TX_HASH, PROOF_TX_URL, TREASURY_ACCOUNT, TREASURY_ACCOUNT_URL } from "@/lib/constants";
 
 const TreasuryCanvas = dynamic(
     () => import('@/components/3d/TreasuryCanvas').then((m) => m.TreasuryCanvas),
     { ssr: false }
 );
 
+// ── Node Catalog vivo ─────────────────────────────────────────
+// Consume GET /api/nodes del box mainnet: los estados y la red de cada nodo
+// vienen del registry del protocolo, no de copy hardcodeado — el sitio no
+// puede afirmar algo distinto a lo que el API declara. Fallback estático
+// (espejo del registry) solo si el fetch falla.
+interface CatalogNode {
+    id: string;
+    name: string;
+    status: 'active' | 'architected' | 'proposed';
+    custody: string;
+    network: 'testnet' | 'mainnet' | 'both';
+    summary: string;
+}
+
+const NODE_FALLBACK: CatalogNode[] = [
+    { id: 'settlement', name: 'Settlement / Agent Payments', status: 'active', custody: 'non-custodial', network: 'both', summary: 'x402 per-request billing + MPP Charge settlement.' },
+    { id: 'audit', name: 'Audit Trail', status: 'active', custody: 'non-custodial', network: 'both', summary: 'Immutable IPFS receipts for any app.' },
+    { id: 'payroll', name: 'Payouts / Disbursement', status: 'active', custody: 'non-custodial', network: 'both', summary: 'Batch payouts, company-signed. Mainnet early access — independent service payments only (contractors/freelancers/B2B).' },
+    { id: 'rebalance', name: 'Treasury Rebalance', status: 'active', custody: 'non-custodial', network: 'both', summary: 'Moves idle treasury into a CETES yield strategy and back, on its own. Live on mainnet over a DeFindex vault you own — invite-only while legal review closes.' },
+        { id: 'compliance-sentinel', name: 'Compliance Sentinel', status: 'proposed', custody: 'non-custodial', network: 'testnet', summary: 'Not built. The intent is to validate every proposed transfer against a policy before it is signed. Do not rely on it as a control today.' },
+    { id: 'reporting', name: 'Reporting', status: 'active', custody: 'non-custodial', network: 'both', summary: 'Institutional-format summaries and exports.' },
+];
+
+function useNodeCatalog(): { nodes: CatalogNode[]; live: boolean } {
+    const [nodes, setNodes] = useState<CatalogNode[]>(NODE_FALLBACK);
+    const [live, setLive] = useState(false);
+    useEffect(() => {
+        const ctrl = new AbortController();
+        const timer = setTimeout(() => ctrl.abort(), 6000);
+        fetch(`${MAINNET_API_URL}/api/nodes`, { signal: ctrl.signal })
+            .then((r) => (r.ok ? r.json() : null))
+            .then((data) => {
+                if (data?.nodes?.length) {
+                    setNodes(data.nodes);
+                    setLive(true);
+                }
+            })
+            .catch(() => {})
+            .finally(() => clearTimeout(timer));
+        return () => { ctrl.abort(); clearTimeout(timer); };
+    }, []);
+    return { nodes, live };
+}
+
 export default function Home() {
     const { language, t } = useLanguage();
-    const lang = (en: string, es: string, zh: string) =>
-        language === 'zh' ? zh : language === 'es' ? es : en;
+    const lang = (en: string, es: string) =>
+        language === 'es' ? es : en;
     const [copied, setCopied] = useState(false);
+    const { nodes, live: catalogLive } = useNodeCatalog();
 
-    const codeSnippet = `import { NiriumAgent } from 'nirium';
+    // Quickstart REAL — el mismo flujo que liquidó el primer pago mainnet (jul 2026).
+    const codeSnippet = `import { Agent } from 'nirium'; // npm install nirium
 
-const agent = new NiriumAgent({ apiKey: process.env.NIRIUM_KEY });
+const agent = new Agent({ apiKey: 'demo', baseUrl: '${MAINNET_API_URL}' });
 
-await agent.start({
-    base: 'USDC',
-    targetAssets: ['CETES'],
-    strategy: 'spread_auto_rebalance',
-    threshold: 1.5, // minimum % spread to trigger swap
-});`;
+// One paid request on Stellar MAINNET: 402 → sign → 0.05 USDC → 200 OK
+agent.initX402({ secretKey: process.env.STELLAR_SECRET_KEY, network: 'stellar:pubnet' });
+
+const res = await agent.x402Fetch('${MAINNET_API_URL}/api/v1/premium/market');
+console.log(await res.json()); // paid for by your agent, settled on-chain`;
 
     const handleCopy = () => {
         navigator.clipboard.writeText(codeSnippet);
@@ -66,10 +112,13 @@ await agent.start({
                                 initial={{ opacity: 0, y: 12 }}
                                 animate={{ opacity: 1, y: 0 }}
                                 transition={{ duration: 0.5 }}
-                                className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-stellar-teal/20 bg-stellar-teal/5 text-stellar-teal text-[10px] font-black uppercase tracking-widest mb-6"
+                                className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-emerald-400/30 bg-emerald-400/10 text-emerald-400 text-[10px] font-black uppercase tracking-widest mb-6"
                             >
-                                <Sparkles className="w-3 h-3" />
-                                {lang('Software B2B · Stellar Testnet · Mainnet Q3 2026', 'Software B2B · Stellar Testnet · Mainnet Q3 2026', '企业软件 · Stellar 测试网 · 主网 Q3 2026')}
+                                <span className="relative flex h-2 w-2">
+                                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
+                                    <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-400" />
+                                </span>
+                                {lang('Live on Stellar Mainnet — verify it on-chain', 'En vivo en Stellar Mainnet — verifícalo on-chain')}
                             </motion.div>
 
                             <motion.h1
@@ -78,28 +127,20 @@ await agent.start({
                                 transition={{ duration: 0.6, delay: 0.05 }}
                                 className="text-4xl sm:text-5xl lg:text-6xl xl:text-7xl font-black leading-[1.05] tracking-tight"
                             >
-                                {language === 'zh' ? (
+                                {language === 'es' ? (
                                     <>
-                                        你的企业资金在睡觉。
+                                        Rieles de pago y auditoría
                                         <br />
                                         <span className="bg-gradient-to-r from-stellar-teal to-stellar-yellow bg-clip-text text-transparent">
-                                            我们来唤醒它。
-                                        </span>
-                                    </>
-                                ) : language === 'es' ? (
-                                    <>
-                                        El dinero de tu empresa
-                                        <br />
-                                        <span className="bg-gradient-to-r from-stellar-teal to-stellar-yellow bg-clip-text text-transparent">
-                                            está dormido. Lo activamos.
+                                            para la economía de agentes.
                                         </span>
                                     </>
                                 ) : (
                                     <>
-                                        Your company's money
+                                        Payment &amp; audit rails
                                         <br />
                                         <span className="bg-gradient-to-r from-stellar-teal to-stellar-yellow bg-clip-text text-transparent">
-                                            is sleeping. We wake it up.
+                                            for the agent economy.
                                         </span>
                                     </>
                                 )}
@@ -112,10 +153,8 @@ await agent.start({
                                 className="mt-5 text-base sm:text-lg text-white/60 max-w-xl leading-relaxed"
                             >
                                 {lang(
-                                    'Nirium is the software that moves your company\'s idle capital automatically — while you sleep, while you work, always. No spreadsheets. No manual transfers.',
-                                    'Nirium es el software que mueve el capital inactivo de tu empresa de forma automática — mientras duermes, mientras trabajas, siempre. Sin Excel. Sin transferencias manuales.',
-                                    'Nirium 是自动移动企业闲置资金的软件——无论你是否在工作，全天候运行。无需电子表格，无需手动转账。'
-                                )}
+                                    'Machine-to-machine settlement, immutable audit receipts and institutional reporting — live on Stellar mainnet today, non-custodial by design. So is the autonomous treasury: it runs on mainnet over a DeFindex vault you own, invite-only while legal review closes. No spreadsheets. No manual transfers.',
+                                    'Liquidación machine-to-machine, recibos de auditoría inmutables y reportería institucional — en vivo en Stellar mainnet hoy, non-custodial por diseño. La tesorería autónoma también: corre en mainnet sobre una bóveda DeFindex que tú posees, invite-only mientras cierra la revisión legal. Sin Excel. Sin transferencias manuales.')}
                             </motion.p>
 
                             {/* 3 numbers */}
@@ -126,21 +165,21 @@ await agent.start({
                                 className="mt-10 grid grid-cols-3 gap-6 w-full max-w-sm"
                             >
                                 <div>
-                                    <div className="text-2xl sm:text-3xl font-black text-white">24/7</div>
+                                    <div className="text-2xl sm:text-3xl font-black text-white">$0.02</div>
                                     <div className="text-[10px] uppercase tracking-widest text-white/40 mt-1">
-                                        {lang('Runs by itself', 'Corre solo', '全天候运行')}
+                                        {lang('Per x402 request', 'Por request x402')}
                                     </div>
                                 </div>
                                 <div className="border-x border-white/5 px-4">
                                     <div className="text-2xl sm:text-3xl font-black text-white">~4s</div>
                                     <div className="text-[10px] uppercase tracking-widest text-white/40 mt-1">
-                                        {lang('Per transaction', 'Por transacción', '每笔交易')}
+                                        {lang('On-chain settlement', 'Liquidación on-chain')}
                                     </div>
                                 </div>
                                 <div>
-                                    <div className="text-2xl sm:text-3xl font-black text-white">$299</div>
+                                    <div className="text-2xl sm:text-3xl font-black text-white">0</div>
                                     <div className="text-[10px] uppercase tracking-widest text-white/40 mt-1">
-                                        {lang('Fixed / month', 'Fijo / mes', '固定月费')}
+                                        {lang('Funds custodied', 'Fondos en custodia')}
                                     </div>
                                 </div>
                             </motion.div>
@@ -154,13 +193,13 @@ await agent.start({
                             >
                                 <Link href="/dashboard">
                                     <Button size="lg" variant="premium" className="w-full sm:w-auto">
-                                        {lang('Try it free', 'Pruébalo gratis', '免费试用')}
+                                        {lang('Try it free', 'Pruébalo gratis')}
                                         <ArrowRight className="ml-2 w-4 h-4" />
                                     </Button>
                                 </Link>
-                                <a href="mailto:hello@nirium.xyz">
+                                <a href="mailto:niriumprotocol@gmail.com">
                                     <Button size="lg" variant="outline" className="w-full sm:w-auto border-white/20 hover:bg-white/5">
-                                        {lang('Talk to us', 'Habla con nosotros', '联系我们')}
+                                        {lang('Talk to us', 'Habla con nosotros')}
                                     </Button>
                                 </a>
                             </motion.div>
@@ -174,10 +213,13 @@ await agent.start({
                             >
                                 <span className="inline-flex items-center gap-1.5">
                                     <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
-                                    {lang('Testnet live', 'Testnet en vivo', '测试网运行中')}
+                                    <span className="text-emerald-400/80">{lang('Mainnet — settlement · audit · payouts · reporting', 'Mainnet — liquidación · auditoría · payouts · reportería')}</span>
                                 </span>
                                 <span>·</span>
-                                <span>{lang('Mainnet Q3 2026 after audit', 'Mainnet Q3 2026 tras auditoría', '主网 Q3 2026 审计后上线')}</span>
+                                <span className="inline-flex items-center gap-1.5">
+                                    <span className="w-1.5 h-1.5 rounded-full bg-amber-400 animate-pulse" />
+                                    <span className="text-amber-400/70">{lang('Testnet — NiriumVault, our own contract (audit-gated)', 'Testnet — NiriumVault, contrato propio (audit-gated)')}</span>
+                                </span>
                             </motion.div>
                         </div>
 
@@ -203,12 +245,22 @@ await agent.start({
                                 </Suspense>
                             </motion.div>
 
-                            {/* Live agent terminal */}
+                            {/* Live agent terminal — flagship testnet, siempre etiquetado */}
                             <motion.div
                                 initial={{ opacity: 0, y: 16 }}
                                 animate={{ opacity: 1, y: 0 }}
                                 transition={{ duration: 0.8, delay: 0.9 }}
                             >
+                                <div className="flex items-center gap-2 mb-1.5 px-1">
+                                    <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full border border-amber-400/25 bg-amber-400/10 text-amber-400 text-[9px] font-black uppercase tracking-widest">
+                                        <span className="w-1 h-1 rounded-full bg-amber-400 animate-pulse" />
+                                        {lang('Live testnet feed', 'Feed testnet en vivo')}
+                                    </span>
+                                    <span className="text-[9px] font-mono text-white/25">
+                                        {lang('NiriumVault — our own contract, audit-gated. Autonomous treasury runs on mainnet over DeFindex.',
+                                              'NiriumVault — contrato propio, audit-gated. La tesorería autónoma corre en mainnet sobre DeFindex.')}
+                                    </span>
+                                </div>
                                 <OpsConsole
                                     isExpanded={false}
                                     onToggleExpand={() => {}}
@@ -221,45 +273,124 @@ await agent.start({
                 </div>
             </section>
 
+            {/* PROOF BAR — no nos creas: verifícanos */}
+            <section className="py-10 border-t border-emerald-400/10 bg-gradient-to-b from-emerald-400/[0.04] to-transparent">
+                <div className="max-w-5xl mx-auto px-6">
+                    <div className="flex flex-col sm:flex-row items-center justify-between gap-4 mb-5">
+                        <h2 className="text-sm font-black uppercase tracking-[0.2em] text-emerald-400">
+                            {lang("Don't trust us. Verify us.", 'No nos creas. Verifícanos.')}
+                        </h2>
+                        <p className="text-[11px] text-white/40 font-mono">
+                            {lang('Every claim below resolves on a public ledger.', 'Cada claim de abajo resuelve en un ledger público.')}
+                        </p>
+                    </div>
+                    <div className="grid sm:grid-cols-3 gap-3">
+                        <a href={PROOF_TX_URL} target="_blank" rel="noopener noreferrer"
+                            className="group flex items-start gap-3 p-4 rounded-xl border border-emerald-400/15 bg-black/40 hover:border-emerald-400/40 transition-colors">
+                            <Zap className="w-4 h-4 text-emerald-400 shrink-0 mt-0.5" />
+                            <div className="min-w-0">
+                                <div className="text-xs font-bold text-white/90">{lang('First mainnet x402 settlement', 'Primer settlement x402 en mainnet')}</div>
+                                <div className="text-[10px] font-mono text-white/35 truncate mt-0.5">{PROOF_TX_HASH.slice(0, 20)}…</div>
+                                <div className="text-[10px] text-emerald-400/70 mt-1 inline-flex items-center gap-1">stellar.expert <ExternalLink className="w-2.5 h-2.5" /></div>
+                            </div>
+                        </a>
+                        <a href={TREASURY_ACCOUNT_URL} target="_blank" rel="noopener noreferrer"
+                            className="group flex items-start gap-3 p-4 rounded-xl border border-emerald-400/15 bg-black/40 hover:border-emerald-400/40 transition-colors">
+                            <Lock className="w-4 h-4 text-emerald-400 shrink-0 mt-0.5" />
+                            <div className="min-w-0">
+                                <div className="text-xs font-bold text-white/90">{lang('Public revenue account', 'Cuenta de ingresos pública')}</div>
+                                <div className="text-[10px] font-mono text-white/35 truncate mt-0.5">{TREASURY_ACCOUNT.slice(0, 12)}…{TREASURY_ACCOUNT.slice(-6)}</div>
+                                <div className="text-[10px] text-emerald-400/70 mt-1 inline-flex items-center gap-1">{lang('watch it grow live', 'mírala crecer en vivo')} <ExternalLink className="w-2.5 h-2.5" /></div>
+                            </div>
+                        </a>
+                        <a href={`${MAINNET_API_URL}/api/reporting/summary?network=mainnet`} target="_blank" rel="noopener noreferrer"
+                            className="group flex items-start gap-3 p-4 rounded-xl border border-emerald-400/15 bg-black/40 hover:border-emerald-400/40 transition-colors">
+                            <FileCheck className="w-4 h-4 text-emerald-400 shrink-0 mt-0.5" />
+                            <div className="min-w-0">
+                                <div className="text-xs font-bold text-white/90">{lang('Live reporting API', 'API de reportería en vivo')}</div>
+                                <div className="text-[10px] font-mono text-white/35 truncate mt-0.5">GET /api/reporting/summary</div>
+                                <div className="text-[10px] text-emerald-400/70 mt-1 inline-flex items-center gap-1">{lang('raw JSON, no login', 'JSON crudo, sin login')} <ExternalLink className="w-2.5 h-2.5" /></div>
+                            </div>
+                        </a>
+                    </div>
+                </div>
+            </section>
+
+            {/* PRICING BAND — precio mainnet destacado (teal) */}
+            <section className="py-8 border-t border-stellar-teal/15 bg-gradient-to-b from-stellar-teal/[0.05] to-transparent">
+                <div className="max-w-5xl mx-auto px-6">
+                    <div className="flex flex-col md:flex-row items-center justify-between gap-5">
+                        <div className="flex items-baseline gap-3">
+                            <span className="text-3xl sm:text-4xl font-black text-stellar-teal">$0.02</span>
+                            <div className="text-left">
+                                <div className="text-sm font-bold text-white/90">{lang('per x402 request on mainnet', 'por request x402 en mainnet')}</div>
+                                <div className="text-[11px] text-white/45 font-mono">{lang('settled on-chain in USDC · no card · no subscription', 'liquidado on-chain en USDC · sin tarjeta · sin suscripción')}</div>
+                            </div>
+                        </div>
+                        <div className="hidden md:block h-10 w-px bg-white/10" />
+                        <div className="flex items-center gap-6 text-center">
+                            <div>
+                                <div className="text-lg font-black text-stellar-teal">{lang('Free', 'Gratis')}</div>
+                                <div className="text-[10px] text-white/40 font-mono uppercase tracking-widest">{lang('audit anchoring · beta', 'anclaje auditoría · beta')}</div>
+                            </div>
+                            <div>
+                                <div className="text-lg font-black text-stellar-teal">$0</div>
+                                <div className="text-[10px] text-white/40 font-mono uppercase tracking-widest">{lang('start on mainnet today', 'empieza en mainnet hoy')}</div>
+                            </div>
+                        </div>
+                        <Link href="/pricing">
+                            <Button variant="premium" className="whitespace-nowrap">
+                                {lang('See pricing', 'Ver precios')}
+                                <ArrowRight className="ml-2 w-4 h-4" />
+                            </Button>
+                        </Link>
+                    </div>
+                    <p className="mt-3 text-center md:text-left text-[10px] text-white/30 font-mono">
+                        {lang('Software license — Nirium never takes a percentage of your capital. DeFindex, the protocol behind the vault, takes 20% of the yield it generates; other financial fees are charged by regulated partners.', 'Licencia de software — Nirium nunca cobra un porcentaje de tu capital. DeFindex, el protocolo de la bóveda, se lleva 20% del rendimiento que genera; los demás fees financieros los cobran partners regulados.')}
+                    </p>
+                </div>
+            </section>
+
             {/* THE PROBLEM */}
             <section className="py-20 border-t border-white/5">
                 <div className="max-w-4xl mx-auto px-6">
                     <h2 className="text-2xl sm:text-3xl font-bold text-center text-white/90">
-                        {lang('Sound familiar?', '¿Te suena familiar?', '你是否也有这些问题？')}
+                        {lang('Sound familiar?', '¿Te suena familiar?')}
                     </h2>
                     <p className="mt-4 text-center text-white/50 max-w-lg mx-auto text-sm">
                         {lang(
                             'Every CFO we talk to has the same three problems.',
-                            'Todos los CFO con los que hablamos tienen los mismos tres problemas.',
-                            '我们交谈过的每位财务总监都有同样的三个问题。'
-                        )}
+                            'Todos los CFO con los que hablamos tienen los mismos tres problemas.')}
                     </p>
-                    <div className="mt-12 grid sm:grid-cols-3 gap-6">
+                    {/* md y no sm: a 640px (el breakpoint sm) las 3 columnas dejan
+                        133px útiles y el número en text-5xl pide 184 — desbordaba
+                        la página 4px. Desde 768px sí cabe sin encoger la tipografía. */}
+                    <div className="mt-12 grid md:grid-cols-3 gap-6">
                         <div className="text-center p-6 rounded-xl border border-red-500/10 bg-red-500/[0.03]">
                             <div className="text-5xl font-black text-red-400/80">$0</div>
                             <p className="mt-3 text-sm font-semibold text-white/80">
-                                {lang('Your idle cash earns nothing', 'Tu caja genera cero', '闲置资金零收益')}
+                                {lang('Your idle cash earns nothing', 'Tu caja genera cero')}
                             </p>
                             <p className="mt-1 text-xs text-white/40">
-                                {lang('Inflation eats it while it sits in the bank.', 'La inflación lo reduce cada mes.', '资金在银行账户中被通胀侵蚀。')}
+                                {lang('Inflation eats it while it sits in the bank.', 'La inflación lo reduce cada mes.')}
                             </p>
                         </div>
                         <div className="text-center p-6 rounded-xl border border-red-500/10 bg-red-500/[0.03]">
-                            <div className="text-5xl font-black text-red-400/80">{lang('Hours', 'Horas', '数小时')}</div>
+                            <div className="text-5xl font-black text-red-400/80">{lang('Hours', 'Horas')}</div>
                             <p className="mt-3 text-sm font-semibold text-white/80">
-                                {lang('Lost every week to manual transfers', 'Perdidas cada semana en transferencias manuales', '每周浪费在手动转账上')}
+                                {lang('Lost every week to manual transfers', 'Perdidas cada semana en transferencias manuales')}
                             </p>
                             <p className="mt-1 text-xs text-white/40">
-                                {lang('Your team moves money by hand. Every. Single. Day.', 'Tu equipo mueve dinero a mano todos los días.', '你的团队每天都在手动处理资金流动。')}
+                                {lang('Your team moves money by hand. Every. Single. Day.', 'Tu equipo mueve dinero a mano todos los días.')}
                             </p>
                         </div>
                         <div className="text-center p-6 rounded-xl border border-red-500/10 bg-red-500/[0.03]">
-                            <div className="text-5xl font-black text-red-400/80">{lang('Months', 'Meses', '数月')}</div>
+                            <div className="text-5xl font-black text-red-400/80">{lang('Months', 'Meses')}</div>
                             <p className="mt-3 text-sm font-semibold text-white/80">
-                                {lang('To build a secure in-house solution', 'Para construir una solución propia segura', '构建安全内部解决方案所需时间')}
+                                {lang('To build a secure in-house solution', 'Para construir una solución propia segura')}
                             </p>
                             <p className="mt-1 text-xs text-white/40">
-                                {lang('If you can build it at all.', 'Si es que puedes construirla.', '如果你能建成的话。')}
+                                {lang('If you can build it at all.', 'Si es que puedes construirla.')}
                             </p>
                         </div>
                     </div>
@@ -270,14 +401,12 @@ await agent.start({
             <section className="py-20 border-t border-white/5">
                 <div className="max-w-5xl mx-auto px-6">
                     <h2 className="text-2xl sm:text-3xl font-bold text-center">
-                        {lang('Three steps. That\'s it.', 'Tres pasos. Nada más.', '三步，就这么简单。')}
+                        {lang('Three steps. That\'s it.', 'Tres pasos. Nada más.')}
                     </h2>
                     <p className="mt-4 text-center text-white/60 max-w-xl mx-auto">
                         {lang(
-                            'No complex setup. No dev team required. Your treasury runs itself.',
-                            'Sin configuración compleja. Sin equipo de desarrollo. Tu tesorería se gestiona sola.',
-                            '无需复杂配置，无需开发团队，你的资金库自动运转。'
-                        )}
+                            'Integrate in minutes. No complex setups. Start billing other agents and anchoring audit trails today.',
+                            'Integra en minutos. Sin configuraciones complejas. Empieza a cobrar a otros agentes y a anclar registros de auditoría hoy mismo.')}
                     </p>
 
                     <div className="mt-14 grid md:grid-cols-3 gap-6">
@@ -285,32 +414,26 @@ await agent.start({
                             {
                                 num: '01',
                                 icon: Workflow,
-                                title: lang('Connect once', 'Conéctate una vez', '一次接入'),
+                                title: lang('Install the SDK', 'Instala el SDK'),
                                 body: lang(
-                                    'Link your company account in minutes. You keep full control — Nirium never holds your money.',
-                                    'Conecta tu cuenta en minutos. Tú conservas el control total — Nirium nunca toca tu dinero.',
-                                    '几分钟内连接您的企业账户。您保持完全控制——Nirium 从不持有您的资金。'
-                                ),
+                                    'Add Nirium to your agent with a single package import. Work in TypeScript or Python, no blockchain knowledge required.',
+                                    'Agrega Nirium a tu agente importando un solo paquete. Trabaja en TypeScript o Python sin necesidad de saber de blockchain.'),
                             },
                             {
                                 num: '02',
                                 icon: Bot,
-                                title: lang('Set your rules', 'Define tus reglas', '设置你的规则'),
+                                title: lang('Enable M2M Payouts', 'Habilita pagos M2M'),
                                 body: lang(
-                                    'Tell Nirium when to act. "If idle cash exceeds $X, move it automatically." Simple as that.',
-                                    'Dile a Nirium cuándo actuar. "Si el capital inactivo supera $X, muévelo automáticamente." Así de simple.',
-                                    '告诉 Nirium 何时行动。"如果闲置资金超过 X，自动移动。"就这么简单。'
-                                ),
+                                    'Activate x402 or MPP Charge on your endpoints. Your agent pays per request — settled on-chain in USDC before the response.',
+                                    'Activa x402 o MPP Charge en tus endpoints. Tu agente paga por llamada — liquidado on-chain en USDC antes de responder.'),
                             },
                             {
                                 num: '03',
-                                icon: TrendingUp,
-                                title: lang('It runs by itself', 'Se ejecuta solo', '自动运行'),
+                                icon: FileCheck,
+                                title: lang('Anchor Audit Trails', 'Ancla tu auditoría'),
                                 body: lang(
-                                    'The software watches your treasury 24/7 and acts for you. Every move is logged automatically — ready for auditors.',
-                                    'El software vigila tu tesorería 24/7 y actúa por ti. Cada movimiento queda registrado — listo para auditores.',
-                                    '软件全天候监控您的资金库并自动行动。每次操作自动记录——随时可供审计。'
-                                ),
+                                    'Anchor every execution on IPFS and Stellar mainnet. Generate verified reports and immutable records ready for compliance.',
+                                    'Ancla cada ejecución en IPFS y Stellar mainnet. Genera reportes verificados y registros inmutables listos para cumplimiento.'),
                             },
                         ].map((step) => (
                             <div
@@ -336,19 +459,20 @@ await agent.start({
                 <div className="absolute top-0 right-0 w-1/2 h-full bg-[radial-gradient(circle_at_100%_0%,rgba(45,235,232,0.04),transparent_70%)] pointer-events-none" />
                 <div className="max-w-5xl mx-auto px-6 relative z-10">
                     <div className="text-center mb-12">
-                        <div className="inline-flex items-center gap-2 px-3 py-1 mb-4 bg-stellar-teal/10 border border-stellar-teal/20 rounded-full text-stellar-teal text-[10px] font-black uppercase tracking-widest">
-                            <Zap className="w-3 h-3" />
-                            {lang('For developers — payment rails', 'Para developers — rieles de pago', '开发者专区 — 支付通道')}
+                        <div className="inline-flex items-center gap-2 px-3 py-1 mb-4 bg-emerald-400/10 border border-emerald-400/25 rounded-full text-emerald-400 text-[10px] font-black uppercase tracking-widest">
+                            <span className="relative flex h-1.5 w-1.5">
+                                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
+                                <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-emerald-400" />
+                            </span>
+                            {lang('Live on Stellar Mainnet', 'En vivo en Stellar Mainnet')}
                         </div>
                         <h2 className="text-2xl sm:text-3xl font-bold">
-                            {lang('Software that pays itself', 'Software que se paga solo', '自动结算的软件')}
+                            {lang('Nodes you can use today — no trust required', 'Nodos que puedes usar hoy — sin pedirte confianza')}
                         </h2>
                         <p className="mt-4 text-white/50 max-w-xl mx-auto text-sm">
                             {lang(
-                                'If you build fintech apps, Nirium includes open payment standards that let your software bill and settle automatically — no manual invoices, no subscriptions.',
-                                'Si construyes apps fintech, Nirium incluye estándares abiertos de pago que permiten que tu software facture y liquide automáticamente — sin facturas manuales, sin suscripciones.',
-                                '如果你构建金融科技应用，Nirium 内置开放支付标准，让你的软件自动计费和结算——无需手动开票，无需订阅。'
-                            )}
+                                'Per-request billing, immutable audit anchoring and institutional reporting run on mainnet right now — non-custodial, no contracts of ours holding funds. Batch payouts are live in mainnet early access; the LCP legal layer follows after final terms review.',
+                                'Facturación por request, anclaje de auditoría inmutable y reportería institucional corren en mainnet ahora mismo — non-custodial, sin contratos nuestros custodiando fondos. Los pagos en lote ya están en mainnet (early access); la capa legal LCP llega tras la revisión final de términos.')}
                         </p>
                     </div>
 
@@ -360,24 +484,25 @@ await agent.start({
                                 <Zap className="w-7 h-7 text-stellar-teal" />
                             </div>
                             <h3 className="text-xl font-black uppercase tracking-tight mb-3">
-                                {lang('x402 — Pay per use', 'x402 — Pago por uso', 'x402 — 按使用付费')}
+                                {lang('x402 — Pay per use', 'x402 — Pago por uso')}
                             </h3>
                             <p className="text-sm text-white/55 leading-relaxed mb-6">
                                 {lang(
                                     'Like a vending machine for software. Your app requests data → pays automatically → gets the data. No invoices, no subscriptions, no human in the loop.',
-                                    'Como una máquina expendedora de software. Tu app solicita datos → paga automáticamente → recibe los datos. Sin facturas, sin suscripciones, sin humanos en el medio.',
-                                    '就像软件自动售货机。你的应用请求数据 → 自动付款 → 获取数据。无需发票，无需订阅，无需人工介入。'
-                                )}
+                                    'Como una máquina expendedora de software. Tu app solicita datos → paga automáticamente → recibe los datos. Sin facturas, sin suscripciones, sin humanos en el medio.')}
                             </p>
                             <div className="flex items-center gap-3 pt-4 border-t border-white/[0.06]">
-                                <div className="text-[9px] font-mono text-stellar-teal uppercase tracking-widest font-bold">Soroban Verified</div>
+                                <div className="inline-flex items-center gap-1.5 text-[9px] font-mono text-emerald-400 uppercase tracking-widest font-bold">
+                                    <span className="w-1 h-1 rounded-full bg-emerald-400 animate-pulse" />
+                                    {lang('Live on Mainnet', 'En vivo en Mainnet')}
+                                </div>
                                 <div className="h-px flex-1 bg-white/5 rounded-full overflow-hidden">
                                     <motion.div
                                         initial={{ width: 0 }}
                                         whileInView={{ width: '100%' }}
                                         viewport={{ once: true }}
                                         transition={{ duration: 1.5, ease: 'easeOut' }}
-                                        className="h-full bg-stellar-teal"
+                                        className="h-full bg-emerald-400"
                                     />
                                 </div>
                             </div>
@@ -390,28 +515,192 @@ await agent.start({
                                 <Layers className="w-7 h-7 text-stellar-yellow" />
                             </div>
                             <h3 className="text-xl font-black uppercase tracking-tight mb-3">
-                                {lang('MPP — Budget per session', 'MPP — Presupuesto por sesión', 'MPP — 会话预算')}
+                                {lang('MPP — Charge, without a middleman', 'MPP — Cobro, sin intermediario')}
                             </h3>
                             <p className="text-sm text-white/55 leading-relaxed mb-6">
                                 {lang(
-                                    'Like a prepaid card for your software. Deposit a budget, run operations, and close at the end. Perfect for payroll runs or bulk transfers — one final settlement, zero manual work.',
-                                    'Como una tarjeta prepagada para tu software. Depositas un presupuesto, corres operaciones y cierras al final. Ideal para nóminas o transferencias masivas — una liquidación final, cero trabajo manual.',
-                                    '就像软件的预付卡。存入预算，执行操作，最后结算。非常适合工资发放或批量转账——一次最终结算，零手动操作。'
-                                )}
+                                    'Your client signs a full USDC transfer inside the request. We validate it by simulation and broadcast it — no external facilitator in the middle, and the network fee can be sponsored. Nothing is deposited, nothing is held.',
+                                    'Tu cliente firma una transferencia completa de USDC dentro del request. La validamos por simulación y la transmitimos — sin facilitador externo de por medio, y la comisión de red puede ir patrocinada. No se deposita ni se retiene nada.')}
                             </p>
                             <div className="flex items-center gap-3 pt-4 border-t border-white/[0.06]">
-                                <div className="text-[9px] font-mono text-stellar-yellow uppercase tracking-widest font-bold">Freighter Ready</div>
+                                <div className="inline-flex items-center gap-1.5 text-[9px] font-mono text-emerald-400 uppercase tracking-widest font-bold">
+                                    <span className="w-1 h-1 rounded-full bg-emerald-400 animate-pulse" />
+                                    {lang('Live on Mainnet · Charge mode', 'En vivo en Mainnet · Modo charge')}
+                                </div>
                                 <div className="h-px flex-1 bg-white/5 rounded-full overflow-hidden">
                                     <motion.div
                                         initial={{ width: 0 }}
                                         whileInView={{ width: '100%' }}
                                         viewport={{ once: true }}
                                         transition={{ duration: 1.5, ease: 'easeOut', delay: 0.2 }}
-                                        className="h-full bg-stellar-yellow"
+                                        className="h-full bg-emerald-400"
                                     />
                                 </div>
                             </div>
                         </div>
+
+                        {/* Audit Trail — mainnet, beta gratis */}
+                        <div className="group relative p-8 rounded-2xl bg-black/60 border border-white/10 hover:border-emerald-400/40 transition-all duration-500">
+                            <div className="absolute top-4 right-6 text-[30px] opacity-[0.07] font-black italic text-emerald-400 group-hover:opacity-[0.14] transition-opacity select-none">CID</div>
+                            <div className="w-14 h-14 rounded-xl bg-emerald-400/10 border border-emerald-400/20 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
+                                <FileCheck className="w-7 h-7 text-emerald-400" />
+                            </div>
+                            <h3 className="text-xl font-black uppercase tracking-tight mb-3">
+                                {lang('Audit Trail — Anchor your evidence', 'Audit Trail — Ancla tu evidencia')}
+                            </h3>
+                            <p className="text-sm text-white/55 leading-relaxed mb-6">
+                                {lang(
+                                    'POST a sha-256 hash of any document or event and get back an immutable, publicly verifiable IPFS receipt. Optionally sign it: the receipt then proves not just that the record was never altered, but who declared it — verifiable from the CID alone, with any Stellar key. One API call, no infrastructure. Free during beta. Anchor hashes, not raw personal data.',
+                                    'Manda el hash sha-256 de cualquier documento o evento y recibe un recibo IPFS inmutable y públicamente verificable. Puedes firmarlo: entonces el recibo no solo prueba que el registro no se alteró, sino quién lo declaró — verificable con solo el CID, con cualquier llave de Stellar. Una llamada de API, sin infraestructura. Gratis en beta. Ancla hashes, no datos personales crudos.')}
+                            </p>
+                            <div className="flex items-center gap-3 pt-4 border-t border-white/[0.06]">
+                                <div className="inline-flex items-center gap-1.5 text-[9px] font-mono text-emerald-400 uppercase tracking-widest font-bold">
+                                    <span className="w-1 h-1 rounded-full bg-emerald-400 animate-pulse" />
+                                    {lang('Live on Mainnet · Free beta', 'En vivo en Mainnet · Beta gratis')}
+                                </div>
+                                <div className="h-px flex-1 bg-white/5 rounded-full overflow-hidden">
+                                    <motion.div initial={{ width: 0 }} whileInView={{ width: '100%' }} viewport={{ once: true }} transition={{ duration: 1.5, ease: 'easeOut' }} className="h-full bg-emerald-400" />
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* Reporting — mainnet */}
+                        <div className="group relative p-8 rounded-2xl bg-black/60 border border-white/10 hover:border-purple-400/40 transition-all duration-500">
+                            <div className="absolute top-4 right-6 text-[30px] opacity-[0.07] font-black italic text-purple-400 group-hover:opacity-[0.14] transition-opacity select-none">CSV</div>
+                            <div className="w-14 h-14 rounded-xl bg-purple-400/10 border border-purple-400/20 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
+                                <TrendingUp className="w-7 h-7 text-purple-400" />
+                            </div>
+                            <h3 className="text-xl font-black uppercase tracking-tight mb-3">
+                                {lang('Reporting — Institutional exports', 'Reporting — Exportes institucionales')}
+                            </h3>
+                            <p className="text-sm text-white/55 leading-relaxed mb-6">
+                                {lang(
+                                    'Summaries and CSV/JSON exports over everything anchored — payments received, payout runs, audit receipts — filtered by date and network. Institutional-format output; what you file with any regulator remains your responsibility.',
+                                    'Resúmenes y exportes CSV/JSON de todo lo anclado — pagos recibidos, corridas de payouts, recibos de auditoría — filtrados por fecha y red. Formato institucional; lo que presentes ante cualquier regulador sigue siendo tu responsabilidad.')}
+                            </p>
+                            <div className="flex items-center gap-3 pt-4 border-t border-white/[0.06]">
+                                <div className="inline-flex items-center gap-1.5 text-[9px] font-mono text-emerald-400 uppercase tracking-widest font-bold">
+                                    <span className="w-1 h-1 rounded-full bg-emerald-400 animate-pulse" />
+                                    {lang('Live on Mainnet · Read-only', 'En vivo en Mainnet · Solo lectura')}
+                                </div>
+                                <div className="h-px flex-1 bg-white/5 rounded-full overflow-hidden">
+                                    <motion.div initial={{ width: 0 }} whileInView={{ width: '100%' }} viewport={{ once: true }} transition={{ duration: 1.5, ease: 'easeOut', delay: 0.2 }} className="h-full bg-purple-400" />
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* Payroll */}
+                        <Link href="/payroll" className="group relative block p-8 rounded-2xl bg-black/60 border border-white/10 hover:border-stellar-teal/40 transition-all duration-500">
+                            <div className="absolute top-4 right-6 text-[30px] opacity-[0.07] font-black italic text-stellar-teal group-hover:opacity-[0.14] transition-opacity select-none">PAY</div>
+                            <div className="w-14 h-14 rounded-xl bg-stellar-teal/10 border border-stellar-teal/20 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
+                                <Send className="w-7 h-7 text-stellar-teal" />
+                            </div>
+                            <h3 className="text-xl font-black uppercase tracking-tight mb-3">
+                                {lang('Payouts — Pay contractors & suppliers', 'Payouts — Paga a contractors y proveedores')}
+                            </h3>
+                            <p className="text-sm text-white/55 leading-relaxed mb-6">
+                                {lang(
+                                    'Pay up to 100 recipients in one signed batch — contractors, freelancers, B2B suppliers. You sign in your own wallet, Nirium never holds your funds, and every run gets an immutable IPFS receipt. Mainnet early access — independent service payments only, not employee salary; you keep your tax and labor responsibilities.',
+                                    'Paga hasta 100 destinatarios en un solo lote firmado — contratistas, freelancers, proveedores B2B. Firmas en tu propia wallet, Nirium nunca custodia tus fondos, y cada corrida obtiene un recibo IPFS inmutable. Early access en mainnet — solo pagos por prestación de servicios, no salario de empleados; tus obligaciones fiscales y laborales siguen siendo tuyas.')}
+                            </p>
+                            <div className="flex items-center gap-3 pt-4 border-t border-white/[0.06]">
+                                <div className="inline-flex items-center gap-1.5 text-[9px] font-mono text-emerald-400 uppercase tracking-widest font-bold">
+                                    <span className="w-1 h-1 rounded-full bg-emerald-400 animate-pulse" />
+                                    {lang('Mainnet early access · Non-custodial', 'Mainnet early access · Non-custodial')}
+                                </div>
+                                <div className="h-px flex-1 bg-white/5 rounded-full overflow-hidden">
+                                    <motion.div initial={{ width: 0 }} whileInView={{ width: '100%' }} viewport={{ once: true }} transition={{ duration: 1.5, ease: 'easeOut' }} className="h-full bg-stellar-teal" />
+                                </div>
+                            </div>
+                        </Link>
+
+                        {/* LCP */}
+                        <div className="group relative p-8 rounded-2xl bg-black/60 border border-white/10 hover:border-emerald-400/40 transition-all duration-500">
+                            <div className="absolute top-4 right-6 text-[36px] opacity-[0.07] font-black italic text-emerald-400 group-hover:opacity-[0.14] transition-opacity select-none">LCP</div>
+                            <div className="w-14 h-14 rounded-xl bg-emerald-400/10 border border-emerald-400/20 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
+                                <FileCheck className="w-7 h-7 text-emerald-400" />
+                            </div>
+                            <h3 className="text-xl font-black uppercase tracking-tight mb-3">
+                                {lang('LCP — from verifiable to legally binding', 'LCP — de verificable a legalmente vinculante')}
+                            </h3>
+                            <p className="text-sm text-white/55 leading-relaxed mb-6">
+                                {lang(
+                                    'An optional legal layer: receipts can bind to a versioned agreement via its SHA-256 hash, referencing an AAA-ICDR dispute-resolution clause. Built on the open Legal Context Protocol (Draft v1.0) — ships once our terms clear legal review.',
+                                    'Una capa legal opcional: los recibos pueden vincularse a un acuerdo versionado mediante su hash SHA-256, referenciando una cláusula de disputa AAA-ICDR. Construida sobre el Legal Context Protocol abierto (Draft v1.0) — se activa cuando nuestros términos pasen revisión legal.')}
+                            </p>
+                            <div className="flex items-center gap-3 pt-4 border-t border-white/[0.06]">
+                                <div className="text-[9px] font-mono text-white/40 uppercase tracking-widest font-bold">{lang('In legal review · Draft v1.0 · not yet active', 'En revisión legal · Draft v1.0 · aún no activo')}</div>
+                                <div className="h-px flex-1 bg-white/5 rounded-full overflow-hidden">
+                                    <motion.div initial={{ width: 0 }} whileInView={{ width: '100%' }} viewport={{ once: true }} transition={{ duration: 1.5, ease: 'easeOut', delay: 0.2 }} className="h-full bg-emerald-400" />
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            {/* NODE CATALOG — estados vivos desde el API del protocolo */}
+            <section className="py-16 border-t border-white/5">
+                <div className="max-w-5xl mx-auto px-6">
+                    <div className="flex flex-col sm:flex-row items-start sm:items-end justify-between gap-3 mb-8">
+                        <div>
+                            <h2 className="text-xl sm:text-2xl font-bold">
+                                {lang('Execution Node framework', 'Framework de Execution Nodes')}
+                            </h2>
+                            <p className="mt-2 text-sm text-white/45 max-w-lg">
+                                {lang(
+                                    'One vault, up to 10 composable nodes. Statuses below come straight from the protocol API — the site cannot claim more than the registry does.',
+                                    'Un vault, hasta 10 nodos componibles. Los estados de abajo vienen directo del API del protocolo — el sitio no puede afirmar más de lo que declara el registry.')}
+                            </p>
+                        </div>
+                        <a href={`${MAINNET_API_URL}/api/nodes`} target="_blank" rel="noopener noreferrer"
+                            className="inline-flex items-center gap-1.5 text-[10px] font-mono text-white/40 hover:text-stellar-teal transition-colors shrink-0">
+                            {catalogLive ? (
+                                <><span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />{lang('live from GET /api/nodes', 'en vivo desde GET /api/nodes')}</>
+                            ) : (
+                                <>GET /api/nodes</>
+                            )}
+                            <ExternalLink className="w-2.5 h-2.5" />
+                        </a>
+                    </div>
+
+                    <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-3">
+                        {nodes.map((node) => {
+                            const isActive = node.status === 'active';
+                            const onMainnet = isActive && (node.network === 'mainnet' || node.network === 'both');
+                            const testnetOnly = node.network === 'testnet';
+                            return (
+                                <div key={node.id} className={`p-4 rounded-xl border bg-white/[0.02] ${isActive ? 'border-white/10' : 'border-white/[0.06] opacity-70'}`}>
+                                    <div className="flex items-center justify-between gap-2 mb-2">
+                                        <span className="text-[13px] font-bold text-white/90 leading-tight">{node.name}</span>
+                                        {isActive ? (
+                                            onMainnet ? (
+                                                <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded border border-emerald-400/25 bg-emerald-400/10 text-emerald-400 text-[8px] font-black uppercase tracking-widest shrink-0">
+                                                    <span className="w-1 h-1 rounded-full bg-emerald-400 animate-pulse" />Mainnet
+                                                </span>
+                                            ) : (
+                                                <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded border border-amber-400/25 bg-amber-400/10 text-amber-400 text-[8px] font-black uppercase tracking-widest shrink-0">
+                                                    <span className="w-1 h-1 rounded-full bg-amber-400 animate-pulse" />Testnet
+                                                </span>
+                                            )
+                                        ) : (
+                                            <span className="px-1.5 py-0.5 rounded border border-white/10 text-white/30 text-[8px] font-black uppercase tracking-widest shrink-0">
+                                                {node.status === 'architected' ? lang('In design', 'En diseño') : 'Roadmap'}
+                                            </span>
+                                        )}
+                                    </div>
+                                    <p className="text-[11px] text-white/45 leading-snug line-clamp-2">{node.summary}</p>
+                                    <div className="mt-2.5 flex items-center gap-2 text-[9px] font-mono uppercase tracking-widest">
+                                        <span className={node.custody === 'non-custodial' ? 'text-stellar-teal/70' : 'text-white/30'}>
+                                            {node.custody === 'non-custodial' ? 'Non-custodial' : lang('Audit-gated', 'Audit-gated')}
+                                        </span>
+                                        {testnetOnly && isActive && (
+                                            <span className="text-white/25">{lang('· mainnet after audit', '· mainnet tras auditoría')}</span>
+                                        )}
+                                    </div>
+                                </div>
+                            );
+                        })}
                     </div>
                 </div>
             </section>
@@ -420,53 +709,45 @@ await agent.start({
             <section className="py-20 border-t border-white/5">
                 <div className="max-w-5xl mx-auto px-6">
                     <h2 className="text-2xl sm:text-3xl font-bold text-center">
-                        {lang('Who is Nirium for?', '¿Para quién es Nirium?', 'Nirium 适合谁？')}
+                        {lang('Who is Nirium for?', '¿Para quién es Nirium?')}
                     </h2>
                     <p className="mt-4 text-center text-white/50 max-w-xl mx-auto text-sm">
                         {lang(
                             'If your company moves money, Nirium saves you time and eliminates errors.',
-                            'Si tu empresa mueve dinero, Nirium te ahorra tiempo y elimina errores.',
-                            '如果你的企业需要移动资金，Nirium 能为你节省时间并消除错误。'
-                        )}
+                            'Si tu empresa mueve dinero, Nirium te ahorra tiempo y elimina errores.')}
                     </p>
 
                     <div className="mt-12 grid md:grid-cols-3 gap-6">
                         {[
                             {
                                 num: '01',
-                                color: 'border-stellar-teal/30 bg-stellar-teal/[0.04]',
-                                accent: 'text-stellar-teal',
-                                title: lang('Your treasury runs itself', 'Tu tesorería corre sola', '资金库自动运转'),
+                                color: 'border-emerald-400/30 bg-emerald-400/[0.04]',
+                                accent: 'text-emerald-400',
+                                title: lang('Charge per API call — on mainnet', 'Cobra por llamada API — en mainnet'),
                                 body: lang(
-                                    'Your team moves capital by hand every day — hours lost, human errors, idle money. Nirium detects the right moment and acts alone.',
-                                    'Tu equipo mueve capital a mano todos los días — horas perdidas, errores humanos, dinero parado. Nirium detecta el momento correcto y actúa solo.',
-                                    '你的团队每天手动移动资金——浪费时间、人为错误、资金闲置。Nirium 自动检测最佳时机并独立行动。'
-                                ),
-                                tag: lang('Fintechs · PSPs · Mexico', 'Fintechs · PSPs · México', '金融科技 · PSP · 墨西哥'),
+                                    'Your API or AI agent bills per request in USDC, settled on-chain in seconds. No subscriptions, no cards, no human in the loop. Live on Stellar mainnet today.',
+                                    'Tu API o agente de IA cobra por request en USDC, liquidado on-chain en segundos. Sin suscripciones, sin tarjetas, sin humano en medio. En vivo en Stellar mainnet hoy.'),
+                                tag: lang('APIs · AI agents · x402', 'APIs · Agentes IA · x402'),
                             },
                             {
                                 num: '02',
-                                color: 'border-purple-500/20 bg-purple-500/[0.03]',
-                                accent: 'text-purple-400',
-                                title: lang('Your cash works when you don\'t', 'Tu caja trabaja cuando tú no', '你的资金从不休息'),
+                                color: 'border-emerald-400/30 bg-emerald-400/[0.04]',
+                                accent: 'text-emerald-400',
+                                title: lang('Prove every move — on mainnet', 'Prueba cada movimiento — en mainnet'),
                                 body: lang(
-                                    'You have millions in accounts doing nothing. Inflation reduces them every month. Nirium moves your idle capital automatically, according to rules you define.',
-                                    'Tienes millones en cuentas que no hacen nada. La inflación los reduce cada mes. Nirium mueve tu capital inactivo automáticamente, según reglas que tú defines.',
-                                    '你的账户里有数百万闲置资金。通胀每月都在侵蚀它们。Nirium 根据你设定的规则自动移动闲置资金。'
-                                ),
-                                tag: lang('SaaS · SMBs $1M–$10M', 'SaaS · Empresas $1M–$10M', 'SaaS · 中小企业'),
+                                    'Anchor any payment or event to an immutable IPFS receipt anyone can verify on a public ledger. Institutional-format exports in one call. Live on mainnet.',
+                                    'Ancla cualquier pago o evento a un recibo IPFS inmutable que cualquiera verifica en un ledger público. Exportes con formato institucional en una llamada. En vivo en mainnet.'),
+                                tag: lang('Fintechs · B2B · audit teams', 'Fintechs · B2B · auditoría'),
                             },
                             {
                                 num: '03',
-                                color: 'border-stellar-yellow/20 bg-stellar-yellow/[0.03]',
-                                accent: 'text-stellar-yellow',
-                                title: lang('The infrastructure is already built', 'La infraestructura ya está lista', '基础设施已就绪'),
+                                color: 'border-amber-400/25 bg-amber-400/[0.04]',
+                                accent: 'text-amber-400',
+                                title: lang('Autonomous treasury — mainnet', 'Tesorería autónoma — mainnet'),
                                 body: lang(
-                                    'Building secure treasury infrastructure from scratch takes months and costs a lot. With Nirium, you integrate in days. Already built, already audited.',
-                                    'Construir infraestructura de tesorería segura desde cero tarda meses y cuesta caro. Con Nirium, integras en días. Ya construida, ya auditada.',
-                                    '从零开始构建安全的财库基础设施需要数月且成本高昂。使用 Nirium，数天内即可完成集成。已构建完毕，已完成审计。'
-                                ),
-                                tag: lang('Fintech builders · SDK on npm', 'Builders fintech · SDK en npm', '金融科技开发者 · npm SDK'),
+                                    'Idle capital moves into the yield strategy and back on its own, over a DeFindex vault you own — a deterministic rule on mainnet, no model in the signing path. Invite-only while legal review closes.',
+                                    'El capital ocioso entra a la estrategia de rendimiento y sale solo, sobre una bóveda DeFindex tuya — una regla determinista en mainnet, sin modelo en el camino que firma. Invite-only mientras cierra la revisión legal.'),
+                                tag: lang('SaaS · treasuries · invite-only', 'SaaS · tesorerías · invite-only'),
                             },
                         ].map((item) => (
                             <div key={item.num} className={`p-6 rounded-xl border ${item.color} flex flex-col gap-4`}>
@@ -485,15 +766,19 @@ await agent.start({
             {/* CODE SNIPPET */}
             <section className="py-20 border-t border-white/5">
                 <div className="max-w-4xl mx-auto px-6">
+                    <div className="text-center">
+                        <div className="inline-flex items-center gap-2 px-3 py-1 mb-4 bg-emerald-400/10 border border-emerald-400/25 rounded-full text-emerald-400 text-[10px] font-black uppercase tracking-widest">
+                            <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+                            {lang('This code runs against mainnet, today', 'Este código corre contra mainnet, hoy')}
+                        </div>
+                    </div>
                     <h2 className="text-2xl sm:text-3xl font-bold text-center">
-                        {lang('Five lines of code', 'Cinco líneas de código', '五行代码')}
+                        {lang('Your first on-chain payment in five minutes', 'Tu primer pago on-chain en cinco minutos')}
                     </h2>
                     <p className="mt-4 text-center text-white/60 max-w-xl mx-auto">
                         {lang(
-                            'Connect your API key. Define your rules. The agent does the rest.',
-                            'Conecta tu API key. Define tus reglas. El agente hace el resto.',
-                            '连接您的 API 密钥。定义规则。智能体完成其余操作。'
-                        )}
+                            'npm install nirium — the exact flow that settled our first mainnet payment. Charging AI agents for YOUR API takes the same five minutes.',
+                            'npm install nirium — el mismo flujo que liquidó nuestro primer pago en mainnet. Cobrarle a agentes de IA por TU API toma los mismos cinco minutos.')}
                     </p>
 
                     <div className="mt-10 relative rounded-xl border border-white/10 bg-black overflow-hidden">
@@ -502,15 +787,15 @@ await agent.start({
                                 <span className="w-2.5 h-2.5 rounded-full bg-red-500/50" />
                                 <span className="w-2.5 h-2.5 rounded-full bg-yellow-500/50" />
                                 <span className="w-2.5 h-2.5 rounded-full bg-green-500/50" />
-                                <span className="ml-3 text-xs text-white/40 font-mono">treasury.ts</span>
+                                <span className="ml-3 text-xs text-white/40 font-mono">x402-quickstart.ts</span>
                             </div>
                             <button
                                 onClick={handleCopy}
                                 className="text-xs text-white/50 hover:text-stellar-teal transition-colors font-mono"
                             >
                                 {copied
-                                    ? lang('Copied!', '¡Copiado!', '已复制！')
-                                    : lang('Copy', 'Copiar', '复制')}
+                                    ? lang('Copied!', '¡Copiado!')
+                                    : lang('Copy', 'Copiar')}
                             </button>
                         </div>
                         <pre className="p-6 text-sm text-white/80 font-mono leading-relaxed overflow-x-auto">
@@ -523,7 +808,7 @@ await agent.start({
                             href="/developers"
                             className="inline-flex items-center gap-2 text-sm text-stellar-teal hover:underline"
                         >
-                            {lang('Full developer docs', 'Ver documentación completa', '完整开发者文档')}
+                            {lang('Full developer docs', 'Ver documentación completa')}
                             <ChevronRight className="w-4 h-4" />
                         </Link>
                     </div>
@@ -539,17 +824,15 @@ await agent.start({
                     <div className="text-center mb-16">
                         <div className="inline-flex items-center gap-2 px-3 py-1.5 mb-5 bg-white/[0.04] border border-white/10 rounded-full text-white/40 text-[10px] font-mono uppercase tracking-widest">
                             <span className="w-1 h-1 rounded-full bg-stellar-teal" />
-                            {lang('Who is it for?', '¿Para quién es?', '适合哪些用户？')}
+                            {lang('Who is it for?', '¿Para quién es?')}
                         </div>
                         <h2 className="text-3xl sm:text-4xl font-black tracking-tight">
-                            {lang('If your company moves money, Nirium is for you.', 'Si tu empresa mueve dinero, Nirium es para ti.', '只要你的企业需要移动资金，Nirium 就适合你。')}
+                            {lang('If your company moves money, Nirium is for you.', 'Si tu empresa mueve dinero, Nirium es para ti.')}
                         </h2>
                         <p className="mt-4 text-white/45 max-w-lg mx-auto text-sm leading-relaxed">
                             {lang(
                                 "You don't need to understand crypto. You just need the problem we solve.",
-                                'No necesitas entender de cripto. Solo necesitas tener el problema que resolvemos.',
-                                '你不需要了解加密货币，只需要有我们解决的问题。'
-                            )}
+                                'No necesitas entender de cripto. Solo necesitas tener el problema que resolvemos.')}
                         </p>
                     </div>
 
@@ -565,7 +848,7 @@ await agent.start({
                             <div className="relative p-7 flex flex-col h-full">
                                 <div className="flex items-center justify-between mb-6">
                                     <span className="text-[9px] font-black uppercase tracking-[0.2em] text-stellar-teal/70 font-mono">
-                                        {lang('Fintechs · PSPs · Mexico', 'Fintechs · PSPs · México', 'LATAM 金融科技')}
+                                        {lang('Fintechs · PSPs · Mexico', 'Fintechs · PSPs · México')}
                                     </span>
                                     <span className="text-[9px] font-mono text-white/20">01</span>
                                 </div>
@@ -574,27 +857,27 @@ await agent.start({
                                         <Building2 className="w-5 h-5 text-stellar-teal" />
                                     </div>
                                     <h3 className="text-base font-black text-white leading-tight">
-                                        {lang('Your treasury runs itself', 'Tu tesorería corre sola', '资金库自动运转')}
+                                        {lang('Charge for your API — automatically', 'Cobra por tu API — automático')}
                                     </h3>
                                 </div>
                                 <div className="space-y-2 mb-5">
                                     <div className="flex items-start gap-2.5 px-3 py-2.5 rounded-lg bg-red-500/[0.06] border border-red-500/10">
                                         <span className="text-red-400/60 text-[9px] font-black uppercase tracking-widest shrink-0 pt-px">ANTES</span>
                                         <span className="text-[11px] text-white/50 leading-snug">
-                                            {lang('Your team moves money by hand every day. Hours lost, human errors, idle cash.', 'Tu equipo mueve dinero a mano todos los días. Horas perdidas, errores humanos, dinero parado.', '你的团队每天手动转账，浪费大量时间，容易出错，资金闲置。')}
+                                            {lang('Charging per use meant Stripe, subscriptions, invoices — none built for machines paying machines.', 'Cobrar por uso significaba Stripe, suscripciones, facturas — nada hecho para máquinas pagando máquinas.')}
                                         </span>
                                     </div>
                                     <div className="flex items-start gap-2.5 px-3 py-2.5 rounded-lg bg-stellar-teal/[0.06] border border-stellar-teal/10">
                                         <span className="text-stellar-teal text-[9px] font-black uppercase tracking-widest shrink-0 pt-px">AHORA</span>
                                         <span className="text-[11px] text-white/70 leading-snug">
-                                            {lang('Nirium detects the right moment and acts automatically. Zero human intervention.', 'Nirium detecta el momento correcto y actúa solo. Cero intervención humana.', 'Nirium 自动检测最佳时机并独立行动。零人工干预。')}
+                                            {lang('Your agent pays per request in USDC, settled on-chain in seconds. One request, one payment, one receipt.', 'Tu agente paga por request en USDC, liquidado on-chain en segundos. Un request, un pago, un recibo.')}
                                         </span>
                                     </div>
                                 </div>
                                 <div className="mt-auto pt-4 border-t border-white/[0.06] flex items-center justify-between">
                                     <div className="flex items-center gap-1.5">
                                         <span className="w-1.5 h-1.5 rounded-full bg-stellar-teal animate-pulse" />
-                                        <span className="text-[10px] font-mono text-stellar-teal">{lang('Zero manual decisions', 'Cero decisiones manuales', '零手动决策')}</span>
+                                        <span className="text-[10px] font-mono text-stellar-teal">{lang('Live on mainnet', 'En vivo en mainnet')}</span>
                                     </div>
                                     <ChevronRight className="w-3.5 h-3.5 text-white/20 group-hover:text-stellar-teal transition-colors" />
                                 </div>
@@ -611,7 +894,7 @@ await agent.start({
                             <div className="relative p-7 flex flex-col h-full">
                                 <div className="flex items-center justify-between mb-6">
                                     <span className="text-[9px] font-black uppercase tracking-[0.2em] text-stellar-yellow/70 font-mono">
-                                        {lang('SaaS · Companies $1M–$10M', 'SaaS · Empresas $1M–$10M', 'SaaS · 中小企业')}
+                                        {lang('SaaS · Companies $1M–$10M', 'SaaS · Empresas $1M–$10M')}
                                     </span>
                                     <span className="text-[9px] font-mono text-white/20">02</span>
                                 </div>
@@ -620,27 +903,27 @@ await agent.start({
                                         <Bot className="w-5 h-5 text-stellar-yellow" />
                                     </div>
                                     <h3 className="text-base font-black text-white leading-tight">
-                                        {lang('Your cash works when you don\'t', 'Tu caja trabaja cuando tú no', '你的资金从不休息')}
+                                        {lang('Prove what happened — verifiably', 'Prueba lo que pasó — verificable')}
                                     </h3>
                                 </div>
                                 <div className="space-y-2 mb-5">
                                     <div className="flex items-start gap-2.5 px-3 py-2.5 rounded-lg bg-red-500/[0.06] border border-red-500/10">
                                         <span className="text-red-400/60 text-[9px] font-black uppercase tracking-widest shrink-0 pt-px">ANTES</span>
                                         <span className="text-[11px] text-white/50 leading-snug">
-                                            {lang('Millions sitting in accounts doing nothing. Inflation reduces them every month.', 'Millones en cuentas que no hacen nada. La inflación los reduce cada mes.', '数百万闲置在账户中毫无作为，通胀每月蚕食。')}
+                                            {lang('Proving a payment happened meant screenshots, PDFs, and trusting a third party.', 'Probar que un pago pasó significaba capturas, PDFs y confiar en un tercero.')}
                                         </span>
                                     </div>
                                     <div className="flex items-start gap-2.5 px-3 py-2.5 rounded-lg bg-stellar-yellow/[0.06] border border-stellar-yellow/10">
                                         <span className="text-stellar-yellow text-[9px] font-black uppercase tracking-widest shrink-0 pt-px">AHORA</span>
                                         <span className="text-[11px] text-white/70 leading-snug">
-                                            {lang('Nirium moves idle capital automatically according to rules you define. 24/7.', 'Nirium mueve el capital inactivo automáticamente según reglas que tú defines. 24/7.', 'Nirium 根据你设定的规则自动移动闲置资金，全天候运行。')}
+                                            {lang('Every move anchored to an immutable IPFS receipt anyone can verify on-chain. Institutional-format exports in one call.', 'Cada movimiento anclado a un recibo IPFS inmutable que cualquiera verifica on-chain. Exportes con formato institucional en una llamada.')}
                                         </span>
                                     </div>
                                 </div>
                                 <div className="mt-auto pt-4 border-t border-white/[0.06] flex items-center justify-between">
                                     <div className="flex items-center gap-1.5">
                                         <span className="w-1.5 h-1.5 rounded-full bg-stellar-yellow animate-pulse" />
-                                        <span className="text-[10px] font-mono text-stellar-yellow">{lang('0 manual decisions / week', '0 decisiones manuales / semana', '0 手动决策/周')}</span>
+                                        <span className="text-[10px] font-mono text-stellar-yellow">{lang('Live on mainnet', 'En vivo en mainnet')}</span>
                                     </div>
                                     <ChevronRight className="w-3.5 h-3.5 text-white/20 group-hover:text-stellar-yellow transition-colors" />
                                 </div>
@@ -657,7 +940,7 @@ await agent.start({
                             <div className="relative p-7 flex flex-col h-full">
                                 <div className="flex items-center justify-between mb-6">
                                     <span className="text-[9px] font-black uppercase tracking-[0.2em] text-purple-400/70 font-mono">
-                                        {lang('Fintech builders · Developers', 'Builders fintech · Developers', '金融科技开发者')}
+                                        {lang('Fintech builders · Developers', 'Builders fintech · Developers')}
                                     </span>
                                     <span className="text-[9px] font-mono text-white/20">03</span>
                                 </div>
@@ -666,27 +949,27 @@ await agent.start({
                                         <Layers className="w-5 h-5 text-purple-400" />
                                     </div>
                                     <h3 className="text-base font-black text-white leading-tight">
-                                        {lang('The infrastructure is already built', 'La infraestructura ya está lista', '基础设施已就绪')}
+                                        {lang('Idle cash that works for you', 'Caja ociosa que trabaja por ti')}
                                     </h3>
                                 </div>
                                 <div className="space-y-2 mb-5">
                                     <div className="flex items-start gap-2.5 px-3 py-2.5 rounded-lg bg-red-500/[0.06] border border-red-500/10">
                                         <span className="text-red-400/60 text-[9px] font-black uppercase tracking-widest shrink-0 pt-px">ANTES</span>
                                         <span className="text-[11px] text-white/50 leading-snug">
-                                            {lang('Building secure treasury infrastructure takes months and costs a lot.', 'Construir infraestructura de tesorería segura tarda meses y cuesta caro.', '构建安全的财库基础设施需要数月，成本高昂。')}
+                                            {lang('Building autonomous treasury infrastructure from scratch takes months and a brokerage.', 'Construir infraestructura de tesorería autónoma desde cero tarda meses y una casa de bolsa.')}
                                         </span>
                                     </div>
                                     <div className="flex items-start gap-2.5 px-3 py-2.5 rounded-lg bg-purple-500/[0.06] border border-purple-500/10">
                                         <span className="text-purple-400 text-[9px] font-black uppercase tracking-widest shrink-0 pt-px">AHORA</span>
                                         <span className="text-[11px] text-white/70 leading-snug">
-                                            {lang('Integrate in days. Already built, already audited. You just configure your rules.', 'Integras en días. Ya construida, ya auditada. Tú solo configuras tus reglas.', '数天内完成集成。已构建，已审计。你只需配置规则。')}
+                                            {lang('Idle capital works on its own inside a vault you own — and the signer literally cannot take it out. Live on mainnet, invite-only while legal review closes.', 'El capital ocioso trabaja solo dentro de una bóveda tuya — y quien firma literalmente no puede sacarlo. En vivo en mainnet, invite-only mientras cierra la revisión legal.')}
                                         </span>
                                     </div>
                                 </div>
                                 <div className="mt-auto pt-4 border-t border-white/[0.06] flex items-center justify-between">
                                     <div className="flex items-center gap-1.5">
                                         <span className="w-1.5 h-1.5 rounded-full bg-purple-400 animate-pulse" />
-                                        <span className="text-[10px] font-mono text-purple-400">{lang('SDK on npm · Claude/GPT ready', 'SDK en npm · Compatible Claude/GPT', 'npm SDK · 支持 Claude/GPT')}</span>
+                                        <span className="text-[10px] font-mono text-purple-400">{lang('Mainnet · invite-only', 'Mainnet · invite-only')}</span>
                                     </div>
                                     <ChevronRight className="w-3.5 h-3.5 text-white/20 group-hover:text-purple-400 transition-colors" />
                                 </div>
@@ -701,7 +984,7 @@ await agent.start({
             <section className="py-20 border-t border-white/5">
                 <div className="max-w-5xl mx-auto px-6">
                     <h2 className="text-2xl sm:text-3xl font-bold text-center">
-                        {lang('Why trust Nirium with your money?', '¿Por qué confiar tu dinero a Nirium?', '为什么选择 Nirium？')}
+                        {lang('Why trust Nirium with your money?', '¿Por qué confiar tu dinero a Nirium?')}
                     </h2>
 
                     {/* Guarantee callout */}
@@ -710,12 +993,10 @@ await agent.start({
                         <p className="relative text-base sm:text-lg font-black text-white tracking-tight">
                             {lang(
                                 '"The software suggests. The contract decides. Your money never moves without your authorization."',
-                                '"El software propone. El contrato decide. Tu dinero nunca se mueve sin tu autorización."',
-                                '"软件建议，合约决定。没有您的授权，资金永远不会移动。"'
-                            )}
+                                '"El software propone. El contrato decide. Tu dinero nunca se mueve sin tu autorización."')}
                         </p>
                         <p className="relative mt-2 text-xs text-stellar-yellow/60 font-mono uppercase tracking-widest">
-                            {lang('Nirium Security Model — You always hold the keys', 'Modelo de seguridad Nirium — Tú siempre tienes las llaves', 'Nirium 安全模型 — 您始终掌握密钥')}
+                            {lang('Nirium Security Model — You always hold the keys', 'Modelo de seguridad Nirium — Tú siempre tienes las llaves')}
                         </p>
                     </div>
 
@@ -723,32 +1004,26 @@ await agent.start({
                         {[
                             {
                                 icon: Lock,
-                                title: lang('Your money, your keys', 'Tu dinero, tus llaves', '你的资金，你的密钥'),
+                                title: lang('Your money, your keys', 'Tu dinero, tus llaves'),
                                 body:  lang(
                                     'Nirium never holds your funds. You control everything. We just run the automation on your behalf.',
-                                    'Nirium nunca toca tu dinero. Tú controlas todo. Nosotros solo corremos la automatización por ti.',
-                                    'Nirium 从不持有您的资金。您掌控一切，我们只是代您运行自动化。'
-                                ),
+                                    'Nirium nunca toca tu dinero. Tú controlas todo. Nosotros solo corremos la automatización por ti.'),
                                 link: '/security',
                             },
                             {
                                 icon: FileCheck,
-                                title: lang('Every move, recorded', 'Cada movimiento, registrado', '每次操作，全程记录'),
+                                title: lang('Every move, recorded', 'Cada movimiento, registrado'),
                                 body:  lang(
                                     'Every action is signed and archived automatically. Export for auditors in one click. Always ready for regulators.',
-                                    'Cada acción queda firmada y archivada automáticamente. Exporta para auditores en un clic. Siempre listo para reguladores.',
-                                    '每次操作自动签署并归档。一键导出给审计人员。随时为监管机构准备好。'
-                                ),
+                                    'Cada acción queda firmada y archivada automáticamente. Exporta para auditores en un clic. Siempre listo para reguladores.'),
                                 link: '/compliance',
                             },
                             {
                                 icon: Building2,
-                                title: lang('Fund with a bank transfer', 'Fondea con una transferencia', '通过银行转账充值'),
+                                title: lang('Etherfuse converts your MXN — we never touch it', 'Etherfuse convierte tus MXN — nosotros nunca los tocamos'),
                                 body:  lang(
-                                    'Send MXN from your bank via SPEI to a CLABE. Etherfuse — a regulated operator — handles the rest. No crypto knowledge required.',
-                                    'Envía MXN desde tu banco vía SPEI a una CLABE. Etherfuse — operador regulado — hace el resto. No necesitas saber de cripto.',
-                                    '通过 SPEI 从您的银行发送 MXN 至 CLABE 账户。受监管运营商 Etherfuse 处理其余事项。无需加密货币知识。'
-                                ),
+                                    'To get tokenized CETES you contract directly with Etherfuse, a regulated operator: you send MXN to their CLABE and they issue the token to your wallet. Nirium never receives, holds or converts fiat — we only show you the instructions and read the resulting balance. Sandbox today.',
+                                    'Para tener CETES tokenizados contratas directamente con Etherfuse, operador regulado: tú envías MXN a su CLABE y ellos emiten el token a tu wallet. Nirium nunca recibe, sostiene ni convierte fiat — solo te muestra las instrucciones y lee el saldo resultante. Hoy en sandbox.'),
                                 link: '/ramp',
                             },
                         ].map((feature) => (
@@ -763,7 +1038,7 @@ await agent.start({
                                 <h3 className="text-lg font-bold mb-2">{feature.title}</h3>
                                 <p className="text-sm text-white/60 leading-relaxed mb-4">{feature.body}</p>
                                 <div className="text-xs text-stellar-teal/80 group-hover:text-stellar-teal flex items-center gap-1.5">
-                                    {lang('Learn more', 'Ver más', '了解更多')}
+                                    {lang('Learn more', 'Ver más')}
                                     <ChevronRight className="w-3 h-3" />
                                 </div>
                             </Link>
@@ -774,13 +1049,11 @@ await agent.start({
                     <div className="mt-8 border border-white/5 rounded-lg px-5 py-4 bg-white/[0.01]">
                         <p className="text-[10px] text-white/30 font-mono leading-relaxed">
                             <span className="text-white/45 font-semibold uppercase tracking-widest">
-                                {lang('Legal notice', 'Aviso legal', '法律声明')} —{' '}
+                                {lang('Legal notice', 'Aviso legal')} —{' '}
                             </span>
                             {lang(
-                                'Nirium is treasury automation software, not a financial intermediary. SPEI onramp and CETES custody are operated exclusively by Etherfuse, an independent regulated entity subject to Mexican Fintech Law and Banxico/CNBV regulations. Nirium does not hold or custody funds at any time. The CETES rate shown is the Banxico official reference rate — not a guaranteed return by Nirium. SPEI funding requires KYC/KYB completion with Etherfuse. XLM is a volatile digital asset; SDF provides no guarantees on its value. Currently operating on Stellar Testnet — no real funds are moved.',
-                                'Nirium es software de automatización de tesorería, no un intermediario financiero. El onramp SPEI y la custodia de CETES son operados exclusivamente por Etherfuse, entidad regulada independiente sujeta a la Ley Fintech y normativa Banxico/CNBV. Nirium no custodia fondos en ningún momento. La tasa CETES mostrada es la tasa de referencia oficial Banxico — no es un rendimiento garantizado por Nirium. El fondeo vía SPEI requiere completar KYC/KYB con Etherfuse. XLM es un activo digital volátil; SDF no garantiza su valor. Actualmente en Stellar Testnet — no se movilizan fondos reales.',
-                                'Nirium 是财库自动化软件，并非金融中介机构。SPEI 入金通道及 CETES 托管服务由 Etherfuse（墨西哥金融科技法规下的独立受监管实体）专属运营。Nirium 不在任何时刻托管资金。所显示的 CETES 利率为 Banxico 官方参考利率，并非 Nirium 保证的收益。通过 SPEI 充值需完成 Etherfuse 的 KYC/KYB 流程。XLM 是波动性数字资产，SDF 不对其价值作任何保证。当前运行于 Stellar 测试网——不涉及真实资金。'
-                            )}
+                                'Nirium is treasury automation software, not a financial intermediary. SPEI onramp and CETES custody are operated exclusively by Etherfuse, an independent regulated entity subject to Mexican Fintech Law and Banxico/CNBV regulations. Nirium does not hold or custody funds at any time. The CETES rate shown is the Banxico official reference rate — not a guaranteed return by Nirium. SPEI funding requires KYC/KYB completion with Etherfuse. XLM is a volatile digital asset; SDF provides no guarantees on its value. Settlement (x402/MPP), batch payouts (early access), audit anchoring and reporting operate on Stellar Mainnet. Autonomous rebalancing operates on DeFindex vaults — third-party audited contracts owned by the client — invite-only while legal review concludes; the role Nirium holds cannot withdraw funds. NiriumVault, Nirium’s own contract, operates on Stellar Testnet only, pending external audit. Nirium never custodies funds in any case.',
+                                'Nirium es software de automatización de tesorería, no un intermediario financiero. El onramp SPEI y la custodia de CETES son operados exclusivamente por Etherfuse, entidad regulada independiente sujeta a la Ley Fintech y normativa Banxico/CNBV. Nirium no custodia fondos en ningún momento. La tasa CETES mostrada es la tasa de referencia oficial Banxico — no es un rendimiento garantizado por Nirium. El fondeo vía SPEI requiere completar KYC/KYB con Etherfuse. XLM es un activo digital volátil; SDF no garantiza su valor. La liquidación (x402/MPP), las dispersiones en lote (early access), el anclaje de auditoría y la reportería operan en Stellar Mainnet. El rebalanceo autónomo opera sobre bóvedas de DeFindex —contratos de terceros, auditados y propiedad del cliente— en modo invitación mientras concluye la revisión legal; el rol que Nirium sostiene no puede retirar fondos. NiriumVault, el contrato propio de Nirium, opera únicamente en Stellar Testnet en espera de auditoría externa. Nirium no custodia fondos en ningún caso.')}
                         </p>
                     </div>
                 </div>
@@ -790,57 +1063,72 @@ await agent.start({
             <section className="py-20 border-t border-white/5">
                 <div className="max-w-5xl mx-auto px-6">
                     <h2 className="text-2xl sm:text-3xl font-bold text-center">
-                        {lang('B2B SDK Pricing', 'Precios del SDK B2B', 'B2B SDK 定价')}
+                        {lang('B2B SDK Pricing', 'Precios del SDK B2B')}
                     </h2>
                     <p className="mt-4 text-center text-white/60">
-                        {lang('Start free on testnet. Pay only when you go to mainnet.', 'Empieza gratis en testnet. Paga solo cuando vayas a mainnet.', '在测试网免费开始。仅在进入主网时付费。')}
+                        {lang('Start on mainnet for free — pay per request, no card. Financial fees are charged by regulated partners.', 'Empieza en mainnet gratis — pagas por request, sin tarjeta. Los fees financieros los cobran partners regulados.')}
                     </p>
 
                     <div className="mt-12 grid md:grid-cols-3 gap-6">
-                        {/* Sandbox */}
-                        <div className="p-6 rounded-xl border border-white/10 bg-white/[0.02]">
-                            <div className="text-xs uppercase tracking-widest text-white/40 mb-2">Sandbox</div>
-                            <div className="text-3xl font-black mb-1">$0</div>
-                            <div className="text-sm text-white/40 mb-6">
-                                {lang('Free forever on testnet', 'Gratis en testnet para siempre', '测试网永久免费')}
+                        {/* Developer — the mainnet plan */}
+                        <div className="relative p-6 rounded-xl border border-emerald-400/30 bg-emerald-400/[0.04]">
+                            <div className="absolute -top-2.5 left-1/2 -translate-x-1/2">
+                                <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-emerald-400 text-[#0b0b0b] text-[10px] font-black uppercase tracking-widest">
+                                    <span className="w-1.5 h-1.5 rounded-full bg-[#0b0b0b] animate-pulse" />
+                                    {lang('Live on Mainnet', 'En vivo en Mainnet')}
+                                </span>
+                            </div>
+                            <div className="text-xs uppercase tracking-widest text-emerald-400/70 mb-2">{lang('Developer · Mainnet', 'Developer · Mainnet')}</div>
+                            <div className="text-3xl font-black mb-1">$0<span className="text-base text-white/40 font-normal">/mo</span></div>
+                            <div className="text-sm text-white/50 mb-1">
+                                {lang('Pay per request: $0.05 market state on mainnet · signals $0.02 and execute $0.25 on testnet', 'Pago por request: $0.05 market state en mainnet · señales $0.02 y execute $0.25 en testnet')}
+                            </div>
+                            <div className="text-[10px] text-emerald-400/70 font-mono mb-6">
+                                {lang('settled on-chain in USDC · no card', 'liquidado on-chain en USDC · sin tarjeta')}
                             </div>
                             <ul className="space-y-2.5 text-sm text-white/70 mb-8">
-                                <li className="flex gap-2"><Check className="w-4 h-4 text-stellar-teal shrink-0 mt-0.5" />{lang('Testnet vault (2-of-3 Soroban)', 'Vault testnet (2-de-3 Soroban)', '测试网金库（2-of-3 Soroban）')}</li>
-                                <li className="flex gap-2"><Check className="w-4 h-4 text-stellar-teal shrink-0 mt-0.5" />{lang('Audit trail (HMAC-SHA256)', 'Audit trail (HMAC-SHA256)', '审计追踪（HMAC-SHA256）')}</li>
-                                <li className="flex gap-2"><Check className="w-4 h-4 text-stellar-teal shrink-0 mt-0.5" />{lang('SDK access (npm: nirium)', 'Acceso SDK (npm: nirium)', 'SDK 访问（npm: nirium）')}</li>
-                                <li className="flex gap-2"><Check className="w-4 h-4 text-stellar-teal shrink-0 mt-0.5" />{lang('MCP server (Claude/Cursor)', 'Servidor MCP (Claude/Cursor)', 'MCP 服务器（Claude/Cursor）')}</li>
+                                <li className="flex gap-2"><Check className="w-4 h-4 text-emerald-400 shrink-0 mt-0.5" />{lang('x402 quickstart on mainnet (pay-per-call)', 'Quickstart x402 en mainnet (pago por llamada)')}</li>
+                                <li className="flex gap-2"><Check className="w-4 h-4 text-emerald-400 shrink-0 mt-0.5" />{lang('Audit anchoring — free beta (mainnet)', 'Anclaje de auditoría — beta gratis (mainnet)')}</li>
+                                <li className="flex gap-2"><Check className="w-4 h-4 text-emerald-400 shrink-0 mt-0.5" />{/* La unidad tiene que coincidir con GET /api/payroll/info: es POR DESTINATARIO
+    con escalones de volumen, no por corrida. Decía "$0.25/corrida" y una corrida
+    de 100 personas cobra $40, no $0.25. */}
+{lang('Batch payouts — monthly software licence by permitted volume, never a per-payment charge (mainnet early access, invite-only)', 'Payouts en lote — licencia mensual de software por volumen permitido, nunca un cargo por pago (mainnet early access, solo por invitación)')}</li>
+                                <li className="flex gap-2"><Check className="w-4 h-4 text-emerald-400 shrink-0 mt-0.5" />{lang('Treasury vault on DeFindex — deploy, fund and withdraw with your own signature; you pay only the network fee', 'Bóveda de tesorería en DeFindex — desplegar, fondear y retirar con tu propia firma; solo pagas el fee de red')}</li>
+                                <li className="flex gap-2"><Check className="w-4 h-4 text-stellar-teal shrink-0 mt-0.5" />{lang('NiriumVault on testnet (2-of-3 Soroban)', 'NiriumVault en testnet (2-de-3 Soroban)')}</li>
+                                <li className="flex gap-2"><Check className="w-4 h-4 text-stellar-teal shrink-0 mt-0.5" />{lang('SDK — nirium 0.10.1 on npm, 0.9.0 on PyPI · MCP v0.5.0 server', 'SDK — nirium 0.10.1 en npm, 0.9.0 en PyPI · Servidor MCP v0.5.0')}</li>
                             </ul>
                             <Link href="/dashboard">
                                 <Button variant="outline" className="w-full border-white/20 hover:bg-white/5">
-                                    {lang('Start free', 'Empezar gratis', '免费开始')}
+                                    {lang('Start free', 'Empezar gratis')}
                                 </Button>
                             </Link>
                         </div>
 
                         {/* Growth */}
                         <div className="relative p-6 rounded-xl border border-stellar-teal/40 bg-stellar-teal/[0.05]">
-                            <div className="absolute -top-2.5 left-1/2 -translate-x-1/2 px-2.5 py-0.5 rounded-full bg-stellar-teal text-black text-[10px] font-black uppercase tracking-widest">
-                                {lang('Most popular', 'Más popular', '最受欢迎')}
+                            <div className="absolute -top-2.5 left-1/2 -translate-x-1/2 px-2.5 py-0.5 rounded-full bg-stellar-teal text-[#0b0b0b] text-[10px] font-black uppercase tracking-widest">
+                                {lang('Most popular', 'Más popular')}
                             </div>
                             <div className="text-xs uppercase tracking-widest text-stellar-teal mb-2">Growth</div>
                             <div className="text-3xl font-black mb-1">$299<span className="text-base text-white/50">/mo</span></div>
                             <div className="text-sm text-white/40 mb-1">
-                                {lang('+ $0.01–0.05 per API call', '+ $0.01–0.05 por llamada API', '+ 每次 API 调用 $0.01–0.05')}
+                                {lang('+ $0.02–0.25 per API call', '+ $0.02–0.25 por llamada API')}
                             </div>
                             <div className="text-[10px] text-stellar-teal/70 font-mono mb-6">
-                                {lang('Software license — no % of capital', 'Licencia de software — sin % del capital', '软件许可证 — 不收取资本百分比')}
+                                {lang('Software license — no % of capital', 'Licencia de software — sin % del capital')}
                             </div>
                             <ul className="space-y-2.5 text-sm text-white/80 mb-8">
-                                <li className="flex gap-2"><Check className="w-4 h-4 text-stellar-teal shrink-0 mt-0.5" />{lang('Mainnet vault (once audited)', 'Vault mainnet (tras auditoría)', '主网金库（审计后）')}</li>
-                                <li className="flex gap-2"><Check className="w-4 h-4 text-stellar-teal shrink-0 mt-0.5" />{lang('CNBV compliance export', 'Exportación compliance CNBV', 'CNBV 合规导出')}</li>
-                                <li className="flex gap-2"><Check className="w-4 h-4 text-stellar-teal shrink-0 mt-0.5" />{lang('IPFS anchoring (Pinata)', 'Anclaje IPFS (Pinata)', 'IPFS 锚定（Pinata）')}</li>
-                                <li className="flex gap-2"><Check className="w-4 h-4 text-stellar-teal shrink-0 mt-0.5" />{lang('x402 + MPP agentic payments', 'Pagos agénticos x402 + MPP', 'x402 + MPP 代理支付')}</li>
-                                <li className="flex gap-2"><Check className="w-4 h-4 text-stellar-teal shrink-0 mt-0.5" />{lang('CETES ↔ USDC signal generation', 'Señales CETES ↔ USDC', 'CETES ↔ USDC 信号生成')}</li>
-                                <li className="flex gap-2"><Check className="w-4 h-4 text-stellar-teal shrink-0 mt-0.5" />{lang('Priority support (48h SLA)', 'Soporte prioritario (SLA 48h)', '优先支持（48 小时 SLA）')}</li>
+                                <li className="flex gap-2"><Check className="w-4 h-4 text-stellar-teal shrink-0 mt-0.5" />{lang('Treasury node — idle capital moves into the yield strategy and back on its own (invite-only while legal review closes)', 'Nodo de tesorería — el capital ocioso entra a la estrategia de rendimiento y sale solo (invite-only mientras cierra la revisión legal)')}</li>
+                                <li className="flex gap-2"><Check className="w-4 h-4 text-stellar-teal shrink-0 mt-0.5" />{lang('NiriumVault on mainnet (once audited)', 'NiriumVault en mainnet (tras auditoría)')}</li>
+                                <li className="flex gap-2"><Check className="w-4 h-4 text-stellar-teal shrink-0 mt-0.5" />{lang('Institutional-format exports (CSV/JSON)', 'Exportes con formato institucional (CSV/JSON)')}</li>
+                                <li className="flex gap-2"><Check className="w-4 h-4 text-stellar-teal shrink-0 mt-0.5" />{lang('IPFS anchoring (Pinata)', 'Anclaje IPFS (Pinata)')}</li>
+                                <li className="flex gap-2"><Check className="w-4 h-4 text-stellar-teal shrink-0 mt-0.5" />{lang('x402 + MPP agentic payments', 'Pagos agénticos x402 + MPP')}</li>
+                                <li className="flex gap-2"><Check className="w-4 h-4 text-stellar-teal shrink-0 mt-0.5" />{lang('CETES and USDC reference rates, attributed to their source', 'Tasas de referencia CETES y USDC, con su fuente')}</li>
+                                <li className="flex gap-2"><Check className="w-4 h-4 text-stellar-teal shrink-0 mt-0.5" />{lang('Priority support (48h SLA)', 'Soporte prioritario (SLA 48h)')}</li>
                             </ul>
                             <Link href="/dashboard">
                                 <Button variant="premium" className="w-full">
-                                    {lang('Try on testnet →', 'Probar en testnet →', '在测试网试用 →')}
+                                    {lang('Talk to sales →', 'Habla con ventas →')}
                                 </Button>
                             </Link>
                         </div>
@@ -850,18 +1138,18 @@ await agent.start({
                             <div className="text-xs uppercase tracking-widest text-white/40 mb-2">Enterprise</div>
                             <div className="text-3xl font-black mb-1">Custom</div>
                             <div className="text-sm text-white/40 mb-6">
-                                {lang('For regulated fintechs, banks and DAOs', 'Para fintechs reguladas, bancos y DAOs', '适用于受监管金融科技、银行和 DAO')}
+                                {lang('For regulated fintechs, banks and DAOs', 'Para fintechs reguladas, bancos y DAOs')}
                             </div>
                             <ul className="space-y-2.5 text-sm text-white/70 mb-8">
-                                <li className="flex gap-2"><Check className="w-4 h-4 text-stellar-teal shrink-0 mt-0.5" />{lang('White-label option', 'Opción white-label', '白标选项')}</li>
-                                <li className="flex gap-2"><Check className="w-4 h-4 text-stellar-teal shrink-0 mt-0.5" />{lang('Custom Soroban vault logic', 'Lógica Soroban personalizada', '自定义 Soroban 金库逻辑')}</li>
-                                <li className="flex gap-2"><Check className="w-4 h-4 text-stellar-teal shrink-0 mt-0.5" />{lang('CNBV audit support', 'Soporte auditoría CNBV', 'CNBV 审计支持')}</li>
-                                <li className="flex gap-2"><Check className="w-4 h-4 text-stellar-teal shrink-0 mt-0.5" />{lang('On-premise deployment', 'Despliegue on-premise', '本地部署')}</li>
-                                <li className="flex gap-2"><Check className="w-4 h-4 text-stellar-teal shrink-0 mt-0.5" />{lang('Joint go-to-market', 'Go-to-market conjunto', '联合市场推广')}</li>
+                                <li className="flex gap-2"><Check className="w-4 h-4 text-stellar-teal shrink-0 mt-0.5" />{lang('White-label option', 'Opción white-label')}</li>
+                                <li className="flex gap-2"><Check className="w-4 h-4 text-stellar-teal shrink-0 mt-0.5" />{lang('Custom Soroban vault logic', 'Lógica Soroban personalizada')}</li>
+                                <li className="flex gap-2"><Check className="w-4 h-4 text-stellar-teal shrink-0 mt-0.5" />{lang('Audit-readiness support', 'Soporte de preparación para auditorías')}</li>
+                                <li className="flex gap-2"><Check className="w-4 h-4 text-stellar-teal shrink-0 mt-0.5" />{lang('On-premise deployment', 'Despliegue on-premise')}</li>
+                                <li className="flex gap-2"><Check className="w-4 h-4 text-stellar-teal shrink-0 mt-0.5" />{lang('Joint go-to-market', 'Go-to-market conjunto')}</li>
                             </ul>
-                            <a href="mailto:hello@nirium.xyz">
+                            <a href="mailto:niriumprotocol@gmail.com">
                                 <Button variant="outline" className="w-full border-white/20 hover:bg-white/5">
-                                    {lang('Talk to the team', 'Hablar con el equipo', '联系团队')}
+                                    {lang('Talk to the team', 'Hablar con el equipo')}
                                 </Button>
                             </a>
                         </div>
@@ -873,15 +1161,16 @@ await agent.start({
             <section className="py-16 border-t border-white/5">
                 <div className="max-w-5xl mx-auto px-6">
                     <p className="text-center text-xs uppercase tracking-widest text-white/40 mb-8">
-                        {lang('Verified by', 'Verificado por', '认证机构')}
+                        {lang('Verified by', 'Verificado por')}
                     </p>
                     <div className="flex flex-wrap items-center justify-center gap-6 sm:gap-10">
                         {[
-                            lang('SCF Stellar Community Fund ✓', 'SCF Stellar Community Fund ✓', 'SCF Stellar 社区基金 ✓'),
-                            lang('Security Audit — 78/78 vectors PASS', 'Auditoría de seguridad — 78/78 vectores PASS', '安全审计 — 78/78 向量通过'),
-                            lang('External Audit — Q3 2026', 'Auditoría externa — Q3 2026', '外部审计 — Q3 2026'),
-                            lang('Etherfuse Integration ✓', 'Integración Etherfuse ✓', 'Etherfuse 集成 ✓'),
-                            lang('Stellar Testnet — Live', 'Stellar Testnet — En vivo', 'Stellar 测试网 — 运行中'),
+                            lang('Stellar Mainnet — settlement · audit · payouts · reporting LIVE', 'Stellar Mainnet — liquidación · auditoría · payouts · reportería EN VIVO'),
+                            lang('SCF Kickstart grantee', 'Beneficiario SCF Kickstart'),
+                            lang('Internal Security Audit — 83/83 vectors PASS', 'Auditoría interna de seguridad — 83/83 vectores PASS'),
+                            lang('External audit — pending (gates NiriumVault, not the DeFindex treasury)', 'Auditoría externa — pendiente (gatea NiriumVault, no la tesorería en DeFindex)'),
+                            lang('Etherfuse Integration ✓', 'Integración Etherfuse ✓'),
+                            lang('Stellar Testnet — NiriumVault (2-of-3 multisig)', 'Stellar Testnet — NiriumVault (multisig 2-de-3)'),
                         ].map((item) => (
                             <div key={item} className="text-[10px] text-white/40 font-mono uppercase tracking-[0.2em]">
                                 {item}
@@ -900,18 +1189,16 @@ await agent.start({
                                 <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-stellar-teal opacity-75" />
                                 <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-stellar-teal" />
                             </span>
-                            {lang('Live on Testnet', 'En vivo en Testnet', '测试网实时运行')}
+                            {lang('Live on Testnet', 'En vivo en Testnet')}
                         </div>
                         <h2 className="text-3xl sm:text-5xl font-black tracking-tight">
-                            {lang('The full product.', 'El producto completo.', '完整产品。')}{' '}
-                            <span className="text-stellar-teal">{lang('Behind one click.', 'Detrás de un clic.', '一键即达。')}</span>
+                            {lang('The full product.', 'El producto completo.')}{' '}
+                            <span className="text-stellar-teal">{lang('Behind one click.', 'Detrás de un clic.')}</span>
                         </h2>
                         <p className="mt-4 text-white/50 max-w-xl mx-auto text-sm">
                             {lang(
                                 'Connect your Freighter wallet and access the full institutional dashboard — agents, analytics, vault, x402, MPP, and IPFS audit trail.',
-                                'Conecta tu wallet Freighter y accede al dashboard institucional completo — agentes, analytics, vault, x402, MPP y rastro de auditoría IPFS.',
-                                '连接 Freighter 钱包，访问完整的机构级仪表板 — 代理、分析、金库、x402、MPP 和 IPFS 审计追踪。'
-                            )}
+                                'Conecta tu wallet Freighter y accede al dashboard institucional completo — agentes, analytics, vault, x402, MPP y rastro de auditoría IPFS.')}
                         </p>
                     </div>
 
@@ -976,10 +1263,10 @@ await agent.start({
                                 {/* Stats row */}
                                 <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
                                     {[
-                                        { label: 'Treasury Balance', value: '$127,430', sub: 'CETES 5.57% (gov. rate)', color: 'text-stellar-teal' },
+                                        { label: 'Vault',            value: '2-of-3',  sub: 'Soroban multisig (testnet)', color: 'text-stellar-teal' },
                                         { label: 'Active Agents',    value: '1 / 10',  sub: '24/7 Autonomous', color: 'text-stellar-yellow' },
-                                        { label: 'USDC → CETES',     value: '82%',     sub: 'Auto-rebalanced', color: 'text-purple-400' },
-                                        { label: 'Audit Entries',    value: '1,847',   sub: 'IPFS Immutable',  color: 'text-green-400' },
+                                        { label: 'Rebalance cycle',  value: '~20 min', sub: 'per asset, alternating', color: 'text-purple-400' },
+                                        { label: 'Audit receipts',   value: 'IPFS',    sub: 'immutable, verifiable', color: 'text-green-400' },
                                     ].map(({ label, value, sub, color }) => (
                                         <div key={label} className="bg-white/[0.03] border border-white/[0.06] rounded-xl p-3">
                                             <div className="text-[9px] font-mono text-white/30 uppercase mb-1">{label}</div>
@@ -993,16 +1280,21 @@ await agent.start({
                                 <div className="bg-white/[0.02] border border-white/[0.06] rounded-xl p-4">
                                     <div className="flex items-center justify-between mb-3">
                                         <span className="text-[10px] font-black uppercase tracking-widest text-white/50">Agent Activity</span>
-                                        <span className="flex items-center gap-1 text-[9px] text-green-400 font-mono">
-                                            <span className="w-1 h-1 rounded-full bg-green-400 animate-pulse" />
-                                            LIVE
+                                        {/* NUNCA "LIVE" aquí: este panel es una maqueta con datos de ejemplo.
+                                            Tenía $127,430 de tesorería, 1,847 recibos y un AGENT-02 inexistente
+                                            junto a un badge LIVE — se contradecía con el "$0 en custodia" de
+                                            arriba y es justo el "números inflados" que costó 3 rechazos de SCF. */}
+                                        <span className="text-[9px] text-white/35 font-mono uppercase tracking-widest">
+                                            {lang('sample data', 'datos de ejemplo')}
                                         </span>
                                     </div>
                                     <div className="space-y-2">
                                         {[
-                                            { time: '23:41:02', msg: '[AGENT-01] Rebalanced 2,400 USDC -> CETES via Etherfuse', type: 'success' },
-                                            { time: '23:40:47', msg: '[AGENT-02] x402 micropayment: 0.05 USDC - API call billed', type: 'info' },
-                                            { time: '23:40:31', msg: '[SENTINEL] Vault health check passed - all systems nominal', type: 'success' },
+                                            // Montos y actores reales: 1.0 USDC por ciclo (no 2,400), un solo
+                                            // agente (no existe AGENT-02) y nada de SENTINEL, que sigue en diseño.
+                                            { time: '23:41:02', msg: '[AGENT-01] Moved 1.0 USDC -> vault treasury (testnet)', type: 'success' },
+                                            { time: '23:40:47', msg: '[AGENT-01] x402 micropayment: 0.02 USDC - API call billed', type: 'info' },
+                                            { time: '23:40:31', msg: '[AUDIT-NODE] Receipt anchored to IPFS - CID: QmYNvmR7C...', type: 'success' },
                                         ].map(({ time, msg, type }) => (
                                             <div key={time} className="flex items-start gap-2 text-[10px] font-mono">
                                                 <span className="text-white/20 shrink-0">{time}</span>
@@ -1019,12 +1311,12 @@ await agent.start({
                             <div className="absolute bottom-8 flex flex-col items-center gap-3">
                                 <Link href="/dashboard">
                                     <Button size="lg" variant="premium" className="shadow-[0_0_40px_rgba(255,215,0,0.3)]">
-                                        {lang('Launch App — Free Testnet', 'Lanzar App — Testnet Gratis', '启动应用 — 免费测试网')}
+                                        {lang('Launch App — Free Testnet', 'Lanzar App — Testnet Gratis')}
                                         <ArrowRight className="ml-2 w-4 h-4" />
                                     </Button>
                                 </Link>
                                 <p className="text-[10px] text-white/30 font-mono">
-                                    {lang('No funds at risk · Non-custodial · Freighter wallet', 'Sin fondos en riesgo · No custodial · Freighter', '无资金风险 · 非托管 · Freighter 钱包')}
+                                    {lang('No funds at risk · Non-custodial · Freighter wallet', 'Sin fondos en riesgo · No custodial · Freighter')}
                                 </p>
                             </div>
                         </div>
@@ -1037,26 +1329,22 @@ await agent.start({
                 <div className="max-w-3xl mx-auto px-6 text-center">
                     <h2 className="text-3xl sm:text-5xl font-black tracking-tight">
                         {lang(
-                            'Your money shouldn\'t sleep.',
-                            'Tu dinero no debería estar durmiendo.',
-                            '你的资金不该继续沉睡。'
-                        )}
+                            'Your rails are live. Verify them.',
+                            'Tus rieles están en vivo. Verifícalos.')}
                     </h2>
                     <p className="mt-4 text-white/60 max-w-xl mx-auto">
                         {lang(
-                            'Try free on testnet. Talk to us if you want a pilot. No commitments.',
-                            'Prueba gratis en testnet. Habla con nosotros si quieres un piloto. Sin compromisos.',
-                            '测试网免费试用。有意向可联系我们。无任何承诺。'
-                        )}
+                            'Make your first mainnet payment in five minutes, or explore the treasury flagship free on testnet. No commitments.',
+                            'Haz tu primer pago en mainnet en cinco minutos, o explora el flagship de tesorería gratis en testnet. Sin compromisos.')}
                     </p>
                     <div className="mt-10 flex flex-col sm:flex-row gap-3 justify-center">
                         <Link href="/dashboard">
                             <Button size="lg" variant="premium" className="w-full sm:w-auto">
-                                {lang('Get started free', 'Comenzar gratis', '免费开始')}
+                                {lang('Get started free', 'Comenzar gratis')}
                                 <ArrowRight className="ml-2 w-4 h-4" />
                             </Button>
                         </Link>
-                        <a href="https://github.com/Eras256/Nirium" target="_blank" rel="noopener noreferrer">
+                        <a href="https://github.com/nirium-protocol/nirium-sdk" target="_blank" rel="noopener noreferrer">
                             <Button size="lg" variant="outline" className="w-full sm:w-auto border-white/20 hover:bg-white/5">
                                 GitHub
                                 <ExternalLink className="ml-2 w-4 h-4" />
@@ -1075,12 +1363,16 @@ await agent.start({
                         <span className="text-white/20">•</span>
                         <span className="font-mono">MPP</span>
                         <span className="text-white/20">•</span>
+                        <span className="font-mono">LCP</span>
+                        <span className="text-white/20">•</span>
                         <span className="font-mono">Apache 2.0</span>
                         <span className="text-white/20">•</span>
-                        <span className="font-mono text-stellar-teal">Stellar Testnet</span>
+                        <span className="font-mono text-emerald-400">Stellar Mainnet</span>
+                        <span className="text-white/20">+</span>
+                        <span className="font-mono text-stellar-teal">Testnet</span>
                     </div>
                     <div className="flex items-center justify-center gap-6 text-sm mb-6">
-                        <a href="https://github.com/Eras256/Nirium" target="_blank" rel="noopener noreferrer" className="text-white/60 hover:text-white transition-colors underline underline-offset-4">GitHub Repository</a>
+                        <a href="https://github.com/nirium-protocol/nirium-sdk" target="_blank" rel="noopener noreferrer" className="text-white/60 hover:text-white transition-colors underline underline-offset-4">GitHub Repository</a>
                         <Link href="/disclaimers" className="text-white/60 hover:text-white transition-colors underline underline-offset-4">Legal Disclaimers</Link>
                     </div>
                     <p className="text-[10px] text-zinc-500 font-mono">

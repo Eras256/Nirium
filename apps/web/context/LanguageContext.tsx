@@ -4,16 +4,14 @@ import React, { createContext, useContext, useState, useEffect, ReactNode } from
 
 import en from '../dictionaries/en.json';
 import es from '../dictionaries/es.json';
-import zh from '../dictionaries/zh.json';
 
-type Language = 'en' | 'es' | 'zh';
+type Language = 'en' | 'es';
 
 type Dictionary = typeof en;
 
 const dictionaries = {
     en,
     es,
-    zh,
 };
 
 interface LanguageContextProps {
@@ -29,12 +27,14 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
 
     useEffect(() => {
         const saved = localStorage.getItem('nirium_lang') as Language;
-        if (saved && ['en', 'es', 'zh'].includes(saved)) {
+        if (saved && ['en', 'es'].includes(saved)) {
             setLanguage(saved);
         }
     }, []);
 
     const handleSetLanguage = (lang: Language) => {
+        const allowed: Language[] = ['en', 'es'];
+        if (!allowed.includes(lang)) return;
         setLanguage(lang);
         localStorage.setItem('nirium_lang', lang);
     };

@@ -19,26 +19,21 @@ export function TreasuryCanvas() {
     if (!mounted) return null;
 
     return (
-        <div className="w-full h-full relative bg-transparent">
+        <div className="w-full h-full relative !bg-transparent darkreader-ignore">
             <CanvasErrorBoundary>
                 <Canvas
-                    camera={{ position: [0, 0, 28], fov: 42 }}
-                    gl={{ antialias: true, alpha: true }}
-                    onCreated={handleContextLoss}
+                    className="!bg-transparent darkreader-ignore"
+                    camera={{ position: [0, 0, 35], fov: 42 }}
+                    gl={{ antialias: true, alpha: true, preserveDrawingBuffer: true }}
+                    onCreated={({ gl }) => {
+                        gl.setClearColor(0x000000, 0);
+                        handleContextLoss({ gl });
+                    }}
                     style={{ background: 'transparent' }}
                 >
                     {/* @ts-ignore */}
                     <Suspense fallback={null}>
                         <TreasuryOrb />
-                        <EffectComposer>
-                            <Bloom
-                                luminanceThreshold={0.08}
-                                luminanceSmoothing={0.9}
-                                height={300}
-                                intensity={2.4}
-                            />
-                            <Vignette eskil={false} offset={0.15} darkness={1.0} />
-                        </EffectComposer>
                     </Suspense>
                 </Canvas>
             </CanvasErrorBoundary>

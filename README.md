@@ -53,7 +53,8 @@ Every claim below is a link. Nothing here asks to be believed.
 |---|---|---|
 | API box | Live, **receive-only, holds no signing key**, enforced at startup | [`/health`](https://nirium-agent-mainnet.fly.dev/health) · [`/api/nodes`](https://nirium-agent-mainnet.fly.dev/api/nodes) |
 | x402: first real payment | Settled 9 Jul 2026 | [`3134a51c…7558bc`](https://stellar.expert/explorer/public/tx/3134a51c66091fd7fbd85b38a4a6ec6cd432bb92c2450eac84ea7855cb7558bc) |
-| x402: paid from a social login (Pollar adapter) | Settled 27 Jul 2026, from a clean npm install | [`48136451…3795e`](https://stellar.expert/explorer/public/tx/4813645165d15af1e503d66ef84d826e83fff235d4f98c3f6eba8a4e7c83795e) · receipt [`QmRzgTtVPg…`](https://gateway.pinata.cloud/ipfs/QmRzgTtVPg5a5pipi8npfpXt81xiGG5Ue5Rygd6Fye1aon) |
+| x402: paid from a social login (Pollar) | Settled 5 Aug 2026, holding **zero XLM** end to end | [`e4fa3df9…16ed9`](https://stellar.expert/explorer/public/tx/e4fa3df9cb225a4d7f64dd0082eb38218ada4b4af3378f288989a5d4b1116ed9) |
+| `nirium-pollar-adapter`: end-to-end from a clean npm install | Settled 27 Jul 2026, standard Stellar keypair signer (the pluggable-signer test, not Pollar-specific) | [`48136451…3795e`](https://stellar.expert/explorer/public/tx/4813645165d15af1e503d66ef84d826e83fff235d4f98c3f6eba8a4e7c83795e) · receipt [`QmRzgTtVPg…`](https://gateway.pinata.cloud/ipfs/QmRzgTtVPg5a5pipi8npfpXt81xiGG5Ue5Rygd6Fye1aon) |
 | MPP Charge | Live: `market` charges and delivers | [`/api/v1/mpp/info`](https://nirium-agent-mainnet.fly.dev/api/v1/mpp/info) |
 | Treasury: vault deployed | 6 Aug 2026, **client signs** | [`93ff6284…78416`](https://stellar.expert/explorer/public/tx/93ff6284cdf03706624c88434a79fba1b213ee547f58e09a9248f75373178416) |
 | Treasury: autonomous invest | 6 Aug 2026, **the agent signs** | [`82d73f53…6b3d4`](https://stellar.expert/explorer/public/tx/82d73f537e907140367f9343f63a36704c74a5286aced7a938cee8fffb56b3d4) |
@@ -130,7 +131,6 @@ Traction is **self-generated and independently verifiable**. It does not depend 
 - **Live autonomous agent** running 24/7 on Stellar Testnet, every rebalance verifiable on Stellar Expert.
 - **Real mainnet activity**: x402 micropayments settling in production, and a full treasury cycle executed with real funds (hashes above).
 - **Open API + free sandbox keys**, so any developer can integrate and exercise the contracts directly.
-- **Listed in Stellar's official developer skills catalog** (skills.stellar.org), reviewed and merged by SDF DevRel: [stellar/stellar-dev-skill#96](https://github.com/stellar/stellar-dev-skill/pull/96).
 
 We provide the middleware; regulated operators (e.g. Etherfuse) hold the licenses and execute settlement. We are open to integration conversations with regional fintechs, but make **no claim of signed pilots**.
 
@@ -228,7 +228,7 @@ app.use('/premium', x402Serve({
 
 **MPP runs in Charge mode only**, on both networks: the client signs a complete USDC transfer inside the request, the server validates it by simulation and broadcasts it: no external facilitator. MPP's Channel mode is implemented but **disabled**, because its setup phase deploys a channel contract holding a deposit, which is temporary custody and falls under the same audit gate as our own vault.
 
-The MCP server exposes Nirium as **25 tools** for Claude Desktop, Cursor, and any MCP-compatible IDE: 10 free, 9 authenticated, 1 informational, 3 paid over x402, 2 paid over MPP.
+The MCP server exposes Nirium as **14 tools** for Claude Desktop, Cursor, and any MCP-compatible IDE: 6 free, 2 authenticated, 1 informational, 3 paid over x402, 2 paid over MPP.
 
 ### Audit Trail Engine
 
@@ -260,9 +260,12 @@ An invalid signature returns **400 and nothing is anchored**: IPFS has no delete
 
 | SDK | Package | Version | Install |
 |---|---|---|---|
-| TypeScript | [nirium (npm)](https://www.npmjs.com/package/nirium) | 0.11.0 | `npm install nirium` |
+| TypeScript | [nirium (npm)](https://www.npmjs.com/package/nirium) | 0.10.2 | `npm install nirium` |
 | Python | [nirium (PyPI)](https://pypi.org/project/nirium/) | 0.9.0 | `pip install nirium` |
-| MCP server | [nirium-mcp (npm)](https://www.npmjs.com/package/nirium-mcp) | 0.6.0 | `npx nirium-mcp` |
+
+> The two SDKs have identical **client** surfaces. TypeScript is one minor ahead because `x402Serve()` is Express middleware: server-side Node, with no meaningful Python equivalent. The version gap is the honest signal, not a lag.
+
+| MCP server | [nirium-mcp (npm)](https://www.npmjs.com/package/nirium-mcp) | 0.5.1 | `npx nirium-mcp` |
 | Pollar adapter | [nirium-pollar-adapter (npm)](https://www.npmjs.com/package/nirium-pollar-adapter) | 0.4.0 | `npm install nirium-pollar-adapter` |
 
 ```typescript
@@ -347,7 +350,7 @@ pip install nirium       # Python SDK
 ```
 Nirium/                        (public repo)
 ├── apps/web/                  → Next.js 15 dashboard (nirium.xyz), 27 routes, i18n (EN/ES)
-├── packages/sdk/              → TypeScript SDK v0.11.0 (npm: nirium)
+├── packages/sdk/              → TypeScript SDK v0.10.2 (npm: nirium)
 ├── packages/sdk-python/       → Python SDK v0.9.0 (PyPI: nirium)
 ├── packages/contracts/        → Soroban contracts (Rust), 2 contracts, 5 fuzz targets
 ├── packages/policy-account/   → Soroban policy account (Rust), scopes a key to one vault
@@ -355,10 +358,8 @@ Nirium/                        (public repo)
 ├── .github/workflows/         → CI, release, security-gate, desktop release
 │
 ├── packages/agent/            → [private] Express 5 API, 86 endpoints (85 HTTP + 1 WebSocket)
-├── packages/mcp/              → [public] MCP server, not published from here: the real
-│                                 nirium-mcp (v0.6.0, npm) ships from the nirium-sdk repo
-├── packages/cli/              → [public] CLI, not published from here: the real
-│                                 nirium-cli (v1.0.4, npm) ships from the nirium-sdk repo
+├── packages/mcp/              → [public] MCP server v0.5.1, 14 tools
+├── packages/cli/              → [public] CLI v1.0.3 (npm: nirium-cli)
 ├── packages/desktop/          → [private] Tauri desktop wrapper
 ```
 
@@ -366,8 +367,8 @@ Nirium/                        (public repo)
 
 ## Security
 
-- **Internal JARGUS Audit v3.0**: 83/83 vectors checked, 0 critical, 0 high
-- Methodology: static analysis (`cargo clippy`, grep), dynamic analysis, JARGUS full-spectrum pentesting, `cargo audit` + `pnpm audit`, fuzz testing (5 cargo-fuzz targets), manual code review
+- **Internal security review**: 83/83 vectors checked, 0 critical, 0 high
+- Methodology: static analysis (`cargo clippy`, grep), dynamic analysis, full-spectrum pentesting, `cargo audit` + `pnpm audit`, fuzz testing (5 cargo-fuzz targets), manual code review
 - A formal independent audit is planned before any mainnet deployment of **NiriumVault**. The mainnet nodes running today do not depend on it: they either never touch funds (x402, MPP, audit, reporting), or the client signs every fund movement themselves (Payouts), or they operate a **third-party contract already audited by OtterSec** in a role that cannot withdraw (Treasury).
 - The mainnet API box holds **no signing key**, enforced at startup. The autonomous mainnet signer is a separate process with no HTTP surface.
 - See [SECURITY.md](SECURITY.md) for responsible disclosure, and [INTERNAL_SECURITY_AUDIT.md](INTERNAL_SECURITY_AUDIT.md) for the full 83-vector report.
@@ -403,8 +404,8 @@ Nirium received Kickstart funding via a regional Stellar Ambassador chapter, wit
 |---|---|
 | Core infrastructure + x402/MPP on testnet | ✅ Complete |
 | Institutional API (86 endpoints) + published SDKs | ✅ Complete |
-| Internal JARGUS security audit v3.0 (83/83 vectors checked) | ✅ Complete |
-| MCP server v0.6.0, 25 tools | ✅ Complete |
+| Internal security review (83/83 vectors checked) | ✅ Complete |
+| MCP server v0.5.0, 14 tools | ✅ Complete |
 | Etherfuse CETES integration (testnet + SPEI sandbox) | ✅ Complete |
 | Self-service API keys console (`/keys`, wallet-signed via SEP-53) | ✅ Live |
 | Mainnet receive-only nodes (x402, MPP Charge, Audit Trail, Reporting) | ✅ Live, early access |
@@ -414,7 +415,7 @@ Nirium received Kickstart funding via a regional Stellar Ambassador chapter, wit
 | Treasury node on mainnet over a client-owned DeFindex vault | ✅ Live, invite-only during legal review |
 | Legal opinion on the treasury node (MX + cross-border) | 🔄 In progress: gates opening it beyond invite-only |
 | Etherfuse, enterprise KYB onboarding | 🔄 In progress |
-| Stellar Community Fund Build Award | 🔄 In progress |
+| Stellar Community Fund Build Award | 🔄 Building verifiable third-party traction before applying |
 | Formal independent audit of NiriumVault | Planned, ahead of any NiriumVault mainnet deployment |
 | NiriumVault mainnet deployment (real treasury funds) | Post formal audit |
 
@@ -436,8 +437,8 @@ Nirium received Kickstart funding via a regional Stellar Ambassador chapter, wit
 |---|---|
 | [SDKs.md](SDKs.md) | Full TypeScript + Python SDK documentation |
 | [API_DOCUMENTATION_OPENAPI.yaml](API_DOCUMENTATION_OPENAPI.yaml) | OpenAPI specification |
-| [MCP_INTEGRATION_GUIDE.md](MCP_INTEGRATION_GUIDE.md) | MCP v0.6.0, 25 tools for Claude Desktop / Cursor |
-| [INTERNAL_SECURITY_AUDIT.md](INTERNAL_SECURITY_AUDIT.md) | Internal JARGUS v3.0 report, 83/83 vectors checked |
+| [MCP_INTEGRATION_GUIDE.md](MCP_INTEGRATION_GUIDE.md) | MCP v0.5.0, 14 tools for Claude Desktop / Cursor |
+| [INTERNAL_SECURITY_AUDIT.md](INTERNAL_SECURITY_AUDIT.md) | Internal security review report, 83/83 vectors checked |
 | [NIRIUM_TECHNICAL_PAPER.md](NIRIUM_TECHNICAL_PAPER.md) | Technical whitepaper |
 | [SECURITY.md](SECURITY.md) | Responsible vulnerability disclosure policy |
 | [CONTRIBUTING.md](CONTRIBUTING.md) | Open source contribution guide |
@@ -488,4 +489,4 @@ This project operates under the [Stellar Community Fund](https://stellar.gitbook
 
 ---
 
-*Nirium Protocol: experimental software. Not financial advice. NiriumVault is testnet-only and audit-gated; the mainnet treasury node runs over a client-owned, third-party audited DeFindex vault in a role that cannot withdraw. Updated August 15, 2026.*
+*Nirium Protocol: experimental software. Not financial advice. NiriumVault is testnet-only and audit-gated; the mainnet treasury node runs over a client-owned, third-party audited DeFindex vault in a role that cannot withdraw. Updated August 6, 2026.*

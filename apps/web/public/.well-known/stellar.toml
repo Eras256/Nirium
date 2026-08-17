@@ -17,18 +17,18 @@ ORG_DBA = "Nirium"
 ORG_URL = "https://nirium.xyz"
 ORG_LOGO = "https://nirium.xyz/icon.png"
 ORG_DESCRIPTION = "Institutional DeFi infrastructure powered by autonomous agents on Stellar/Soroban. x402 micropayments, MPP session budgets, multi-asset vaults, cross-border FX (MXN-USDC), and ELO-ranked agent strategies. SDK v0.5.0. Testnet — not financial advice."
-ORG_OFFICIAL_EMAIL = "institutional@nirium.xyz"
-ORG_SUPPORT_EMAIL = "sandbox@nirium.xyz"
+ORG_OFFICIAL_EMAIL = "niriumprotocol@gmail.com"
+ORG_SUPPORT_EMAIL = "niriumprotocol@gmail.com"
 ORG_GITHUB = "https://github.com/Eras256/Nirium"
 ORG_KEYBASE = ""
 ORG_TWITTER = "@Niriumstellar"
 
 [[PRINCIPALS]]
 name = "Giovanny Amador"
-email = "vaiogioss@gmail.com"
+email = "niriumprotocol@gmail.com"
 github = "https://github.com/Eras256"
 twitter = "@Niriumstellar"
 
 [[PRINCIPALS]]
 name = "Monserrat Mendoza"
-email = "institutional@nirium.xyz"
+email = "niriumprotocol@gmail.com"

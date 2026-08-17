@@ -1,4 +1,4 @@
-/** Nirium Protocol - Final Institutional Build (April 2026) **/
+/** Nirium Protocol - Final Institutional Build (July 2026) **/
 'use client';
 
 import { useFreighter } from "@/hooks/useFreighter";
@@ -110,7 +110,7 @@ export default function Home() {
     });
 
     return (
-        <main className="min-h-screen bg-[#050505] text-white selection:bg-stellar-teal/30 overflow-hidden relative">
+        <main className="min-h-screen bg-black text-white selection:bg-stellar-teal/30 overflow-hidden relative">
 {/* Background Gradients */}
             <div className="fixed inset-0 z-0 pointer-events-none">
                 <div className="absolute top-0 left-0 w-full h-[500px] bg-gradient-to-b from-stellar-yellow/10 to-transparent opacity-50" />
@@ -132,7 +132,7 @@ export default function Home() {
                                     <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-stellar-teal opacity-75"></span>
                                     <span className="relative inline-flex rounded-full h-2 w-2 bg-stellar-teal"></span>
                                 </span>
-                                v0.6.1 // {t.home.institutional_use_cases.extra.mpp_enabled}
+                                v0.10.2 // {t.home.institutional_use_cases.extra.mpp_enabled}
                             </div>
                         </div>
  
@@ -166,7 +166,7 @@ export default function Home() {
 
                         <div className="flex flex-wrap justify-center md:justify-start gap-3 sm:gap-4 pt-8">
                             <Link href="/dashboard" className="w-full sm:w-auto">
-                                <Button size="hero" className="w-full sm:w-auto bg-stellar-yellow text-black hover:bg-stellar-yellow/90 font-black italic tracking-tight rounded-full px-8">
+                                <Button size="hero" className="w-full sm:w-auto bg-stellar-yellow text-[#0b0b0b] hover:bg-stellar-yellow/90 font-black italic tracking-tight rounded-full px-8">
                                     {t.home.launch_dashboard} <ArrowRight className="ml-2 w-5 h-5" />
                                 </Button>
                             </Link>
@@ -250,8 +250,8 @@ export default function Home() {
                                 </thead>
                                 <tbody>
                                     {(t.home.value_prop.competitors as any[]).map((c: any, i: number) => {
-                                        const isNoCustody = c.custody?.startsWith('No') || c.custody?.startsWith('无');
-                                        const isNoYield = c.yield?.startsWith('No') || c.yield?.startsWith('无');
+                                        const isNoCustody = c.custody?.startsWith('No');
+                                        const isNoYield = c.yield?.startsWith('No');
                                         return (
                                             <tr key={i} className="border-b border-white/5 hover:bg-white/[0.02] transition-colors">
                                                 <td className="px-6 py-4 text-gray-300 font-medium">{c.name}</td>
@@ -309,7 +309,7 @@ export default function Home() {
                                 <p className="text-gray-400 text-sm max-w-xs">{t.home.value_prop.savings_desc}</p>
                             </motion.div>
                             <Link href="/sandbox">
-                                <Button size="hero" className="bg-stellar-teal text-black hover:bg-stellar-teal/90 font-black italic tracking-tight rounded-full px-8">
+                                <Button size="hero" className="bg-stellar-teal text-[#0b0b0b] hover:bg-stellar-teal/90 font-black italic tracking-tight rounded-full px-8">
                                     {t.home.value_prop.cta} <ArrowRight className="ml-2 w-5 h-5" />
                                 </Button>
                             </Link>
@@ -335,7 +335,7 @@ export default function Home() {
                             className="relative"
                         >
                             <img
-                                src="/logos/logo.png"
+                                src="/brand/logo.png"
                                 alt="Nirium Logo"
                                 className="w-48 sm:w-64 h-auto object-contain drop-shadow-[0_0_40px_rgba(45,235,232,0.4)]"
                             />
@@ -537,7 +537,7 @@ export default function Home() {
                             { id: "liquidity", tags: ["MXN", "USDC", "1.4%"] },
                             { id: "b2b", tags: ["Global Bonds", "Etherfuse"] },
                             { id: "treasury", tags: ["Blend", "USDC"] },
-                            { id: "audit", tags: ["IPFS", "RegTech"] },
+                            { id: "audit", tags: ["IPFS", "Audit Trail"] },
                             { id: "settlement", tags: ["x402", "MPP"] },
                             { id: "vault", tags: ["Soroban", "Multisig"] }
                         ].map((item, idx) => {
@@ -640,7 +640,7 @@ export default function Home() {
                                             <motion.div
                                                 animate={{ y: [0, -5, 0] }}
                                                 transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
-                                                className="bg-stellar-yellow text-black p-3 rounded-lg flex items-center gap-2 shadow-lg z-10"
+                                                className="bg-stellar-yellow text-[#0b0b0b] p-3 rounded-lg flex items-center gap-2 shadow-lg z-10"
                                             >
                                                 <Zap className="w-3 h-3 fill-black" />
                                                 <span className="text-[10px] font-bold uppercase">{t.home.institutional_use_cases.extra.fx_trigger}</span>
@@ -660,7 +660,7 @@ export default function Home() {
                                             <motion.div
                                                 animate={{ y: [0, 5, 0] }}
                                                 transition={{ duration: 4, repeat: Infinity, ease: "easeInOut", delay: 1 }}
-                                                className="bg-stellar-teal text-black p-3 rounded-lg flex items-center gap-2 shadow-lg z-10"
+                                                className="bg-stellar-teal text-[#0b0b0b] p-3 rounded-lg flex items-center gap-2 shadow-lg z-10"
                                             >
                                                 <Zap className="w-3 h-3 fill-black" />
                                                 <span className="text-[10px] font-bold uppercase">{t.home.institutional_use_cases.extra.settle_cetes}</span>

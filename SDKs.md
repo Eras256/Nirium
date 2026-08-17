@@ -57,7 +57,7 @@ npm install nirium
 import { Agent } from 'nirium';
 
 const agent = new Agent({
-  apiKey: 'sk_inst_partner_lead_investor_nirium_2026',
+  apiKey: '<YOUR_INSTITUTIONAL_API_KEY>',
   baseUrl: 'https://nirium-agent.fly.dev',
   // token: 'eyJhbG...'  // Optional JWT for WebSocket auth
 });
@@ -324,7 +324,7 @@ const { token } = await agent.request('POST', '/api/auth/token', {
 });
 
 const agentWithToken = new Agent({
-  apiKey: 'sk_inst_partner_lead_investor_nirium_2026',
+  apiKey: '<YOUR_INSTITUTIONAL_API_KEY>',
   baseUrl: 'https://nirium-agent.fly.dev',
   token,
 });
@@ -527,7 +527,7 @@ from nirium import Agent
 
 agent = Agent(
     api_url="https://nirium-agent.fly.dev",
-    api_key="sk_inst_partner_lead_investor_nirium_2026",
+    api_key="<YOUR_INSTITUTIONAL_API_KEY>",
     # token="eyJhbG..."  # Optional JWT for WebSocket auth
 )
 ```
@@ -753,7 +753,7 @@ from nirium import Agent
 
 agent = Agent(
     api_url="https://nirium-agent.fly.dev",
-    api_key="sk_inst_partner_lead_investor_nirium_2026",
+    api_key="<YOUR_INSTITUTIONAL_API_KEY>",
     token="eyJhbG...",  # JWT from /api/auth/token
 )
 

@@ -185,6 +185,20 @@ export function useFreighter() {
         return await StellarWalletsKit.signMessage(message, opts);
     };
 
+    // Read the wallet's CURRENTLY ACTIVE address (the one it will actually sign
+    // with) WITHOUT changing the connected treasury. Used to detect when the user
+    // has switched accounts in the wallet after connecting — signing then wouldn't
+    // match the tx source (tx_bad_auth). Pure read; does not mutate state.
+    const getAddress = async (): Promise<string | null> => {
+        try {
+            ensureInit();
+            const { address: addr } = await StellarWalletsKit.getAddress();
+            return addr || null;
+        } catch {
+            return null;
+        }
+    };
+
     return {
         address,
         network,
@@ -197,5 +211,6 @@ export function useFreighter() {
         signTransaction,
         signAuthEntry,
         signMessage,
+        getAddress,
     };
 }

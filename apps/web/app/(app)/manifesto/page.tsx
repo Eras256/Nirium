@@ -169,13 +169,13 @@ export default function ManifestoPage() {
                             Nirium is not just a technology layer; it is a commitment to the <strong className="text-white">Stellar Ecosystem</strong>. We believe in the power of open financial rails to provide equitable access to the global economy.
                         </p>
                         <p className="text-gray-300 italic">
-                            "In alignment with the Stellar Development Foundation (SDF) and the Stellar Community Fund (SCF 7.0), Nirium operates under a mandate of technical transparency and professional integrity. Our agents are designed to serve, our code is built to be audited, and our mission is to ensure that the Autonomous Economy remains inclusive, secure, and focused on real-world impact."
+                            "As an independent project in the Stellar ecosystem and an SCF Kickstart grantee, Nirium operates under a mandate of technical transparency and professional integrity. Our agents are designed to serve, our code is built to be audited, and our mission is to ensure that the Autonomous Economy remains inclusive, secure, and focused on real-world impact."
                         </p>
                     </section>
                 </div>
 
                 <div className="mt-32 pt-8 border-t border-white/10 text-center">
-                    <p className="text-gray-500 text-sm font-mono mb-4 uppercase tracking-[0.4em]">Aligned with SDF & SCF 7.0 Principles</p>
+                    <p className="text-gray-500 text-sm font-mono mb-4 uppercase tracking-[0.4em]">Aligned with the Stellar Code of Conduct</p>
                     <h2 className="text-4xl font-black text-white mb-8 tracking-tighter">BUILD THE INFRASTRUCTURE.</h2>
                     <div className="flex justify-center gap-6">
                         <Link href="/terms" className="text-gray-400 hover:text-white transition-colors underline underline-offset-4 decoration-stellar-teal/50">Code of Conduct</Link>

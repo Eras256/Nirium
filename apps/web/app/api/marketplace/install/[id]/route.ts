@@ -30,7 +30,7 @@ export async function POST(
 
         if (isPremium && !paymentHeader) {
             // Build a REAL submittable transaction 
-            const destination = process.env.STELLAR_RECIPIENT_ADDRESS || "GBBD47IF6LWK7P7MDEVSCWR7DPUWV3NY3DTQEVFL4NAT4AQH3ZLLFLA5";
+            const destination = process.env.STELLAR_RECIPIENT_ADDRESS || "GCLBBPON256CV7ATEHM5B54BOKNC7GX53MBINJ42MHVXGDMMZ3ZWKBHP";
             const amount = id === 'flash-loan-executor' ? "0.01" : "0.05";
             
             let sourceAccount: Account;

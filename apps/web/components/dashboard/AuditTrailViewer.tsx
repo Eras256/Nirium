@@ -290,7 +290,7 @@ export default function AuditTrailViewer() {
                         Showing {filteredEntries.length} of {total} records
                     </span>
                     <span className="text-[9px] font-mono text-white/20">
-                        Archival interval: 5 min // IPFS Pinata
+                        Daily digest // one anchored document per UTC day, covering the day confirmed executions
                     </span>
                 </div>
             )}

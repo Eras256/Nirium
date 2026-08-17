@@ -6,7 +6,7 @@ import LegalDisclaimer from "@/components/legal/LegalDisclaimer";
 
 export default function Footer() {
   return (
-    <footer className="w-full bg-[#050505] border-t border-white/10 overflow-hidden relative">
+    <footer className="w-full bg-background border-t border-white/10 overflow-hidden relative">
       <div className="max-w-7xl mx-auto px-6 py-16">
         <div className="grid grid-cols-1 md:grid-cols-12 gap-12 lg:gap-8">
           
@@ -53,7 +53,7 @@ export default function Footer() {
               <li><a href="https://communityfund.stellar.org/" target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1.5 text-sm text-zinc-400 hover:text-white transition-colors">Stellar Community Fund <ExternalLink className="w-3 h-3" /></a></li>
               <li><a href="https://developers.stellar.org/docs" target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1.5 text-sm text-zinc-400 hover:text-white transition-colors">Developer Docs <ExternalLink className="w-3 h-3" /></a></li>
               <li><a href="http://discord.gg/stellardev" target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1.5 text-sm text-zinc-400 hover:text-white transition-colors">Stellar Discord <ExternalLink className="w-3 h-3" /></a></li>
-              <li><a href="https://stellar.gitbook.io/scf-handbook/scf-awards/build-award/integration-track" target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1.5 text-sm text-zinc-400 hover:text-white transition-colors">SCF Integration Track <ExternalLink className="w-3 h-3" /></a></li>
+              <li><a href="https://stellarcommunityfund.gitbook.io/scf-handbook" target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1.5 text-sm text-zinc-400 hover:text-white transition-colors">SCF Handbook <ExternalLink className="w-3 h-3" /></a></li>
             </ul>
           </div>
 
@@ -83,8 +83,8 @@ export default function Footer() {
               <span className="px-2 py-1 rounded bg-white/5 border border-white/10 uppercase tracking-wider text-zinc-300">
                 Apache 2.0 (Protocol & Interface)
               </span>
-              <span className="px-2 py-1 rounded bg-stellar-teal/10 border border-stellar-teal/20 text-stellar-teal uppercase tracking-wider">
-                Non-custodial · Stellar Testnet
+              <span className="px-2 py-1 rounded bg-emerald-400/10 border border-emerald-400/20 text-emerald-400 uppercase tracking-wider">
+                Non-custodial · Stellar Mainnet + Testnet
               </span>
               <a 
                 href="https://communityfund.stellar.org" 

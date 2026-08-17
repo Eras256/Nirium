@@ -17,7 +17,7 @@ export default function CocPage() {
           <h1 className="text-4xl sm:text-5xl font-black text-white tracking-tight mb-4">
             Code of Conduct
           </h1>
-          <p className="text-sm font-mono text-zinc-500">Last updated: May 13, 2026</p>
+          <p className="text-sm font-mono text-zinc-500">Last updated: August 15, 2026</p>
         </div>
 
         <div className="prose prose-invert prose-zinc max-w-none">
@@ -27,7 +27,7 @@ export default function CocPage() {
               Stellar Code of Conduct Alignment
             </h2>
             <p className="text-sm m-0">
-              The Nirium Protocol community, developers, and ecosystem operate in strict alignment with the <strong>Stellar Code of Conduct (updated May 2026)</strong>. We believe in building a welcoming, professional, and transparent environment for everyone.
+              The Nirium Protocol community, developers, and ecosystem operate in strict alignment with the <strong>Stellar Code of Conduct</strong>. We believe in building a welcoming, professional, and transparent environment for everyone.
             </p>
             <a 
               href="https://stellar.org/foundation/code-of-conduct" 
@@ -45,7 +45,7 @@ export default function CocPage() {
             <div>
               <h3 className="text-white font-bold text-lg mb-2">1. Transparency</h3>
               <p className="text-sm text-zinc-400">
-                We build in the open. Every action executed by the Nirium agent infrastructure is fully auditable on-chain. Users can independently verify our testnet transactions via <a href="https://stellar.expert/explorer/testnet" target="_blank" rel="noopener noreferrer" className="text-stellar-teal hover:underline">Stellar Expert</a>.
+                We build in the open. Every action executed by the Nirium agent infrastructure is fully auditable on-chain. Users can independently verify our mainnet settlement and testnet activity via <a href="https://stellar.expert/explorer/public" target="_blank" rel="noopener noreferrer" className="text-stellar-teal hover:underline">Stellar Expert</a>.
               </p>
             </div>
 
@@ -100,7 +100,7 @@ export default function CocPage() {
             <div className="p-5 bg-zinc-900 border border-zinc-800 rounded-xl">
               <div className="font-bold text-white mb-1">Nirium-Specific Violations</div>
               <p className="text-sm text-zinc-400 mb-3">For issues specifically within Nirium's repositories or Discord.</p>
-              <a href="mailto:xvaiosx7@gmail.com" className="text-stellar-teal text-sm font-mono hover:underline">xvaiosx7@gmail.com</a>
+              <a href="mailto:niriumprotocol@gmail.com" className="text-stellar-teal text-sm font-mono hover:underline">niriumprotocol@gmail.com</a>
             </div>
           </div>
         </div>

@@ -1,8 +1,9 @@
 # Nirium MCP Server — Integration Guide v0.4.0
 
 > Model Context Protocol server for Nirium Protocol.
-> Exposes 12 tools to any MCP-compatible AI: Claude, GPT, Cursor, VS Code Copilot.
-> Tested: 19 April 2026 via JSON-RPC stdio.
+> Exposes 11 tools to any MCP-compatible AI: Claude, GPT, Cursor, VS Code Copilot.
+> Published on npm as [`nirium-mcp`](https://www.npmjs.com/package/nirium-mcp).
+> Tested: 19 April 2026 via JSON-RPC stdio (see note on `get_system_health` below — removed after this test run).
 
 ---
 
@@ -14,8 +15,8 @@ Add to `claude_desktop_config.json`:
 {
   "mcpServers": {
     "nirium": {
-      "command": "node",
-      "args": ["/path/to/nirium/packages/mcp/dist/index.js"],
+      "command": "npx",
+      "args": ["-y", "nirium-mcp"],
       "env": {
         "AGENT_API_URL": "https://nirium-agent.fly.dev",
         "NIRIUM_API_KEY": "sk_inst_...",
@@ -41,7 +42,7 @@ Add to `claude_desktop_config.json`:
 | Variable | Required | Purpose |
 |----------|----------|---------|
 | `AGENT_API_URL` | Yes | Nirium agent API URL. Default: `http://127.0.0.1:3001`. Production: `https://nirium-agent.fly.dev` |
-| `NIRIUM_API_KEY` | For auth tools | API key from `/api/auth/keys`. Unlocks loop control, system health |
+| `NIRIUM_API_KEY` | For auth tools | API key from `/api/auth/keys`. Unlocks loop control (`start_loop`/`stop_loop`) |
 | `STELLAR_SECRET_KEY` | For paid tools | Stellar testnet keypair. Funds x402 + MPP payments |
 | `STELLAR_NETWORK` | No | `testnet` (default) or `mainnet` |
 | `SOROBAN_RPC_URL` | No | Soroban RPC. Default: `https://soroban-testnet.stellar.org` |
@@ -159,15 +160,9 @@ Input: none
 Output: { stopped, message }
 ```
 
-#### `get_system_health`
-Full system health: Horizon, Soroban RPC, WebSocket, LLM provider status.
-
-```
-Input: none
-Output: { horizon, soroban, websocket, llm, uptime, version }
-```
-
-> All three require `NIRIUM_API_KEY` in env. Without it: `{ "error": "Unauthorized" }`.
+> Both require `NIRIUM_API_KEY` in env. Without it: `{ "error": "Unauthorized" }`.
+>
+> **Removed:** an earlier build also exposed `get_system_health`, but that endpoint requires an admin-permission API key (`adminMiddleware`), which no self-service key from `/keys` ever has — every external caller got an unexplained 403. Dropped from the public tool list rather than ship a tool that can't work for anyone outside Nirium.
 
 ---
 
@@ -215,7 +210,7 @@ Same output as `get_premium_market`.
 
 ## Test Results Summary (19 April 2026)
 
-All 13 tool invocations tested end-to-end. Paid tools tested with a funded Stellar testnet wallet (1 USDC obtained via SDEX swap from Friendbot XLM).
+13 tool invocations tested end-to-end at the time (`get_system_health` included below for the historical record — it was removed from the tool list on 16 July 2026, see note above). Paid tools tested with a funded Stellar testnet wallet (1 USDC obtained via SDEX swap from Friendbot XLM). MPP prices shown here were corrected on 16 July 2026 to match the enforced `mppRoutes.ts` price table ($0.02/$0.05, not $0.01 as originally logged).
 
 | Tool | Auth Required | Status | Notes |
 |------|--------------|--------|-------|
@@ -226,7 +221,7 @@ All 13 tool invocations tested end-to-end. Paid tools tested with a funded Stell
 | `get_wallet_info` | None | ✅ PASS | Shows tier config |
 | `start_loop` | NIRIUM_API_KEY + STELLAR_PUBLIC_KEY | ✅ PASS | Requires `x-stellar-account` header — set `STELLAR_PUBLIC_KEY` in env |
 | `stop_loop` | NIRIUM_API_KEY | ✅ PASS | Loop stopped cleanly |
-| `get_system_health` | NIRIUM_API_KEY | ✅ PASS | `status: online`, `service: nirium-matrix-v2.5` |
+| ~~`get_system_health`~~ | ~~NIRIUM_API_KEY~~ | REMOVED | Actually admin-gated — every non-admin key got 403, so it was dropped from the tool list |
 | `get_premium_signals` | STELLAR_SECRET_KEY | ✅ PASS | Paid 0.02 USDC via x402 — `paidWith: "USDC/Stellar"` |
 | `get_premium_market` | STELLAR_SECRET_KEY | ✅ PASS | Paid 0.05 USDC via x402 — path routes returned |
 | `execute_paid_strategy` | STELLAR_SECRET_KEY | ✅ PASS | Paid 0.25 USDC via x402 — txHash `77a250...`, contract CAU2X |
@@ -234,9 +229,8 @@ All 13 tool invocations tested end-to-end. Paid tools tested with a funded Stell
 | `get_mpp_market` | STELLAR_SECRET_KEY | ✅ PASS | Paid 0.05 USDC via MPP — path routes returned |
 
 **Protocol:** JSON-RPC 2.0 over stdio
-**Server:** `nirium-mcp-server` v0.4.0
-**Tools registered:** 12
-**Total test run:** 13/13 PASS
+**Package:** [`nirium-mcp`](https://www.npmjs.com/package/nirium-mcp) on npm, v0.4.0
+**Tools registered today:** 11 (12 at original test time, `get_system_health` since removed)
 
 ---
 
@@ -314,7 +308,7 @@ node dist/index.js
 
 ## Institutional Partner Integration Notes
 
-- Institutional Partner team installs MCP in their Claude Desktop using their `sk_inst_partner_lead_investor_nirium_2026` key as `NIRIUM_API_KEY`
+- Institutional Partner team installs MCP in their Claude Desktop using their own API key as `NIRIUM_API_KEY`
 - This gives them access to loop control and health monitoring without touching the Core Repo
 - Paid tools (x402/MPP) require a funded Stellar testnet wallet — Institutional Partner provides their own keypair
 - The MCP never exposes the Core Repo, secret keys, or admin credentials

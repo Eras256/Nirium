@@ -1,9 +1,45 @@
 "use client";
 
-import { useState, useEffect, useRef, useCallback } from 'react';
+import { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 import { Terminal, Maximize2, Brain, CreditCard, Shield, Cpu, Zap } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useLanguage } from '../../context/LanguageContext';
+
+// El loop escribe el mismo pensamiento cada ~30s ("REBALANCE (95%) — CETES 5.57%
+// excede el umbral de 2.5%"), así que el feed se veía como un disco rayado: veinte
+// renglones idénticos leídos como "está atorado" en lugar de "está trabajando".
+// Se pliegan los consecutivos equivalentes en uno con contador ×N.
+//
+// NUNCA se pliega una línea con hash de transacción o CID: esas son evidencia
+// única y cada una tiene que poder abrirse y verificarse por separado.
+const UNIQUE_EVIDENCE = /\b[a-f0-9]{64}\b|\bQm[1-9A-HJ-NP-Za-km-z]{44}\b/;
+
+function collapseKey(log: { agent_id?: string; message?: string }): string | null {
+    const raw = log.message || '';
+    if (UNIQUE_EVIDENCE.test(raw)) return null;
+    const normalized = raw
+        .replace(/\(\d+%\)/g, '')      // confianza del LLM: 95% y 99% son el mismo pensamiento
+        .replace(/#\d+/g, '#')          // [Scan #14] y [Scan #15] son el mismo evento
+        .split(/[—|:]/)[0]!
+        .trim()
+        .slice(0, 60);
+    return `${log.agent_id || ''}|${normalized}`;
+}
+
+function collapseRepeats<T extends { agent_id?: string; message?: string }>(logs: T[]): { log: T; repeat: number }[] {
+    const out: { log: T; repeat: number; key: string | null }[] = [];
+    for (const log of logs) {
+        const key = collapseKey(log);
+        const prev = out[out.length - 1];
+        if (key !== null && prev && prev.key === key) {
+            prev.repeat += 1;
+            prev.log = log;             // conservar el más reciente del grupo
+            continue;
+        }
+        out.push({ log, repeat: 1, key });
+    }
+    return out.map(({ log, repeat }) => ({ log, repeat }));
+}
 
 // Render a feed message, turning verifiable identifiers into clickable links:
 // 64-char Stellar tx hashes → stellar.expert testnet, IPFS CIDs (Qm…) → Pinata gateway.
@@ -54,6 +90,11 @@ export default function OpsConsole({ isExpanded, onToggleExpand, walletAddress, 
     
     const [logs, setLogs] = useState<any[]>(DEMO_LOGS);
     const [status, setStatus] = useState<'connecting' | 'online' | 'unavailable'>('connecting');
+    // El feed escribe ~2 líneas por segundo (scans, señales, corredores) y una
+    // ejecución real ocurre cada ~10 minutos. Los hashes existen y confirman,
+    // pero quedan enterrados bajo el parloteo. Este filtro deja solo las líneas
+    // que traen un hash — lo único que alguien puede verificar por su cuenta.
+    const [onlyTx, setOnlyTx] = useState(false);
     const logContainerRef = useRef<HTMLDivElement>(null);
     const lastIdRef = useRef<string | null>(null);
 
@@ -87,6 +128,12 @@ export default function OpsConsole({ isExpanded, onToggleExpand, walletAddress, 
         const poll = setInterval(fetchLogs, 4000);
         return () => clearInterval(poll);
     }, [fetchLogs]);
+
+    const visibleLogs = useMemo(
+        () => (onlyTx ? logs.filter((l: any) => /TX:\s*[0-9a-f]{16,}/i.test(l?.message ?? '')) : logs),
+        [logs, onlyTx],
+    );
+    const collapsedLogs = useMemo(() => collapseRepeats(visibleLogs), [visibleLogs]);
 
     useEffect(() => {
         const timeout = setTimeout(() => {
@@ -124,9 +171,22 @@ export default function OpsConsole({ isExpanded, onToggleExpand, walletAddress, 
                         {s.label}
                     </span>
                 </div>
+                <div className="flex items-center gap-3">
+                    <button
+                        onClick={() => setOnlyTx((v) => !v)}
+                        title="Mostrar solo ejecuciones con hash verificable"
+                        className={`px-2 py-0.5 rounded text-[9px] font-mono font-bold uppercase tracking-widest border transition-colors ${
+                            onlyTx
+                                ? 'bg-stellar-teal/15 text-stellar-teal border-stellar-teal/40'
+                                : 'text-gray-600 border-white/10 hover:text-gray-300'
+                        }`}
+                    >
+                        solo tx
+                    </button>
                 <button onClick={onToggleExpand} className="text-gray-500 hover:text-white transition-colors">
                     {isExpanded ? <Maximize2 size={16} /> : <Maximize2 size={16} />}
                 </button>
+                </div>
             </div>
 
             <div ref={logContainerRef} className="flex-1 bg-black/50 p-4 font-mono text-[10px] overflow-y-auto custom-scrollbar min-h-0">
@@ -134,8 +194,13 @@ export default function OpsConsole({ isExpanded, onToggleExpand, walletAddress, 
                     {status === 'unavailable' && (
                         <div className="text-yellow-600 italic">No database connection.</div>
                     )}
+                    {onlyTx && collapsedLogs.length === 0 && status !== 'unavailable' && (
+                        <div className="text-gray-600 italic">
+                            Sin ejecuciones confirmadas en esta ventana. El rebalanceo alterna un activo por ciclo, cada ~10 minutos.
+                        </div>
+                    )}
                     <AnimatePresence mode="popLayout">
-                    {logs.map((log, i) => {
+                    {collapsedLogs.map(({ log, repeat }, i) => {
                         const rawMsg = (log.message || '');
                         let mainMsg = (rawMsg.split('|')[0] || '').replace(/IPFS:\s*\S+/gi, '').replace(/\s{2,}/g, ' ').trim();
                         // El recorte en '|' oculta el CID de los batches IPFS — re-adjuntarlo para que salga clickeable.
@@ -170,7 +235,16 @@ export default function OpsConsole({ isExpanded, onToggleExpand, walletAddress, 
                                         <span className="text-[8px] text-gray-500 font-mono">
                                             [{mounted ? formatTime(log.created_at || log.timestamp) : '--:--:--'}]
                                         </span>
-                                        
+
+                                        {repeat > 1 && (
+                                            <span
+                                                title={`${repeat} eventos equivalentes plegados`}
+                                                className="text-[8px] font-mono font-bold px-1.5 py-0.5 rounded bg-white/10 text-gray-400 shrink-0"
+                                            >
+                                                ×{repeat}
+                                            </span>
+                                        )}
+
                                         <div className="flex items-center gap-1.5">
                                             {isIntelligence && <Brain className="w-3 h-3 text-pink-400" />}
                                             {(isSettlement || isX402) && <Zap className="w-3 h-3 text-stellar-yellow" />}

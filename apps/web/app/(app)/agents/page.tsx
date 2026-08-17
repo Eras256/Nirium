@@ -4,7 +4,7 @@ import { motion } from "framer-motion";
 import {
     Shield, Cpu, Globe, Lock, CheckCircle, Clock,
     Activity, Server, Zap, AlertTriangle, FlaskConical, ArrowRight,
-    FileSearch
+    FileSearch, Send
 } from "lucide-react";
 import { useLanguage } from "@/context/LanguageContext";
 import { useFreighter } from "@/hooks/useFreighter";
@@ -17,8 +17,8 @@ import { eloGetTotalSentinels } from "@/lib/sorobanContracts";
 
 export default function AgentsPage() {
     const { language } = useLanguage();
-    const lang = (en: string, es: string, zh: string) =>
-        language === "zh" ? zh : language === "es" ? es : en;
+    const lang = (en: string, es: string) =>
+        language === "es" ? es : en;
 
     const { address: walletAddress, isConnected } = useFreighter();
     const elo = useEloReputation();
@@ -35,159 +35,146 @@ export default function AgentsPage() {
     const nodes = [
         {
             id: "rebalance-node",
-            statusLabel: "ACTIVE",
-            statusColor: "bg-stellar-teal/10 text-stellar-teal border-stellar-teal/20",
+            statusLabel: "LIVE · MAINNET · INVITE-ONLY",
+            statusColor: "bg-emerald-400/10 text-emerald-400 border-emerald-400/20",
             dotColor: "bg-stellar-teal",
             accentBorder: "border-stellar-teal/20",
             icon: Activity,
             iconColor: "text-stellar-teal",
             name: lang(
                 "Rebalance Node",
-                "Nodo de Rebalanceo",
-                "再平衡节点"
-            ),
+                "Nodo de Rebalanceo"),
             role: lang(
                 "Autonomous rebalancing between USDC and CETES (Etherfuse) based on operator thresholds. Operates 24/7 with zero human intervention.",
-                "Rebalanceo autónomo entre USDC y CETES (Etherfuse) basado en umbrales del operador. Opera 24/7 sin intervención humana.",
-                "基于运营商阈值的 USDC 和 CETES (Etherfuse) 之间的自动再平衡。全天候运行，无需人工干预。"
-            ),
-            cycle: lang("Continuous / 24h active", "Continuo / 24h activo", "持续 / 24小时活跃"),
+                "Rebalanceo autónomo entre USDC y CETES (Etherfuse) basado en umbrales del operador. Opera 24/7 sin intervención humana."),
+            cycle: lang("Continuous / 24h active", "Continuo / 24h activo"),
             trigger: lang(
                 "Spread exceeds operator-configured threshold",
-                "Spread supera umbral configurado por el operador",
-                "利差超过运营商配置的阈值"
-            ),
+                "Spread supera umbral configurado por el operador"),
             authorized: lang(
-                "Swap USDC↔CETES via Etherfuse, up to daily limit",
-                "Swap USDC↔CETES vía Etherfuse, hasta límite diario",
-                "通过 Etherfuse 交换 USDC↔CETES，不超过每日限额"
-            ),
+                "Invest and Unwind between the vault own strategies — no swaps, no destination address",
+                "Invest y Unwind entre las estrategias de la propia bóveda — sin swaps y sin dirección de destino"),
             audit: lang(
                 "HMAC-SHA256 + IPFS anchor per execution",
-                "HMAC-SHA256 + anclaje IPFS por ejecución",
-                "每次执行 HMAC-SHA256 + IPFS 锚定"
-            ),
+                "HMAC-SHA256 + anclaje IPFS por ejecución"),
             metric: lang(
                 "Last execution: success · Monitoring: continuous",
-                "Última ejecución: exitosa · Monitoreo: continuo 24h",
-                "上次执行：成功 · 监控：持续不间断"
-            ),
+                "Última ejecución: exitosa · Monitoreo: continuo 24h"),
+            locked: false,
+        },
+        {
+            id: "payroll-node",
+            statusLabel: "MAINNET · EARLY ACCESS",
+            statusColor: "bg-emerald-400/10 text-emerald-400 border-emerald-400/20",
+            dotColor: "bg-stellar-teal",
+            accentBorder: "border-stellar-teal/20",
+            icon: Send,
+            iconColor: "text-stellar-teal",
+            name: lang(
+                "Disbursement Node (Bulk Payouts)",
+                "Nodo de Dispersión (Pagos Masivos)"),
+            role: lang(
+                "Disburse funds from one treasury to up to 100 recipients (contractors, freelancers, B2B partners) in a single signed batch payment. Non-custodial — the company signs in its own wallet, Nirium never holds funds.",
+                "Dispersa fondos de una tesorería a hasta 100 destinatarios (contratistas, freelancers, socios B2B) en un solo lote de pago firmado. Non-custodial — la empresa firma en su propia wallet, Nirium nunca custodia fondos."),
+            cycle: lang("On-demand / per run", "Bajo demanda / por corrida"),
+            trigger: lang(
+                "Company builds and signs a payout run",
+                "La empresa arma y firma una corrida de pago"),
+            authorized: lang(
+                "Batch USDC/XLM payment (≤100 recipients) + sponsored USDC trustline onboarding",
+                "Pago batch USDC/XLM (≤100 destinatarios) + alta de trustline USDC"),
+            audit: lang(
+                "Immutable IPFS receipt per run (optional LCP legal layer — in legal review)",
+                "Recibo IPFS inmutable por corrida (capa legal LCP opcional — en revisión legal)"),
+            metric: lang(
+                "Mainnet early access · independent service payments only · Freighter-signed",
+                "Mainnet early access · solo pagos de servicios independientes · firmado con Freighter"),
             locked: false,
         },
         {
             id: "compliance-sentinel",
-            statusLabel: "ACTIVE",
-            statusColor: "bg-green-500/10 text-green-400 border-green-500/20",
+            statusLabel: "ARCHITECTED",
+            statusColor: "bg-white/5 text-white/40 border-white/10",
             dotColor: "bg-green-400",
             accentBorder: "border-green-500/20",
             icon: Shield,
             iconColor: "text-green-400",
             name: lang(
                 "Compliance Sentinel",
-                "Centinela de Cumplimiento",
-                "合规哨兵"
-            ),
+                "Centinela de Cumplimiento"),
             role: lang(
-                "Real-time validation of vault movements against compliance policies. Rejects unauthorized multisig attempts.",
-                "Validación en tiempo real de movimientos del vault contra políticas de cumplimiento. Rechaza intentos multisig no autorizados.",
-                "根据合规策略实时验证资金库变动。拒绝未经授权的多签尝试。"
-            ),
-            cycle: lang("Continuous", "Continuo", "持续运行"),
-            trigger: lang("Any vault event", "Cualquier evento del vault", "任何资金库事件"),
+                "Designed to validate vault movements against compliance policies before signature. Backend service exists; public surface ships after the external audit.",
+                "Diseñado para validar movimientos del vault contra políticas de cumplimiento antes de firmar. El servicio backend existe; la superficie pública llega tras la auditoría externa."),
+            cycle: lang("Continuous", "Continuo"),
+            trigger: lang("Any vault event", "Cualquier evento del vault"),
             authorized: lang(
                 "Transaction validation, event filtering, policy enforcement",
-                "Validación de transacciones, filtrado de eventos, aplicación de políticas",
-                "交易验证、事件过滤、策略执行"
-            ),
+                "Validación de transacciones, filtrado de eventos, aplicación de políticas"),
             audit: lang(
                 "Audit logs anchored on IPFS",
-                "Logs de auditoría anclados en IPFS",
-                "审计日志锚定在 IPFS 上"
-            ),
+                "Logs de auditoría anclados en IPFS"),
             metric: lang(
-                "Uptime: 100% · Policies enforced: active",
-                "Uptime: 100% · Políticas aplicadas: activas",
-                "运行时间：100% · 策略执行：激活"
-            ),
+                "Status: architected · not yet public",
+                "Estado: en diseño · aún no público"),
             locked: false,
         },
         {
             id: "settlement-hub",
-            statusLabel: "ACTIVE",
-            statusColor: "bg-purple-500/10 text-purple-400 border-purple-500/20",
+            statusLabel: "LIVE · MAINNET",
+            statusColor: "bg-emerald-400/10 text-emerald-400 border-emerald-400/20",
             dotColor: "bg-purple-400",
             accentBorder: "border-purple-500/20",
             icon: Globe,
             iconColor: "text-purple-400",
             name: lang(
                 "Settlement Hub",
-                "Hub de Liquidación",
-                "结算中心"
-            ),
+                "Hub de Liquidación"),
             role: lang(
-                "Orchestrates x402 micro-billing and MPP session-scoped institutional flows. Direct integration with Horizon Horizon API.",
-                "Orquestra micro-facturación x402 y flujos institucionales MPP por sesión. Integración directa con Horizon Horizon API.",
-                "编排 x402 微计费和 MPP 会话范围的机构流程。直接集成 Horizon Horizon API。"
-            ),
-            cycle: lang("On-demand", "Bajo demanda", "按需"),
-            trigger: lang("Authenticated API calls", "Llamadas API autenticadas", "经过身份验证的 API 调用"),
+                "Orchestrates x402 micro-billing and MPP Charge settlement, per request. Direct integration with the Horizon API.",
+                "Orquestra micro-facturación x402 y liquidación MPP Charge, por request. Integración directa con la Horizon API."),
+            cycle: lang("On-demand", "Bajo demanda"),
+            trigger: lang("Authenticated API calls", "Llamadas API autenticadas"),
             authorized: lang(
                 "Payment verification, on-chain settlement",
-                "Verificación de pagos, liquidación en cadena",
-                "支付验证、链上结算"
-            ),
+                "Verificación de pagos, liquidación en cadena"),
             audit: lang(
                 "Transaction hash anchored per payment",
-                "Hash de transacción anclado por pago",
-                "每笔支付锚定交易哈希"
-            ),
+                "Hash de transacción anclado por pago"),
             metric: lang(
-                "Active protocols: x402 · MPP",
-                "Protocolos activos: x402 · MPP",
-                "激活协议：x402 · MPP"
-            ),
+                "Active protocols: x402 · MPP — LIVE ON MAINNET",
+                "Protocolos activos: x402 · MPP — EN VIVO EN MAINNET"),
             locked: false,
         },
         {
             id: "audit-node",
-            statusLabel: "ACTIVE",
-            statusColor: "bg-stellar-yellow/10 text-stellar-yellow border-stellar-yellow/20",
+            statusLabel: "LIVE · MAINNET",
+            statusColor: "bg-emerald-400/10 text-emerald-400 border-emerald-400/20",
             dotColor: "bg-stellar-yellow",
             accentBorder: "border-stellar-yellow/20",
             icon: FileSearch,
             iconColor: "text-stellar-yellow",
             name: lang(
                 "Audit Node",
-                "Nodo de Auditoría",
-                "审计节点"
-            ),
+                "Nodo de Auditoría"),
             role: lang(
-                "Generates CNBV-ready reports and ensures every vault operation is signed with HMAC-SHA256 and anchored to IPFS.",
-                "Genera reportes listos para CNBV y asegura que cada operación del vault esté firmada con HMAC-SHA256 y anclada a IPFS.",
-                "生成合规 CNBV 报告，并确保每个资金库操作都经过 HMAC-SHA256 签名并锚定到 IPFS。"
-            ),
-            cycle: lang("Continuous", "Continuo", "持续运行"),
-            trigger: lang("Every signed execution", "Cada ejecución firmada", "每次签名的执行"),
+                "Anchors every operation to IPFS as an immutable, publicly verifiable receipt, and powers institutional-format exports. Optional Legal Context Protocol layer in legal review.",
+                "Ancla cada operación a IPFS como recibo inmutable y públicamente verificable, y alimenta exportes con formato institucional. Capa opcional Legal Context Protocol en revisión legal."),
+            cycle: lang("Continuous", "Continuo"),
+            trigger: lang("Every signed execution", "Cada ejecución firmada"),
             authorized: lang(
                 "IPFS pinning, report generation, signature verification",
-                "Pinning en IPFS, generación de reportes, verificación de firmas",
-                "IPFS 固定、报告生成、签名验证"
-            ),
+                "Pinning en IPFS, generación de reportes, verificación de firmas"),
             audit: lang(
                 "Self-auditing — every report is verifiable on IPFS",
-                "Auto-auditable — cada reporte es verificable en IPFS",
-                "自我审计 — 每份报告都可在 IPFS 上验证"
-            ),
+                "Auto-auditable — cada reporte es verificable en IPFS"),
             metric: lang(
                 "Audit trail status: 100% anchored",
-                "Estado del rastro de auditoría: 100% anclado",
-                "审计追踪状态：100% 锚定"
-            ),
+                "Estado del rastro de auditoría: 100% anclado"),
             locked: false,
         },
         {
             id: "vault-operations",
-            statusLabel: lang("2-OF-3 MULTISIG", "MULTISIG 2-DE-3", "2-OF-3 多签"),
+            statusLabel: lang("2-OF-3 MULTISIG · TESTNET", "MULTISIG 2-DE-3 · TESTNET"),
             statusColor: "bg-red-500/10 text-red-400 border-red-500/20",
             dotColor: "bg-red-400",
             accentBorder: "border-red-500/20",
@@ -195,35 +182,23 @@ export default function AgentsPage() {
             iconColor: "text-red-400",
             name: lang(
                 "Vault Operations Node",
-                "Nodo de Operaciones de Vault",
-                "资金库操作节点"
-            ),
+                "Nodo de Operaciones de Vault"),
             role: lang(
                 "Critical treasury operations requiring human 2-of-3 multisig authorization. This node never executes autonomously.",
-                "Operaciones críticas de tesorería que requieren autorización multisig humana 2-de-3. Este nodo nunca ejecuta de forma autónoma.",
-                "需要人工 2/3 多签授权的关键资金库操作。此节点从不自主执行。"
-            ),
-            cycle: lang("Manual only", "Solo manual", "仅手动"),
+                "Operaciones críticas de tesorería que requieren autorización multisig humana 2-de-3. Este nodo nunca ejecuta de forma autónoma."),
+            cycle: lang("Manual only", "Solo manual"),
             trigger: lang(
                 "Multisig request from Owner/Cosigners",
-                "Solicitud multisig de Owner/Cosignatarios",
-                "来自所有者/共签者的多签请求"
-            ),
+                "Solicitud multisig de Owner/Cosignatarios"),
             authorized: lang(
-                "Withdrawals >$10K · Emergency Pause · Governance Changes",
-                "Retiros >$10K · Pausa de Emergencia · Cambios de Gobernanza",
-                "提款 >$10K · 紧急暂停 · 治理变更"
-            ),
+                "Protocol pause/unpause · cosigner changes · vault closure",
+                "Pausa/reanudación del protocolo · cambio de cosignatarios · cierre de bóveda"),
             audit: lang(
                 "On-chain multisig event history",
-                "Historial de eventos multisig on-chain",
-                "链上多签事件历史"
-            ),
+                "Historial de eventos multisig on-chain"),
             metric: lang(
                 "Requires human signatures — no autonomous risk",
-                "Requiere firmas humanas — sin riesgo autónomo",
-                "需要人工签名 — 无自主风险"
-            ),
+                "Requiere firmas humanas — sin riesgo autónomo"),
             locked: false,
         },
     ];
@@ -246,14 +221,12 @@ export default function AgentsPage() {
                     className="text-center mb-12"
                 >
                     <h1 className="text-5xl sm:text-7xl font-black tracking-tight mb-4">
-                        {lang("Execution Architecture", "Arquitectura de Ejecución", "执行架构")}
+                        {lang("Execution Architecture", "Arquitectura de Ejecución")}
                     </h1>
                     <p className="text-white/50 max-w-xl mx-auto text-base">
                         {lang(
-                            "5 specialized nodes. Each with a defined role, authorized actions, and cryptographic audit trail.",
-                            "5 nodos especializados. Cada uno con un rol definido, acciones autorizadas y rastro de auditoría criptográfico.",
-                            "5 个专用节点。每个都有明确角色、授权操作和密码学审计追踪。"
-                        )}
+                            "6 specialized nodes. Each with a defined role, authorized actions, and cryptographic audit trail.",
+                            "6 nodos especializados. Cada uno con un rol definido, acciones autorizadas y rastro de auditoría criptográfico.")}
                     </p>
                 </motion.div>
 
@@ -269,35 +242,35 @@ export default function AgentsPage() {
                             <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-stellar-teal opacity-75" />
                             <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-stellar-teal" />
                         </span>
-                        <span className="text-white/40">{lang("Connection", "Conexión", "连接")}</span>
-                        <span className="text-stellar-teal ml-1">Stellar Testnet</span>
+                        <span className="text-white/40">{lang("Connection", "Conexión")}</span>
+                        <span className="text-stellar-teal ml-1">Stellar Mainnet + Testnet</span>
                     </div>
                     <div className="flex items-center gap-1.5">
                         <Server className="w-3 h-3 text-white/20" />
-                        <span className="text-white/40">{lang("Latency", "Latencia", "延迟")}</span>
-                        <span className="text-white/80 ml-1">~13ms</span>
+                        <span className="text-white/40">{lang("Latency", "Latencia")}</span>
+                        <span className="text-white/80 ml-1">~5s / ledger</span>
                     </div>
                     <div className="flex items-center gap-1.5">
                         <Cpu className="w-3 h-3 text-white/20" />
-                        <span className="text-white/40">{lang("Protocol", "Protocolo", "协议")}</span>
-                        <span className="text-white/80 ml-1">Soroban v21</span>
+                        <span className="text-white/40">{lang("Protocol", "Protocolo")}</span>
+                        <span className="text-white/80 ml-1">Soroban · Protocol 23</span>
                     </div>
                     <div className="flex items-center gap-1.5">
                         <Globe className="w-3 h-3 text-white/20" />
-                        <span className="text-white/40">{lang("Network", "Red", "网络")}</span>
+                        <span className="text-white/40">{lang("Network", "Red")}</span>
                         <span className="text-white/80 ml-1">Horizon API</span>
                     </div>
-                    {eloScore !== null && (
+                    {eloScore !== null && eloScore > 0 && (
                         <div className="flex items-center gap-1.5">
                             <Activity className="w-3 h-3 text-stellar-teal/60" />
                             <span className="text-white/40">ELO</span>
                             <span className="text-stellar-teal ml-1 font-bold">{eloScore}</span>
                         </div>
                     )}
-                    {totalSentinels !== null && (
+                    {totalSentinels !== null && totalSentinels > 0 && (
                         <div className="flex items-center gap-1.5">
                             <Shield className="w-3 h-3 text-green-400/60" />
-                            <span className="text-white/40">{lang("Sentinels", "Centinelas", "哨兵")}</span>
+                            <span className="text-white/40">{lang("Sentinels", "Centinelas")}</span>
                             <span className="text-green-400 ml-1 font-bold">{totalSentinels}</span>
                         </div>
                     )}
@@ -337,19 +310,19 @@ export default function AgentsPage() {
                                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-8 gap-y-3 text-xs">
                                         <div>
                                             <p className="text-[10px] font-black uppercase tracking-widest text-white/20 mb-1">
-                                                {lang("Cycle / Trigger", "Ciclo / Disparador", "周期 / 触发器")}
+                                                {lang("Cycle / Trigger", "Ciclo / Disparador")}
                                             </p>
                                             <p className="text-white/60">{node.cycle} — {node.trigger}</p>
                                         </div>
                                         <div>
                                             <p className="text-[10px] font-black uppercase tracking-widest text-white/20 mb-1">
-                                                {lang("Authorized Action", "Acción Autorizada", "授权操作")}
+                                                {lang("Authorized Action", "Acción Autorizada")}
                                             </p>
                                             <p className="text-white/60">{node.authorized}</p>
                                         </div>
                                         <div>
                                             <p className="text-[10px] font-black uppercase tracking-widest text-white/20 mb-1">
-                                                {lang("Audit Trail", "Rastro de Auditoría", "审计追踪")}
+                                                {lang("Audit Trail", "Rastro de Auditoría")}
                                             </p>
                                             <p className="text-white/60">{node.audit}</p>
                                         </div>
@@ -378,21 +351,19 @@ export default function AgentsPage() {
                         <AlertTriangle className="w-4 h-4 text-stellar-yellow/40 mt-0.5 shrink-0" />
                         <div>
                             <p className="text-[10px] font-black uppercase tracking-widest text-white/30 mb-1">
-                                {lang("What we removed and why", "Qué removimos y por qué", "我们删除了什么以及为什么")}
+                                {lang("What we removed and why", "Qué removimos y por qué")}
                             </p>
                             <p className="text-white/40 text-xs leading-relaxed">
                                 {lang(
-                                    "Previous versions showed 26 experimental agent names (Astra, Titan, Eliza, etc.) running \"spread condition\" checks. These were testnet research nodes that confused the institutional narrative. The 5 nodes above represent the actual production architecture — each with a defined role, authorized scope, and audit trail.",
-                                    "Versiones anteriores mostraban 26 nombres de agentes experimentales (Astra, Titan, Eliza, etc.) ejecutando verificaciones de \"condiciones de spread\". Estos eran nodos de investigación en testnet que confundían la narrativa institucional. Los 5 nodos anteriores representan la arquitectura de producción real — cada uno con un rol definido, alcance autorizado y rastro de auditoría.",
-                                    "以前的版本显示了 26 个实验性代理名称（Astra、Titan、Eliza 等）运行 \"利差条件\" 检查。这些是测试网研究节点，混淆了机构叙述。上面的 5 个节点代表实际生产架构 — 每个都有明确角色、授权范围和审计追踪。"
-                                )}
+                                    "Previous versions showed 26 experimental agent names (Astra, Titan, Eliza, etc.) running \"spread condition\" checks. These were testnet research nodes that confused the institutional narrative. The 6 nodes above represent the actual production architecture — each with a defined role, authorized scope, and audit trail.",
+                                    "Versiones anteriores mostraban 26 nombres de agentes experimentales (Astra, Titan, Eliza, etc.) ejecutando verificaciones de \"condiciones de spread\". Estos eran nodos de investigación en testnet que confundían la narrativa institucional. Los 6 nodos anteriores representan la arquitectura de producción real — cada uno con un rol definido, alcance autorizado y rastro de auditoría.")}
                             </p>
                             <Link 
                                 href="/labs/experimental" 
                                 className="inline-flex items-center gap-1 mt-3 text-[10px] font-bold text-purple-400 hover:text-purple-300 transition-colors uppercase tracking-widest group"
                             >
                                 <FlaskConical className="w-3 h-3" />
-                                {lang("Access Experimental Labs", "Acceder a Laboratorios Experimentales", "访问实验实验室")}
+                                {lang("Access Experimental Labs", "Acceder a Laboratorios Experimentales")}
                                 <ArrowRight className="w-3 h-3 group-hover:translate-x-0.5 transition-transform" />
                             </Link>
                         </div>
@@ -409,7 +380,7 @@ export default function AgentsPage() {
                     transition={{ duration: 0.6 }}
                 >
                     <h2 className="text-xs font-black uppercase tracking-widest text-white/40 mb-5">
-                        {lang("Live Activity Feed", "Feed de Actividad en Vivo", "实时活动提要")}
+                        {lang("Live Activity Feed", "Feed de Actividad en Vivo")}
                     </h2>
                     <OpsConsole
                         isExpanded={false}
