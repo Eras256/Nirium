@@ -24,7 +24,7 @@
 
 ---
 
-**Nirium is an Infrastructure-as-Software provider**: a developer SDK and API, not a consumer dashboard.
+**Nirium is an Infrastructure-as-Software provider**: autonomous treasury and agentic payments (x402/MPP) on Stellar/Soroban, not a consumer dashboard.
 
 **The hero product is the rail, not the data.** An 86-endpoint API and TypeScript/Python SDKs that let any B2B fintech both *pay* for machine-to-machine services and *charge* for its own, plus autonomous execution nodes that run treasury operations 24/7 without manual CFO intervention.
 
@@ -32,7 +32,7 @@
 
 | # | Node | Status | Network | What it does |
 |---|---|---|---|---|
-| 1 | **Settlement** (x402 + MPP Charge) | ✅ Active | both | Per-request micropayments for AI agents. Pay for others' APIs with `initX402()`, or charge for your own with `x402Serve()`. |
+| 1 | **Settlement** (x402 + MPP Charge) | ✅ Active | both | Per-request micropayments for AI agents. Pay for others' APIs with `initX402()` today. Charging for your own with `x402Serve()` as a third-party facilitator is invite-only while legal review closes — same gate as Treasury and Payouts. |
 | 2 | **Audit Trail** | ✅ Active | both | Evidence anchored to IPFS as immutable receipts, optionally **signed by the agent that produced it** (ed25519 over a domain-separated statement), so the CID proves not just *that* a fact is unaltered but *who declared it*. |
 | 3 | **Payouts** | ✅ Active | both | Non-custodial batch disbursements, up to 100 recipients per transaction. Mainnet is invite-only; independent service payments only (contractors, freelancers, B2B); never subordinate-employee salary. |
 | 4 | **Treasury Rebalance** | ✅ Active | both | Moves idle capital into a CETES strategy and back, on its own, over a **DeFindex vault the client owns**. Live on mainnet, invite-only during legal review. |
@@ -221,7 +221,7 @@ Any AI agent (Claude, GPT, custom) can access Nirium's premium data **per reques
 - x402 integrated April 2, 2026: same day as the Linux Foundation x402 Foundation launch
 - MPP integrated April 3, 2026: 16 days after the spec was published (March 18, 2026)
 
-**Both directions are supported.** `initX402()` pays for someone else's API; `x402Serve()` charges for yours:
+**Both directions are supported.** `initX402()` pays for someone else's API, live today. `x402Serve()` charges for yours — third-party facilitator use is invite-only while legal review closes, same gate as Treasury and Payouts:
 
 ```typescript
 import { x402Serve } from 'nirium';
@@ -416,7 +416,7 @@ Nirium received Kickstart funding via a regional Stellar Ambassador chapter, wit
 | Self-service API keys console (`/keys`, wallet-signed via SEP-53) | ✅ Live |
 | Mainnet receive-only nodes (x402, MPP Charge, Audit Trail, Reporting) | ✅ Live, early access |
 | Payouts node, non-custodial batch disbursements | ✅ Live, mainnet invite-only |
-| `x402Serve()`, charge for your own API in one call | ✅ Shipped in SDK |
+| `x402Serve()`, charge for your own API in one call | ✅ Shipped in SDK, third-party use invite-only during legal review |
 | Agent attestation in the audit trail (signed evidence) | ✅ Shipped |
 | Treasury node on mainnet over a client-owned DeFindex vault | ✅ Live, invite-only during legal review |
 | Legal opinion on the treasury node (MX + cross-border) | 🔄 In progress: gates opening it beyond invite-only |
