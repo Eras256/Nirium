@@ -28,6 +28,19 @@ central_issuer.json
 packages/agent/.env
 apps/web/.env.local
 
+# 21-ago-2026: orphaned debug scripts with a hardcoded Etherfuse sandbox
+# key as fallback default, never present in the current private source,
+# invisible to the sync whitelist -- nobody was reviewing them. Removed;
+# rule kept so a stale branch can't silently reintroduce them.
+apps/web/test-etherfuse.js
+apps/web/test-quote.js
+
+# Python venv accidentally tracked before this rule existed (git doesn't
+# retroactively apply gitignore to already-tracked paths). No secrets in
+# it, just hygiene -- matches the venv/ rule already in the private repo.
+venv/
+**/venv/
+
 # ══════════════════════════════════════════════════
 # LOGICA PROPIETARIA — PROTEGIDA (STUBS EN SU LUGAR)
 # ══════════════════════════════════════════════════
