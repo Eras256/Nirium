@@ -133,8 +133,9 @@ Traction is **self-generated and independently verifiable**. It does not depend 
 - **Open API + free sandbox keys**, so any developer can integrate and exercise the contracts directly.
 - **Real upstream engagement**: 5 reported issues/PRs across three repos
   (x402-foundation/x402, stellar/stellar-dev-skill, OpenZeppelin/stellar-contracts) —
-  2 merged by maintainers (x402-foundation/x402#3171, fixed and merged as #3180;
-  stellar/stellar-dev-skill#96), 3 open awaiting response
+  2 merged: stellar/stellar-dev-skill#96 is our own fix, written and merged;
+  x402-foundation/x402#3171 is a bug we reported that an external contributor,
+  JasonColapietro, wrote and merged the fix for as #3180 — 3 open awaiting response
   (x402-foundation/x402#3148, stellar/stellar-dev-skill#97,
   OpenZeppelin/stellar-contracts#840).
 
