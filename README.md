@@ -37,7 +37,7 @@
 | 3 | **Payouts** | ✅ Active | both | Non-custodial batch disbursements, up to 100 recipients per transaction. Mainnet is invite-only; independent service payments only (contractors, freelancers, B2B); never subordinate-employee salary. |
 | 4 | **Treasury Rebalance** | ✅ Active | both | Moves idle capital into a CETES strategy and back, on its own, over a **DeFindex vault the client owns**. Live on mainnet, invite-only during legal review. |
 | 5 | **Reporting** | ✅ Active | both | Institutional-format summaries and CSV/JSON exports over anchored receipts. Read-only; regulatory filings remain the client's responsibility. |
-| 6 | **Compliance Sentinel** | 🟡 Architected | testnet | Real-time policy validation on proposed transfers. Logic exists; no stable public surface yet. |
+| 6 | **Compliance Sentinel** | 🟡 Proposed | testnet | Not built. The intent is to validate every proposed transfer against a policy before it is signed. What exists today is the agent-to-agent x402 client pattern in `coordinationService`; the auditor endpoint it calls does not exist yet, and the call fails open by design so a downed auditor never blocks execution. Do not rely on this as a control. |
 
 The framework supports up to 10 nodes per vault. Live catalog: `GET /api/nodes`.
 
@@ -131,13 +131,20 @@ Traction is **self-generated and independently verifiable**. It does not depend 
 - **Live autonomous agent** running 24/7 on Stellar Testnet, every rebalance verifiable on Stellar Expert.
 - **Real mainnet activity**: x402 micropayments settling in production, and a full treasury cycle executed with real funds (hashes above).
 - **Open API + free sandbox keys**, so any developer can integrate and exercise the contracts directly.
-- **Real upstream engagement**: 5 reported issues/PRs across three repos
+- **Real upstream engagement**: 6 reported issues/PRs across three repos
   (x402-foundation/x402, stellar/stellar-dev-skill, OpenZeppelin/stellar-contracts) —
   2 merged: stellar/stellar-dev-skill#96 is our own fix, written and merged;
   x402-foundation/x402#3171 is a bug we reported that an external contributor,
-  JasonColapietro, wrote and merged the fix for as #3180 — 3 open awaiting response
-  (x402-foundation/x402#3148, stellar/stellar-dev-skill#97,
-  OpenZeppelin/stellar-contracts#840).
+  JasonColapietro, wrote and merged the fix for as #3180.
+  stellar/stellar-dev-skill#97 went through real, multi-round review from the
+  Foundation's own bot, and that review found two real security bugs in our
+  own production code — a paid route that could silently serve for free
+  instead of charging when its payment middleware wasn't initialized, fixed
+  in MPP (c54c707d) and, once the same pattern was checked for and confirmed
+  live, in the mainnet-settling x402 route too (e88b2360) — not just a docs
+  correction. OpenZeppelin/stellar-contracts#840 now has a proposed fix we
+  wrote and submitted (#844, open, unmerged, pending maintainer review).
+  x402-foundation/x402#3148 remains open, awaiting response.
 
 We provide the middleware; regulated operators (e.g. Etherfuse) hold the licenses and execute settlement. We are open to integration conversations with regional fintechs, but make **no claim of signed pilots**.
 
@@ -496,4 +503,4 @@ This project operates under the [Stellar Community Fund](https://stellar.gitbook
 
 ---
 
-*Nirium Protocol: experimental software. Not financial advice. NiriumVault is testnet-only and audit-gated; the mainnet treasury node runs over a client-owned, third-party audited DeFindex vault in a role that cannot withdraw. Updated August 6, 2026.*
+*Nirium Protocol: experimental software. Not financial advice. NiriumVault is testnet-only and audit-gated; the mainnet treasury node runs over a client-owned, third-party audited DeFindex vault in a role that cannot withdraw. Updated August 28, 2026.*
