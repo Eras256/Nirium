@@ -8,7 +8,7 @@
 ![x402](https://img.shields.io/badge/x402-In%20Production-teal?style=for-the-badge)
 ![MPP](https://img.shields.io/badge/MPP-Charge%20In%20Production-teal?style=for-the-badge)
 ![CoC](https://img.shields.io/badge/Stellar%20CoC-Aligned-green?style=for-the-badge)
-![SCF](https://img.shields.io/badge/SCF-Kickstart%20Active-success?style=for-the-badge)
+![SCF](https://img.shields.io/badge/SCF-Instaward%20Active-success?style=for-the-badge)
 
 ---
 
@@ -444,7 +444,7 @@ Nirium received Instaward funding via a regional Stellar Ambassador chapter, wit
 
 - **3rd place, Fintech World Cup Mexico 2026**: Sui Loop (founder's prior project; architecture migrated to Nirium on Stellar)
 - **Stellar Scale / Kickstart**: 83/100 Bootcamp Impact; active graduate with ongoing SDF mentorship
-- **SCF Kickstart**: approved and delivered across two awards; full KYC complete (Airtable + Persona + W-8BEN)
+- **SCF Instaward**: approved and delivered across two awards; full KYC complete (Airtable + Persona + W-8BEN)
 - **Stellar House CDMX 2026**: presented to SDF executives, LatAm fintechs, and VCs (invite-only, 3rd edition)
 - **Etherfuse**: active technical integration (CETES on testnet + SPEI sandbox); enterprise KYB onboarding in progress
 
