@@ -274,7 +274,7 @@ An invalid signature returns **400 and nothing is anchored**: IPFS has no delete
 
 | SDK | Package | Version | Install |
 |---|---|---|---|
-| TypeScript | [nirium (npm)](https://www.npmjs.com/package/nirium) | 0.12.0 | `npm install nirium` |
+| TypeScript | [nirium (npm)](https://www.npmjs.com/package/nirium) | 0.13.2 | `npm install nirium` |
 | Python | [nirium (PyPI)](https://pypi.org/project/nirium/) | 0.9.0 | `pip install nirium` |
 
 > The two SDKs have identical **client** surfaces. TypeScript is one minor ahead because `x402Serve()` is Express middleware: server-side Node, with no meaningful Python equivalent. The version gap is the honest signal, not a lag.
