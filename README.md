@@ -443,7 +443,7 @@ Nirium received Instaward funding via a regional Stellar Ambassador chapter, wit
 ## External Credentials
 
 - **3rd place, Fintech World Cup Mexico 2026**: Sui Loop (founder's prior project; architecture migrated to Nirium on Stellar)
-- **Stellar Scale / Kickstart**: 83/100 Bootcamp Impact; active graduate with ongoing SDF mentorship
+- **Stellar Scale**: BAF's Stellar acceleration program, unrelated to SCF; 83/100 Bootcamp Impact, active graduate with ongoing mentorship
 - **SCF Instaward**: approved and delivered across two awards; full KYC complete (Airtable + Persona + W-8BEN)
 - **Stellar House CDMX 2026**: presented to SDF executives, LatAm fintechs, and VCs (invite-only, 3rd edition)
 - **Etherfuse**: active technical integration (CETES on testnet + SPEI sandbox); enterprise KYB onboarding in progress
