@@ -137,12 +137,15 @@ Traction is **self-generated and independently verifiable**. It does not depend 
   x402-foundation/x402#3171 is a bug we reported that an external contributor,
   JasonColapietro, wrote and merged the fix for as #3180.
   stellar/stellar-dev-skill#97 went through real, multi-round review from the
-  Foundation's own bot, and that review found two real security bugs in our
-  own production code — a paid route that could silently serve for free
-  instead of charging when its payment middleware wasn't initialized, fixed
-  in MPP (c54c707d) and, once the same pattern was checked for and confirmed
-  live, in the mainnet-settling x402 route too (e88b2360) — not just a docs
-  correction. OpenZeppelin/stellar-contracts#840 now has a proposed fix we
+  Foundation's own bot, and that review found a real security bug pattern —
+  a paid route that could silently serve for free instead of charging when
+  its payment middleware wasn't initialized. We confirmed and fixed the same
+  pattern in our own production MPP and x402 middleware, both of which now
+  fail closed instead of open; the finding and our confirmation are in the
+  #97 thread itself, not a doc-only correction. (Commit hashes for that fix
+  live in our private monorepo and aren't independently checkable, so we're
+  not citing them here — the public thread is the verifiable part.)
+  OpenZeppelin/stellar-contracts#840 now has a proposed fix we
   wrote and submitted (#844, open, unmerged, pending maintainer review).
   x402-foundation/x402#3148 remains open, awaiting response.
 
@@ -324,7 +327,7 @@ Verifiable at [Stellar Expert](https://stellar.expert/explorer/public).
 ## Side Projects
 
 ### x402-VPN: Institutional Mesh Proxy
-A public proxy that puts any legacy API behind an x402 pay-gate on Stellar. Primary use case: a bank, fintech, or data provider monetizes its APIs per request in USDC without rewriting its backend.
+A decentralized, zero-custody dVPN and AI-proxy network on Soroban, paid per request over x402 instead of a subscription.
 
 Live: [x402-vpn.vercel.app](https://x402-vpn.vercel.app)
 
@@ -408,9 +411,9 @@ Nirium operates in alignment with the [Stellar Code of Conduct](https://stellar.
 
 To report violations: [community@stellar.org](mailto:community@stellar.org)
 
-### SCF Kickstart
+### SCF Instaward
 
-Nirium received Kickstart funding via a regional Stellar Ambassador chapter, with full KYC complete (Airtable + Persona + W-8BEN). Kickstart (formerly Instaward) is SCF's early-stage program for prototyping and local validation, up to $15,000 per project. More info: [communityfund.stellar.org](https://communityfund.stellar.org)
+Nirium received Instaward funding via a regional Stellar Ambassador chapter, with full KYC complete (Airtable + Persona + W-8BEN). Instaward (formerly Kickstart) is SCF's early-stage program for prototyping and local validation, up to $15,000 per project. More info: [communityfund.stellar.org](https://communityfund.stellar.org)
 
 ---
 
@@ -431,7 +434,7 @@ Nirium received Kickstart funding via a regional Stellar Ambassador chapter, wit
 | Treasury node on mainnet over a client-owned DeFindex vault | ✅ Live, invite-only during legal review |
 | Legal opinion on the treasury node (MX + cross-border) | 🔄 In progress: gates opening it beyond invite-only |
 | Etherfuse, enterprise KYB onboarding | 🔄 In progress |
-| Stellar Community Fund Build Award | 🔄 Building verifiable third-party traction before applying |
+| Stellar Community Fund Build Award | 🔄 Submission in active preparation — third-party traction now documented and verifiable: [10-minute reviewer path](https://github.com/nirium-protocol/nirium-sdk/blob/main/docs/FOR-REVIEWERS.md), the GrantFox bounty program, the DeFindex treasury node, and the Pollar integration |
 | Formal independent audit of NiriumVault | Planned, ahead of any NiriumVault mainnet deployment |
 | NiriumVault mainnet deployment (real treasury funds) | Post formal audit |
 
