@@ -326,11 +326,6 @@ Verifiable at [Stellar Expert](https://stellar.expert/explorer/public).
 
 ## Side Projects
 
-### x402-VPN: Institutional Mesh Proxy
-A decentralized, zero-custody dVPN and AI-proxy network on Soroban, paid per request over x402 instead of a subscription.
-
-Live: [x402-vpn.vercel.app](https://x402-vpn.vercel.app)
-
 ### /build: Startup Ideas Hub
 Interactive dashboard with 12 production-ready startup ideas buildable on the Nirium API and SDKs, with code examples in TypeScript, Python, cURL, and MCP.
 
@@ -491,7 +486,6 @@ wscat -c "wss://nirium-agent.fly.dev/ws/signals?token=YOUR_JWT"
 | **API (testnet)** | [nirium-agent.fly.dev](https://nirium-agent.fly.dev) |
 | **API (mainnet)** | [nirium-agent-mainnet.fly.dev](https://nirium-agent-mainnet.fly.dev) |
 | **Build Hub** | [nirium.xyz/build](https://nirium.xyz/build) |
-| **x402-VPN** | [x402-vpn.vercel.app](https://x402-vpn.vercel.app) |
 | **X / Twitter** | [@Niriumstellar](https://x.com/Niriumstellar) |
 | **SCF / Community** | [communityfund.stellar.org](https://communityfund.stellar.org) |
 | **Security** | niriumprotocol@gmail.com |
