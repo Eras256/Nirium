@@ -366,7 +366,7 @@ pip install nirium       # Python SDK
 ```
 Nirium/                        (public repo)
 ├── apps/web/                  → Next.js 15 dashboard (nirium.xyz), 27 routes, i18n (EN/ES)
-├── packages/sdk/              → TypeScript SDK v0.12.0 (npm: nirium)
+├── packages/sdk/              → TypeScript SDK v0.13.2 (npm: nirium)
 ├── packages/sdk-python/       → Python SDK v0.9.0 (PyPI: nirium)
 ├── packages/contracts/        → Soroban contracts (Rust), 2 contracts, 5 fuzz targets
 ├── packages/policy-account/   → Soroban policy account (Rust), scopes a key to one vault
@@ -375,7 +375,7 @@ Nirium/                        (public repo)
 │
 ├── packages/agent/            → [private] Express 5 API, 86 endpoints (85 HTTP + 1 WebSocket)
 ├── packages/mcp/              → [public] MCP server v0.6.0, 25 tools
-├── packages/cli/              → [public] CLI v1.0.5 (npm: nirium-cli)
+├── packages/cli/              → [public] CLI v1.1.1 (npm: nirium-cli)
 ├── packages/desktop/          → [private] Tauri desktop wrapper
 ```
 
