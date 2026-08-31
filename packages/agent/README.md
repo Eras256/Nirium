@@ -7,7 +7,7 @@ Nirium is an institutional-grade treasury protocol. While the **Smart Contracts*
 
 ## How to use?
 To interact with the Nirium Network, please use the provided SDKs:
-- [@nirium/sdk](https://www.npmjs.com/package/nirium)
+- [nirium (TypeScript)](https://www.npmjs.com/package/nirium)
 - [nirium (Python)](https://pypi.org/project/nirium/)
 
 If you are an Institutional Partner, you have received a private API key to access our hosted execution clusters.

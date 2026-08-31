@@ -6,7 +6,7 @@
 // The source code is not included in the public repository to protect IP.
 //
 // For integration, please use the provided SDKs:
-// - npm: @nirium/sdk
+// - npm: nirium
 // - pip: nirium
 //
 // ══════════════════════════════════════════════════════════════════════

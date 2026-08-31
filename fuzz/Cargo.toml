@@ -1,0 +1,32 @@
+[package]
+name = "nirium-fuzz"
+version = "0.1.0"
+edition = "2021"
+
+# cargo-fuzz requires the package NOT to be part of the workspace
+[workspace]
+
+[dependencies]
+libfuzzer-sys = "0.4"
+soroban-sdk = { version = "22.0.0", features = ["testutils"] }
+stellar-xdr = { version = "22.0.0", features = ["curr", "alloc"] }
+
+[[bin]]
+name = "fuzz_vault_create"
+path = "fuzz_targets/fuzz_vault_create.rs"
+
+[[bin]]
+name = "fuzz_flash_loan"
+path = "fuzz_targets/fuzz_flash_loan.rs"
+
+[[bin]]
+name = "fuzz_elo_record"
+path = "fuzz_targets/fuzz_elo_record.rs"
+
+[[bin]]
+name = "fuzz_xdr_parse"
+path = "fuzz_targets/fuzz_xdr_parse.rs"
+
+[[bin]]
+name = "fuzz_auth_keys"
+path = "fuzz_targets/fuzz_auth_keys.rs"
