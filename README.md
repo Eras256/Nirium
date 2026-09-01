@@ -134,8 +134,9 @@ Traction is **self-generated and independently verifiable**. It does not depend 
 - **Live autonomous agent** running 24/7 on Stellar Testnet, every rebalance verifiable on Stellar Expert.
 - **Real mainnet activity**: x402 micropayments settling in production, and a full treasury cycle executed with real funds (hashes above).
 - **Open API + free sandbox keys**, so any developer can integrate and exercise the contracts directly.
-- **Real upstream engagement**: 6 reported issues/PRs across three repos
-  (x402-foundation/x402, stellar/stellar-dev-skill, OpenZeppelin/stellar-contracts) —
+- **Real upstream engagement**: 8 reported issues/PRs across four repos
+  (x402-foundation/x402, stellar/stellar-dev-skill, OpenZeppelin/stellar-contracts,
+  stellar/stellar-mpp-sdk) —
   2 merged: stellar/stellar-dev-skill#96 is our own fix, written and merged;
   x402-foundation/x402#3171 is a bug we reported that an external contributor,
   JasonColapietro, wrote and merged the fix for as #3180.
@@ -151,6 +152,10 @@ Traction is **self-generated and independently verifiable**. It does not depend 
   OpenZeppelin/stellar-contracts#840 now has a proposed fix we
   wrote and submitted (#844, open, unmerged, pending maintainer review).
   x402-foundation/x402#3148 remains open, awaiting response.
+  stellar/stellar-mpp-sdk#68 reports two invalid mainnet SAC contract addresses
+  (USDC_SAC_MAINNET, XLM_SAC_MAINNET) that fail Stellar's own StrKey validation —
+  a proposed fix we wrote and submitted as #69 (open, unmerged, pending
+  maintainer review).
 
 We provide the middleware; regulated operators (e.g. Etherfuse) hold the licenses and execute settlement. We are open to integration conversations with regional fintechs, but make **no claim of signed pilots**.
 
