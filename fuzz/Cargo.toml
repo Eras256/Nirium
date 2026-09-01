@@ -16,6 +16,16 @@ cargo-fuzz = true
 libfuzzer-sys = "0.4"
 soroban-sdk = { version = "22.0.0", features = ["testutils"] }
 stellar-xdr = { version = "22.0.0", features = ["curr", "alloc"] }
+# soroban-env-host 22.1.3 specifies ed25519-dalek ">=2.0.0" with no upper
+# bound, and its testutils.rs calls SigningKey::generate() against the
+# 2.x trait-bound shape -- but Cargo's resolver still lets it pick the
+# newly-released, breaking 3.0.0 for its own copy even with this pin
+# present, since a plain version requirement doesn't force whole-graph
+# unification on its own. The committed Cargo.lock in this directory has
+# a `cargo update -p ed25519-dalek@3.0.0 --precise 2.2.0` applied on top
+# of this pin to force it -- re-run that if the lockfile is ever
+# regenerated and this starts failing again.
+ed25519-dalek = "=2.2.0"
 
 [[bin]]
 name = "fuzz_vault_create"
