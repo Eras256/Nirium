@@ -171,13 +171,21 @@ fuzz_target!(|data: &[u8]| {
                 assert!(repay.is_none(), "Repay must overflow for near-MAX amounts");
             } else {
                 assert!(repay.is_some(), "Repay must succeed for safe amounts");
-                // Net profit accounting: verify no underflow
-                let simulated_profit = (input.amount * 50) / 10_000;
-                let total = input.amount.checked_add(simulated_profit);
-                assert!(
-                    total.is_some() || input.amount > i128::MAX - simulated_profit,
-                    "Simulated profit addition must use checked_add"
-                );
+                // Net profit accounting: verify no underflow. The multiply
+                // itself must be checked too, not just the add after it --
+                // `amount * 50` overflows well before `amount + amount*30/
+                // 10_000` does, since the multiplier here is bigger and
+                // isn't pre-divided. A None here (amount too large for this
+                // simulation) is an expected outcome, same as the
+                // near-MAX branch above, not a bug to assert against.
+                if let Some(scaled) = input.amount.checked_mul(50) {
+                    let simulated_profit = scaled / 10_000;
+                    let total = input.amount.checked_add(simulated_profit);
+                    assert!(
+                        total.is_some() || input.amount > i128::MAX - simulated_profit,
+                        "Simulated profit addition must use checked_add"
+                    );
+                }
             }
         }
     }
