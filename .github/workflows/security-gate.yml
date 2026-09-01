@@ -30,8 +30,10 @@ jobs:
 
       - name: Setup pnpm
         uses: pnpm/action-setup@v4
-        with:
-          version: 10
+        # No `version:` here on purpose — action-setup@v4 reads it from
+        # package.json's own "packageManager" field. Pinning both is what
+        # broke this (ERR_PNPM_BAD_PM_VERSION: version 10 here vs 9.12.2
+        # in package.json, action-setup refuses to pick one).
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
@@ -58,9 +60,15 @@ jobs:
         run: cargo install cargo-fuzz --locked || true
 
       - name: Fuzz Flash Loan (60s smoke)
-        working-directory: fuzz
+        # No working-directory: fuzz — `cargo fuzz run` already resolves
+        # ./fuzz/Cargo.toml from wherever it's invoked; running it a second
+        # time from inside fuzz/ makes it look for fuzz/fuzz/Cargo.toml,
+        # which doesn't exist (this is what broke it).
         run: cargo +nightly fuzz run fuzz_flash_loan -- -max_total_time=60 2>&1 || exit 1
 
       - name: Fuzz Vault Create (60s smoke)
-        working-directory: fuzz
+        # No working-directory: fuzz — `cargo fuzz run` already resolves
+        # ./fuzz/Cargo.toml from wherever it's invoked; running it a second
+        # time from inside fuzz/ makes it look for fuzz/fuzz/Cargo.toml,
+        # which doesn't exist (this is what broke it).
         run: cargo +nightly fuzz run fuzz_vault_create -- -max_total_time=60 2>&1 || exit 1
