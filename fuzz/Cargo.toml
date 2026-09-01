@@ -6,6 +6,12 @@ edition = "2021"
 # cargo-fuzz requires the package NOT to be part of the workspace
 [workspace]
 
+# Current cargo-fuzz refuses to run against a manifest that doesn't declare
+# itself as a fuzz crate — this predates that check, so CI now fails with
+# "does not look like a cargo-fuzz manifest" until this is here.
+[package.metadata]
+cargo-fuzz = true
+
 [dependencies]
 libfuzzer-sys = "0.4"
 soroban-sdk = { version = "22.0.0", features = ["testutils"] }
