@@ -1,5 +1,8 @@
 # Nirium Protocol: Institutional Infrastructure on Stellar
 
+[![CI](https://github.com/Eras256/Nirium/actions/workflows/ci.yml/badge.svg)](https://github.com/Eras256/Nirium/actions/workflows/ci.yml)
+[![Security Gate](https://github.com/Eras256/Nirium/actions/workflows/security-gate.yml/badge.svg)](https://github.com/Eras256/Nirium/actions/workflows/security-gate.yml)
+
 ![Network](https://img.shields.io/badge/Network-Testnet%20%2B%20Mainnet%20(partial)-orange?style=for-the-badge)
 ![Status](https://img.shields.io/badge/Status-Active-yellow?style=for-the-badge)
 ![API](https://img.shields.io/badge/API-86%20Endpoints-blue?style=for-the-badge)
