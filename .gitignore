@@ -65,3 +65,4 @@ tmp-sdk-test/
 .idea/
 .vscode/
 *.log
+packages/contracts/test_snapshots/

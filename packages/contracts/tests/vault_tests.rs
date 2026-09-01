@@ -15,11 +15,17 @@
 use soroban_sdk::{
     symbol_short,
     testutils::{Address as _, Events},
-    token, vec, Address, Env, IntoVal,
+    token, vec, Address, Env, IntoVal, String,
 };
 
-use crate::nirium_vault::NiriumVaultContract;
-use crate::nirium_vault::NiriumVaultContractClient;
+// `crate::` doesn't work here: integration tests (files under tests/) are
+// compiled as their own separate crate, not part of this library's crate
+// root — has to go through the library's own name. `nirium_vault` itself
+// stays a private module (`mod nirium_vault;` in lib.rs); its contents
+// reach here via lib.rs's own `pub use nirium_vault::*;` re-export, so the
+// path is flat (nirium_contracts::NiriumVaultContract), not
+// nirium_contracts::nirium_vault::NiriumVaultContract.
+use nirium_contracts::{NiriumVaultContract, NiriumVaultContractClient};
 
 fn setup_env() -> (Env, Address, NiriumVaultContractClient<'static>) {
     let env = Env::default();
@@ -38,6 +44,16 @@ fn create_token(env: &Env) -> (Address, token::StellarAssetClient<'_>) {
     (token_address.address(), token_client)
 }
 
+/// create_vault() charges its 12.5 XLM deployment fee (DEPLOYMENT_FEE =
+/// 125_000_000 stroops) via a separate xlm_address parameter, distinct from
+/// the vault's own base token -- funds owner with well above that so every
+/// call site doesn't have to reason about the exact fee amount itself.
+fn create_xlm(env: &Env, owner: &Address) -> Address {
+    let (xlm_addr, xlm_admin) = create_token(env);
+    xlm_admin.mint(owner, &1_000_000_000);
+    xlm_addr
+}
+
 // ═══════════════════════════════════════════════════════════════
 // VAULT CREATION TESTS
 // ═══════════════════════════════════════════════════════════════
@@ -53,12 +69,13 @@ fn test_vault_creation() {
     let (token_addr, token_admin) = create_token(&env);
     token_admin.mint(&owner, &100_000_000_000);
     token_admin.mint(&treasury, &0);
+    let xlm_addr = create_xlm(&env, &owner);
 
     // Initialize the contract
     client.initialize(&treasury, &admin);
 
     // Create vault
-    let vault = client.create_vault(&owner, &token_addr);
+    let vault = client.create_vault(&owner, &token_addr, &String::from_str(&env, "Test Vault"), &xlm_addr);
 
     assert_eq!(vault.vault_id, 1);
     assert_eq!(vault.owner, owner);
@@ -77,11 +94,13 @@ fn test_multiple_vault_creation() {
     let (token_addr, token_admin) = create_token(&env);
     token_admin.mint(&owner1, &100_000_000_000);
     token_admin.mint(&owner2, &100_000_000_000);
+    let xlm_addr1 = create_xlm(&env, &owner1);
+    let xlm_addr2 = create_xlm(&env, &owner2);
 
     client.initialize(&treasury, &admin);
 
-    let vault1 = client.create_vault(&owner1, &token_addr);
-    let vault2 = client.create_vault(&owner2, &token_addr);
+    let vault1 = client.create_vault(&owner1, &token_addr, &String::from_str(&env, "Vault 1"), &xlm_addr1);
+    let vault2 = client.create_vault(&owner2, &token_addr, &String::from_str(&env, "Vault 2"), &xlm_addr2);
 
     assert_eq!(vault1.vault_id, 1);
     assert_eq!(vault2.vault_id, 2);
@@ -99,14 +118,17 @@ fn test_deployment_fee_collection() {
     let (token_addr, token_admin) = create_token(&env);
     let initial_balance: i128 = 100_000_000_000;
     token_admin.mint(&owner, &initial_balance);
+    let xlm_addr = create_xlm(&env, &owner);
+    let xlm_client = token::Client::new(&env, &xlm_addr);
+    let initial_xlm_balance = xlm_client.balance(&owner);
 
     client.initialize(&treasury, &admin);
-    client.create_vault(&owner, &token_addr);
+    client.create_vault(&owner, &token_addr, &String::from_str(&env, "Test Vault"), &xlm_addr);
 
-    // Verify fee was collected
-    let token_client = token::Client::new(&env, &token_addr);
-    let owner_balance = token_client.balance(&owner);
-    assert!(owner_balance < initial_balance);
+    // Verify fee was collected -- charged in XLM (xlm_addr), not the
+    // vault's own base token, which create_vault() never touches.
+    let owner_xlm_balance = xlm_client.balance(&owner);
+    assert!(owner_xlm_balance < initial_xlm_balance);
 
     let fees = client.get_total_fees();
     assert!(fees > 0);
@@ -125,9 +147,10 @@ fn test_deposit() {
 
     let (token_addr, token_admin) = create_token(&env);
     token_admin.mint(&owner, &100_000_000_000);
+    let xlm_addr = create_xlm(&env, &owner);
 
     client.initialize(&treasury, &admin);
-    let vault = client.create_vault(&owner, &token_addr);
+    let vault = client.create_vault(&owner, &token_addr, &String::from_str(&env, "Test Vault"), &xlm_addr);
 
     let deposit_amount: i128 = 50_000_000_000;
     client.deposit(&vault.vault_id, &deposit_amount);
@@ -145,9 +168,10 @@ fn test_withdraw() {
 
     let (token_addr, token_admin) = create_token(&env);
     token_admin.mint(&owner, &100_000_000_000);
+    let xlm_addr = create_xlm(&env, &owner);
 
     client.initialize(&treasury, &admin);
-    let vault = client.create_vault(&owner, &token_addr);
+    let vault = client.create_vault(&owner, &token_addr, &String::from_str(&env, "Test Vault"), &xlm_addr);
 
     let deposit_amount: i128 = 50_000_000_000;
     client.deposit(&vault.vault_id, &deposit_amount);
@@ -169,9 +193,10 @@ fn test_withdraw_exceeding_balance() {
 
     let (token_addr, token_admin) = create_token(&env);
     token_admin.mint(&owner, &100_000_000_000);
+    let xlm_addr = create_xlm(&env, &owner);
 
     client.initialize(&treasury, &admin);
-    let vault = client.create_vault(&owner, &token_addr);
+    let vault = client.create_vault(&owner, &token_addr, &String::from_str(&env, "Test Vault"), &xlm_addr);
 
     client.deposit(&vault.vault_id, &10_000_000);
     client.withdraw(&vault.vault_id, &20_000_000); // Should panic
@@ -191,9 +216,10 @@ fn test_delegate_agent() {
 
     let (token_addr, token_admin) = create_token(&env);
     token_admin.mint(&owner, &100_000_000_000);
+    let xlm_addr = create_xlm(&env, &owner);
 
     client.initialize(&treasury, &admin);
-    let vault = client.create_vault(&owner, &token_addr);
+    let vault = client.create_vault(&owner, &token_addr, &String::from_str(&env, "Test Vault"), &xlm_addr);
 
     let max_exec = 1_000_000_000i128;
     let delegation = client.delegate_agent(&vault.vault_id, &agent, &max_exec);
@@ -216,9 +242,10 @@ fn test_revoke_agent() {
 
     let (token_addr, token_admin) = create_token(&env);
     token_admin.mint(&owner, &100_000_000_000);
+    let xlm_addr = create_xlm(&env, &owner);
 
     client.initialize(&treasury, &admin);
-    let vault = client.create_vault(&owner, &token_addr);
+    let vault = client.create_vault(&owner, &token_addr, &String::from_str(&env, "Test Vault"), &xlm_addr);
 
     client.delegate_agent(&vault.vault_id, &agent, &1_000_000_000);
 
@@ -241,7 +268,6 @@ fn test_flash_loan_execute_success() {
     let (env, _contract_id, client) = setup_env();
     let owner = Address::generate(&env);
     let agent = Address::generate(&env);
-    let creator = Address::generate(&env);
     let treasury = Address::generate(&env);
     let admin = Address::generate(&env);
 
@@ -249,16 +275,17 @@ fn test_flash_loan_execute_success() {
     let (quote_token, _) = create_token(&env);
     let (vault_token, vault_token_admin) = create_token(&env);
     vault_token_admin.mint(&owner, &100_000_000_000);
+    let xlm_addr = create_xlm(&env, &owner);
 
     client.initialize(&treasury, &admin);
 
     // Create vault and delegate agent
-    let vault = client.create_vault(&owner, &vault_token);
+    let vault = client.create_vault(&owner, &vault_token, &String::from_str(&env, "Test Vault"), &xlm_addr);
     client.delegate_agent(&vault.vault_id, &agent, &1_000_000_000);
 
     // Create pool
     let pool = client.create_pool(
-        &creator,
+        &admin,
         &base_token,
         &quote_token,
         &1_000_000_0_000_000i128,
@@ -291,7 +318,6 @@ fn test_flash_loan_insufficient_liquidity() {
     let (env, _contract_id, client) = setup_env();
     let owner = Address::generate(&env);
     let agent = Address::generate(&env);
-    let creator = Address::generate(&env);
     let treasury = Address::generate(&env);
     let admin = Address::generate(&env);
 
@@ -299,14 +325,15 @@ fn test_flash_loan_insufficient_liquidity() {
     let (quote_token, _) = create_token(&env);
     let (vault_token, vault_token_admin) = create_token(&env);
     vault_token_admin.mint(&owner, &100_000_000_000);
+    let xlm_addr = create_xlm(&env, &owner);
 
     client.initialize(&treasury, &admin);
 
-    let vault = client.create_vault(&owner, &vault_token);
+    let vault = client.create_vault(&owner, &vault_token, &String::from_str(&env, "Test Vault"), &xlm_addr);
     client.delegate_agent(&vault.vault_id, &agent, &1_000_000_000);
 
     let pool = client.create_pool(
-        &creator,
+        &admin,
         &base_token,
         &quote_token,
         &1_000i128, // Very small pool
@@ -324,7 +351,6 @@ fn test_flash_loan_revoked_agent() {
     let (env, _contract_id, client) = setup_env();
     let owner = Address::generate(&env);
     let agent = Address::generate(&env);
-    let creator = Address::generate(&env);
     let treasury = Address::generate(&env);
     let admin = Address::generate(&env);
 
@@ -332,14 +358,15 @@ fn test_flash_loan_revoked_agent() {
     let (quote_token, _) = create_token(&env);
     let (vault_token, vault_token_admin) = create_token(&env);
     vault_token_admin.mint(&owner, &100_000_000_000);
+    let xlm_addr = create_xlm(&env, &owner);
 
     client.initialize(&treasury, &admin);
 
-    let vault = client.create_vault(&owner, &vault_token);
+    let vault = client.create_vault(&owner, &vault_token, &String::from_str(&env, "Test Vault"), &xlm_addr);
     client.delegate_agent(&vault.vault_id, &agent, &1_000_000_000);
 
     let pool = client.create_pool(
-        &creator,
+        &admin,
         &base_token,
         &quote_token,
         &1_000_000_0_000_000i128,
@@ -358,7 +385,6 @@ fn test_flash_loan_exceeds_limit() {
     let (env, _contract_id, client) = setup_env();
     let owner = Address::generate(&env);
     let agent = Address::generate(&env);
-    let creator = Address::generate(&env);
     let treasury = Address::generate(&env);
     let admin = Address::generate(&env);
 
@@ -366,14 +392,15 @@ fn test_flash_loan_exceeds_limit() {
     let (quote_token, _) = create_token(&env);
     let (vault_token, vault_token_admin) = create_token(&env);
     vault_token_admin.mint(&owner, &100_000_000_000);
+    let xlm_addr = create_xlm(&env, &owner);
 
     client.initialize(&treasury, &admin);
 
-    let vault = client.create_vault(&owner, &vault_token);
+    let vault = client.create_vault(&owner, &vault_token, &String::from_str(&env, "Test Vault"), &xlm_addr);
     client.delegate_agent(&vault.vault_id, &agent, &100); // Very low limit
 
     let pool = client.create_pool(
-        &creator,
+        &admin,
         &base_token,
         &quote_token,
         &1_000_000_0_000_000i128,
@@ -399,10 +426,11 @@ fn test_execute_path_arbitrage() {
 
     let (vault_token, vault_token_admin) = create_token(&env);
     vault_token_admin.mint(&owner, &100_000_000_000);
+    let xlm_addr = create_xlm(&env, &owner);
 
     client.initialize(&treasury, &admin);
 
-    let vault = client.create_vault(&owner, &vault_token);
+    let vault = client.create_vault(&owner, &vault_token, &String::from_str(&env, "Test Vault"), &xlm_addr);
     client.delegate_agent(&vault.vault_id, &agent, &1_000_000_000);
 
     // Execute path arbitrage: amount=1000, min_output=1050 (5% profit)
@@ -432,10 +460,11 @@ fn test_execute_path_arbitrage_no_profit() {
 
     let (vault_token, vault_token_admin) = create_token(&env);
     vault_token_admin.mint(&owner, &100_000_000_000);
+    let xlm_addr = create_xlm(&env, &owner);
 
     client.initialize(&treasury, &admin);
 
-    let vault = client.create_vault(&owner, &vault_token);
+    let vault = client.create_vault(&owner, &vault_token, &String::from_str(&env, "Test Vault"), &xlm_addr);
     client.delegate_agent(&vault.vault_id, &agent, &1_000_000_000);
 
     // Try path arb with output <= input — should panic
@@ -452,10 +481,11 @@ fn test_execute_cross_dex() {
 
     let (vault_token, vault_token_admin) = create_token(&env);
     vault_token_admin.mint(&owner, &100_000_000_000);
+    let xlm_addr = create_xlm(&env, &owner);
 
     client.initialize(&treasury, &admin);
 
-    let vault = client.create_vault(&owner, &vault_token);
+    let vault = client.create_vault(&owner, &vault_token, &String::from_str(&env, "Test Vault"), &xlm_addr);
     client.delegate_agent(&vault.vault_id, &agent, &1_000_000_000);
 
     // Buy on SDEX for 950, sell on Soroswap for 980 = 30 profit
@@ -480,10 +510,11 @@ fn test_execute_soroswap_swap() {
 
     let (vault_token, vault_token_admin) = create_token(&env);
     vault_token_admin.mint(&owner, &100_000_000_000);
+    let xlm_addr = create_xlm(&env, &owner);
 
     client.initialize(&treasury, &admin);
 
-    let vault = client.create_vault(&owner, &vault_token);
+    let vault = client.create_vault(&owner, &vault_token, &String::from_str(&env, "Test Vault"), &xlm_addr);
     client.delegate_agent(&vault.vault_id, &agent, &1_000_000_000);
 
     let out = client.execute_soroswap_swap(
@@ -509,10 +540,11 @@ fn test_execute_blend_yield() {
 
     let (vault_token, vault_token_admin) = create_token(&env);
     vault_token_admin.mint(&owner, &100_000_000_000);
+    let xlm_addr = create_xlm(&env, &owner);
 
     client.initialize(&treasury, &admin);
 
-    let vault = client.create_vault(&owner, &vault_token);
+    let vault = client.create_vault(&owner, &vault_token, &String::from_str(&env, "Test Vault"), &xlm_addr);
     client.delegate_agent(&vault.vault_id, &agent, &1_000_000_000);
 
     // Supply 5000 to Blend
@@ -529,7 +561,6 @@ fn test_execute_blend_yield() {
 #[test]
 fn test_pool_creation() {
     let (env, _contract_id, client) = setup_env();
-    let creator = Address::generate(&env);
     let treasury = Address::generate(&env);
     let admin = Address::generate(&env);
 
@@ -539,7 +570,7 @@ fn test_pool_creation() {
     client.initialize(&treasury, &admin);
 
     let pool = client.create_pool(
-        &creator,
+        &admin,
         &base_token,
         &quote_token,
         &1_000_000i128,
@@ -560,7 +591,6 @@ fn test_pool_creation() {
 #[should_panic(expected = "fee too high")]
 fn test_pool_creation_excessive_fee() {
     let (env, _contract_id, client) = setup_env();
-    let creator = Address::generate(&env);
     let treasury = Address::generate(&env);
     let admin = Address::generate(&env);
 
@@ -571,7 +601,7 @@ fn test_pool_creation_excessive_fee() {
 
     // 10% fee — should panic (max is 5%)
     client.create_pool(
-        &creator,
+        &admin,
         &base_token,
         &quote_token,
         &1_000_000i128,
