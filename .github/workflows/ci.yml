@@ -14,8 +14,10 @@ jobs:
 
       - name: Setup pnpm
         uses: pnpm/action-setup@v4
-        with:
-          version: 10
+        # No `version:` here on purpose — same fix as security-gate.yml.
+        # action-setup@v4 reads it from package.json's own "packageManager"
+        # field; pinning both is ERR_PNPM_BAD_PM_VERSION (version 10 here
+        # vs pnpm@9.12.2 in package.json).
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
