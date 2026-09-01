@@ -32,7 +32,20 @@ jobs:
         run: pnpm --filter @nirium/sdk build
 
       - name: Build Agent
-        run: pnpm --filter agent build
+        run: |
+          # packages/agent/scripts/obfuscate.js only exists in the private
+          # repo. The public mirror (Eras256/Nirium) ships packages/agent as
+          # a deliberate placeholder — no real agent source, by design (see
+          # AGENTS.md: "Sync al repo público" — never a raw push, always the
+          # quirurgical/rebuild-public-repo.sh copy that leaves the agent as
+          # a stub) — so `tsc && node scripts/obfuscate.js` can never pass
+          # there. Skip with a clear message instead of failing on a step
+          # that was never meant to run against a stub.
+          if [ -f packages/agent/scripts/obfuscate.js ]; then
+            pnpm --filter agent build
+          else
+            echo "packages/agent/scripts/obfuscate.js not found — skipping Build Agent (placeholder agent, expected in the public mirror)."
+          fi
 
       - name: Build CLI
         run: pnpm --filter nirium-cli build
