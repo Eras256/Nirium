@@ -134,9 +134,9 @@ Traction is **self-generated and independently verifiable**. It does not depend 
 - **Live autonomous agent** running 24/7 on Stellar Testnet, every rebalance verifiable on Stellar Expert.
 - **Real mainnet activity**: x402 micropayments settling in production, and a full treasury cycle executed with real funds (hashes above).
 - **Open API + free sandbox keys**, so any developer can integrate and exercise the contracts directly.
-- **Real upstream engagement**: 8 reported issues/PRs across four repos
+- **Real upstream engagement**: 10 reported issues/PRs across five repos
   (x402-foundation/x402, stellar/stellar-dev-skill, OpenZeppelin/stellar-contracts,
-  stellar/stellar-mpp-sdk) —
+  stellar/stellar-mpp-sdk, stellar/smart-account-kit) —
   2 merged: stellar/stellar-dev-skill#96 is our own fix, written and merged;
   x402-foundation/x402#3171 is a bug we reported that an external contributor,
   JasonColapietro, wrote and merged the fix for as #3180.
@@ -156,6 +156,16 @@ Traction is **self-generated and independently verifiable**. It does not depend 
   (USDC_SAC_MAINNET, XLM_SAC_MAINNET) that fail Stellar's own StrKey validation —
   a proposed fix we wrote and submitted as #69 (open, unmerged, pending
   maintainer review).
+  Ahead of Stellar Protocol 28 (mainnet vote September 16, 2026), we reproduced
+  two real breaking-change gaps against the actual compiler/runtime, not just
+  the upgrade notes: we opened OpenZeppelin/stellar-contracts#865, a non-exhaustive
+  match in production code that compiles clean today but fails to build
+  (`error[E0004]`, reproduced against both SDK versions) the day the crate's own
+  soroban-sdk pin moves to 28.x; and we opened stellar/smart-account-kit#7, an
+  uncapped peer-dependency range that lets a routine install resolve an
+  `@stellar/stellar-sdk` version whose API removed a method that library calls
+  in 9+ production files — a runtime crash, live today, independent of the
+  mainnet vote date. Both open, unmerged, pending maintainer review.
 
 We provide the middleware; regulated operators (e.g. Etherfuse) hold the licenses and execute settlement. We are open to integration conversations with regional fintechs, but make **no claim of signed pilots**.
 
