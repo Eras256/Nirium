@@ -167,6 +167,10 @@ Traction is **self-generated and independently verifiable**. It does not depend 
   `@stellar/stellar-sdk` version whose API removed a method that library calls
   in 9+ production files — a runtime crash, live today, independent of the
   mainnet vote date. Both open, unmerged, pending maintainer review.
+- **A real integrator's own words**, not solicited copy:
+
+  > "We verify everything a 402 claims, whoever it comes from, and with Nirium it all checked out... And when things did come up, they got resolved fast. They warned us about a risk in our integration — that the collection account rotated on mainnet — before it bit us, and the bugs we reported were fixed the same day, not in the next release. That tells me more than any number on a landing page."
+  > — Fer, AgentLedger
 
 We provide the middleware; regulated operators (e.g. Etherfuse) hold the licenses and execute settlement. We are open to integration conversations with regional fintechs, but make **no claim of signed pilots**.
 
