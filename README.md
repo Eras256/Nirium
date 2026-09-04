@@ -162,7 +162,13 @@ Traction is **self-generated and independently verifiable**. It does not depend 
   the upgrade notes: we opened OpenZeppelin/stellar-contracts#865, a non-exhaustive
   match in production code that compiles clean today but fails to build
   (`error[E0004]`, reproduced against both SDK versions) the day the crate's own
-  soroban-sdk pin moves to 28.x; and we opened stellar/smart-account-kit#7, an
+  soroban-sdk pin moves to 28.x. The maintainer's own fix PR for it (#866, `fix #865`)
+  is now shaping how he designs an unrelated security fix for a different reporter:
+  four days later, replying on #852 (an event-size bug from IvanBelyakoff, unrelated
+  to us), he cites #866 by number as the reason to shape that fix's new enum around
+  `ContractExecutable` rather than a bare hash — "#866 bumps to soroban-sdk 28 and
+  brings `ContractExecutable::ExternalRef`... and the enum will pick the new variant
+  up unchanged." We opened stellar/smart-account-kit#7, an
   uncapped peer-dependency range that lets a routine install resolve an
   `@stellar/stellar-sdk` version whose API removed a method that library calls
   in 9+ production files — a runtime crash, live today, independent of the
