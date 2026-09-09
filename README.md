@@ -150,13 +150,17 @@ Traction is **self-generated and independently verifiable**. It does not depend 
   #97 thread itself, not a doc-only correction. (Commit hashes for that fix
   live in our private monorepo and aren't independently checkable, so we're
   not citing them here — the public thread is the verifiable part.)
-  OpenZeppelin/stellar-contracts#840 now has a proposed fix we
-  wrote and submitted (#844, open, unmerged, pending maintainer review).
+  On OpenZeppelin/stellar-contracts#840 the maintainer reviewed our
+  proposed fix (#844) and closed both, treating the Lazy-mode expiration value as
+  intended behavior rather than a bug — our reading, corrected by theirs.
   x402-foundation/x402#3148 remains open, awaiting response.
   stellar/stellar-mpp-sdk#68 reports two invalid mainnet SAC contract addresses
   (USDC_SAC_MAINNET, XLM_SAC_MAINNET) that fail Stellar's own StrKey validation —
   a proposed fix we wrote and submitted as #69 (open, unmerged, pending
-  maintainer review).
+  maintainer review). Its impact does not wait on that merge: an external
+  contributor, jeesunikim, opened #72 stacked on #69, replacing the hand-copied
+  SAC literals with values derived from the asset code and network passphrase so
+  the same class of typo cannot recur.
   Ahead of Stellar Protocol 28 (mainnet vote September 16, 2026), we reproduced
   two real breaking-change gaps against the actual compiler/runtime, not just
   the upgrade notes: we opened OpenZeppelin/stellar-contracts#865, a non-exhaustive
