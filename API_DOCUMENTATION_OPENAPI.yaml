@@ -12,17 +12,18 @@ info:
     - Strategy execution and testing
     - WebSocket subscriptions for live updates
 
-    ## Institutional Security & Compliance (AAA Grade)
-    As of Apr 1, 2026, Nirium Protocol adheres to the highest institutional standards:
-    - **Data Residency**: Fully compliant with Mexico's LFPDPPP and California's DFAL.
-    - **Smart Contract Audits**: Zero critical vulnerabilities. Fuzz-tested with `cargo-fuzz`.
-    - **API Security**: 100% compliant with OWASP API Security Top 10. Full-spectrum internal penetration review passed.
-    - **JWT**: HS256 algorithm locked — `alg:none` / algorithm-confusion attacks blocked.
-    - **Prototype Pollution**: All request bodies stripped of `__proto__`/`constructor`/`prototype` keys before routing.
-    - **Host Header Injection**: Incoming `Host` header validated against `nirium.xyz` allowlist on the Edge proxy.
-    - **WebSocket**: JWT required via query param (`?token=`). Per-IP connection rate limit: 10 connections/min.
-    - **Responsible Disclosure**: `/.well-known/security.txt` (RFC 9116) available at `https://nirium.xyz/.well-known/security.txt`.
-    - **SDKs**: Official wrappers available on npm (`nirium`) and PyPI (`nirium`).
+    ## Security controls
+
+    Internal review only — the Nirium contracts and API have not had a third-party audit.
+
+    - **Privacy**: aligned with Mexico's LFPDPPP (reformed March 2025).
+    - **Smart contracts**: fuzz-tested with `cargo-fuzz`.
+    - **API**: request bodies stripped of `__proto__` / `constructor` / `prototype` keys before routing; OWASP API Security Top 10 checklist applied in review.
+    - **JWT**: HS256 algorithm locked — `alg:none` / algorithm-confusion rejected.
+    - **Host header**: incoming `Host` validated against a `nirium.xyz` allowlist at the edge proxy.
+    - **WebSocket**: JWT required via query param (`?token=`); per-IP connection limit 10/min.
+    - **Responsible disclosure**: `/.well-known/security.txt` (RFC 9116) at `https://nirium.xyz/.well-known/security.txt`.
+    - **SDKs**: official wrappers on npm (`nirium`) and PyPI (`nirium`).
 
     ## Authentication
 
@@ -57,11 +58,11 @@ info:
     ## Support
 
     - **Documentation:** https://docs.nirium.xyz
-    - **Email:** xvaiosx7@gmail.com
+    - **Email:** niriumprotocol@gmail.com
     - **Discord:** https://discord.gg/nirium
   contact:
     name: Nirium Protocol Support
-    email: xvaiosx7@gmail.com
+    email: niriumprotocol@gmail.com
     url: https://nirium.xyz
   license:
     name: MIT
