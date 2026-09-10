@@ -135,48 +135,24 @@ Traction is **self-generated and independently verifiable**. It does not depend 
 - **Live autonomous agent** running 24/7 on Stellar Testnet, every rebalance verifiable on Stellar Expert.
 - **Real mainnet activity**: x402 micropayments settling in production, and a full treasury cycle executed with real funds (hashes above).
 - **Open API + free sandbox keys**, so any developer can integrate and exercise the contracts directly.
-- **Real upstream engagement**: 10 reported issues/PRs across five repos
-  (x402-foundation/x402, stellar/stellar-dev-skill, OpenZeppelin/stellar-contracts,
-  stellar/stellar-mpp-sdk, stellar/smart-account-kit) —
-  2 merged: stellar/stellar-dev-skill#96 is our own fix, written and merged;
-  x402-foundation/x402#3171 is a bug we reported that an external contributor,
-  JasonColapietro, wrote and merged the fix for as #3180.
-  stellar/stellar-dev-skill#97 went through real, multi-round review from the
-  Foundation's own bot, and that review found a real security bug pattern —
-  a paid route that could silently serve for free instead of charging when
-  its payment middleware wasn't initialized. We confirmed and fixed the same
-  pattern in our own production MPP and x402 middleware, both of which now
-  fail closed instead of open; the finding and our confirmation are in the
-  #97 thread itself, not a doc-only correction. (Commit hashes for that fix
-  live in our private monorepo and aren't independently checkable, so we're
-  not citing them here — the public thread is the verifiable part.)
-  On OpenZeppelin/stellar-contracts#840 the maintainer reviewed our
-  proposed fix (#844) and closed both, treating the Lazy-mode expiration value as
-  intended behavior rather than a bug — our reading, corrected by theirs.
-  x402-foundation/x402#3148 remains open, awaiting response.
-  stellar/stellar-mpp-sdk#68 reports two invalid mainnet SAC contract addresses
-  (USDC_SAC_MAINNET, XLM_SAC_MAINNET) that fail Stellar's own StrKey validation —
-  a proposed fix we wrote and submitted as #69 (open, unmerged, pending
-  maintainer review). Its impact does not wait on that merge: an external
-  contributor, jeesunikim, opened #72 stacked on #69, replacing the hand-copied
-  SAC literals with values derived from the asset code and network passphrase so
-  the same class of typo cannot recur.
-  Ahead of Stellar Protocol 28 (mainnet vote September 16, 2026), we reproduced
-  two real breaking-change gaps against the actual compiler/runtime, not just
-  the upgrade notes: we opened OpenZeppelin/stellar-contracts#865, a non-exhaustive
-  match in production code that compiles clean today but fails to build
-  (`error[E0004]`, reproduced against both SDK versions) the day the crate's own
-  soroban-sdk pin moves to 28.x. The maintainer's own fix PR for it (#866, `fix #865`)
-  is now shaping how he designs an unrelated security fix for a different reporter:
-  four days later, replying on #852 (an event-size bug from IvanBelyakoff, unrelated
-  to us), he cites #866 by number as the reason to shape that fix's new enum around
-  `ContractExecutable` rather than a bare hash — "#866 bumps to soroban-sdk 28 and
-  brings `ContractExecutable::ExternalRef`... and the enum will pick the new variant
-  up unchanged." We opened stellar/smart-account-kit#7, an
-  uncapped peer-dependency range that lets a routine install resolve an
-  `@stellar/stellar-sdk` version whose API removed a method that library calls
-  in 9+ production files — a runtime crash, live today, independent of the
-  mainnet vote date. Both open, unmerged, pending maintainer review.
+- **Real upstream engagement** — issues we filed and fixes we shipped against the
+  Stellar and x402 ecosystems, most recent first. Every row links to the public thread;
+  status is as of 2026-09-09 and re-verified against the GitHub API.
+
+  | Date | Where | What we reported / did | Outcome |
+  |------|-------|------------------------|---------|
+  | 2026-09-09 | [stellar/stellar-mpp-sdk#68](https://github.com/stellar/stellar-mpp-sdk/issues/68) | Two mainnet SAC contract addresses in the official MPP SDK fail Stellar's own StrKey validation (`USDC_SAC_MAINNET` 54 chars, `XLM_SAC_MAINNET` 55) — we wrote the fix. | **Merged** as [#69](https://github.com/stellar/stellar-mpp-sdk/pull/69). Follow-up [#72](https://github.com/stellar/stellar-mpp-sdk/pull/72) (contributor jeesunikim, open) derives the literals from asset code + network passphrase so the typo class can't recur. |
+  | 2026-09-09 | [OpenZeppelin/relayer-plugin-x402-facilitator#47](https://github.com/OpenZeppelin/relayer-plugin-x402-facilitator/issues/47) | OpenZeppelin's mainnet x402 facilitator sponsor (`GA5SXMFJ…`) has gone 30+ days with zero successful settlements while still listed as the sole `stellar:pubnet` signer — the mainnet paid path is down for every integrator. | Open. After a month across two official channels, an OpenZeppelin maintainer responded (2026-09-09) and is investigating; tracking the follow-up. |
+  | 2026-09-05 | [stellar/stellar-dev-skill#97](https://github.com/stellar/stellar-dev-skill/pull/97) | Production patterns for x402 + MPP, through multi-round review from the Foundation's own bot. | **Merged.** The review surfaced a real security-bug pattern — a paid route that could silently serve for free when its payment middleware wasn't initialized. We confirmed and fixed the same pattern in our own production MPP and x402 middleware (both now fail closed); the finding and our confirmation are in the #97 thread itself. |
+  | 2026-09-03 | [x402-foundation/x402#3332](https://github.com/x402-foundation/x402/issues/3332) | `@x402/stellar`: `feeBumpSigner` is documented as a facilitator address by `getSigners()` but excluded from every facilitator-safety check. | **Fixed** — our PR [#3336](https://github.com/x402-foundation/x402/pull/3336) merged. |
+  | 2026-09-02 | [OpenZeppelin/stellar-contracts#839](https://github.com/OpenZeppelin/stellar-contracts/issues/839), [#863](https://github.com/OpenZeppelin/stellar-contracts/issues/863) | `Signer::Delegated` + `CallContract`: recording-mode simulation never surfaces the delegate's `require_auth_for_args`; hand-constructing both auth entries authorizes and confirms on-chain. | **Closed as completed.** Maintainer confirmed the manual two-entry construction and is adding `Delegated`-signer tests and docs ([#868](https://github.com/OpenZeppelin/stellar-contracts/pull/868), draft). |
+  | 2026-09-02 | [stellar/js-stellar-sdk#1672](https://github.com/stellar/js-stellar-sdk/pull/1672) | `needsNonInvokerSigningBy()` / `signAuthEntries()` walk only the top-level auth node, so any custom account whose `__check_auth` calls `require_auth_for_args()` on a second address is invisible ([#1700](https://github.com/stellar/js-stellar-sdk/issues/1700)). | Open — all five review points addressed, `CHANGES_REQUESTED`, pending re-review. |
+  | 2026-09-02 | [stellar/smart-account-kit#7](https://github.com/stellar/smart-account-kit/issues/7) | Uncapped `@stellar/stellar-sdk` peer range lets a routine install resolve a version whose API removed a method the library calls in 9+ production files — a runtime crash, live today. | Open, pending maintainer review. |
+  | Protocol 28 | [OpenZeppelin/stellar-contracts#865](https://github.com/OpenZeppelin/stellar-contracts/issues/865) | A non-exhaustive `match` on `ContractExecutable` in production code that compiles clean today but fails to build (`error[E0004]`, reproduced against the real compiler) the day the crate's soroban-sdk pin moves to 28.x — ahead of the 2026-09-16 mainnet vote. | Open. The maintainer's fix PR ([#866](https://github.com/OpenZeppelin/stellar-contracts/pull/866), `fix #865`) is now shaping how he designs an unrelated security fix — on [#852](https://github.com/OpenZeppelin/stellar-contracts/issues/852) he cites #866 by number as the reason to shape that fix's enum around `ContractExecutable`. |
+  | 2026-08 | [x402-foundation/x402#3171](https://github.com/x402-foundation/x402/issues/3171) | Reported a crash in `@x402/core` when `payload.accepted` is null/undefined. | **Fixed** — external contributor JasonColapietro wrote and merged [#3180](https://github.com/x402-foundation/x402/pull/3180). |
+  | 2026-08 | [stellar/stellar-dev-skill#96](https://github.com/stellar/stellar-dev-skill/pull/96) | Add Nirium to the Foundation's community developer-skills catalog. | **Merged.** |
+  | 2026-08 | [OpenZeppelin/stellar-contracts#840](https://github.com/OpenZeppelin/stellar-contracts/issues/840) | Read the fee-abstraction Lazy-mode expiration check as validating the wrong value; proposed a fix ([#844](https://github.com/OpenZeppelin/stellar-contracts/pull/844)). | Closed — maintainer treats the Lazy-mode value as intended behavior. Our reading, corrected by theirs. |
+  | 2026-08 | [x402-foundation/x402#3148](https://github.com/x402-foundation/x402/issues/3148) | Original header claim was corrected by a reviewer; reframed as a proposal for a payment-rejection reason-code vocabulary, grounded in five measured failure modes from production integrators. | Open, awaiting maintainer response on the proposal. |
 - **A real integrator's own words**, not solicited copy:
 
   > "We verify everything a 402 claims, whoever it comes from, and with Nirium it all checked out... And when things did come up, they got resolved fast. They warned us about a risk in our integration — that the collection account rotated on mainnet — before it bit us, and the bugs we reported were fixed the same day, not in the next release. That tells me more than any number on a landing page."
