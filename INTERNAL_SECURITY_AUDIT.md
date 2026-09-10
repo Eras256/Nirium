@@ -3,7 +3,7 @@
 
 **Scope:** Full-stack: Soroban/Rust smart contracts + Node.js API + Next.js frontend + CI/CD + Stellar SEPs
 **Methodology:** Static analysis (cargo clippy, grep), dynamic analysis (runtime checks), full-spectrum pentesting, dependency audit (cargo audit + pnpm audit), fuzz testing (cargo-fuzz 5 targets), manual code review
-**Result:** A+ — 100% (83/83 checks PASS, Grade AAA)
+**Result:** 83/83 vectors PASS, 0 critical, 0 high. This is a self-assessment, not a third-party certification.
 
 ---
 
