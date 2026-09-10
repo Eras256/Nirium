@@ -287,7 +287,7 @@ An invalid signature returns **400 and nothing is anchored**: IPFS has no delete
 | SDK | Package | Version | Install |
 |---|---|---|---|
 | TypeScript | [nirium (npm)](https://www.npmjs.com/package/nirium) | 0.13.4 | `npm install nirium` |
-| Python | [nirium (PyPI)](https://pypi.org/project/nirium/) | 0.9.0 | `pip install nirium` |
+| Python | [nirium (PyPI)](https://pypi.org/project/nirium/) | 0.9.1 | `pip install nirium` |
 
 > The two SDKs have identical **client** surfaces. TypeScript is one minor ahead because `x402Serve()` is Express middleware: server-side Node, with no meaningful Python equivalent. The version gap is the honest signal, not a lag.
 
@@ -374,7 +374,7 @@ pip install nirium       # Python SDK
 Nirium/                        (public repo)
 ├── apps/web/                  → Next.js 15 dashboard (nirium.xyz), 27 routes, i18n (EN/ES)
 ├── packages/sdk/              → TypeScript SDK v0.13.4 (npm: nirium)
-├── packages/sdk-python/       → Python SDK v0.9.0 (PyPI: nirium)
+├── packages/sdk-python/       → Python SDK v0.9.1 (PyPI: nirium)
 ├── packages/contracts/        → Soroban contracts (Rust), 2 contracts, 5 fuzz targets
 ├── packages/policy-account/   → Soroban policy account (Rust), scopes a key to one vault
 ├── packages/pollar-adapter/   → nirium-pollar-adapter v0.4.1, sign x402 with a social login
