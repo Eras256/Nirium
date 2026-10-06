@@ -43,7 +43,9 @@
       "undici@6": "6.28.1",
       "undici@8": "8.10.2",
       "ws@7": "7.5.11",
-      "ws@8": "8.21.0"
+      "ws@8": "8.21.0",
+      "source-map-js": ">=1.2.2",
+      "proxy-addr": ">=2.0.8"
     },
     "auditConfig": {
       "ignoreGhsas": [

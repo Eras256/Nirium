@@ -9,7 +9,7 @@
 ![Security](https://img.shields.io/badge/Security-Internal%20Self%20Assessment%20Only%2C%20No%20External%20Audit-blue?style=for-the-badge)
 ![Instaward](https://img.shields.io/badge/Instaward%20%231%20%26%20%232-Delivered-blueviolet?style=for-the-badge)
 ![x402](https://img.shields.io/badge/x402-In%20Production-teal?style=for-the-badge)
-![MPP](https://img.shields.io/badge/MPP-Charge%20In%20Production-teal?style=for-the-badge)
+![MPP](https://img.shields.io/badge/MPP-Experimental-lightgrey?style=for-the-badge)
 ![CoC](https://img.shields.io/badge/Stellar%20CoC-Aligned-green?style=for-the-badge)
 ![SCF](https://img.shields.io/badge/SCF-Kickstart%20Active-success?style=for-the-badge)
 
@@ -58,7 +58,7 @@ Every claim below is a link. Nothing here asks to be believed.
 | x402: first real payment | Settled 9 Jul 2026 | [`3134a51c…7558bc`](https://stellar.expert/explorer/public/tx/3134a51c66091fd7fbd85b38a4a6ec6cd432bb92c2450eac84ea7855cb7558bc) |
 | x402: paid from a social login (Pollar) | Settled 5 Aug 2026, holding **zero XLM** end to end | [`e4fa3df9…16ed9`](https://stellar.expert/explorer/public/tx/e4fa3df9cb225a4d7f64dd0082eb38218ada4b4af3378f288989a5d4b1116ed9) |
 | `nirium-pollar-adapter`: end-to-end from a clean npm install | Settled 27 Jul 2026, standard Stellar keypair signer (the pluggable-signer test, not Pollar-specific) | [`48136451…3795e`](https://stellar.expert/explorer/public/tx/4813645165d15af1e503d66ef84d826e83fff235d4f98c3f6eba8a4e7c83795e) · receipt [`QmRzgTtVPg…`](https://gateway.pinata.cloud/ipfs/QmRzgTtVPg5a5pipi8npfpXt81xiGG5Ue5Rygd6Fye1aon) |
-| MPP Charge | Live: `market` charges and delivers | [`/api/v1/mpp/info`](https://nirium-agent-mainnet.fly.dev/api/v1/mpp/info) |
+| MPP Charge | **Experimental**: rejected a valid payment when tested (testnet, 1 Oct 2026); mainnet unverified | [`/api/v1/mpp/info`](https://nirium-agent-mainnet.fly.dev/api/v1/mpp/info) |
 | Treasury: vault deployed | 6 Aug 2026, **client signs** | [`93ff6284…78416`](https://stellar.expert/explorer/public/tx/93ff6284cdf03706624c88434a79fba1b213ee547f58e09a9248f75373178416) |
 | Treasury: autonomous invest | 6 Aug 2026, **the agent signs** | [`82d73f53…6b3d4`](https://stellar.expert/explorer/public/tx/82d73f537e907140367f9343f63a36704c74a5286aced7a938cee8fffb56b3d4) |
 | Treasury: the vault itself | Client-owned, roles readable on-chain | [`CAMDXG6L…K57MH`](https://stellar.expert/explorer/public/contract/CAMDXG6L4LXLXXV675KZSHM3BMSETZ4NVMC7JYIQCZ2JTG54OMSK57MH) |

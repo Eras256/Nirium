@@ -156,7 +156,6 @@ venv/
 .pyre_configuration
 pyrightconfig.json
 apps/web/.env.local
-nirium-soroban-contracts/
 *.map
 arbitrumagents.md
 agent_*_keys.json
