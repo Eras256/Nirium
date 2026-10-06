@@ -22,6 +22,18 @@ Disbursement node: a fan-out payment from a paying party's treasury ("the
 **Company**") to one or more recipient accounts ("**Recipients**") on the Stellar
 network. "**Nirium**" refers to the software provider.
 
+On **mainnet**, the Company must identify itself before a run can be built:
+legal name, tax identification number, and the name of an authorized
+representative (`clientInfo: { legalName, taxId, repName }`). This is not
+KYC in the regulated-institution sense — Nirium performs no verification of
+the information provided, holds no license to do so, and the requirement
+exists purely as documentation preparation, adopted six months ahead of the
+LFPIORPI Art. 17 fracc. XVI effective date (17-Jan-2027) rather than in
+response to a present legal obligation. This paragraph documents what the
+software already enforces (`requireClientIdentification()`,
+`services/payoutsLegal.ts`); it does not itself constitute a representation
+that such identification satisfies any specific regulatory requirement.
+
 ## 2. Nature of the service (software-only, non-custodial)
 
 Nirium provides **software only**. The node builds an **unsigned** Stellar
@@ -85,6 +97,21 @@ without regard to its conflict-of-laws rules.
 - The number of arbitrators shall be **one**.
 - The place (seat) of arbitration shall be **Mexico City, Mexico**.
 - The language(s) of the arbitration shall be **Spanish and English**.
+
+> **Why these values (for counsel to confirm or override, not to draft from
+> scratch)**: one arbitrator, not three, because run values disputed under
+> this document are expected to stay small relative to three-arbitrator ICDR
+> cases, and a single arbitrator is materially faster and cheaper to convene
+> — the interim assumption is that speed matters more than a panel here.
+> Mexico City as seat because it is where the Company's counterparties and,
+> in most anticipated disputes, the Company itself are located, and because
+> §6 already sets Mexican governing law — an ICDR seat outside the
+> jurisdiction whose law governs the contract is an unforced complication.
+> Spanish and English together, not Spanish alone, because Nirium's own
+> operations and documentation are bilingual and a Recipient may not share
+> the Company's language. None of these were chosen to favor Nirium over the
+> Company — they were chosen to minimize friction for whichever party ends up
+> needing to actually use this clause.
 
 Judgment on the award rendered by the arbitrator(s) may be entered in any court
 having jurisdiction thereof.

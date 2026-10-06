@@ -58,6 +58,16 @@ export function middleware(request: NextRequest) {
         return blocked
     }
 
+    // /payroll se renombró a /payouts (4-oct-2026): el producto no es nómina
+    // subordinada (LFT 101), y la URL vieja seguía diciendo lo contrario.
+    // 301 explícito para que enlaces ya publicados no se rompan. /api/payroll
+    // no entra aquí: es la API del agente y conserva su nombre.
+    if (path === '/payroll' || path.startsWith('/payroll/')) {
+        const url = request.nextUrl.clone()
+        url.pathname = '/payouts' + path.slice('/payroll'.length)
+        return NextResponse.redirect(url, 301)
+    }
+
     const response = NextResponse.next()
 
     // ═══ Security Headers — OWASP API8:2023 Compliance ═══
@@ -92,7 +102,7 @@ export function middleware(request: NextRequest) {
             "img-src 'self' data: blob: https://*.nirium.xyz https://gateway.pinata.cloud https://stellar.expert https://horizon-testnet.stellar.org https://fonts.gstatic.com https://grainy-gradients.vercel.app https://api.web3modal.org https://api.sand.etherfuse.com https://stellar.creit.tech https://storage.herewallet.app https://uni.onekey-asset.com https://sdk.api.pollar.xyz https://pollar.xyz https://*.pollar.xyz",
             // OJO: vercel.json también emite un CSP — el browser aplica la INTERSECCIÓN
             // de ambos. Mantener las dos listas de connect-src idénticas.
-            "connect-src 'self' https://*.nirium.xyz https://nirium-agent.fly.dev wss://nirium-agent.fly.dev https://nirium-agent-mainnet.fly.dev https://horizon-testnet.stellar.org https://soroban-testnet.stellar.org https://horizon.stellar.org https://soroban-rpc.mainnet.stellar.gateway.fm wss://relay.walletconnect.com wss://relay.walletconnect.org https://rpc.walletconnect.com https://api.web3modal.com https://api.web3modal.org https://api.coingecko.com https://vercel.live https://va.vercel-scripts.com https://*.supabase.co wss://*.supabase.co https://api.sand.etherfuse.com https://pulse.walletconnect.org https://sdk.api.pollar.xyz",
+            "connect-src 'self' https://*.nirium.xyz https://nirium-agent.fly.dev wss://nirium-agent.fly.dev https://nirium-agent-mainnet.fly.dev https://nirium-play-backend.fly.dev https://horizon-testnet.stellar.org https://soroban-testnet.stellar.org https://horizon.stellar.org https://soroban-rpc.mainnet.stellar.gateway.fm wss://relay.walletconnect.com wss://relay.walletconnect.org https://rpc.walletconnect.com https://api.web3modal.com https://api.web3modal.org https://api.coingecko.com https://vercel.live https://va.vercel-scripts.com https://*.supabase.co wss://*.supabase.co https://api.sand.etherfuse.com https://pulse.walletconnect.org https://sdk.api.pollar.xyz",
             "frame-src 'self' https://verify.walletconnect.com https://verify.walletconnect.org",
             "object-src 'none'",
             "base-uri 'self'",

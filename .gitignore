@@ -1,68 +1,227 @@
-# --- NIRIUM SHOWROOM .gitignore --- (BSL 1.1 Public Distribution)
-
-# Node/PNPM
 node_modules/
-.npmrc
-pnpm-lock.yaml
-package-lock.json
-
-# Build / Transpiled
+**/node_modules/
 dist/
-build/
-target/
-.vercel
-.next/
-out/
-*.tsbuildinfo
+**/dist/
+.turbo/
+**/ .turbo/
+/.pnpm-debug.log*
+/.next-internal
 
-# ══════════════════════════════════════════════════
-# SECRETOS — NUNCA DEBEN APARECER EN EL SHOWROOM
-# ══════════════════════════════════════════════════
+# next.js
+/.next/
+/out/
+
+# production
+/build
+
+# misc
+.DS_Store
+*.pem
+
+# debug
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# local env files
+.env*.local
+
+# vercel
+.vercel
+
+# typescript
+*.tsbuildinfo
+next-env.d.ts
+
+# Rust / Soroban
+/target/
+target/
+**/target/
+Cargo.lock
+# fuzz/ is a standalone binary-only crate (never published, never a
+# dependency of anything) run only in CI -- committing its lockfile is
+# the standard cargo-fuzz convention and is what keeps a loose upstream
+# dependency spec (see fuzz/Cargo.toml's ed25519-dalek comment) from
+# silently breaking CI again whenever crates.io publishes something new.
+!fuzz/Cargo.lock
+# Root workspace lockfile (packages/contracts + protocol/) -- these compile
+# to deployed WASM artifacts, not a library other Rust projects depend on,
+# so the usual "don't commit a library's Cargo.lock" advice doesn't apply
+# here; reproducible builds matter more than resolution flexibility. Same
+# root cause as fuzz/Cargo.lock: without this, `ethnum` floated to 1.5.2
+# and broke CI's contracts build against the current rustc (fixed via
+# `cargo update -p ethnum --precise 1.5.3`) with nobody noticing until CI
+# finally got far enough to reach that step.
+!/Cargo.lock
+fuzz/corpus/
+fuzz/artifacts/
+packages/contracts/test_snapshots/
+*.wasm
+
+
+
+# ---------------------------------------------
+# AI Agent Generated Documentation (Ignored)
+# ---------------------------------------------
+# Ignoring prompts and plans generated for other networks/hackathons
+# Ignore all root markdown files except core documentation
+*.md
+# 13-sep-2026: the *.md rule above is repo-wide (no leading /), so it was
+# also silently swallowing every SKILL.md under .agents/skills/ and
+# .claude/skills/ — only nirium-core-context/SKILL.md survived, via a past
+# `git add -f`. Everything else (full-context-loading, nirium-github-sweep,
+# npm-tarball-verify, cross-repo-content-sync, claude-antigravity-setup)
+# existed only on this machine's filesystem, not in git — a fresh clone or
+# machine swap would have lost them. First pass only excepted SKILL.md
+# itself, then found companion .md files (cross-chain/{cctp,axelar,
+# layerzero}.md, pitch-deck/references/*.md, copywriting/references/*.md,
+# spec-to-code-compliance/resources/*.md) still silently caught by the same
+# rule — widened to the whole directory so no future companion file repeats
+# this. Explicit exception, not a `git add -f` workaround, so it survives
+# future edits to the *.md list above.
+!.agents/skills/**
+!.claude/skills/**
+!README.md
+!DECISION_LOG.md
+!CONTRIBUTING.md
+!NIRIUM_TECHNICAL_PAPER.md
+!DEMO_SCRIPT.md
+!SECURITY.md
+!SECURITY_AUDIT_V2.md
+!claude.md
+!AGENTS.md
+!IsacapKey.md
+!SDKs.md
+!MCP_INTEGRATION_GUIDE.md
+!MARKETING_PLAN_APRIL_2026.md
+!Pitch_Alberto_Stellar_House_CDMX.md
+!Playbook_Stellar_House_CDMX.md
+!SCF_Pitch_Deck_Completo.md
+!Elevator_Pitches.md
+# Servable legal docs live under public/ — not internal docs, must ship.
+!apps/web/public/legal/*.md
+!CODE_OF_CONDUCT.md
+!LICENSING.md
+!SCF_Pitch_Deck_REFINED.md
+!INTERNAL_SECURITY_AUDIT.md
+!supanirium.md
+
+# ---------------------------------------------
+# Legal-sensitive docs: explicit rule, not just *.md
+# ---------------------------------------------
+# 20-ago-2026: PAQUETE-ABOGADO-2026.md ended up committed (b117f70) with no
+# rule covering it at all — the *.md pattern above never protected it, an
+# earlier oversight, not a later exception overriding it. Stripped from
+# history and given its own explicit rule here so a future edit to the *.md
+# exception list above can't silently re-expose it the same way.
+PAQUETE-ABOGADO-2026.md
+
+# 20-ago-2026: NiriumMainnet.md is different from the case above — the rule
+# for it already existed (see the "Internal product strategy docs" list
+# further down), added in the very same commit (1a384b9, 16-jul-2026) that
+# ALSO force-added the file to git anyway (git add -f), contradicting the
+# rule it had just written. A gitignore rule can't un-track a file once
+# tracked — that's what let it stay committed for over a month despite the
+# rule existing the whole time. Stripped from history (4 commits rewritten,
+# main rebase); no new line needed here, the existing one below already
+# covers it correctly now that the file is untracked again.
+
+# Ignoring plans generated if any
+implementation_plan.json
+
+# Internal product strategy docs (not committed)
+nodos.md
+qapitch.md
+instaward2-plan.md
+propuesta-remzy.md
+contrato-remzy-msa.md
+SDF.md
+boxb-mainnet.md
+NiriumMainnet.md
+
+# Secrets
 .env
 .env.*
-*.env
-*.env.local
-.env.local
-.contract-ids.env
-central_issuer.json
-packages/agent/.env
-apps/web/.env.local
 
-# ══════════════════════════════════════════════════
-# LOGICA PROPIETARIA — PROTEGIDA (STUBS EN SU LUGAR)
-# ══════════════════════════════════════════════════
-packages/agent/src/services/swarm/
-packages/agent/src/execution/executeStrategy.ts
-packages/agent/src/providers/llm/
-packages/agent/scripts/
-scripts/surgical_filter.sh
-scripts/public_export.sh
+# AI config
+.gemini/
 
-# ══════════════════════════════════════════════════
-# INFRAESTRUCTURA INTERNA
-# ══════════════════════════════════════════════════
-db_scripts/
-supabase/
-bin/
-
-# ══════════════════════════════════════════════════
-# AI / INSTRUCCIONES INTERNAS
-# ══════════════════════════════════════════════════
-.claude/
-claude.md
-.agent/
-
-# ══════════════════════════════════════════════════
-# DIRECTORIOS DE TRABAJO
-# ══════════════════════════════════════════════════
-nirium-public-rebuilt/
-nirium-public-showroom/
-tmp/
-tmp-sdk-test/
-
-# IDE
-.DS_Store
-.idea/
-.vscode/
+# Benchmarking
+# Python / Local Dev Extras
+.venv/
+**/.venv/
+venv/
+**/venv/
 *.log
-packages/contracts/test_snapshots/
+.pyre_configuration
+pyrightconfig.json
+apps/web/.env.local
+nirium-soroban-contracts/
+*.map
+arbitrumagents.md
+agent_*_keys.json
+
+# Compliance (internal docs - gitignored)
+compliance/eligibility-checklist.md
+compliance/social-media-guide.md
+compliance/video-demo-script.md
+compliance/out-of-scope-findings.md
+# Note: claude.md is tracked (see !claude.md exception above)
+
+# JARGUS — Framework propietario de Gio Vargas (pentesting)
+# Tracked en el repo PRIVADO — nunca sincronizar al repo público
+# (el script de sync solo copia README/SECURITY/SDKs/TECHNICAL_PAPER)
+
+# Working/throwaway dirs (local only)
+scratch/
+.vercel-backup/
+.vercel.bak/
+.env*
+pitch-deploy/
+
+# Salida generada por scripts/rebuild-public-repo.sh — nunca trackear
+nirium-public-rebuilt/
+
+# Python bytecode
+__pycache__/
+*.pyc
+
+# Preparación de consulta legal — interno, no va al repo público
+legal-preguntas-tesoreria.md
+
+# ---------------------------------------------
+# Contexto de estrategia SCF — SOLO en el privado
+# ---------------------------------------------
+# Instalado el 7-ago-2026 con stellar-build. Nada de esto va al repo público
+# (Eras256/Nirium) ni al de la organización (nirium-protocol/nirium-sdk).
+#
+# Por qué importa aunque hoy viva fuera del repo: ECOSYSTEM.md es el catálogo
+# de LumenLoop con los 728 proyectos y sus montos de award, y las notas de
+# estrategia dicen contra quién competimos y qué track vamos a usar. Publicar
+# eso es regalarle a otro postulante el análisis que nos costó construir — y
+# `*.md` ya lo cubre, pero un `!ECOSYSTEM.md` distraído lo desharía en un
+# segundo. La redundancia aquí es a propósito.
+ECOSYSTEM.md
+PROMPT-nirium-audit.md
+PROMPT-periplo-build.md
+submission-*.md
+dossier-*.html
+correo-scf-*.md
+scheme_upto_stellar.md
+
+# Referencias de terceros clonadas para consulta (viven en ~/stellar-ref).
+# Si alguna vez se copian aquí, no se versionan: la mayoría no publica licencia,
+# y la que sí la publica se consume como dependencia de npm/crates, no vendorizada.
+stellar-ref/
+stellar-build/
+.stellar-build/
+
+# Catálogo y skills instalados por stellar-build (viven en ~/.claude/skills).
+# Se ignoran por si alguien los copia al repo para "tenerlos a mano".
+**/skills/data/lumenloop/
+**/projects.json
+packages/agent/central_issuer.json
+
+# stale deploy artifacts
+packages/contracts/deployment_id.txt
+packages/contracts/deploy_output.log

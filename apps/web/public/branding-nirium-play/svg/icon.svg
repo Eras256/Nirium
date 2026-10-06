@@ -1,0 +1,39 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
+  <defs>
+    <linearGradient id="gold" x1="0" y1="0" x2="100" y2="100" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#F5D57A"/>
+      <stop offset="0.5" stop-color="#D4AF37"/>
+      <stop offset="1" stop-color="#8B6F2E"/>
+    </linearGradient>
+  </defs>
+
+  <!-- shoulder bumpers -->
+  <rect x="18" y="24" width="16" height="10" rx="4" fill="none" stroke="url(#gold)" stroke-width="5"/>
+  <rect x="66" y="24" width="16" height="10" rx="4" fill="none" stroke="url(#gold)" stroke-width="5"/>
+
+  <!-- body + grip bulges: classic controller silhouette, one outline -->
+  <path d="M22,32
+           H78
+           a12,12 0 0 1 12,12
+           v10
+           a16,16 0 0 1 -16,16
+           a10,10 0 0 1 -9,-5.5 L58,58
+           H42
+           l-7,6.5
+           a10,10 0 0 1 -9,5.5
+           a16,16 0 0 1 -16,-16
+           v-10
+           a12,12 0 0 1 12,-12
+           Z"
+        fill="none" stroke="url(#gold)" stroke-width="5.5" stroke-linejoin="round"/>
+
+  <!-- D-pad: the official N mark, scaled — identical path to icon.svg -->
+  <g transform="translate(18,34) scale(0.20)">
+    <path d="M25,85 L25,15 L75,85 L75,15" fill="none" stroke="url(#gold)" stroke-width="14" stroke-linecap="round" stroke-linejoin="round"/>
+  </g>
+
+  <!-- face buttons: payment / audit dots + a Stellar 4-point star -->
+  <circle cx="66" cy="41" r="3.4" fill="url(#gold)"/>
+  <circle cx="66" cy="53" r="3.4" fill="url(#gold)"/>
+  <path d="M78,39 L80.1,44.9 L86,47 L80.1,49.1 L78,55 L75.9,49.1 L70,47 L75.9,44.9 Z" fill="url(#gold)"/>
+</svg>

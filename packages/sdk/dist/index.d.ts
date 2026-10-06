@@ -1,3 +1,4 @@
+import { type X402GuardConfig } from './x402-guard.js';
 export interface AgentConfig {
     apiKey: string;
     baseUrl?: string;
@@ -426,6 +427,29 @@ export interface TreasuryRebalanceResult {
     signWith: string;
     instructionCount: number;
 }
+export interface TreasuryProposeRebalanceOptions {
+    vault: string;
+    caller: string;
+    /** Rate (%) at or above which idle funds get proposed for Invest. Your mandate, not a Nirium default. */
+    enterAt: number;
+    /** Rate (%) at or below which invested funds get proposed for Unwind. */
+    exitAt: number;
+    /** Stroops, as a string or number. Omit for no minimum (0). */
+    minIdle?: string | number;
+}
+export interface TreasuryProposeRebalanceResult {
+    ok: true;
+    network: string;
+    vault: string;
+    instructions: TreasuryInstruction[];
+    rate: number | null;
+    rateSource: 'declared';
+    /** Present only when `instructions` is non-empty. Sign with `signWith` and submit via submitTreasuryTx. */
+    xdr?: string;
+    signWith?: string;
+    /** Present only when `instructions` is empty, explaining why nothing was proposed. */
+    reason?: string;
+}
 export interface TreasuryRebalanceExecuteResult {
     ok: true;
     network: string;
@@ -757,6 +781,18 @@ export declare class Agent {
      */
     buildTreasuryRebalance(options: TreasuryRebalanceOptions): Promise<TreasuryRebalanceResult>;
     /**
+     * Ask the agent what it would propose for this vault — the same decision
+     * logic the autonomous signer uses (rate vs. your own enterAt/exitAt),
+     * but this never signs. Returns an unsigned XDR for you to review and
+     * sign yourself, or an empty `instructions` array with a `reason` if
+     * there's nothing to do right now. Public: no allowlist, no invite —
+     * works for any vault where `caller` is already the on-chain
+     * rebalanceManager. Unlike executeTreasuryRebalance, Nirium never
+     * executes on your behalf here, so this doesn't wait on the same legal
+     * review the fully autonomous path does.
+     */
+    proposeTreasuryRebalance(options: TreasuryProposeRebalanceOptions): Promise<TreasuryProposeRebalanceResult>;
+    /**
      * Sign and submit a rebalance with Nirium's own RebalanceManager key and
      * wait for confirmation. Only available where that key actually lives —
      * mainnet's receive-only box returns 501 by design, not a broken 500.
@@ -844,7 +880,20 @@ export interface X402ServeConfig {
     facilitatorAuthHeader?: string;
     appName?: string;
     appLogo?: string;
+    /**
+     * Optional replay/rate-limit protection - off by default. Providing
+     * `guard.store` turns it on; without it, x402Serve() behaves exactly
+     * as before. See x402-guard.ts and
+     * https://github.com/nirium-protocol/nirium/issues/91.
+     */
+    guard?: X402GuardConfig;
 }
 export declare function x402Serve(config: X402ServeConfig): any;
+export { x402Metrics } from './metrics.js';
+export type { X402MetricsResult, MetricsSnapshot } from './metrics.js';
+export type { X402GuardStore, X402GuardConfig, GuardRequest, GuardDenied } from './x402-guard.js';
+export { createUpstashX402GuardStore } from './x402-guard-upstash.js';
+export type { UpstashX402GuardStoreOptions } from './x402-guard-upstash.js';
 export default Agent;
+export { ResilientSignalClient, type ResilientSignalClientOptions, type ConnectionStatus, type ConnectionStatusInfo, } from './resilient-ws.js';
 //# sourceMappingURL=index.d.ts.map

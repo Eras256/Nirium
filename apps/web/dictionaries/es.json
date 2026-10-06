@@ -27,11 +27,16 @@
     "developers": "Developers",
     "pricing": "Precios",
     "blog": "Blog",
+    "build": "Construir",
     "launch_app": "Launch app",
     "coming_soon_nav": "PRÓXIMAMENTE",
     "back_to_marketing": "← Inicio",
     "no_wallet": "Entrar",
-    "no_wallet_hint": "Entra con correo o Google — sin instalar nada"
+    "no_wallet_hint": "Entra con correo o Google — sin instalar nada",
+    "group_core": "CORE",
+    "group_treasury": "TESORERÍA",
+    "group_developer": "DEVELOPER",
+    "product_menu": "Producto"
   },
   "blog": {
     "badge": "Blog",
@@ -69,7 +74,91 @@
         "h_takeaway": "Lo que nos llevamos",
         "takeaway_p1": "Más allá del pitch, el valor de La Arena fueron las conversaciones que abrió — con inversionistas y operadores del ecosistema que entienden tanto el stack de Stellar como el contexto regulatorio mexicano. Esas son las relaciones que convierten un protocolo funcionando en testnet en un producto financiado, auditado y en mainnet. Salimos con nuevos hilos que jalar y una lectura más clara de lo que los socios institucionales necesitan ver a continuación: adopción verificable, no promesas.",
         "where_label": "Dónde estamos",
-        "where_body": "Nirium corre en vivo en la testnet de Stellar — un agente autónomo, SDKs de TypeScript y Python publicados, pagos agénticos x402/MPP nativos y un audit trail inmutable. Mainnet sigue sujeto a auditoría. Respaldado por el ecosistema Stellar: beca SCF Kickstart, graduado de SDF Scale y Embajador activo de Stellar México."
+        "where_body": "Nirium corre en vivo en la testnet de Stellar — un agente autónomo, SDKs de TypeScript y Python publicados, pagos agénticos x402/MPP nativos y un audit trail inmutable. Mainnet sigue sujeto a auditoría. Respaldado por el ecosistema Stellar: Instaward SCF, graduado de SDF Scale y Embajador activo de Stellar México."
+      },
+      "treasury-node-verify-it-yourself": {
+        "tag": "Tesorería",
+        "title": "El Treasury Node en mainnet: no nos creas, verifica el contrato",
+        "excerpt": "El agente de Nirium sostiene el rol RebalanceManager sobre un vault real de DeFindex en Stellar mainnet — y el propio código del contrato hace que retirar sea estructuralmente imposible para ese rol, no solo algo contrario a nuestra política. Aquí está la transacción, la línea exacta de código fuente que lo prueba, y qué significa para cada parte involucrada.",
+        "h1": "El Treasury Node en mainnet: no nos creas, verifica el contrato",
+        "fact_date": "6 ago 2026",
+        "fact_network": "Stellar mainnet",
+        "fact_role": "Solo RebalanceManager",
+        "p1": "La mayoría de las afirmaciones de \"no somos custodios\" en esta industria son una política: un equipo dice que no va a mover tu dinero, y tú decides si le crees. La nuestra es una restricción que impone un contrato inteligente que nosotros no controlamos. Este post recorre una transacción real que lo demuestra, y qué vale esa prueba para cada actor cerca de ella — DeFindex, Etherfuse, OtterSec, el ecosistema Stellar, la gente que eventualmente confiaría dinero real a un agente, y Nirium mismo.",
+        "p2": "Nada de esto es un resumen que tengas que creer por fe. Cada hash, dirección de contrato y línea de código de abajo es un link — ve a comprobarlo.",
+        "h_fact": "El hecho, en simple",
+        "fact_p1": "El 6 de agosto de 2026 a las 00:56:39 UTC, una dirección controlada por el agente de Nirium llamó a `rebalance()` sobre un vault real de DeFindex en Stellar mainnet, con una instrucción `Invest`, moviendo 1.0 CETES del saldo ocioso del vault hacia la estrategia de Etherfuse de DeFindex. Ningún humano hizo clic en nada. Transacción:",
+        "fact_p2": "La dirección que firmó esta transacción específica ya rotó a una llave nueva — higiene operativa de rutina, no un escándalo. Quién sostiene el rol RebalanceManager hoy es en sí un hecho público, en cadena, que cualquiera puede leer llamando la propia función de lectura `get_rebalance_manager()` del vault — nada sobre quién sostiene este rol está escondido detrás de nuestra palabra.",
+        "fact_p3": "Aquí está la parte que de verdad importa: esto no es una política que Nirium decidió seguir. Es lo que el propio código del contrato del vault le permite hacer al rol RebalanceManager, punto. `rebalance()` acepta exactamente dos instrucciones que mueven valor — `Unwind` e `Invest` — y ninguna recibe una dirección de destino como argumento. `Unwind` tiene el destino fijo en el código a `e.current_contract_address()`, el propio vault; `Invest` no tiene ningún parámetro de destino, el dinero solo puede moverse hacia una estrategia que el vault ya reconoce como propia. Retirar hacia una dirección arbitraria no está bloqueado por una validación en algún lado — no existe ninguna ruta de código que acepte una. Cualquier otra capacidad real — pausar una estrategia, rescatar fondos, cambiar quién sostiene un rol — pertenece al Manager, un rol que el agente de Nirium no sostiene.",
+        "evidence_label": "Compruébalo tú mismo",
+        "evidence_tx_label": "La transacción (Stellar Expert)",
+        "evidence_vault_label": "El contrato del vault",
+        "evidence_strategy_label": "La estrategia de Etherfuse en la que invirtió",
+        "evidence_source_label": "El código fuente exacto — rebalance(), Unwind e Invest",
+        "evidence_roles_label": "La documentación de DeFindex sobre roles del vault",
+        "evidence_audit_label": "La auditoría de OtterSec sobre esta familia de contratos de vault",
+        "h_why": "Por qué importa, más allá de esta transacción",
+        "why_p1": "\"No custodiamos tu dinero\" es la frase más común en DeFi, y por sí sola no vale nada — es exactamente lo que diría un equipo a punto de huir con tu dinero. Lo que cambia el cálculo no es la frase, es si la afirmación se puede comprobar sin tener que confiar en quien la dice. El código fuente de un contrato se puede comprobar. Las intenciones de un equipo no.",
+        "why_p2": "Ese es el cambio real que demuestra esta transacción: de \"confía en nosotros\" a \"aquí está el código, aquí está la transacción, ve y verifica tú mismo los dos.\" Nirium no sostiene el rol que podría tomar custodia aunque quisiera — ese rol es el Manager de DeFindex, y en este vault ese rol le pertenece al dueño del vault, no a nosotros. El agente propone y ejecuta el rebalanceo; estructuralmente no puede irse con el dinero.",
+        "h_impact": "Qué significa esto, actor por actor",
+        "impact_intro": "Esto no es una sola historia — es una afirmación distinta y específica para cada actor cerca de ella, y ninguna es nuestra para hacerla de forma unilateral. Esto es lo que cada uno puede comprobar de verdad.",
+        "impact_defindex_h": "Para DeFindex",
+        "impact_defindex_p": "La arquitectura de un vault es tan fuerte como su peor integración. Este es un tercero real — no la propia documentación de DeFindex, no una prueba sintética — moviendo valor real a través del rol RebalanceManager exactamente como fue diseñado, en mainnet, con el resultado verificable públicamente. Esa es una validación más dura que cualquier suite de pruebas interna, y es evidencia que DeFindex puede señalar, no solo afirmar.",
+        "impact_etherfuse_h": "Para Etherfuse",
+        "impact_etherfuse_p": "CETES en Stellar acaba de ganar un camino más — real, automatizado y ahora verificado — hacia su rendimiento: capital moviéndose hacia la estrategia de Etherfuse en Blend sin un humano frente a una terminal, y sin que nadie tenga que confiar en quien opera esa automatización. Esa es una respuesta concreta a la pregunta que cualquier integrador potencial hace antes de conectarse a un producto de rendimiento: ¿qué pasa si lo que me manda capital se ve comprometido? Aquí: nada que no esté permitido, porque el contrato no lo deja.\n\nY no es solo tracción técnica: Etherfuse ya opera con dos bases legales reales, no una promesa — un no-action relief de la CNBV mexicana (Resolución P090/2024, 16 de abril de 2024, para la entidad Etherfuse Liquid) y sus Stablebonds registrados como valores basados en registro bajo ley suiza (Art. 973d del Código de Obligaciones). Este flujo automatizado se suma a esa base, no depende de ella.",
+        "impact_ottersec_h": "Para OtterSec",
+        "impact_ottersec_p": "Un reporte de auditoría prueba que el código fue revisado. Una transacción real, meses después, comportándose exactamente como esa revisión dice que debería, prueba que la revisión resistió fuera del laboratorio — bajo una integración real que nadie escribió específicamente para pasar una prueba. Esa es una afirmación más fuerte que \"auditado\": auditado y confirmado en producción.",
+        "impact_stellar_h": "Para Stellar como ecosistema",
+        "impact_stellar_p": "La automatización DeFi no-custodial es un pitch común y un artefacto raro en mainnet. Este es un ejemplo concreto, fechado y en cadena de un agente autónomo moviendo valor real entre primitivas DeFi en Stellar sin sostener nunca custodia de él — no una diapositiva de roadmap, no una demo de testnet, una transacción que cualquiera puede decodificar por su cuenta.",
+        "impact_clients_h": "Para quienes eventualmente confiarían dinero real a un agente",
+        "impact_clients_p": "Para ser directos sobre dónde está esto hoy: el vault de este post es el propio equipo de Nirium probando el mecanismo con su propio dinero, todavía no el dinero de un cliente externo — vale decirlo con claridad, porque el punto entero de este post es no exagerar lo que es verificable. Lo que esto le da a un futuro cliente no es la promesa de que va a funcionar cuando le toque a él. Es algo que puede comprobar antes de tener que creer nuestra palabra sobre nada: el contrato exacto, el rol exacto, la transacción exacta, todo público, todo hoy.",
+        "impact_nirium_h": "Para Nirium",
+        "impact_nirium_p": "Este es el tipo de evidencia que no se infla bajo escrutinio — se vuelve más fuerte mientras más se le mire de cerca, que es lo contrario de la mayoría de las afirmaciones en este espacio. Para el Stellar Community Fund y para cualquier socio futuro evaluando si la afirmación de no-custodia es real, esta transacción y las tres líneas de código del contrato detrás de ella son el diferenciador real, no una línea en un pitch deck.",
+        "regulatory_map_p": "Un dato más para ser exhaustivos: convertir USDC a CETES en este flujo toca tres regímenes regulatorios distintos, no uno — Circle (emisor de USDC) tiene licencia completa bajo MiCA en la UE y múltiples licencias en EE.UU., pero sin autorización directa de Banxico/CNBV para operar en México; Etherfuse opera bajo su no-action relief mexicano y su registro suizo, también sin ser una entidad bancaria mexicana autorizada. Ninguno de los dos está haciendo algo indebido — es simplemente el mapa real de quién regula qué, sin simplificarlo.",
+        "h_close": "Ve y compruébalo",
+        "close_p1": "Cada link de arriba resuelve a algo que no tienes que creernos por nuestra palabra — un explorador de bloques en vivo, un repositorio público de GitHub, una página de documentación que controla DeFindex, no nosotros. Decodifica la transacción. Lee el contrato. Si algo aquí no resiste como este post dice que resiste, vale la pena saberlo — para ti y para nosotros.",
+        "where_label": "Dónde estamos",
+        "where_body": "El Treasury Node de Nirium corre en mainnet como RebalanceManager sobre vaults de DeFindex que el cliente posee — invite-only mientras se resuelve una pregunta legal específica abierta bajo la ley mexicana de prevención de lavado de dinero (LFPIORPI, art. 24 Bis 4) sobre intermediación de activos virtuales, con un camino público firmado por el cliente (propose-and-sign) disponible para cualquiera hoy. x402, MPP y el anclaje de auditoría están en vivo en testnet y en mainnet."
+      },
+      "x402-outage-verify-it-yourself": {
+        "tag": "Liquidación",
+        "title": "x402 en mainnet estuvo caído 32 días: no nos creas, verifica el arreglo",
+        "excerpt": "Cada request de pago en mainnet contra los endpoints x402 de Nirium falló durante 32 días — no por nuestro código, sino por una URL de RPC desactualizada dentro de un facilitador que no operamos. Aquí está la causa raíz, los dos pagos reales independientes que prueban que ya está arreglado, y el hook de logging permanente que dejamos para que la próxima vez no tarde un mes en notarse.",
+        "h1": "x402 en mainnet estuvo caído 32 días: no nos creas, verifica el arreglo",
+        "fact_date": "11 sep 2026",
+        "fact_network": "Stellar mainnet",
+        "fact_duration": "32 días caído",
+        "p1": "Todo producto de pagos construido sobre un estándar que no controla del todo tarde o temprano enfrenta la misma prueba: ¿qué pasa cuando lo que dependes se rompe, y no es tu código? Durante 32 días, los pagos x402 en mainnet contra los endpoints de Nirium fallaron en cada intento — no por un bug nuestro, sino por una mala configuración dentro de un facilitador que no operamos y no podemos parchar nosotros mismos. Este post es el arco completo: qué se rompió, cómo probamos que no era nuestro, cómo se arregló, y qué dejamos construido para que la próxima caída no necesite un reporte externo para notarse.",
+        "p2": "Nada aquí es un resumen que tengas que creer por fe. Cada hash de transacción, comentario de GitHub y archivo de abajo es un link — ve y compruébalo.",
+        "h_fact": "El hecho, en términos simples",
+        "fact_p1": "Desde alrededor del 10 de agosto de 2026, cada liquidación x402 en mainnet contra los endpoints pagados de Nirium — y contra cualquier otro integrador que usara el mismo facilitador hosted — empezó a fallar con `unexpected_verify_error`, el catch-all de una excepción no manejada dentro del propio `verify()` del facilitador. No era un pago rechazado: el facilitador nunca llegaba lo bastante lejos como para evaluar uno. Las pruebas de aislamiento de ese día, y de cada día después, mostraron el mismo patrón: el mismo cliente y el mismo payload liquidaban limpio en testnet, y fallaban igual en mainnet, cada vez.",
+        "fact_p2": "Abrimos OpenZeppelin/relayer-plugin-x402-facilitator#47 el 19 de agosto. Tres integradores independientes — nosotros, AgentLedger, y un tercero — convergimos en exactamente el mismo hallazgo a lo largo de un mes de silencio en dos canales oficiales de OpenZeppelin. Lo que en realidad destrabó todo no fue el hilo ni un post en su foro de soporte: fue etiquetar directamente, por nombre de usuario, a los dos maintainers que verificamos que seguían activos en otra parte de la organización. Uno respondió en menos de un día.",
+        "fact_p3": "La causa raíz, una vez publicada: la instancia hosted del facilitador en pubnet apuntaba a una URL de RPC desactualizada, así que `verify()` reventaba antes de siquiera llegar al payload. Reprobamos esa misma tarde con una liquidación real contra nuestro propio endpoint de mainnet — `200` limpio, confirmado en Horizon. Un segundo equipo, completamente independiente, corrió la prueba idéntica al día siguiente, con el mismo resultado. Dos equipos, dos pagos, dos días distintos, una sola causa raíz:",
+        "evidence_label": "Compruébalo tú mismo",
+        "evidence_tx1_label": "Nuestra reprueba, confirmada en Horizon",
+        "evidence_tx2_label": "La confirmación independiente de AgentLedger, al día siguiente",
+        "evidence_issue_label": "El issue que abrimos — ya cerrado",
+        "evidence_rootcause_label": "El comentario del maintainer con la causa raíz",
+        "evidence_devlog_label": "Nuestra propia entrada de devlog, con fechas y todo",
+        "h_why": "Por qué importa, más allá de esta caída",
+        "why_p1": "Todo producto de pagos construido sobre x402 — el nuestro incluido — depende de un facilitador que no opera. Esa dependencia es real, no teórica, y fingir lo contrario no hace que una caída sea menos probable. Lo que de verdad cambia el resultado es si la falla se encuentra, se diagnostica con la misma disciplina que un bug en tu propio código, y se hace visible en vez de reintentarse en silencio hasta volverse invisible.",
+        "why_p2": "La respuesta correcta a depender de infraestructura que no controlas no es esconderse cuando se rompe — es instrumentarla, diagnosticarla con método, y dejar visibilidad permanente para que la próxima falla no necesite un reporte externo para notarse.",
+        "h_impact": "Qué significa esto, actor por actor",
+        "impact_intro": "Esto no es una sola historia — es una afirmación distinta y específica para cada actor cerca de ella. Esto es lo que cada uno puede comprobar de verdad.",
+        "impact_openzeppelin_h": "Para OpenZeppelin",
+        "impact_openzeppelin_p": "Un facilitador hosted carga peso operativo real — el tráfico pagado de cada integrador pasa por ahí, y una mala configuración silenciosa de su lado es invisible del nuestro hasta que alguien la reporta desde afuera. Una vez etiquetados directamente, el arreglo real (corregir la URL de RPC en pubnet) llegó en dos días, y se sostiene bajo las liquidaciones reales de dos equipos independientes desde entonces. Ese resultado pesa más que cuánto duró el silencio.",
+        "impact_fernando_h": "Para Fernando / AgentLedger",
+        "impact_fernando_p": "Su propio pago en mainnet chocó con esta misma caída el 4 de septiembre, bloqueado por algo completamente fuera de su control y del nuestro. Se quedó en el hilo, reintentó al día siguiente de que se publicara el arreglo, y publicó su propia confirmación independiente — una segunda liquidación real, otra cuenta, el mismo resultado limpio. Eso pesa más que cualquier equipo reprobando su propio arreglo.",
+        "impact_stellar_h": "Para Stellar como ecosistema",
+        "impact_stellar_p": "Esto corrió completamente en mainnet, contra infraestructura real, con liquidaciones reales de USDC con fee patrocinado — no una demo de testnet haciendo de sustituto. Una caída de facilitador que afecta a todo un ecosistema es exactamente el tipo de falla fácil de describir en abstracto y difícil de probar que fue real; este post existe para que tampoco tengas que creer esa parte por fe.",
+        "impact_clients_h": "Para los clientes e integradores de Nirium",
+        "impact_clients_p": "El camino de pago en mainnet vuelve a ser confiable, confirmado por dos equipos separados en dos días separados — no solo nuestra palabra de que ya está arreglado. Nada cambia del lado de la integración: el mismo cliente, los mismos endpoints, el mismo header. Si te falló durante esta ventana, no era tu integración.",
+        "impact_nirium_h": "Para Nirium",
+        "impact_nirium_p": "Publicamos un hook de logging del lado del servidor a mitad de la caída — `onAfterVerify`/`onVerifyFailure` sobre el cliente del facilitador, que escribe cada razón de rechazo y la dirección del pagador en nuestros propios logs en vez de ser visible solo desde afuera. Se queda de forma permanente, no como parche para este bug específico: es la diferencia entre encontrar la próxima regresión del facilitador nosotros mismos, o esperar a que otro integrador la reporte primero.",
+        "h_close": "Ve y compruébalo",
+        "close_p1": "Cada link de arriba resuelve a algo que no tienes que creernos por nuestra palabra — un explorador de bloques en vivo, un hilo de issue de GitHub, nuestra propia entrada de devlog con las fechas y la causa raíz explicadas. Decodifica las transacciones. Lee el hilo. Si algo aquí no resiste como este post dice que resiste, vale la pena saberlo — para ti y para nosotros.",
+        "where_label": "Dónde estamos",
+        "where_body": "x402 corre en vivo hoy en testnet y en mainnet — los mismos endpoints, el mismo cliente, el mismo header, nada cambió por este incidente salvo que una falla del lado del facilitador ahora llega a nuestros propios logs en el momento en que ocurre, no después de que alguien más la note primero. Actualización, 2026-10-04 (verificado contra el changelog de nirium 0.16.0 ese día): este párrafo decía originalmente que MPP Charge también corre en vivo en mainnet. Era incorrecto: MPP Charge es experimental y no está disponible en mainnet."
       }
     }
   },
@@ -96,7 +185,7 @@
     "ignite_protocol": "LANZAR INTERFAZ",
     "connection_established": "CONEXIÓN ESTABLE",
     "connection_connecting": "CONECTANDO...",
-    "kernel_version": "NIRIUM v0.10.2 (Julio 2026)",
+    "kernel_version": "NIRIUM v0.16.0 (Octubre 2026)",
     "soroban_verified": "SOROBAN VERIFICADO",
     "testnet_live": "STELLAR TESTNET ACTIVA",
     "powered_by": "Tecnología Stellar · Código Abierto",
@@ -110,14 +199,14 @@
     "terms": "Términos de Servicio",
     "testnet_nodes": "Nodos Online",
     "rights": "TODOS LOS DERECHOS RESERVADOS",
-    "compliance_disclaimer": "Nirium proporciona infraestructura de software no custodial. No brindamos asesoría financiera, legal o de inversión. Las métricas de ejecución de software son estimaciones históricas y no están garantizadas. Los activos digitales conllevan riesgos. Nirium es independiente y no está respaldado por la Stellar Development Foundation. Nirium es beneficiario de una beca SCF Kickstart y un proyecto independiente del ecosistema Stellar. Al participar en nuestro ecosistema, aceptas el Código de Conducta de Stellar (actualizado el 30 de abril de 2026), priorizando el profesionalismo, la diversidad y el respeto mutuo.",
+    "compliance_disclaimer": "Nirium proporciona infraestructura de software no custodial. No brindamos asesoría financiera, legal o de inversión. Las métricas de ejecución de software son estimaciones históricas y no están garantizadas. Los activos digitales conllevan riesgos. Nirium es independiente y no está respaldado por la Stellar Development Foundation. Nirium es beneficiario de un Instaward SCF y un proyecto independiente del ecosistema Stellar. Al participar en nuestro ecosistema, aceptas el Código de Conducta de Stellar, priorizando el profesionalismo, la diversidad y el respeto mutuo.",
     "audit_title": "Auditoría de Seguridad y Cumplimiento",
     "audit_vectors": "Estándares del Ecosistema Stellar",
     "audit_result": "CUMPLE STELLAR COC",
     "audit_status": "VERIFICADO",
-    "scf_verified": "BENEFICIARIO SCF KICKSTART",
+    "scf_verified": "BENEFICIARIO SCF INSTAWARD",
     "ecosystem_ready": "LISTO PARA ECOSISTEMA SCF",
-    "coc_aligned": "CUMPLIMIENTO COC (30 ABRIL 2026)"
+    "coc_aligned": "CUMPLIMIENTO COC"
   },
   "leaderboard": {
     "header": {
@@ -325,7 +414,7 @@
     "pro_features_list": {
       "plugins": {
         "title": "Liquidación M2M",
-        "desc": "Dos formas de cobrarle a una máquina por la misma API: x402 por llamada vía facilitador, o MPP Charge liquidado directo, sin tercero de por medio."
+        "desc": "x402 le cobra a una máquina por llamada vía facilitador. MPP Charge, liquidado directo y sin tercero de por medio, está implementado pero sin aceptar pagos por ahora."
       },
       "skills": {
         "title": "Tesorería Autónoma",
@@ -372,7 +461,7 @@
       },
       "ts": {
         "title": "TypeScript SDK",
-        "desc": "Scale-web MPP. Disponible en NPM."
+        "desc": "Cliente MPP Charge (experimental). Publicado en npm."
       },
       "cli": {
         "title": "Nirium CLI",
@@ -394,7 +483,7 @@
       "x402_title": "x402 — Monetización de APIs & IA",
       "x402_desc": "El estándar institucional para cobros por consumo (Pay-per-Call). Liquidación instantánea de fracciones de centavo para modelos LLM y agentes de IA, eliminando el riesgo de impago.",
       "mpp_title": "MPP — Machine Payment Protocol",
-      "mpp_desc": "Modo Charge, vivo en testnet y mainnet: el cliente firma una transferencia completa de USDC, el servidor la valida por simulación y la transmite — sin facilitador externo, y las comisiones de red pueden ir patrocinadas. Los canales de sesión requieren un contrato de canal fondeado on-chain y siguen sujetos a auditoría."
+      "mpp_desc": "El modo Charge está implementado: el cliente firma una transferencia completa de USDC, el servidor la valida por simulación y la transmite, sin facilitador externo. Los endpoints alojados de Nirium no aceptan pagos MPP por ahora. Los canales de sesión requieren un contrato de canal fondeado on-chain y siguen sujetos a auditoría."
     },
     "institutional_use_cases": {
       "title": "CONSTRUYE EL",
@@ -420,7 +509,7 @@
         },
         "settlement": {
           "name": "x402 + MPP PAGOS",
-          "desc": "Vivo en testnet y mainnet. Micropagos por llamada API (x402) y liquidación MPP Charge por request. El revenue crece con el tráfico de API."
+          "desc": "En vivo en testnet y mainnet: micropagos por llamada API (x402). MPP Charge está implementado, sin aceptar pagos por ahora. El revenue crece con el tráfico de API."
         },
         "vault": {
           "name": "CORPORATE VAULT",
@@ -431,17 +520,17 @@
         "badge": "FOUNDERS · PROYECTOS DE FIN DE SEMANA",
         "title": "Qué puedes construir",
         "title_span": "con Nirium",
-        "subtitle": "Seis ideas de producto que puedes prototipar este fin de semana sobre nuestro stack (EN TESTNET · COMING SOON MAINNET) — cada pieza ya está en producción sobre Stellar.",
+        "subtitle": "Doce ideas de producto que puedes prototipar sobre nuestro stack — la mayoría de las piezas aquí ya funcionan en vivo sobre Stellar Testnet. Un par (marcadas Solo Invitación) tocan una pregunta legal todavía en revisión y no están abiertas de uso general aún.",
         "items": {
           "global_payroll": {
             "name": "Flota de Payouts Global",
-            "tagline": "Payouts automatizados para equipos remotos y contractors. Convierte stablecoins a moneda local (MXN/BRL) vía rieles de dispersión no custodial y SEP-24.",
+            "tagline": "Blueprint para nómina de equipos remotos: dispersión no custodial y onboarding de trustlines como piezas que combinas con tu propio anchor fiat licenciado.",
             "stack": [
               "Payroll",
               "Vault",
               "Fiat Ramp"
             ],
-            "time": "Listo para Auditoría"
+            "time": "No Custodial"
           },
           "m2m_exchange": {
             "name": "Mercado de Inferencia M2M",
@@ -455,17 +544,16 @@
           },
           "forensic_treasury": {
             "name": "Hub de Auditoría Forense",
-            "tagline": "Monitoreo de tesorería corporativa inmutable en tiempo real. Usa Protocol Archive (IPFS) para generar reportes exportables bajo demanda.",
+            "tagline": "Monitoreo de tesorería corporativa inmutable en tiempo real. Usa el Audit Trail (IPFS) para generar reportes exportables bajo demanda.",
             "stack": [
               "Webhooks",
-              "ELO",
-              "Protocol Hub"
+              "Audit Trail"
             ],
             "time": "Institucional"
           },
           "savings_neobank": {
-            "name": "Neobanco No-Custodial",
-            "tagline": "App de ahorros que usa agentes autónomos para mover capital (USDC/MXN) a los protocolos de Stellar/Soroban con mayor eficiencia.",
+            "name": "Router de Capital Autónomo",
+            "tagline": "App de ahorros donde el propio agente de cada usuario final, firmando con su propia llave, mueve su propio capital (USDC/MXN) a los protocolos de Stellar/Soroban. Tu app nunca sostiene una llave que no es suya.",
             "stack": [
               "Vault",
               "Execute",
@@ -475,17 +563,16 @@
           },
           "grant_distributor": {
             "name": "Grants Autónomos",
-            "tagline": "Agentes de financiamiento para DAOs que verifican hitos on-chain y liberan fondos automáticamente desde bóvedas no custodiales.",
+            "tagline": "Los agentes verifican hitos on-chain y proponen una liberación; la propia bóveda y firmantes de la DAO la autorizan — mismo patrón no-custodial que Treasury Rebalance, donde el agente puede proponer pero no puede redirigir fondos por diseño del contrato.",
             "stack": [
               "Vault",
-              "Execute",
-              "ELO"
+              "Execute"
             ],
             "time": "Gobernanza"
           },
           "logistics_settle": {
             "name": "Motor de Liquidación Inteligente",
-            "tagline": "Paga a proveedores logísticos al instante de verificar la entrega vía IoT. Usa x402 para liquidación inmediata en el SDEX de Stellar.",
+            "tagline": "Paga a proveedores logísticos al instante de verificar la entrega vía IoT. Usa x402 para liquidación inmediata sobre Stellar.",
             "stack": [
               "x402",
               "Webhooks",
@@ -505,23 +592,22 @@
           },
           "rwa_market": {
             "name": "Mercado RWA Institucional",
-            "tagline": "Infraestructura B2B para instrumentos soberanos (CETES). Los agentes gestionan el ruteo 24/7 sin custodia.",
+            "tagline": "Infraestructura B2B para ruteo de instrumentos soberanos (CETES vía Etherfuse) — el operador define el mandato; los agentes lo ejecutan 24/7, sin tomar custodia jamás. Este es el nodo real de Treasury Rebalance — solo invitación mientras sigue abierta la revisión legal del Art. 24 Bis 4.",
             "stack": [
               "Vault",
-              "Execute",
-              "ELO"
+              "Execute"
             ],
-            "time": "WealthTech"
+            "time": "Solo Invitación"
           },
           "defi_insurance": {
             "name": "Bóvedas de Mitigación de Riesgo",
-            "tagline": "Agentes que monitorean la salud de los protocolos y cubren riesgos automáticamente moviendo fondos entre bóvedas seguras.",
+            "tagline": "Agentes que monitorean la salud de los protocolos y señalan cuándo reubicar — la propia firma del dueño de la bóveda autoriza cualquier movimiento entre bóvedas, nunca la del agente.",
             "stack": [
               "Skills",
               "Vault",
               "Webhooks"
             ],
-            "time": "Seguros"
+            "time": "Monitoreo de Riesgo"
           },
           "content_license": {
             "name": "Licenciamiento de Contenido IA",
@@ -545,13 +631,12 @@
           },
           "escrow_fleet": {
             "name": "Escrow Institucional",
-            "tagline": "Agentes de liquidación para comercio de alto valor. Los fondos permanecen en bóvedas hasta cumplir hitos legales e IoT.",
+            "tagline": "Solo concepto, no está construido: conectar o liberar una operación entre dos contrapartes por su cuenta es exactamente el supuesto de intermediación del Art. 24 Bis 4 de la LFPIORPI que ya condiciona a Treasury Rebalance. No se publica como capacidad hasta que cierre esa revisión legal.",
             "stack": [
               "Vault",
-              "Execute",
-              "ELO"
+              "Execute"
             ],
-            "time": "Enterprise"
+            "time": "Solo Invitación"
           }
         },
         "stack_label": "Construido sobre",
@@ -598,23 +683,23 @@
           },
           "settle": {
             "label": "Liquidación MPP",
-            "desc": "Pagos masivos institucionales."
+            "desc": "Primitiva de liquidación masiva."
           },
           "vault": {
-            "label": "Bóvedas & Custodia",
-            "desc": "Crea bóvedas, deposita, retira."
+            "label": "Bóvedas de Tesorería",
+            "desc": "Despliega, deposita, retira — el cliente firma cada tx."
           },
-          "elo": {
-            "label": "Reputación ELO",
-            "desc": "Consulta el score de cada agente."
+          "audit": {
+            "label": "Audit Trail",
+            "desc": "Ancla registros inmutables en IPFS."
+          },
+          "payroll": {
+            "label": "Payroll",
+            "desc": "Dispersión en lote no custodial."
           },
           "webhooks": {
             "label": "Webhooks",
             "desc": "Suscríbete a eventos on-chain."
-          },
-          "mcp": {
-            "label": "Servidor MCP",
-            "desc": "Conecta Claude, Grok o cualquier LLM."
           }
         },
         "sdks": {
@@ -622,35 +707,29 @@
             "name": "TypeScript SDK",
             "sub": "NPM · nirium",
             "cmd": "npm install nirium",
-            "badge": "v0.9.0"
+            "badge": "v0.16.0"
           },
           "py": {
             "name": "Python SDK",
             "sub": "PyPI · nirium",
             "cmd": "pip install nirium",
-            "badge": "v0.9.0"
+            "badge": "v0.11.0"
           },
           "mcp": {
             "name": "Servidor MCP",
             "sub": "Claude · Grok · Cualquier LLM",
-            "cmd": "npx @nirium/mcp",
-            "badge": "v0.5.0"
+            "cmd": "npx nirium-mcp",
+            "badge": "v0.6.0"
           },
           "rest": {
             "name": "REST API",
             "sub": "nirium-agent.fly.dev",
-            "cmd": "curl nirium-agent.fly.dev/v1",
+            "cmd": "curl nirium-agent.fly.dev/api/info",
             "badge": "Público"
           },
-          "tauri": {
-            "name": "Desktop Studio",
-            "sub": "Tauri v2 · macOS/Win/Linux",
-            "cmd": "Descargar instalador",
-            "badge": "Alpha"
-          },
           "studio": {
-            "name": "Studio Visual",
-            "sub": "Sin código",
+            "name": "Constructor de Tesorería",
+            "sub": "Reglas de rebalanceo sin código",
             "cmd": "Abrir en navegador",
             "badge": "Beta"
           }
@@ -672,7 +751,7 @@
         "cta_github": "Ver en GitHub"
       },
       "extra": {
-        "mpp_enabled": "x402 + MPP Activado",
+        "mpp_enabled": "x402 Activado",
         "optimized_for": "Optimizado para",
         "micro_billing": "Micro-Facturación",
         "institutional_settlements": "Liquidaciones Globales",
@@ -721,7 +800,7 @@
   },
   "dashboard": {
     "title": "PANEL INSTITUCIONAL",
-    "version_live": "STELLAR TESTNET · v0.10.2",
+    "version_live": "STELLAR TESTNET · v0.16.0",
     "fleet_status": "Monitoreo de Infraestructura",
     "active_agents": "Nodos de Ejecución B2B",
     "total_profit": "Ahorro Estructural (Spread)",
@@ -752,7 +831,7 @@
       "settlements": "Volumen Liquidado",
       "feed_title": "Telemetría del SDK",
       "awaiting": "A la espera de enrutamiento corporativo...",
-      "powered_by": "Infraestructura MPP & x402",
+      "powered_by": "Infraestructura x402",
       "live_stream": "TIEMPO REAL",
       "last_update": "Sync"
     },
@@ -828,7 +907,7 @@
     "payment_streams": {
       "title": "Liquidación B2B en Tiempo Real",
       "waiting": "A la espera de triggers de enrutamiento corporativo...",
-      "engine_active": "Motor Dual (x402/MPP) Operativo",
+      "engine_active": "Motor x402 Operativo",
       "market_rates": "Tasa de Referencia CETES",
       "supply": "Aporte",
       "borrow": "Préstamo",
@@ -874,7 +953,7 @@
     "institutional_grade": "Grado Institucional",
     "audit_ready": "Listo para Auditoría",
     "protocol_26": "Protocolo 26 Verificado",
-    "scf_7": "SCF KICKSTART",
+    "scf_7": "SCF INSTAWARD",
     "coc_compliant": "CUMPLIMIENTO COC"
   },
   "builder": {
@@ -914,11 +993,11 @@
     "sections": {
       "nature": {
         "title": "1. Naturaleza del Servicio y Marco Legal (México)",
-        "content": "Nirium es exclusivamente software de infraestructura tecnológica (IaaS). Nirium opera estrictamente como proveedor de software B2B que facilita la orquestación de flujos de tesorería y NO es una Institución de Tecnología Financiera (ITF), IFPE, ni entidad bancaria, ni realiza actividad financiera regulada. La plataforma proporciona telemetría inmutable y protocolos Soroban. Los servicios de custodia, liquidación y emisión de cualquier activo del mundo real son responsabilidad exclusiva de proveedores terceros regulados (ej. Etherfuse) bajo sus propias licencias y términos. Nirium nunca custodia fondos de clientes."
+        "content": "Nirium es software de infraestructura tecnológica (IaaS). Nirium opera como proveedor de software B2B que facilita la orquestación de flujos de tesorería. La plataforma proporciona telemetría inmutable y protocolos Soroban. Los servicios de custodia, liquidación y emisión de cualquier activo del mundo real son responsabilidad exclusiva de proveedores terceros regulados (ej. Etherfuse) bajo sus propias licencias y términos. Nirium nunca custodia fondos de clientes."
       },
       "no_guarantees": {
         "title": "2. Sin Garantías — Acuerdo de Nivel de Servicio (SLA)",
-        "content": "Nirium no garantiza rendimientos financieros de ningún tipo ni asume responsabilidad por la liquidez del mercado secundario. Las proyecciones de ruteo y métricas de spread son estrictamente informativas y reflejan el historial de ejecución algorítmica en Stellar Testnet.\n\nNirium no es un producto de inversión, valor, ni fondo mutuo. El capital permanece bajo el control soberano de las llaves corporativas del operador regulado en todo momento. Nirium es un SDK de automatización con el que las instituciones interactúan asumiendo el riesgo tecnológico."
+        "content": "Nirium no garantiza rendimientos financieros de ningún tipo ni asume responsabilidad por la liquidez del mercado secundario. Las proyecciones de ruteo y métricas de spread son estrictamente informativas y reflejan el historial de ejecución algorítmica en Stellar Testnet.\n\nNirium no es un producto de inversión, valor, ni fondo mutuo. El capital permanece bajo el control soberano de las llaves corporativas del operador regulado en todo momento. Nirium es software de automatización con el que las instituciones interactúan asumiendo el riesgo tecnológico."
       },
       "ai_liability": {
         "title": "3. Responsabilidad de Nodos Autónomos y Oráculos",
@@ -981,7 +1060,7 @@
       },
       "governance": {
         "title": "3. Gobernanza Institucional",
-        "content": "Nirium proporciona software B2B en alineación con el Código de Conducta de Stellar. La institución integradora asume la responsabilidad exclusiva del cumplimiento KYC/AML y normativo ante las autoridades pertinentes. La tecnología provista es estrictamente una capa de ruteo inmutable actualizada a mayo de 2026."
+        "content": "Nirium proporciona software B2B en alineación con el Código de Conducta de Stellar. La institución integradora asume la responsabilidad del cumplimiento KYC/AML y normativo ante las autoridades pertinentes. Nirium no custodia fondos ni gestiona liquidez de terceros."
       }
     },
     "footer": "Al conectar su billetera, usted acepta todos los riesgos descritos anteriormente."
@@ -996,7 +1075,7 @@
       },
       "anonymity": {
         "title": "2. Trazabilidad Forense On-Chain",
-        "content": "Como infraestructura Stellar, todas las operaciones de bóveda generan un hash inmutable (HMAC-SHA256). Nirium no asocia estas operaciones a identidades corporativas, recayendo la responsabilidad de identidad (KYB - Conozca a su Institución) exclusivamente en el operador regulado y proveedores de liquidación (ej. Etherfuse)."
+        "content": "Como infraestructura Stellar, todas las operaciones de bóveda generan un hash inmutable en cadena (SHA-256). Nirium no asocia estas operaciones a identidades corporativas, recayendo la responsabilidad de identidad (KYB - Conozca a su Institución) exclusivamente en el operador regulado y proveedores de liquidación (ej. Etherfuse)."
       },
       "telemetry": {
         "title": "3. Telemetría de SLA",
@@ -1015,7 +1094,7 @@
     "sections": {
       "general": {
         "title": "1. Proveedor de Software B2B",
-        "content": "Nirium Protocol opera exclusivamente como proveedor de software (SaaS/SDK). Nirium no gestiona, no custodia, no provee liquidez ni actúa como intermediario financiero (ITF/IFPE). Cualquier integración en producción es responsabilidad regulatoria de la institución operadora bajo la legislación aplicable en su jurisdicción."
+        "content": "Nirium Protocol opera como proveedor de software (SaaS/SDK). Nirium no gestiona, no custodia y no provee liquidez de terceros. Cualquier integración en producción es responsabilidad regulatoria de la institución operadora bajo la legislación aplicable en su jurisdicción."
       },
       "no_advice": {
         "title": "2. Ausencia de Asesoría Financiera",
@@ -1065,17 +1144,17 @@
       "title": "Documentación B2B de Nirium",
       "subtitle": "Referencia técnica para integrar, automatizar y auditar flujos de tesorería corporativa (USDC a CETES) sobre Soroban.",
       "hero": {
-        "version": "Versión del SDK",
+        "version": "Versión del paquete",
         "contracts": "Contratos Activos",
         "helpers": "Nodos Desplegados",
-        "fee": "Costo de Red (XLM)",
+        "fee": "Precio API (USDC)",
         "coins": "Instrumentos Soberanos"
       },
       "testnet_notice": "Entorno B2B en dos redes. Los rieles de pago y auditoría están vivos en Stellar mainnet; el vault de tesorería autónoma y sus contratos corren en Stellar Testnet, audit-gated, hasta una auditoría externa formal — antes de desplegar capital real.",
       "summary_title": "Resumen Ejecutivo de Infraestructura",
-      "summary_p1": "Nirium es exclusivamente un proveedor de software de infraestructura (SDK/API) construido sobre la red Stellar. Facilitamos el ruteo autónomo de capital corporativo —con un enfoque primario en la tokenización de CETES vía Etherfuse— sin que Nirium asuma custodia, liquidez o roles de ITF.",
+      "summary_p1": "Nirium es un proveedor de software de infraestructura (paquete/API) construido sobre la red Stellar. Facilitamos el ruteo autónomo de capital corporativo —con un enfoque primario en la tokenización de CETES vía Etherfuse— sin que Nirium asuma custodia ni gestione liquidez de terceros.",
       "summary_p2": "La arquitectura core se compone de contratos Soroban endurecidos (hardened), nodos de ejecución programáticos con micro-pagos atómicos (x402/MPP) y un sistema de telemetría forense anclado a IPFS para auditabilidad de grado institucional.",
-      "summary_who": "¿Para quién es? Operadores regulados y Fintechs. Integre nuestro SDK TypeScript o despliegue lógicas a través del Treasury Builder para generar trazas de cumplimiento inmutables (HMAC-SHA256).",
+      "summary_who": "¿Para quién es? Operadores regulados y Fintechs. Integre nuestro paquete TypeScript o despliegue lógicas a través del Treasury Builder para generar trazas de cumplimiento inmutables (SHA-256).",
       "summary_warning": "Software-only. Nirium no provee asesoría legal ni financiera. Todos los contratos están en fase Sandbox/Testnet.",
       "progressive_title": "Modelos de Aprobación de Flujo",
       "progressive_subtitle": "Configure el nivel de autonomía del nodo B2B para ajustarse a sus políticas de compliance interno.",
@@ -1093,7 +1172,7 @@
         "item3": "Ejecución continua sin bloqueo de UI",
         "item4": "Ideal para optimización 24/7 del float corporativo"
       },
-      "features_title": "Módulos de Arquitectura (v0.10.2)",
+      "features_title": "Módulos de Arquitectura (v0.16.0)",
       "features": {
         "builder": {
           "title": "Treasury Builder (Visual)",
@@ -1117,7 +1196,7 @@
         },
         "ipfs": {
           "title": "Integridad Criptográfica",
-          "desc": "Toda mutación de estado se firma con HMAC-SHA256 y persiste en redes descentralizadas. Cada registro se vincula a términos legales LCP (atrHash SHA-256, AAA-ICDR)."
+          "desc": "Toda mutación de estado se hashea con SHA-256 y persiste en redes descentralizadas. Cada registro puede vincularse a términos legales LCP (atrHash SHA-256, AAA-ICDR) cuando LCP esté activo; hoy está en revisión legal."
         },
         "payroll": {
           "title": "Dispersiones y Payouts",
@@ -1137,7 +1216,7 @@
       },
       "operator_wallet": "Llave Institucional (Operador)",
       "mainnet_treasury": "Tesorería de liquidación (solo recepción):",
-      "network_scope": "En mainnet corren los rieles software-only y non-custodial: liquidación x402, MPP Charge, anclaje de auditoría y reportería. Las dispersiones en mainnet son por invitación. El vault de tesorería autónoma y su loop de rebalanceo siguen en testnet, audit-gated, hasta una auditoría externa formal — ahí no se despliega capital de terceros.",
+      "network_scope": "En mainnet corren los rieles software-only y non-custodial: liquidación x402, anclaje de auditoría y reportería. Las dispersiones en mainnet son por invitación. El rebalanceo autónomo corre en mainnet sobre bóvedas de DeFindex propiedad del cliente, por invitación mientras concluye la revisión legal. NiriumVault, el contrato propio de Nirium, sigue en testnet, audit-gated, hasta una auditoría externa formal. MPP Charge es experimental y no está disponible en mainnet.",
       "testnet_warning": "Testnet — sin capital real en riesgo",
       "stats": {
         "version": "Versión Testnet",
@@ -1216,7 +1295,7 @@
         "m1": "Fase 1: Blindaje y Cumplimiento — Audit Trails y Reportes (entregado)",
         "m2": "Fase 2: Nodos de Settlement, Payouts y Audit en mainnet early access",
         "m3": "Fase 3: Auditoría externa de seguridad y verificación formal de los contratos del vault",
-        "m4": "Fase 4: Nodo de Rebalanceo de Tesorería a mainnet (audit-gated) y escalado LatAm"
+        "m4": "Fase 4: Rebalanceo de Tesorería — entregado en mainnet, invite-only mientras cierra la revisión legal; escala a disponibilidad general y LatAm después"
       },
       "ecosystem_impact_title": "Ecosistema Stellar",
       "ecosystem_impact_desc": "Nirium está optimizado para el ecosistema de Stellar, enfocándose en soluciones de tesorería flexibles y de alto impacto para la región LatAm. Colaboramos con Capítulos de Embajadores locales para asegurar la alineación con las necesidades financieras regionales.",
@@ -1228,7 +1307,7 @@
         "elo": "Puntuación de reputación y rendimiento de agentes",
         "marketplace": "Registro de estrategias y lógica de suscripción",
         "sentinel": "Pausa de emergencia y monitoreo de seguridad",
-        "settlement": "Gestión de sesiones x402 y MPP",
+        "settlement": "Liquidación x402 por request",
         "skill": "Desbloqueo de habilidades x402 y puerta de pago USDC"
       },
       "functions": {
@@ -1239,7 +1318,7 @@
         "revoke_agent": "Interruptor de emergencia — revoca el acceso del agente inmediatamente",
         "close_vault": "Cierra permanentemente la bóveda en cadena (registro de terminación final)",
         "publish_strategy": "Registra la estrategia en el contrato Marketplace",
-        "open_session": "Abre una sesión de liquidación de alta frecuencia MPP",
+        "open_session": "Cliente MPP Charge (experimental, no disponible en mainnet)",
         "unlock_skill": "Entrada x402 — deduce la comisión USDC, emite la clave de acceso"
       }
     },
@@ -1555,7 +1634,7 @@
             "desc": "Metadata del nodo de Audit Trail: precios, límites de tasa y deslinde legal."
           },
           {
-            "desc": "Resumen consolidado de payouts, recibos x402/MPP y anclajes IPFS por periodo/red."
+            "desc": "Resumen consolidado de payouts, recibos x402 y anclajes IPFS por periodo/red."
           },
           {
             "desc": "Exporta filas en CSV o JSON (payroll | payments | anchors). Formato institucional, no es reportería regulatoria certificada."
@@ -1572,10 +1651,10 @@
             "desc": "⚡ [x402] Datos de mercado premium con pago por llamada."
           },
           {
-            "desc": "💎 [mpp] Señales premium vía sesión de presupuesto activa."
+            "desc": "💎 [mpp] Señales premium vía MPP Charge (experimental, sin aceptar pagos por ahora)."
           },
           {
-            "desc": "💎 [mpp] Datos de mercado premium vía sesión de presupuesto activa."
+            "desc": "💎 [mpp] Datos de mercado premium vía MPP Charge (experimental, sin aceptar pagos por ahora)."
           }
         ]
       }
@@ -1658,28 +1737,28 @@
         ]
       },
       "stellar_coc": {
-        "title": "Código de Conducta de Stellar (30 de Abril de 2026)",
+        "title": "Código de Conducta de Stellar",
         "principles": [
           "Transparencia: Cada acción del protocolo es auditable on-chain y vía IPFS.",
           "Integridad: Sin front-running ni extracción depredadora; el sistema prioriza la Mejor Ejecución.",
           "Safety: No custodial por diseño; el usuario sigue siendo el único dueño de sus llaves.",
           "Profesionalismo: La interacción dentro de la comunidad sigue los más altos estándares éticos de la SDF."
         ],
-        "compliance": "Diseñado para los marcos de cumplimiento SEP-12 y SEP-24.",
+        "compliance": "Construido para auditoría institucional y revisión regulatoria — ver la capa de evidencia de audit trail abajo.",
         "audit_trail": {
           "title": "Capa de Cumplimiento: Audit Trail",
-          "subtitle": "audit-ready. Cada decisión del agente firmada con HMAC-SHA256, encadenada criptográficamente, anclada en IPFS, y exportable a formatos institucionales.",
+          "subtitle": "Cada decisión del agente lleva un hash SHA-256 de su contenido, firmada opcionalmente con la llave del propio agente, anclada en IPFS, y exportable a formatos institucionales.",
           "layers_title": "Cuatro capas de prueba",
           "layers": [
             {
               "id": "01",
-              "name": "HMAC-SHA256",
-              "desc": "Cada acción del agente se firma con la llave maestra del cliente. Si alguien manipula el registro, la firma se invalida automáticamente."
+              "name": "Hash de contenido (SHA-256)",
+              "desc": "El contenido de cada registro se hashea con SHA-256 antes de anclarlo. Cambiar un solo byte hace que el hash ya no coincida — la manipulación se detecta de inmediato."
             },
             {
               "id": "02",
-              "name": "Cadena criptográfica",
-              "desc": "Cada registro hashea al anterior. Cambiar uno solo rompe toda la cadena posterior. Es blockchain-style sin necesidad de blockchain."
+              "name": "Atestiguamiento del agente (ed25519)",
+              "desc": "Una firma ed25519 opcional —la misma que usan las wallets de Stellar— permite que el agente declarante pruebe quién produjo el registro. Verificable por cualquiera con solo el CID, sin autoridad central."
             },
             {
               "id": "03",
@@ -1689,7 +1768,7 @@
             {
               "id": "04",
               "name": "Export institucional",
-              "desc": "JSON estructurado con campos folio, fecha_hora, tipo_operacion, agente, monto_usdc, red_blockchain, hash_transaccion, firma_hmac, integridad. Listo para envío."
+              "desc": "JSON estructurado con campos folio, fecha_hora, tipo_operacion, agente, monto_usdc, red_blockchain, hash_transaccion, content_sha256, agent_signature (opcional), integridad. Listo para envío."
             }
           ],
           "fintech_law": "Reportes de auditoría inmutables y de grado forense — la capa de auditoría que los operadores regulados necesitan, sin construirla ellos mismos."
@@ -1706,9 +1785,9 @@
       "items": [
         {
           "name": "Global Payouts Fleet",
-          "desc": "Payouts automatizados para equipos remotos y contractors. Convierte stablecoins a moneda local (MXN/BRL) vía rieles de dispersión no custodial y SEP-24.",
+          "desc": "Blueprint para nómina de equipos remotos: dispersión no custodial y onboarding de trustlines como piezas que combinas con tu propio anchor fiat licenciado.",
           "diff": "Intermediate",
-          "code": "// Uso de Payroll para dispersión + SEP-24 para rampa fiat\nawait nirium.payroll.disburse(payroll_list)\n  .then(tx => stellar.sep24.withdraw(tx, 'MXN_ANCHOR'));"
+          "code": "// Primitiva de payroll: dispersión + onboarding de trustlines.\n// El off-ramp a fiat se conecta aparte, vía tu propio anchor licenciado.\nawait nirium.payroll.disburse(payroll_list);"
         },
         {
           "name": "Mercado de Inferencia M2M",
@@ -1723,20 +1802,20 @@
           "code": "// Rastro de auditoría forense vía IPFS\nvault.onEvent(async (e) => {\n  const cid = await ipfs.pin(e.signature);\n  await elo.verify(cid);\n});"
         },
         {
-          "name": "Neobanco No-Custodial",
+          "name": "Router de Capital Autónomo",
           "desc": "App de ahorros que usa agentes autónomos para mover capital (USDC/MXN) a los protocolos de Stellar/Soroban con mayor eficiencia.",
           "diff": "Intermediate",
           "code": "// Bucle de optimización de eficiencia\nloop.optimize(['blend', 'cetes', 'soroswap'])\n  .rebalance({ threshold: 0.05, vault: 'USER_VAULT' });"
         },
         {
           "name": "Grants Autónomos",
-          "desc": "Agentes de financiamiento para DAOs que verifican hitos on-chain y liberan fondos automáticamente desde bóvedas no custodiales.",
+          "desc": "Agentes que verifican hitos on-chain y liberan los fondos de tesorería propios de la DAO automáticamente desde bóvedas no custodiales.",
           "diff": "Intermediate",
           "code": "// Desbloqueo de grants disparado por GitHub\ngrant.checkMilestone(github_pr_id)\n  .then(() => vault.unlock(milestone_funds, receiver_pubkey));"
         },
         {
           "name": "Motor de Liquidación Inteligente",
-          "desc": "Paga a proveedores logísticos al instante de verificar la entrega vía IoT. Usa x402 para liquidación inmediata en el SDEX de Stellar.",
+          "desc": "Paga a proveedores logísticos al instante de verificar la entrega vía IoT. Usa x402 para liquidación inmediata sobre Stellar.",
           "diff": "Standard",
           "code": "// Liquidación instantánea disparada por IoT\nwebhook.on('delivery_confirmed', async (id) => {\n  await x402.settle(id, 'USDC', { urgent: true });\n});"
         },
@@ -1748,13 +1827,13 @@
         },
         {
           "name": "RWA Institucional",
-          "desc": "Infraestructura B2B para instrumentos soberanos (CETES). Los agentes gestionan el ruteo 24/7 sin custodia.",
+          "desc": "Infraestructura B2B para ruteo de instrumentos soberanos (CETES vía Etherfuse) — el operador define el mandato; los agentes lo ejecutan 24/7, sin tomar custodia jamás.",
           "diff": "Advanced",
-          "code": "// Aprovisionamiento programático 24/7 para CETES vía Etherfuse\napi.sand.etherfuse.mint('CETES_TOKEN', 1000)\n  .with(operator_auth)\n  .monitor(80_bps_fee);"
+          "code": "// Mandato definido por el operador; el agente lo ejecuta 24/7 -- sin tomar custodia jamás\nvault.setMandate({ asset: 'CETES', entryRate: 2.5, exitRate: 2.0 });\nagent.rebalance(vault_id);"
         },
         {
           "name": "Bóvedas de Mitigación de Riesgo",
-          "desc": "Agentes que monitorean la salud de los protocolos y cubren riesgos automáticamente moviendo fondos entre bóvedas seguras.",
+          "desc": "Agentes que monitorean la salud de los protocolos y reubican fondos automáticamente entre bóvedas seguras.",
           "diff": "Intermediate",
           "code": "// Gestión automatizada de riesgo de protocolos\nagent.monitor(protocol_id)\n  .onRiskDetected(() => moveFunds('secure_cold_vault'));"
         },
@@ -1772,15 +1851,15 @@
         },
         {
           "name": "Escrow Institucional",
-          "desc": "Agentes de liquidación para comercio de alto valor. Los fondos permanecen en bóvedas hasta cumplir hitos legales e IoT.",
+          "desc": "Agentes de liquidación para comercio de alto valor. Los fondos permanecen bloqueados en bóvedas hasta cumplir condiciones on-chain e IoT predefinidas.",
           "diff": "Intermediate",
-          "code": "// Liberación de escrow multi-hitos\nescrow.releaseWhen({\n  legal_sig: 'LAWYER_PUBKEY',\n  iot_status: 'DELIVERED'\n});"
+          "code": "// Liberación de escrow multi-condición\nescrow.releaseWhen({\n  multisig_condition: 'COUNTERPARTY_PUBKEY',\n  iot_status: 'DELIVERED'\n});"
         }
       ]
     },
     "payroll": {
       "title": "Integración de Dispersiones",
-      "desc": "Dispersión por lote non-custodial utilizando los estándares x402 y MPP.",
+      "desc": "Dispersión por lote non-custodial en Stellar, firmada con tu propia wallet.",
       "endpoints_title": "Endpoints de Dispersiones",
       "flow_title": "Flujo de Dispersión",
       "code_example": "// Inicializar el Nodo de Payouts (dispersión por lote)\nconst result = await agent.post(\"/api/payroll/run\", {\n  recipients: payroll_list,\n  asset: \"USDC\"\n});"
@@ -1807,7 +1886,7 @@
       "stats": {
         "alpha": "Ahorro de Ejecución (Spread)",
         "liquidity": "Float Operativo",
-        "secure_kernel": "KERNEL B2B v0.10.2"
+        "secure_kernel": "KERNEL B2B v0.16.0"
       },
       "buttons": {
         "backtest": "SIMULAR",
@@ -1820,7 +1899,7 @@
         },
         "liquidity-optimizer": {
           "name": "Orquestador x402 / MPP",
-          "desc": "Blueprint para integrar pagos programáticos máquina a máquina. Permite a los agentes desencadenar micro-pagos atómicos por llamada (x402) o en lotes por sesión (MPP) para liquidaciones institucionales."
+          "desc": "Blueprint para integrar pagos programáticos máquina a máquina. Permite a los agentes desencadenar micro-pagos atómicos por llamada (x402). MPP Charge es experimental y no está disponible en mainnet."
         },
         "lst-peg": {
           "name": "Ruteo Cross-Border B2B",
@@ -1828,7 +1907,7 @@
         },
         "eliza-sentiment": {
           "name": "Centinela de Cumplimiento",
-          "desc": "Módulo criptográfico que firma todas las decisiones de tesorería con HMAC-SHA256 y ancla el registro en IPFS para auditabilidad inmutable de grado forense."
+          "desc": "Módulo criptográfico que hashea todas las decisiones de tesorería con SHA-256 y ancla el registro en IPFS para auditabilidad inmutable de grado forense."
         }
       }
     },
@@ -1857,7 +1936,7 @@
         },
         "ipfs-blackbox-logger": {
           "name": "Motor de Auditoría IPFS",
-          "desc": "ARCHIVA TODOS LOS EVENTOS DE EJECUCIÓN (HMAC-SHA256) EN ALMACENAMIENTO IPFS PARA COMPLIANCE FORENSE."
+          "desc": "ARCHIVA TODOS LOS EVENTOS DE EJECUCIÓN (SHA-256) EN ALMACENAMIENTO IPFS PARA COMPLIANCE FORENSE."
         },
         "eliza-trading-brain": {
           "name": "Capa Lógica de Aprobación",
@@ -2042,7 +2121,7 @@
       "badge": "Entorno Testnet",
       "title_pre": "Aprovisionar",
       "title_span": "Sandbox",
-      "subtitle": "Aprovisione una clave API para evaluar la infraestructura de Nirium en la Testnet de Stellar. Entorno de incubación rápida alineado con los estándares de SCF y el Código de Conducta de Stellar (30 de Abril de 2026). Utiliza exclusivamente tokens de prueba sin valor."
+      "subtitle": "Aprovisione una clave API para evaluar la infraestructura de Nirium en la Testnet de Stellar. Entorno de incubación rápida alineado con los estándares de SCF y el Código de Conducta de Stellar. Utiliza exclusivamente tokens de prueba sin valor."
     },
     "features": {
       "title": "Especificaciones del Entorno",
@@ -2145,7 +2224,7 @@
       "horizon": "Estado de Nodo Horizon",
       "soroban": "RPC Institucional (Soroban)",
       "latency": "Latencia de Ejecución",
-      "version": "Versión del SDK B2B",
+      "version": "Versión del paquete B2B",
       "operational": "Operativo",
       "active": "Sincronizado"
     },
@@ -2209,7 +2288,7 @@
       },
       "legal": {
         "infrastructure": "Infraestructura B2B",
-        "compliance": "Compliance (SEP-12)",
+        "compliance": "Compliance (KYC/AML)",
         "security": "Seguridad de Custodia",
         "agreements": "Acuerdos (SLA)",
         "ethics_aligned": "Código de Conducta Stellar"
@@ -2254,7 +2333,7 @@
       "connect_prompt": "Conecte su bóveda institucional para generar credenciales",
       "use_navbar": "Autentique vía Freighter en el menú superior",
       "security_note_label": "Protocolo de Seguridad",
-      "security_note": "Se requiere firma criptográfica (HMAC-SHA256) para probar la propiedad de la bóveda. La firma nunca abandona su cliente local.",
+      "security_note": "Se requiere firma criptográfica (ed25519 — la misma que usan las wallets de Stellar) para probar la propiedad de la bóveda. La firma nunca abandona su cliente local.",
       "generating": "Aprovisionando entorno seguro...",
       "generate_button": "APROVISIONAR CLAVE API",
       "success": "Aprovisionamiento Exitoso",
@@ -2324,26 +2403,26 @@
   "compliance": {
     "title": "Cumplimiento y Confianza Institucional",
     "regulatory_awareness": "Aviso Regulatorio: Proveedor de Software B2B",
-    "disclosure_text": "Nirium es exclusivamente un proveedor de software e infraestructura (SDK/API). No operamos como Institución de Tecnología Financiera (ITF), no gestionamos fondos de terceros, ni estamos sujetos a registro bajo el Art. 80 de la Ley Fintech. Toda la responsabilidad operativa, KYC, AML y cumplimiento recae en el operador institucional regulado que utiliza nuestra infraestructura. Nirium actúa únicamente como capa de ruteo descentralizado en Soroban.",
+    "disclosure_text": "Nirium es exclusivamente un proveedor de software e infraestructura (paquete/API). No operamos como Institución de Tecnología Financiera (ITF) y no gestionamos fondos de terceros. Toda la responsabilidad operativa, KYC, AML y cumplimiento recae en el operador institucional regulado que utiliza nuestra infraestructura. Nirium actúa como capa de ruteo descentralizado en Soroban.",
     "non_custodial_manifesto": "La naturaleza no custodial de la infraestructura de Nirium asegura que la institución u operador mantenga el control exclusivo sobre sus llaves privadas y activos de tesorería en todo momento. Nuestros nodos de ejecución operan estrictamente bajo autorizaciones de contratos inteligentes (Soroban) predefinidas y auditables.",
     "atomic_proof": "Cada acción automatizada está respaldada por una prueba atómica on-chain. Puede auditar cualquier transacción ejecutada por el SDK a través del explorador de Stellar (Stellar.Expert).",
-    "scf_conduct": "La utilización de este SDK implica la adhesión estricta al Código de Conducta de Stellar (Mayo 2026) y a los principios de innovación responsable del ecosistema (Stellar ecosystem)."
+    "scf_conduct": "La utilización de este paquete implica la adhesión estricta al Código de Conducta de Stellar y a los principios de innovación responsable del ecosistema (Stellar ecosystem)."
   },
   "compliance_page": {
     "badge": "Arquitectura de Cumplimiento B2B",
     "hero": {
       "title": "Institutional Audit Trail",
-      "subtitle": "Cada ejecución del nodo B2B se firma con HMAC-SHA256, se ancla en IPFS y se estructura en formato JSON, listo para integración con tus sistemas de reporte."
+      "subtitle": "Cada ejecución del nodo B2B lleva un hash SHA-256 de su contenido, se ancla en IPFS y se estructura en formato JSON, listo para integración con tus sistemas de reporte."
     },
     "layers": {
       "title": "Cinco Capas de Prueba Verificable",
       "hmac": {
-        "title": "Firma Institucional (HMAC-SHA256)",
-        "desc": "Cada acción de infraestructura requiere la firma de la llave maestra corporativa. Cualquier mutación del payload invalida automáticamente la autenticidad del registro."
+        "title": "Integridad de Contenido (SHA-256)",
+        "desc": "El payload de cada acción de infraestructura se hashea con SHA-256 antes de anclarlo. Cualquier mutación cambia el hash, haciendo la manipulación detectable de inmediato."
       },
       "chain": {
-        "title": "Concatenación Criptográfica",
-        "desc": "Cada evento de ejecución aplica un hash sobre el estado anterior. Este diseño tipo blockchain garantiza la integridad forense del flujo completo de tesorería."
+        "title": "Atestiguamiento del Agente (ed25519)",
+        "desc": "Una firma ed25519 opcional —la misma que usan las wallets de Stellar— permite que el agente declarante pruebe quién produjo el registro, verificable por cualquiera con solo el CID."
       },
       "ipfs": {
         "title": "Persistencia Descentralizada (IPFS)",
@@ -2351,11 +2430,11 @@
       },
       "cnbv": {
         "title": "Exportación Estructurada (JSON)",
-        "desc": "Formatos pre-estructurados con identificadores estándar (`folio`, `monto_usdc`, `firma_hmac`, etc.) que aceleran la generación de reportes normativos para reguladores locales."
+        "desc": "Formatos pre-estructurados con identificadores estándar (`folio`, `monto_usdc`, `content_sha256`, etc.) que aceleran la generación de reportes normativos para reguladores locales."
       },
       "lcp": {
         "title": "Contexto Legal (LCP)",
-        "desc": "Más allá de la prueba criptográfica: cada recibo se vincula a un acuerdo vigente versionado mediante su hash ATR SHA-256, con cláusula de disputa AAA-ICDR. El Legal Context Protocol hace cada dispersión legalmente exigible, no solo verificable."
+        "desc": "Más allá de la prueba criptográfica: cada recibo puede vincularse a un acuerdo vigente versionado mediante su hash ATR SHA-256, con cláusula de disputa AAA-ICDR. LCP puede vincular cada dispersión a un acuerdo legalmente exigible una vez activo — en revisión legal hoy."
       }
     },
     "fintech_law": {
@@ -2372,7 +2451,7 @@
         ]
       },
       "stats": {
-        "fintechs": "Infraestructura",
+        "fintechs": "Endpoints API",
         "integration": "Integración",
         "cost": "Costos API",
         "automated": "Aprovisionamiento"
@@ -2393,15 +2472,15 @@
   "developers_page": {
     "hero": {
       "title": "Construye en",
-      "subtitle": "Infraestructura B2B: SDK TypeScript, 86 endpoints REST, servidor MCP para Claude/Cursor, y soporte nativo para micropagos x402 + MPP."
+      "subtitle": "Infraestructura B2B: paquete TypeScript, 86 endpoints REST, servidor MCP para Claude/Cursor, y soporte nativo para micropagos x402 (cliente MPP Charge: experimental)."
     },
     "quickstart": {
       "title": "Aprovisionamiento: 5 Líneas",
-      "subtitle": "Rebalanceo corporativo autónomo (USDC a CETES) en producción."
+      "subtitle": "Rebalanceo corporativo autónomo (USDC a CETES) en mainnet, por invitación mientras concluye la revisión legal."
     },
     "agentic_payments": {
       "title": "Micropagos B2B para Agentes",
-      "subtitle": "x402 para pagos atómicos por API. MPP Charge para liquidación por request sin facilitador externo.",
+      "subtitle": "x402 para pagos atómicos por API. MPP Charge (experimental, no disponible en mainnet) para liquidación por request sin facilitador externo.",
       "x402": {
         "title": "x402 — Pago Atómico por Llamada"
       },
@@ -2417,7 +2496,7 @@
         "no_third_party": "P2P B2B Nativo",
         "high_freq": "Liquidación Alta Frecuencia",
         "optional": "Opc.",
-        "note": "La tabla compara los tres protocolos. Hoy Nirium corre x402 y MPP Charge, en testnet y mainnet. MPP Channel requiere un contrato de canal fondeado on-chain, así que queda tras la misma puerta de auditoría externa que el vault de tesorería — los endpoints existen y reportan el modo canal como deshabilitado."
+        "note": "La tabla compara los tres protocolos. Hoy Nirium corre x402, en testnet y mainnet; MPP Charge está implementado pero sin aceptar pagos por ahora. MPP Channel requiere un contrato de canal fondeado on-chain, así que queda tras la misma puerta de auditoría externa que el vault de tesorería — los endpoints existen y reportan el modo canal como deshabilitado."
       }
     },
     "mcp": {
@@ -2427,7 +2506,7 @@
     },
     "hub": {
       "title": "Hub de Telemetría",
-      "subtitle": "86 Endpoints diseñados estrictamente para el ruteo autónomo institucional y exportación forense (Ley Fintech).",
+      "subtitle": "86 Endpoints diseñados estrictamente para el ruteo autónomo institucional y exportación forense (para operadores sujetos a Ley Fintech).",
       "infrastructure": "Infraestructura B2B Core",
       "explorer": "Explorador de Cumplimiento",
       "subsystems": "+18 Subsistemas modulares para Orquestación Institucional"
@@ -2459,11 +2538,11 @@
       },
       "step2": {
         "title": "Define reglas de ruteo",
-        "body": "Configura parámetros como límites de exposición, liquidez mínima operativa (0K) y políticas de ruteo corporativo B2B."
+        "body": "Configura parámetros como límites de exposición, liquidez mínima operativa y políticas de ruteo corporativo B2B."
       },
       "step3": {
         "title": "Ejecuta políticas institucionales",
-        "body": "Si los parámetros cumplen las políticas, el SDK ejecuta de forma autónoma. Cada transacción queda firmada criptográficamente (HMAC-SHA256)."
+        "body": "Si los parámetros cumplen las políticas, el SDK avanza de forma autónoma — sin aprobación manual. La transacción en sí se firma en el siguiente paso, con tu propia llave."
       },
       "step4": {
         "title": "Liquida en Stellar (~4s)",
@@ -2499,7 +2578,9 @@
       "title": "Ruteo cross-border eficiente",
       "subtitle": "El rebalanceo autónomo habilita rieles de transferencia B2B como consecuencia de infraestructura directa.",
       "traditional": "Rieles Legacy",
+      "traditional_example": "Transferencia bancaria",
       "best_crypto": "Soluciones Crypto",
+      "crypto_example": "Puente stablecoin",
       "nirium": "Nirium + Etherfuse",
       "total_to_user": "Liquidez Neta",
       "explanation": "El corredor corporativo USDC ↔ CETES vía Etherfuse optimiza la tesorería B2B. Nirium provee la infraestructura de software (licencia fija). Etherfuse cobra ~0.20% por ejecución CETES. El Partner Regulado (ITF/casa de bolsa) establece y cobra todas las comisiones financieras de manera independiente."
@@ -2542,12 +2623,12 @@
     "last_updated": "ÚLTIMA ACTUALIZACIÓN: MAYO 2026",
     "sections": {
       "stellar_coc": {
-        "title": "Código de Conducta de Stellar (Mayo 2026)",
-        "content": "Nirium se adhiere estrictamente al Código de Conducta de Stellar actualizado a Mayo de 2026. Fomentamos una comunidad basada en el respeto mutuo, la integridad profesional y la transparencia radical. El acoso, la manipulación del mercado o las prácticas engañosas están estrictamente prohibidas. Se espera que todos los participantes contribuyan a un entorno seguro y acogedor."
+        "title": "Código de Conducta de Stellar",
+        "content": "Nirium se adhiere estrictamente al Código de Conducta de Stellar. Fomentamos una comunidad basada en el respeto mutuo, la integridad profesional y la transparencia radical. El acoso, la manipulación del mercado o las prácticas engañosas están estrictamente prohibidas. Se espera que todos los participantes contribuyan a un entorno seguro y acogedor."
       },
       "scf_rules": {
         "title": "Participación en el Ecosistema",
-        "content": "Como beneficiario de SCF Kickstart, Nirium cumple con todas las pautas relativas a la contribución de código abierto, la notificación transparente de métricas y los parámetros de subvención no dilutivos. Aseguramos que nuestra infraestructura de software avance el ecosistema Stellar en general sin reclamar el respaldo exclusivo de la SDF."
+        "content": "Como beneficiario de un Instaward SCF, Nirium cumple con todas las pautas relativas a la contribución de código abierto, la notificación transparente de métricas y los parámetros de subvención no dilutivos. Aseguramos que nuestra infraestructura de software avance el ecosistema Stellar en general sin reclamar el respaldo exclusivo de la SDF."
       },
       "instaward": {
         "title": "Estándares de Premio Institucional (Instaward)",
@@ -2557,11 +2638,11 @@
   },
   "legal": {
     "disclaimer_short": "Nirium es software experimental en Stellar Testnet. No es asesoría financiera. No garantiza rendimientos, dividendos ni retornos. Úselo bajo su propio riesgo.",
-    "disclaimer_full": "Nirium es infraestructura software-only, non-custodial, y nunca custodia fondos de clientes. La liquidación non-custodial (x402/MPP), el anclaje de auditoría y la reportería corren en Stellar mainnet; el vault de tesorería autónoma corre en Stellar testnet, audit-gated, hasta una auditoría externa formal. Nirium no es asesoría financiera, no es un producto de inversión, ni una actividad financiera regulada. No garantiza rendimientos, dividendos, apreciación de activos ni retornos de ningún tipo. Los datos de tasas de referencia mostrados (ej. CETES vía Etherfuse) son información pública de referencia únicamente — no proyecciones ni promesas de retorno. XLM y los activos de Stellar son volátiles. Los servicios financieros los prestan partners regulados, no Nirium.",
+    "disclaimer_full": "Nirium es infraestructura software-only, non-custodial, y nunca custodia fondos de clientes. La liquidación non-custodial (x402), el anclaje de auditoría y la reportería corren en Stellar mainnet; el rebalanceo autónomo corre en mainnet sobre bóvedas de DeFindex propiedad del cliente, por invitación mientras concluye la revisión legal; NiriumVault, el contrato propio de Nirium, corre en Stellar testnet, audit-gated, hasta una auditoría externa formal. MPP Charge es experimental y no está disponible en mainnet. Nirium no es asesoría financiera, no es un producto de inversión, ni una actividad financiera regulada. No garantiza rendimientos, dividendos, apreciación de activos ni retornos de ningún tipo. Los datos de tasas de referencia mostrados (ej. CETES vía Etherfuse) son información pública de referencia únicamente — no proyecciones ni promesas de retorno. XLM y los activos de Stellar son volátiles. Los servicios financieros los prestan partners regulados, no Nirium.",
     "rate_disclaimer": "Tasa de referencia del protocolo únicamente. No es una proyección o garantía de retorno.",
     "non_custodial": "No custodial. Tú tienes las llaves.",
     "testnet_only": "Solo Testnet. Sin fondos reales.",
-    "scf_compliant": "Beneficiario SCF Kickstart · Stellar CoC"
+    "scf_compliant": "Beneficiario SCF Instaward · Stellar CoC"
   },
   "payroll": {
     "eyebrow": "Nodo de Ejecución · Liquidación",
@@ -2656,5 +2737,55 @@
       "recipients": "destinatario(s)"
     },
     "footerSuffix": "Non-custodial · La empresa firma, Nirium nunca custodia fondos"
+  },
+  "nirium_play_page": {
+    "eyebrow": "NIRIUM · PLAY",
+    "eyebrow_event": "HackMeridian Lisboa",
+    "title": "Pagos por acción, dentro del juego.",
+    "subtitle": "x402 en Stellar, corriendo de verdad en Unity — no un mockup. Un jugador paga $0.02 por una acción, la firma se verifica en cadena, y el juego desbloquea el resultado en segundos.",
+    "badge_settled": "Liquidado en Stellar testnet",
+    "badge_stack": "Unity 6 + Soroban",
+    "badge_bugs": "4 bugs reales encontrados y corregidos",
+    "play_cta": "Jugar la demo",
+    "flow_title": "Cómo funciona",
+    "flow_note": "El mismo flujo que corre en el ejemplo de referencia de x402, adaptado al SDK de Stellar para Unity.",
+    "flow_1_title": "Solicita la acción",
+    "flow_1_desc": "El jugador pide \"revelar loot\" sin pagar todavía.",
+    "flow_2_title": "402 Payment Required",
+    "flow_2_desc": "El servidor responde con el precio y la red exacta.",
+    "flow_3_title": "Firma y reintenta",
+    "flow_3_desc": "El cliente firma la autorización Soroban y reenvía.",
+    "flow_4_title": "Loot desbloqueado",
+    "flow_4_desc": "El facilitador liquida el pago; el juego responde.",
+    "evidence_title": "Evidencia real",
+    "evidence_note": "Nada de esto es una demo grabada de antemano — cada fila es verificable de forma independiente.",
+    "pr87_title": "#87 — fix de compilación en Unity",
+    "pr87_desc": "Primera vez que el cliente de Unity se corrió en un Editor real — encontró y corrigió un bug de SHA256.HashData.",
+    "pr87_link": "ver PR →",
+    "pr88_title": "#88 — fix del header de liquidación",
+    "pr88_desc": "Verificación independiente del flujo de pago, con llaves de testnet propias — corrigió el nombre de header contra el spec oficial de x402 v2.",
+    "pr88_link": "ver PR →",
+    "pr89_title": "#89 — el hash de liquidación llega al jugador",
+    "pr89_desc": "El cliente ahora lee el hash de la transacción del header payment-response — ese valor solo existe ahí, nunca en el body de la respuesta, por cómo x402Serve() liquida un pago.",
+    "pr89_link": "ver PR →",
+    "tx_editor_title": "Pago liquidado en vivo, dentro de Unity",
+    "tx_second_title": "Segunda corrida, mismo flujo",
+    "tx_browser_title": "Pagado desde un navegador real (build WebGL, no el Editor)",
+    "tx_link": "stellar.expert →",
+    "external_title": "Reconocido río arriba, no solo autoreportado",
+    "external_note": "Cuatro contribuciones de casos de uso al propio repo de investigación de escrows de Trustless Work, mergeadas la misma noche — reconocidas directamente por su CEO en GitHub.",
+    "tw1_title": "Pagos de milestone con autoridad acotada + x402",
+    "tw1_desc": "Caso de uso: un agente que puede liberar el pago de un milestone, pero nunca redirigir a dónde va — el mismo patrón que Nirium ya corre en producción.",
+    "tw2_title": "Autoridad por parámetro ausente (rebalanceo de Tesorería)",
+    "tw2_desc": "Caso de uso construido desde el propio rol de RebalanceManager de Tesorería de Nirium: la llamada rebalance() de DeFindex no tiene ningún parámetro de destino, así que redirigir fondos no está restringido — es inescribible.",
+    "tw3_title": "Pago x402 directo sin escrow (liquidación en vivo verificada)",
+    "tw3_desc": "Escrito por Monse — cita la propia liquidación en vivo de testnet de Nirium Play como evidencia de cuándo un escrow basado en milestones es la herramienta equivocada.",
+    "tw4_title": "Evidencia de producción para el schema de herramientas del agente",
+    "tw4_desc": "Nota de investigación construida desde endpoints reales y corriendo, en vez de un schema hipotético.",
+    "tw_link": "ver PR →",
+    "pending_tag": "en construcción",
+    "pending_title": "Demo jugable, embebida aquí mismo",
+    "pending_body": "El build WebGL ya está arriba — puedes probarlo ahora mismo con el botón \"Jugar la demo\" al inicio de esta página. Lo que todavía no está resuelto es el puente de firma por wallet (Freighter) para el modo conectado — el build de hoy firma con una llave de demo fija, no con la wallet del visitante.",
+    "footer_tagline": "Nirium — infraestructura de pagos x402 en Stellar"
   }
 }

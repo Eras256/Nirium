@@ -190,6 +190,29 @@ export async function POST(req: Request) {
             return NextResponse.json(data);
         }
 
+        // Live price/TVL for the reference card on /ramp. Public endpoint, no
+        // auth needed — but it MUST hit the same BASE_URL (sandbox today) the
+        // rest of this route uses, not the production API: sandbox and
+        // production report genuinely different numbers (verified live,
+        // 26-ago-2026 — sandbox CETES price 1.142034 / TVL ~734M vs.
+        // production 1.178212 / TVL ~87.9M), and quoting production while
+        // orders execute against sandbox would just trade one mismatch for
+        // another. Replaces a hardcoded snapshot that had drifted from both.
+        if (action === 'lookup') {
+            const { bondId = 'CETES' } = body;
+            const res = await fetch(`${BASE_URL}/lookup/stablebonds`);
+            const data = await res.json().catch(() => ({}));
+            const bond = (data.stablebonds || []).find((b: any) => b.symbol === bondId);
+            if (!bond) return NextResponse.json({ error: 'Bond not found in lookup response' }, { status: 502 });
+            return NextResponse.json({
+                symbol: bond.symbol,
+                tokenPriceDecimal: bond.tokenPriceDecimal,
+                netValueDecimal: bond.netValueDecimal,
+                bondCurrency: bond.bondCurrency,
+                calculatedAt: data.calculatedAt,
+            });
+        }
+
         return NextResponse.json({ error: 'Invalid action' }, { status: 400 });
 
     } catch (e: any) {

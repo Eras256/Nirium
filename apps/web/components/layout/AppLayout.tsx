@@ -15,6 +15,7 @@ import { useFreighter } from "@/hooks/useFreighter";
 import { useLanguage } from "@/context/LanguageContext";
 import { useNetwork } from "@/context/NetworkContext";
 import { ThemeToggle } from "@/components/ui/ThemeToggle";
+import Footer from "@/components/layout/Footer";
 
 export function AppSidebar({ onClose }: { onClose?: () => void }) {
     const pathname = usePathname();
@@ -29,7 +30,7 @@ export function AppSidebar({ onClose }: { onClose?: () => void }) {
                 { href: "/",                 label: t.nav.home,        icon: Home,            accent: "#3B82F6" },
                 { href: "/dashboard",        label: t.nav.dashboard,   icon: LayoutDashboard, accent: "#2DEBE8" },
                 { href: "/agents",           label: t.nav.agents,      icon: Cpu,             accent: "#FFD700" },
-                { href: "/payroll",          label: t.nav.payroll,     icon: Send,            accent: "#2DEBE8" },
+                { href: "/payouts",          label: t.nav.payroll,     icon: Send,            accent: "#2DEBE8" },
                 { href: "/security",         label: t.nav.security,    icon: ShieldCheck,     accent: "#10B981" },
                 { href: "/compliance",       label: t.nav.compliance,  icon: Shield,          accent: "#2DEBE8" },
             ]
@@ -39,7 +40,7 @@ export function AppSidebar({ onClose }: { onClose?: () => void }) {
             items: [
                 { href: "/treasury",         label: t.nav.treasury,    icon: Building2,       accent: "#3B82F6" },
                 { href: "/treasury/vault",   label: t.nav.vault,       icon: ShieldCheck,     accent: "#2DEBE8" },
-                { href: "/treasury/builder", label: t.nav.builder,    icon: Zap,             accent: "#A78BFA" },
+                { href: "/treasury/builder", label: t.nav.builder,    icon: Zap,             accent: "#A78BFA", badge: "BETA" },
                 { href: "/ramp",             label: t.nav.ramp,        icon: Globe,           accent: "#EC4899" },
             ]
         },
@@ -64,7 +65,7 @@ export function AppSidebar({ onClose }: { onClose?: () => void }) {
             <div className="flex items-center justify-between px-5 py-5 border-b border-white/[0.06] shrink-0">
                 <Link href="/" className="flex items-center gap-2 group">
                     <div className="overflow-hidden flex items-center">
-                        <img src="/brand/logo.png" alt="Nirium" className="h-7 w-auto object-contain" />
+                        <img src="/brand/icon.svg" alt="Nirium" className="h-7 w-auto object-contain" />
                     </div>
                 </Link>
                 {onClose && (
@@ -82,7 +83,7 @@ export function AppSidebar({ onClose }: { onClose?: () => void }) {
                             {section.label}
                         </p>
                         <ul className="space-y-0.5">
-                            {section.items.map(({ href, label, icon: Icon, accent }) => {
+                            {section.items.map(({ href, label, icon: Icon, accent, badge }: { href: string; label: string; icon: any; accent: string; badge?: string }) => {
                                 const isActive = pathname === href || (href !== "/" && href !== "/dashboard" && pathname.startsWith(href));
                                 return (
                                     <li key={href}>
@@ -107,7 +108,12 @@ export function AppSidebar({ onClose }: { onClose?: () => void }) {
                                                 style={isActive ? { color: accent } : {}}
                                             />
                                             <span className="truncate text-[13px]">{label}</span>
-                                            {isActive && (
+                                            {badge && (
+                                                <span className="ml-auto text-[8px] font-black px-1.5 py-0.5 rounded border border-white/10 text-white/30 uppercase tracking-widest shrink-0">
+                                                    {badge}
+                                                </span>
+                                            )}
+                                            {isActive && !badge && (
                                                 <ChevronRight size={12} className="ml-auto text-white/30" />
                                             )}
                                         </Link>
@@ -146,14 +152,38 @@ export function AppSidebar({ onClose }: { onClose?: () => void }) {
             <div className="px-3 pb-3 shrink-0">
                 <div className="flex flex-col gap-1.5 px-3 py-2 rounded-xl bg-white/[0.03] border border-white/[0.06]">
                     {/* Los cuatro nodos non-custodial de mainnet, no dos: el resto
-                        del sitio (home, disclaimer legal) ya listaba los cuatro. */}
+                        del sitio (home, disclaimer legal) ya listaba los cuatro.
+                        Treasury va aquí, no en la línea de testnet: el rebalanceo
+                        (DeFindex, bóveda del cliente) ya corre en mainnet, invite-only
+                        mientras cierra la revisión legal. Solo NiriumVault -- el
+                        contrato propio de Nirium -- sigue en testnet, audit-gated.
+                        Calificador por ítem, no uno solo al final de la línea: en
+                        una lista corrida "TREASURY (INVITE-ONLY)" al cierre se leía
+                        como si aplicara a toda la lista.
+                        Segunda pasada: red no es lo único que varía dentro de
+                        mainnet -- nivel de acceso también. Settlement/Audit/Reporting
+                        son de uso abierto; Payouts (early access, términos que
+                        aceptar) y Treasury (beta, invite-only mientras cierra la
+                        revisión legal) no lo son. Antes las seis palabras vivían en
+                        una sola línea del mismo color -- igualaba visualmente algo
+                        de acceso general con algo que sigue siendo limitado. Ahora
+                        son dos líneas dentro de mainnet: abierto arriba, acceso
+                        limitado abajo. */}
                     <div className="flex items-start gap-2">
                         <span className="relative flex h-1.5 w-1.5 shrink-0 mt-[3px]">
                             <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75" />
                             <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-green-500" />
                         </span>
                         <span className="text-[9px] font-mono font-bold text-green-400 uppercase tracking-widest leading-[1.5]">
-                            MAINNET · SETTLEMENT · AUDIT · PAYOUTS · REPORTING
+                            MAINNET · SETTLEMENT · AUDIT · REPORTING
+                        </span>
+                    </div>
+                    <div className="flex items-start gap-2">
+                        <span className="relative flex h-1.5 w-1.5 shrink-0 mt-[3px]">
+                            <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-green-500/50" />
+                        </span>
+                        <span className="text-[9px] font-mono font-bold text-green-400/60 uppercase tracking-widest leading-[1.5]">
+                            MAINNET · PAYOUTS (INVITE-ONLY) · TREASURY (BETA)
                         </span>
                     </div>
                     <div className="flex items-start gap-2">
@@ -161,7 +191,7 @@ export function AppSidebar({ onClose }: { onClose?: () => void }) {
                             <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-amber-400" />
                         </span>
                         <span className="text-[9px] font-mono font-bold text-amber-400/80 uppercase tracking-widest leading-[1.5]">
-                            TESTNET · TREASURY
+                            TESTNET · NIRIUMVAULT
                         </span>
                     </div>
 
@@ -210,8 +240,9 @@ export function AppSidebar({ onClose }: { onClose?: () => void }) {
                 <ThemeToggle />
             </div>
 
-            {/* Wallet */}
-            <div className="px-3 pb-4 shrink-0 border-t border-white/[0.06] pt-3">
+            {/* Wallet — último elemento del panel ahora que el link redundante
+                "Inicio" de hasta abajo se quitó (CORE ya lo tiene arriba) */}
+            <div className="px-3 pb-6 shrink-0 border-t border-white/[0.06] pt-3">
                 {isConnected && address ? (
                     <div className="flex items-center gap-2 px-3 py-2.5 rounded-xl bg-stellar-teal/5 border border-stellar-teal/20">
                         <Activity size={13} className="text-stellar-teal shrink-0 animate-pulse" />
@@ -234,17 +265,6 @@ export function AppSidebar({ onClose }: { onClose?: () => void }) {
                         {t.nav.auth_session}
                     </button>
                 )}
-            </div>
-
-            {/* Marketing Back Link */}
-            <div className="px-3 pb-6 shrink-0">
-                <Link
-                    href="/"
-                    className="flex items-center justify-center gap-2 px-3 py-2 text-[9px] font-black uppercase tracking-[0.2em] text-white/20 hover:text-white/60 transition-all border border-transparent hover:border-white/5 rounded-lg"
-                >
-                    <ChevronRight size={10} className="rotate-180" />
-                    {t.nav.home}
-                </Link>
             </div>
         </aside>
     );
@@ -300,7 +320,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
                     >
                         <Menu size={18} />
                     </button>
-                    <img src="/brand/logo.png" alt="Nirium" className="h-7 w-auto object-contain" />
+                    <img src="/brand/icon.svg" alt="Nirium" className="h-7 w-auto object-contain" />
                     <Link href="/" className="ml-auto text-[9px] font-mono text-white/30 hover:text-white transition-colors uppercase tracking-widest">
                         {t.nav.back_to_marketing}
                     </Link>
@@ -308,6 +328,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
 
                 <main className="flex-1 overflow-auto">
                     {children}
+                    <Footer />
                 </main>
             </div>
         </div>

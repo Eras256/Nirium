@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="en-us">
+  <head>
+    <meta charset="utf-8">
+
+    <!-- Unity's own asset paths (Build/, StreamingAssets, TemplateData) are
+         relative and assume this page is served at its own directory root.
+         Next.js serves this file at /nirium-play/game/ (with a
+         trailing-slash redirect from /nirium-play/game), so without this
+         <base> tag every relative Unity asset resolves one directory level
+         too high and 404s. MUST be the first URL-bearing thing in <head>,
+         before any <link>/<script src> — browsers resolve+fetch each
+         resource AS THEY PARSE IT, not after the whole <head> is read, so a
+         <base> placed after a <link rel="stylesheet"> has zero effect on
+         that specific tag. Real bug, not theoretical: on the 22-sep
+         rebuild this was placed after the TemplateData/style.css <link>,
+         which made that stylesheet 404 (fetched relative to /nirium-play/
+         instead of /nirium-play/game/) — Unity's own `.unity-mobile {
+         width:100%; height:100% }` rule lives in that stylesheet, so
+         without it the canvas fell back to its hardcoded 960x600
+         attribute size on real mobile devices, cramming a desktop-sized
+         frame into a 390px-wide screen. Only caught because a bare local
+         static-file server doesn't reproduce Next.js's trailing-slash
+         redirect, so this passed local verification and only broke in
+         production. Unity regenerates this whole file from its template on
+         every build — this tag (and everything else below it) has to be
+         reapplied, in this exact position, after each rebuild. -->
+    <base href="/nirium-play/game/">
+
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <title>Nirium Play — HackMeridian demo</title>
+    <link rel="shortcut icon" href="TemplateData/favicon.ico">
+    <link rel="stylesheet" href="TemplateData/style.css">
+
+    <style>
+      :root {
+        --gold-1: #F5D57A;
+        --gold-2: #D4AF37;
+        --gold-3: #8B6F2E;
+        --ink: #0A0A0C;
+      }
+
+      html, body { margin: 0; padding: 0; background: var(--ink); overflow: hidden; }
+
+      #nirium-header {
+        position: relative;
+        z-index: 20;
+        height: 56px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 0 16px;
+        background: var(--ink);
+        border-bottom: 2px solid;
+        border-image: linear-gradient(90deg, var(--gold-1), var(--gold-2), var(--gold-3)) 1;
+        box-shadow: 0 2px 16px rgba(212, 175, 55, 0.15);
+        box-sizing: border-box;
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
+      }
+      #nirium-header .brand { display: flex; align-items: center; gap: 10px; min-width: 0; }
+      #nirium-header .brand svg { width: 28px; height: 28px; flex-shrink: 0; }
+      #nirium-header .brand span {
+        color: #F5F3EF;
+        font-weight: 800;
+        font-size: 15px;
+        letter-spacing: 0.02em;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+      #nirium-header nav { display: flex; align-items: center; gap: 16px; flex-shrink: 0; }
+      #nirium-header nav a {
+        color: var(--gold-2);
+        text-decoration: none;
+        font-size: 13px;
+        font-weight: 700;
+        white-space: nowrap;
+      }
+      #nirium-header nav a:hover { color: var(--gold-1); }
+
+      #nirium-game-area { position: relative; height: calc(100vh - 56px); background: var(--ink); }
+
+      /* Unity's own default is #unity-build-title { ... arial ... } — keep
+         the brand gold instead of whatever the template ships with. */
+      #unity-build-title { color: var(--gold-3) !important; font-family: inherit !important; }
+
+      /* .unity-mobile (TemplateData/style.css) sizes #unity-container to
+         position:fixed, 100% of the *viewport* — which would sit UNDER our
+         56px header (z-index: 20 keeps the header visually on top, but the
+         canvas underneath would still cover the same screen space and the
+         fixed layout math would be wrong). Pin it to start below the
+         header instead, same idea as #nirium-game-area's height on
+         desktop. */
+      #unity-container.unity-mobile {
+        position: fixed !important;
+        top: 56px !important;
+        left: 0 !important;
+        width: 100% !important;
+        height: calc(100% - 56px) !important;
+      }
+
+      @media (max-width: 480px) {
+        #nirium-header nav a.hide-mobile { display: none; }
+      }
+    </style>
+  </head>
+  <body>
+    <header id="nirium-header">
+      <div class="brand">
+        <svg viewBox="0 0 100 100" aria-hidden="true">
+          <defs>
+            <linearGradient id="niriumPlayHeaderGold" x1="0" y1="0" x2="100" y2="100" gradientUnits="userSpaceOnUse">
+              <stop offset="0" stop-color="#F5D57A"/>
+              <stop offset="0.5" stop-color="#D4AF37"/>
+              <stop offset="1" stop-color="#8B6F2E"/>
+            </linearGradient>
+          </defs>
+          <path d="M14,34 H86 a10,10 0 0 1 10,10 v6 a18,18 0 0 1 -18,18 a12,12 0 0 1 -10,-5.5 L62,54 H38 l-6,8.5 a12,12 0 0 1 -10,5.5 A18,18 0 0 1 4,50 v-6 a10,10 0 0 1 10,-10 Z" fill="url(#niriumPlayHeaderGold)"/>
+          <path d="M27,56 L27,38 L43,56 L43,38" fill="none" stroke="#0A0A0C" stroke-width="6.5" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M72,36 L75,45 L84,48 L75,51 L72,60 L69,51 L60,48 L69,45 Z" fill="#0A0A0C"/>
+        </svg>
+        <span>NIRIUM PLAY</span>
+      </div>
+      <nav>
+        <a href="/nirium-play">&larr; evidence</a>
+        <a href="/branding-nirium-play">brand pack</a>
+        <a href="https://nirium.xyz" class="hide-mobile">nirium.xyz</a>
+      </nav>
+    </header>
+
+    <div id="nirium-game-area">
+      <div id="unity-container" class="unity-desktop">
+        <div id="unity-fullscreen-container">
+          <canvas id="unity-canvas" width="960" height="600" tabindex="-1"></canvas>
+          <div id="unity-loading-container">
+            <div id="unity-loading-bar">
+              <div id="unity-logo"></div>
+              <div id="unity-progress-bar-empty">
+                <div id="unity-progress-bar-full"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div id="unity-warning"> </div>
+        <div id="unity-footer">
+          <div id="unity-logo-title-footer"></div>
+          <div id="unity-fullscreen-button"></div>
+          <div id="unity-build-title">NiriumPlay</div>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      let canvas = document.querySelector("#unity-canvas");
+      let fullscreenContainer = document.querySelector("#unity-fullscreen-container");
+
+      // Shows a temporary message banner/ribbon for a few seconds, or
+      // a permanent error message on top of the canvas if type=='error'.
+      // If type=='warning', a yellow highlight color is used.
+      // Modify or remove this function to customize the visually presented
+      // way that non-critical warnings and error messages are presented to the
+      // user.
+      function unityShowBanner(msg, type) {
+        var warningBanner = document.querySelector("#unity-warning");
+        function updateBannerVisibility() {
+          warningBanner.style.display = warningBanner.children.length ? 'block' : 'none';
+        }
+        var div = document.createElement('div');
+        div.innerHTML = msg;
+        warningBanner.appendChild(div);
+        if (type == 'error') div.style = 'background: red; padding: 10px;';
+        else {
+          if (type == 'warning') div.style = 'background: yellow; padding: 10px;';
+          setTimeout(function() {
+            warningBanner.removeChild(div);
+            updateBannerVisibility();
+          }, 5000);
+        }
+        updateBannerVisibility();
+      }
+
+      var buildUrl = "Build";
+      var loaderUrl = buildUrl + "/WebGLBuild.loader.js";
+      var config = {
+        arguments: [],
+        dataUrl: buildUrl + "/WebGLBuild.data.br",
+        frameworkUrl: buildUrl + "/WebGLBuild.framework.js.br",
+        codeUrl: buildUrl + "/WebGLBuild.wasm.br",
+        streamingAssetsUrl: "StreamingAssets",
+
+        // If you have a custom web site structure, or want to place multiple Unity build instances on the same page,
+        // you can pass fullscreenElementID: "my-unity-fullscreen-container-id", in this configuration field to
+        // explicitly point to the element tree root that is displayed in fullscreen mode.
+        fullscreenElementID: "unity-fullscreen-container",
+
+        companyName: "DefaultCompany",
+        productName: "NiriumPlay",
+        productVersion: "0.1.0",
+        showBanner: unityShowBanner,
+      };
+
+      // By default, Unity keeps WebGL canvas render target size matched with
+      // the DOM size of the canvas element (scaled by window.devicePixelRatio).
+      // matchWebGLToCanvasSize stays at its default (true) here — everything
+      // below sizes the canvas element itself instead of touching this flag.
+
+      if (/iPhone|iPad|iPod|Android/i.test(navigator.userAgent)) {
+        // Mobile device style: fill the browser viewport below the header
+        // with the game canvas (see #unity-container.unity-mobile above for
+        // the header-offset fix — TemplateData/style.css's own rule doesn't
+        // know about our added header).
+
+        var meta = document.createElement('meta');
+        meta.name = 'viewport';
+        meta.content = 'width=device-width, height=device-height, initial-scale=1.0, user-scalable=no, shrink-to-fit=yes';
+        document.getElementsByTagName('head')[0].appendChild(meta);
+        document.querySelector("#unity-container").className = "unity-mobile";
+        canvas.className = "unity-mobile";
+
+        // Real mobile crash report (WASM trap, 20-sep-2026): with
+        // devicePixelRatio left uncapped, Unity renders the WebGL
+        // framebuffer at the phone's *physical* pixel count — on a typical
+        // modern phone (devicePixelRatio 2.5-3x) that's roughly 6-9x the
+        // pixel count of the same CSS size on desktop, for a scene that
+        // already carries a neon skybox + bloom + reflective floor.
+        // Capping it to 1 is Unity's own suggested fix for exactly this,
+        // just shipped commented out by default. Confirmed fixed on the
+        // real device that crashed before this line was uncommented.
+        config.devicePixelRatio = 1;
+
+      } else {
+        // Desktop style: scaled to fit the viewport instead of a fixed
+        // 960x600 — the fixed size overflowed the page on any window
+        // narrower than ~1000px (or at 100% zoom on a normal-width
+        // window), cutting off the title and footer. Keeps the original
+        // 960:600 aspect ratio; Unity's own matchWebGLToCanvasSize (on by
+        // default) keeps the real render resolution in sync with whatever
+        // size this computes.
+        //
+        // Also caps against *height*, not just width: TemplateData/style.css
+        // centers #unity-container (canvas + #unity-footer stacked) with
+        // `position: absolute; top: 50%; transform: translate(-50%, -50%)`.
+        // That formula doesn't clamp — on any viewport shorter than the
+        // container, the top edge lands at a negative, permanently
+        // invisible offset. Subtracting the footer's and header's fixed
+        // heights keeps the *whole* container inside the viewport instead
+        // of just the canvas.
+        //
+        // Unity regenerates this file from its template on every build, so
+        // this has to be reapplied after each rebuild.
+        var BASE_WIDTH = 960;
+        var BASE_HEIGHT = 600;
+        var FOOTER_HEIGHT = 38; // #unity-footer, fixed in TemplateData/style.css
+        var HEADER_HEIGHT = 56; // #nirium-header
+
+        function sizeFullscreenContainer() {
+          var maxWidth = Math.min(BASE_WIDTH, window.innerWidth - 32);
+          var maxCanvasHeight = (window.innerHeight - HEADER_HEIGHT) - FOOTER_HEIGHT - 32;
+          var scale = Math.min(maxWidth / BASE_WIDTH, maxCanvasHeight / BASE_HEIGHT, 1);
+          fullscreenContainer.style.width = Math.round(BASE_WIDTH * scale) + "px";
+          fullscreenContainer.style.height = Math.round(BASE_HEIGHT * scale) + "px";
+        }
+
+        sizeFullscreenContainer();
+        window.addEventListener("resize", sizeFullscreenContainer);
+      }
+
+
+      var script = document.createElement("script");
+      script.src = loaderUrl;
+      script.onload = () => {
+        const loadingContainer = document.querySelector("#unity-loading-container");
+        const progressBarFull = document.querySelector("#unity-progress-bar-full");
+
+        createUnityInstance(canvas, config, (progress) => {
+          if (progress < 1) {
+            loadingContainer.style.display = "block";
+            progressBarFull.style.width = 100 * progress + "%";
+          } else {
+            loadingContainer.style.display = "none";
+          }
+        }).then((unityInstance) => {
+                document.querySelector("#unity-fullscreen-button").onclick = () => {
+                  unityInstance.SetFullscreen(1);
+                };
+
+              }).catch((message) => {
+                alert(message);
+              });
+            };
+
+      document.body.appendChild(script);
+
+    </script>
+  </body>
+</html>

@@ -1,7 +1,7 @@
 [workspace]
 members = [
-    "packages/contracts",
-    "packages/contracts/protocol",
+    "nirium-soroban-contracts",
+    "nirium-soroban-contracts/protocol",
 ]
 resolver = "2"
 

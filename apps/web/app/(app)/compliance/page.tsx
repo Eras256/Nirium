@@ -47,7 +47,7 @@ export default function CompliancePage() {
                             {t.compliance_page.hero.title}
                             <br />
                             <span className="bg-gradient-to-r from-stellar-teal via-white to-stellar-yellow bg-clip-text text-transparent drop-shadow-[0_0_30px_rgba(45,235,232,0.3)]">
-                                Audit-Ready
+                                Verifiable by Design
                             </span>
                         </motion.h1>
                         <motion.p 

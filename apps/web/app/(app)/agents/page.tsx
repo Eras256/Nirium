@@ -55,8 +55,8 @@ export default function AgentsPage() {
                 "Invest and Unwind between the vault own strategies — no swaps, no destination address",
                 "Invest y Unwind entre las estrategias de la propia bóveda — sin swaps y sin dirección de destino"),
             audit: lang(
-                "HMAC-SHA256 + IPFS anchor per execution",
-                "HMAC-SHA256 + anclaje IPFS por ejecución"),
+                "SHA-256 + IPFS anchor per execution",
+                "SHA-256 + anclaje IPFS por ejecución"),
             metric: lang(
                 "Last execution: success · Monitoring: continuous",
                 "Última ejecución: exitosa · Monitoreo: continuo 24h"),
@@ -93,7 +93,10 @@ export default function AgentsPage() {
         },
         {
             id: "compliance-sentinel",
-            statusLabel: "ARCHITECTED",
+            // nodeRegistry.ts:132 tiene status: 'proposed', y GET /api/nodes
+            // confirma 0 'architected' / 1 'proposed' en la cuenta real — este
+            // es ese nodo. "ARCHITECTED" no correspondía a ningún estado real.
+            statusLabel: "PROPOSED",
             statusColor: "bg-white/5 text-white/40 border-white/10",
             dotColor: "bg-green-400",
             accentBorder: "border-green-500/20",
@@ -102,9 +105,14 @@ export default function AgentsPage() {
             name: lang(
                 "Compliance Sentinel",
                 "Centinela de Cumplimiento"),
+            // Texto igual al de packages/agent/src/services/nodeRegistry.ts:152
+            // (la fuente real) — verificado en vivo, POST /api/v1/premium/audit
+            // responde 404 en testnet y en mainnet. Si se actualiza uno, actualizar
+            // el otro: esta página tenía una versión vieja y falsa ("el servicio
+            // backend existe") que nodeRegistry.ts ya había corregido.
             role: lang(
-                "Designed to validate vault movements against compliance policies before signature. Backend service exists; public surface ships after the external audit.",
-                "Diseñado para validar movimientos del vault contra políticas de cumplimiento antes de firmar. El servicio backend existe; la superficie pública llega tras la auditoría externa."),
+                "Not built. The intent is to validate every proposed transfer against a policy before it is signed. What exists today is the agent-to-agent x402 client pattern in coordinationService; the auditor endpoint it calls does not exist yet, and the call fails open by design so a downed auditor never blocks execution. Do not rely on this as a control.",
+                "No está construido. La intención es validar cada transferencia propuesta contra una política antes de firmarla. Lo que existe hoy es el patrón de cliente x402 agente-a-agente en coordinationService; el endpoint auditor que llama todavía no existe, y la llamada falla abierta por diseño para que un auditor caído nunca bloquee la ejecución. No confíes en esto como un control."),
             cycle: lang("Continuous", "Continuo"),
             trigger: lang("Any vault event", "Cualquier evento del vault"),
             authorized: lang(
@@ -130,8 +138,8 @@ export default function AgentsPage() {
                 "Settlement Hub",
                 "Hub de Liquidación"),
             role: lang(
-                "Orchestrates x402 micro-billing and MPP Charge settlement, per request. Direct integration with the Horizon API.",
-                "Orquestra micro-facturación x402 y liquidación MPP Charge, por request. Integración directa con la Horizon API."),
+                "Orchestrates x402 micro-billing, per request. Direct integration with the Horizon API.",
+                "Orquestra micro-facturación x402, por request. Integración directa con la Horizon API."),
             cycle: lang("On-demand", "Bajo demanda"),
             trigger: lang("Authenticated API calls", "Llamadas API autenticadas"),
             authorized: lang(
@@ -141,8 +149,8 @@ export default function AgentsPage() {
                 "Transaction hash anchored per payment",
                 "Hash de transacción anclado por pago"),
             metric: lang(
-                "Active protocols: x402 · MPP — LIVE ON MAINNET",
-                "Protocolos activos: x402 · MPP — EN VIVO EN MAINNET"),
+                "Active protocols: x402 — LIVE ON MAINNET",
+                "Protocolos activos: x402 — EN VIVO EN MAINNET"),
             locked: false,
         },
         {
@@ -253,7 +261,8 @@ export default function AgentsPage() {
                     <div className="flex items-center gap-1.5">
                         <Cpu className="w-3 h-3 text-white/20" />
                         <span className="text-white/40">{lang("Protocol", "Protocolo")}</span>
-                        <span className="text-white/80 ml-1">Soroban · Protocol 23</span>
+                        {/* Verificado 4-oct-2026 contra el último ledger de Horizon (mainnet y testnet): protocol_version 29. */}
+                        <span className="text-white/80 ml-1">Soroban · Protocol 29</span>
                     </div>
                     <div className="flex items-center gap-1.5">
                         <Globe className="w-3 h-3 text-white/20" />

@@ -2,7 +2,7 @@
   "x-status": "interim — governing law (§6) and arbitration seat/language (§7) filled with ICDR-recommended defaults, pending final confirmation by outside counsel",
   "terms": "https://nirium.xyz/legal/payroll-terms-v1.md",
   "termsFormat": "text/markdown",
-  "atrHash": "sha-256:ad62b4465e1196edbba772b71f7755fafc3f5ce2245adf1e090f411873c8b478",
+  "atrHash": "sha-256:fd4e544542501193fb04565b06ad14dcdc0fdead61e74b9da67e05ccea294faf",
   "acceptanceRequired": false,
   "disputeResolution": {
     "clauseId": "ICDR-INTL-STANDARD",

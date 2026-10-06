@@ -15,13 +15,13 @@ const FEATURES_FREE: Feature[] = [
     { en: 'Up to 10 test transactions/day',  es: 'Hasta 10 txs de prueba/día' },
     { en: 'Audit trail (SHA-256 · IPFS)',  es: 'Audit trail (SHA-256 · IPFS)' },
     { en: 'Payouts node (batch disbursement)', es: 'Nodo de dispersiones (batch)' },
-    { en: 'SDK access (npm: nirium)',          es: 'Acceso SDK (npm: nirium)' },
+    { en: 'Package access (npm: nirium)',       es: 'Acceso al paquete (npm: nirium)' },
     { en: 'MCP server (Claude/Cursor)',       es: 'MCP server (Claude/Cursor)' },
     // Estas dos cobran donde existe la capacidad, no donde queda mejor en el
     // copy: la señal la produce el loop autónomo y la ejecución necesita una
     // llave firmante. El box de mainnet no tiene ninguna de las dos y responde
     // 501 sin cobrar, así que anunciarlas allá sería vender una puerta cerrada.
-    { en: 'x402 signals — $0.02 per call (the autonomous loop produces them here)', es: 'Señales x402 — $0.02 por llamada (aquí es donde el loop autónomo las produce)' },
+    { en: 'x402 snapshot — $0.02 per call (factual loop data, not a recommendation)', es: 'Snapshot x402 — $0.02 por llamada (datos del loop, no una recomendación)' },
     { en: 'x402 execute — $0.25 per call (execution needs a signing key; mainnet box holds none)', es: 'Execute x402 — $0.25 por llamada (ejecutar necesita llave firmante; el box de mainnet no tiene)' },
 ];
 
@@ -29,9 +29,10 @@ const FEATURES_MAINNET: Feature[] = [
     // Cada renglón dice QUÉ hace y POR QUÉ es software y no servicio financiero.
     // No es adorno legal: el encuadre se defiende explicando el flujo de fondos,
     // y el mejor lugar para explicarlo es donde alguien decide comprar.
-    { en: 'x402 market state — $0.05 per call. You pay us for our own data; we are the payee, never an intermediary', es: 'Market state x402 — $0.05 por llamada. Nos pagas por nuestros propios datos; somos el vendedor, nunca un intermediario' },
-    { en: 'x402Serve() — charge for YOUR API in ten lines, same rail. Funds go payer → you; they never touch Nirium', es: 'x402Serve() — cobra por TU API en diez líneas, el mismo riel. El dinero va del pagador a ti; nunca toca a Nirium' },
-    { en: 'MPP Charge — per-request settlement with no external facilitator. The payment is to us, for our service', es: 'MPP Charge — liquidación por request, sin facilitador externo. El pago es hacia nosotros, por nuestro servicio' },
+    { en: 'x402 market state — $0.05 per call. We sell our own data directly', es: 'Market state x402 — $0.05 por llamada. Vendemos nuestros propios datos directamente' },
+    { en: 'x402Serve() — charge for YOUR API, same rail. Funds go payer → you; they never touch Nirium. Third-party facilitator use is invite-only while legal review closes', es: 'x402Serve() — cobra por TU API, el mismo riel. El dinero va del pagador a ti; nunca toca a Nirium. Usarlo como facilitador de terceros es solo por invitación mientras cierra la revisión legal' },
+    // MPP Charge salió de esta lista el 4-oct-2026: estaba listada como viva en
+    // mainnet y no lo está (ver la nota fechada debajo de la tarjeta).
     // "Desplegar y depositar" se quedaba corto y justo donde no conviene: RETIRAR
     // también corre en mainnet y lo firmas tú, sin pedirnos permiso. Es la primera
     // pregunta de cualquiera que va a meter dinero en un contrato, y omitirla se
@@ -58,7 +59,7 @@ const FEATURES_GROWTH: Feature[] = [
     { en: 'Unlimited transactions',             es: 'Transacciones ilimitadas' },
     { en: 'Institutional-format exports (CSV/JSON)', es: 'Exportes formato institucional (CSV/JSON)' },
     { en: 'IPFS anchoring (Pinata)',             es: 'Anclaje IPFS (Pinata)' },
-    { en: 'x402 + MPP agentic payments',        es: 'Pagos agénticos x402 + MPP' },
+    { en: 'x402 agentic payments',              es: 'Pagos agénticos x402' },
     { en: 'Payouts / batch disbursement',       es: 'Dispersiones / pagos por lote' },
     { en: 'LCP legal layer (in legal review)',  es: 'Capa legal LCP (en revisión legal)' },
     { en: 'Cross-border USDC transfers',        es: 'Transfers cross-border USDC' },
@@ -94,7 +95,7 @@ const COMPARISON: ComparisonRow[] = [
     { feature: { en: 'Multisig',         es: 'Multisig'             }, free: '2-of-3', growth: '2-of-3', enterprise: { en: 'Configurable', es: 'Configurable' } },
     { feature: { en: 'Institutional export',      es: 'Export institucional'        }, free: '✗', growth: '✓', enterprise: '✓' },
     { feature: { en: 'IPFS anchoring',   es: 'Anclaje IPFS'        }, free: '✗', growth: '✓', enterprise: '✓' },
-    { feature: { en: 'x402 / MPP',       es: 'x402 / MPP'       }, free: '✗', growth: '✓', enterprise: '✓' },
+    { feature: { en: 'x402',             es: 'x402'             }, free: '✗', growth: '✓', enterprise: '✓' },
     { feature: { en: 'API pricing',      es: 'Precio API'         }, free: { en: 'Free (testnet)', es: 'Gratis (testnet)' }, growth: { en: '$0.02–0.25/call', es: '$0.02–0.25/call' }, enterprise: { en: 'Volume discount', es: 'Descuento por volumen' } },
     { feature: { en: 'Support',          es: 'Soporte'             }, free: '✗', growth: '48h SLA', enterprise: '24/7' },
 ];
@@ -166,6 +167,15 @@ export default function PricingPage() {
                                     </li>
                                 ))}
                             </ul>
+                            <p className="mb-3 text-xs text-amber-400/80">
+                                {lang('MPP Charge: experimental, not available on mainnet.', 'MPP Charge: experimental, no disponible en mainnet.')}
+                            </p>
+                            <p className="mb-6 text-[11px] text-white/45 leading-relaxed">
+                                <strong className="text-white/70">{lang('Update, 2026-10-04 (checked against the nirium 0.16.0 changelog that day):', 'Actualización, 2026-10-04 (verificado contra el changelog de nirium 0.16.0 ese día):')}</strong>{' '}
+                                {lang(
+                                    'this card used to list MPP Charge as live on mainnet. That was wrong: MPP Charge has never been verified end to end against our hosted endpoints (the testnet one rejected the payment when tested on 2026-10-01; mainnet was never tested). Use x402 for paid access.',
+                                    'esta tarjeta listaba MPP Charge como en vivo en mainnet. Era incorrecto: MPP Charge nunca se verificó de punta a punta contra nuestros endpoints alojados (el de testnet rechazó el pago al probarlo el 2026-10-01; el de mainnet nunca se probó). Usa x402 para acceso pagado.')}
+                            </p>
                             <Link href="/developers">
                                 <Button variant="premium" className="w-full">
                                     {lang('Make your first paid call', 'Haz tu primera llamada pagada')}
@@ -277,8 +287,13 @@ export default function PricingPage() {
                                 label: lang('Nirium Software License', 'Licencia de Software Nirium'),
                                 rows: [
                                     { who: lang('Platform fee (Growth)', 'Cuota plataforma (Growth)'), fee: '$299/mo', note: lang('Flat monthly — no % of capital', 'Mensual fijo — sin % del capital'), highlight: true, total: false },
-                                    { who: lang('API calls (execution, market, signals)', 'Llamadas API (ejecución, mercado, señales)'), fee: '$0.02–0.25', note: lang('Per call, pay-as-you-go', 'Por llamada, pago por uso'), highlight: false, total: false },
-                                    { who: lang('x402 premium endpoints', 'Endpoints premium x402'), fee: '$0.02–0.25', note: lang('USDC micropayment per request', 'Micropago USDC por request'), highlight: false, total: false },
+                                    // Antes una sola fila lumpeaba "execution, market, signals" bajo un
+                                    // rango $0.02-0.25 sin decir red — solo market corre en mainnet;
+                                    // signals y execute son testnet-only por diseño (ver FEATURES_FREE
+                                    // arriba). Separado en dos filas para que el fee no implique más
+                                    // disponibilidad de la real.
+                                    { who: lang('x402 market state — mainnet', 'x402 market state — mainnet'), fee: '$0.05', note: lang('The only x402 endpoint live on mainnet today', 'El único endpoint x402 en vivo en mainnet hoy'), highlight: false, total: false },
+                                    { who: lang('x402 snapshot + execute — testnet only', 'x402 snapshot + execute — solo testnet'), fee: '$0.02 / $0.25', note: lang('Need the autonomous loop / a signing key the mainnet box does not hold', 'Necesitan el loop autónomo / una llave firmante que el box de mainnet no tiene'), highlight: false, total: false },
                                 ],
                             },
                             {
@@ -367,24 +382,28 @@ export default function PricingPage() {
                             {
                                 q: lang('What is on mainnet today and how is it billed?', '¿Qué está en mainnet hoy y cómo se cobra?'),
                                 a: lang(
-                                    'Settlement (x402/MPP), audit anchoring and reporting run on Stellar mainnet now. x402 endpoints bill per request in USDC ($0.02 signals · $0.05 market · $0.25 execute), settled on-chain before the response — every payment is a verifiable transaction. Audit anchoring is free during beta; the reporting API is free read-only.',
-                                    'La liquidación (x402/MPP), el anclaje de auditoría y la reportería ya corren en Stellar mainnet. Los endpoints x402 cobran por request en USDC ($0.02 señales · $0.05 market · $0.25 execute), liquidado on-chain antes de responder — cada pago es una transacción verificable. El anclaje de auditoría es gratis en beta; el API de reportería es gratis en lectura.'),
+                                    "Settlement (x402), audit anchoring and reporting run on Stellar mainnet now. MPP Charge is experimental and not available on mainnet. Of the three x402 premium endpoints, only market state ($0.05) actually runs on mainnet — it only reads public rate data, so it needs neither a live signal loop nor a signing key. Snapshot signals ($0.02) and strategy execution ($0.25) run on testnet only, by design: signals need the autonomous loop, which does not run on the mainnet box (receive-only), and execution needs a signing key the mainnet box deliberately does not hold. Every mainnet call settles on-chain before the response — every payment is a verifiable transaction. Audit anchoring is free during beta; the reporting API is free read-only.",
+                                    'La liquidación (x402), el anclaje de auditoría y la reportería ya corren en Stellar mainnet. MPP Charge es experimental y no está disponible en mainnet. De los tres endpoints premium x402, solo el market state ($0.05) corre de verdad en mainnet — solo lee datos públicos de tasas, así que no necesita ni el loop de señales ni una llave firmante. El snapshot de señales ($0.02) y la ejecución de estrategia ($0.25) corren solo en testnet, por diseño: las señales necesitan el loop autónomo, que no corre en el box de mainnet (receive-only), y la ejecución necesita una llave firmante que el box de mainnet deliberadamente no tiene. Cada llamada en mainnet liquida on-chain antes de responder — cada pago es una transacción verificable. El anclaje de auditoría es gratis en beta; el API de reportería es gratis en lectura.'),
                             },
                             {
                                 q: lang('What does the treasury node cost?', '¿Cuánto cuesta el nodo de tesorería?'),
                                 a: lang(
-                                    'Deploying the vault costs nothing beyond the Stellar network fee (about 0.04 XLM), which you pay from your own wallet — the vault is yours from the first block. Autonomous rebalancing is early access and carries no cost during the beta. On mainnet it is invite-only while the legal review closes — not a technical limit: the signer runs, but rebalancing someone else’s funds is the question sitting with counsel, so we do not open it before the answer. One thing we do not charge but you should know: DeFindex, the protocol behind the vault, takes 20% of the yield generated. Nirium never takes a percentage of your capital.',
-                                    'Desplegar la bóveda no cuesta nada más que el fee de red de Stellar (unos 0.04 XLM), que pagas desde tu propia wallet — la bóveda es tuya desde el primer bloque. El rebalanceo autónomo es early access y no tiene costo durante la beta. En mainnet es invite-only mientras cierra la revisión legal — y no por un límite técnico: el firmante corre, pero reacomodar fondos de otra persona es justo la pregunta que está con el abogado, así que no lo abrimos antes de la respuesta. Algo que no cobramos nosotros pero conviene que sepas: DeFindex, el protocolo de la bóveda, se lleva 20% sobre el rendimiento generado. Nirium nunca cobra un porcentaje de tu capital.'),
+                                    'Deploying the vault costs nothing beyond the Stellar network fee (about 1.4 XLM on mainnet), which you pay from your own wallet — the vault is yours from the first block. Autonomous rebalancing is early access and carries no cost during the beta. On mainnet it is invite-only while the legal review closes — not a technical limit: the signer runs, but rebalancing someone else’s funds is the question sitting with counsel, so we do not open it before the answer. One thing we do not charge but you should know: DeFindex, the protocol behind the vault, takes 20% of the yield generated. Nirium never takes a percentage of your capital.',
+                                    'Desplegar la bóveda no cuesta nada más que el fee de red de Stellar (unos 1.4 XLM en mainnet), que pagas desde tu propia wallet — la bóveda es tuya desde el primer bloque. El rebalanceo autónomo es early access y no tiene costo durante la beta. En mainnet es invite-only mientras cierra la revisión legal — y no por un límite técnico: el firmante corre, pero reacomodar fondos de otra persona es justo la pregunta que está con el abogado, así que no lo abrimos antes de la respuesta. Algo que no cobramos nosotros pero conviene que sepas: DeFindex, el protocolo de la bóveda, se lleva 20% sobre el rendimiento generado. Nirium nunca cobra un porcentaje de tu capital.'),
                             },
                             {
-                                q: lang('How do I pay $0.02 if there is no card on file?', '¿Cómo pago $0.02 si no hay tarjeta?'),
+                                q: lang('How do I pay $0.05 if there is no card on file?', '¿Cómo pago $0.05 si no hay tarjeta?'),
                                 // El cierre decía que los developers nuevos reciben un starter credit
                                 // patrocinado. No existe: nada lo emite ni lo redime. Se reemplaza por lo
                                 // que sí es gratis de verdad — testnet — que además responde mejor la
                                 // pregunta real detrás de la pregunta: "¿puedo probar sin gastar?".
+                                // El monto de ejemplo es $0.05 (market state) porque es el único de los
+                                // tres endpoints x402 que corre de verdad en mainnet — usar $0.02
+                                // (snapshot, testnet-only) aquí habría implicado que ese precio también
+                                // aplica en mainnet, que es justo el error que esta página tenía.
                                 a: lang(
-                                    'Your agent pays, not your finance team: the API replies 402, the SDK signs a USDC payment from your wallet, the facilitator settles it on-chain (network fees sponsored), and the API responds. One request, one payment, one receipt. To try it without spending, the same endpoints run on testnet with free faucet USDC.',
-                                    'Paga tu agente, no tu equipo de finanzas: el API responde 402, el SDK firma un pago USDC desde tu wallet, el facilitador lo liquida on-chain (fees de red patrocinados) y el API responde. Un request, un pago, un recibo. Para probarlo sin gastar, los mismos endpoints corren en testnet con USDC de faucet.'),
+                                    'Your agent pays, not your finance team: the API replies 402, the SDK signs a USDC payment from your wallet, the facilitator settles it on-chain (network fees sponsored), and the API responds. One request, one payment, one receipt. That $0.05 call is market state — the endpoint that actually runs on mainnet. To try it without spending, the same market-state endpoint also runs on testnet with free faucet USDC.',
+                                    'Paga tu agente, no tu equipo de finanzas: el API responde 402, el SDK firma un pago USDC desde tu wallet, el facilitador lo liquida on-chain (fees de red patrocinados) y el API responde. Un request, un pago, un recibo. Esa llamada de $0.05 es market state — el endpoint que de verdad corre en mainnet. Para probarlo sin gastar, el mismo endpoint de market state también corre en testnet con USDC de faucet.'),
                             },
                             {
                                 q: lang('When does the treasury vault reach mainnet?', '¿Cuándo llega el vault de tesorería a mainnet?'),

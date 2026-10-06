@@ -36,7 +36,7 @@ export default function TestnetBanner() {
                         </span>
                     </div>
                     <p className="text-[11px] sm:text-xs font-mono text-emerald-700 dark:text-emerald-200/90 leading-relaxed truncate sm:whitespace-normal">
-                        <span className="font-bold text-emerald-800 dark:text-emerald-300">Live on Stellar mainnet — settlement, audit & reporting.</span>
+                        <span className="font-bold text-emerald-800 dark:text-emerald-300">Live on Stellar mainnet - settlement, audit & reporting.</span>
                         {' '}
                         <span className="hidden sm:inline text-amber-600 dark:text-amber-300/80">The treasury vault stays on testnet until external audit. Non-custodial · not financial advice.</span>
                     </p>

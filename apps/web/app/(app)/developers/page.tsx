@@ -80,6 +80,8 @@ const data = await res.json();
 // ─────────────────────────────────────────────────────────────
 // CHARGE for YOUR OWN API. Same rail, other side of the counter.
 // Funds go payer → you. They never touch Nirium.
+// Third-party facilitator use is invite-only while legal review closes —
+// same gate as Treasury and Payouts. Request access before integrating.
 import { x402Serve } from "nirium";
 
 app.use("/premium", x402Serve({
@@ -90,23 +92,14 @@ app.use("/premium", x402Serve({
 
 const MPP_CODE = `import { Agent } from "nirium";
 
-const agent = new Agent({ baseUrl: "https://nirium-agent-mainnet.fly.dev" });
+// MPP Charge client (experimental): the server answers 402 with a challenge,
+// the client signs a full USDC transfer and retries. No external facilitator.
+// Nirium's hosted endpoints are not accepting MPP payments right now, so point
+// this at your own MPP Charge server. For paid access to Nirium, use x402.
+const agent = new Agent({ apiKey: "unused" });
+agent.initMpp({ secretKey: process.env.STELLAR_SECRET_KEY, mode: "pull" });
 
-// MPP Charge: the client signs a full USDC transfer inside each request.
-// No external facilitator — the server validates by simulation and submits.
-agent.initMpp({
-  secretKey: process.env.STELLAR_SECRET_KEY,
-  network: "stellar:pubnet",
-});
-
-// $0.05 USDC — charges and delivers on mainnet
-const res = await agent.mppFetch(
-  "https://nirium-agent-mainnet.fly.dev/api/v1/mpp/market",
-);
-
-// Note: /signals and /execute are testnet-only. Signals come from the
-// autonomous loop and execution needs a signing key; the mainnet box has
-// neither by design, so it answers 501 without charging you.
+const res = await agent.mppFetch("https://your-mpp-server.example/resource");
 `;
 
 const MCP_CODE = `// Claude Desktop config (~/.claude/claude_desktop_config.json)
@@ -140,15 +133,20 @@ const ENDPOINTS = [
     { method: 'POST', path: '/api/auth/token',            desc_en: 'Exchange credentials for a JWT',          desc_es: 'Cambia credenciales por un JWT' },
     { method: 'POST', path: '/api/auth/keys',             desc_en: 'Issue an API key (also GET / DELETE)',    desc_es: 'Emite una API key (también GET / DELETE)' },
 
-    // x402 — pago por request
-    { method: 'GET',  path: '/api/v1/premium/signals',    desc_en: 'Premium signals — $0.02 USDC (x402)',     desc_es: 'Señales premium — $0.02 USDC (x402)' },
-    { method: 'GET',  path: '/api/v1/premium/market',     desc_en: 'Enriched market state — $0.05 USDC (x402)', desc_es: 'Estado de mercado — $0.05 USDC (x402)' },
-    { method: 'POST', path: '/api/v1/premium/execute',    desc_en: 'Paid strategy execution — $0.25 USDC (x402)', desc_es: 'Ejecución pagada — $0.25 USDC (x402)' },
+    // x402 — pago por request. signals/execute son testnet-only por diseño
+    // (necesitan el loop autónomo / una llave firmante; el box de mainnet no
+    // tiene ninguna de las dos) — ver X402_CODE arriba y el FAQ de /pricing.
+    // Sin el "(testnet only)" aquí, la tabla vendía dos rutas que en mainnet
+    // responden 501 como si fueran igual de reales que market.
+    { method: 'GET',  path: '/api/v1/premium/signals',    desc_en: 'Premium signals — $0.02 USDC (x402, testnet only)',     desc_es: 'Señales premium — $0.02 USDC (x402, solo testnet)' },
+    { method: 'GET',  path: '/api/v1/premium/market',     desc_en: 'Enriched market state — $0.05 USDC (x402, mainnet + testnet)', desc_es: 'Estado de mercado — $0.05 USDC (x402, mainnet + testnet)' },
+    { method: 'POST', path: '/api/v1/premium/execute',    desc_en: 'Paid strategy execution — $0.25 USDC (x402, testnet only)', desc_es: 'Ejecución pagada — $0.25 USDC (x402, solo testnet)' },
 
-    // MPP Charge
-    { method: 'GET',  path: '/api/v1/mpp/signals',        desc_en: 'Premium signals — $0.02 USDC per call',  desc_es: 'Señales premium — $0.02 USDC por llamada' },
-    { method: 'GET',  path: '/api/v1/mpp/market',         desc_en: 'Enriched market state — $0.05 USDC',     desc_es: 'Estado de mercado enriquecido — $0.05 USDC' },
-    { method: 'POST', path: '/api/v1/mpp/execute',        desc_en: 'Paid strategy execution — $0.25 USDC',   desc_es: 'Ejecución de estrategia pagada — $0.25 USDC' },
+    // MPP Charge — mismo patrón: signals/execute 501 en el box de mainnet
+    // (verificado en vivo), solo market corre en las dos redes.
+    { method: 'GET',  path: '/api/v1/mpp/signals',        desc_en: 'Premium signals — $0.02 USDC per call (testnet only; not accepting MPP payments right now)',  desc_es: 'Señales premium — $0.02 USDC por llamada (solo testnet; sin aceptar pagos MPP por ahora)' },
+    { method: 'GET',  path: '/api/v1/mpp/market',         desc_en: 'Enriched market state — $0.05 USDC (not accepting MPP payments right now)',     desc_es: 'Estado de mercado enriquecido — $0.05 USDC (sin aceptar pagos MPP por ahora)' },
+    { method: 'POST', path: '/api/v1/mpp/execute',        desc_en: 'Paid strategy execution — $0.25 USDC (testnet only; not accepting MPP payments right now)',   desc_es: 'Ejecución de estrategia pagada — $0.25 USDC (solo testnet; sin aceptar pagos MPP por ahora)' },
     { method: 'GET',  path: '/api/v1/mpp/info',           desc_en: 'Active mode, routes and pricing',        desc_es: 'Modo activo, rutas y precios' },
 
     // Audit Trail
@@ -174,10 +172,10 @@ const MCP_TOOLS = [
     { name: 'execute_demo',            desc_en: 'Simulate a strategy via Soroban dry-run (Free)',        desc_es: 'Simula una estrategia vía Soroban dry-run (Gratis)' },
     { name: 'get_premium_signals',     desc_en: 'Market signals from the autonomous loop, testnet only — factual data, not a recommendation ($0.02 USDC)',   desc_es: 'Señales del loop autónomo, solo testnet — datos, no recomendación ($0.02 USDC)' },
     { name: 'get_premium_market',      desc_en: 'Market state with reference rates attributed to their source, via x402 ($0.05 USDC)',       desc_es: 'Estado de mercado con tasas de referencia y su fuente, vía x402 ($0.05 USDC)' },
-    { name: 'execute_paid_strategy',   desc_en: 'Execute strategy on-chain via x402 ($0.25 USDC)',       desc_es: 'Ejecuta estrategia on-chain vía x402 ($0.25 USDC)' },
+    { name: 'execute_paid_strategy',   desc_en: 'Execute strategy on-chain via x402, testnet only — needs a signing key the mainnet box does not hold ($0.25 USDC)',       desc_es: 'Ejecuta estrategia on-chain vía x402, solo testnet — necesita una llave firmante que el box de mainnet no tiene ($0.25 USDC)' },
     { name: 'get_wallet_info',         desc_en: 'Show wallet address and session tools (Free)',          desc_es: 'Muestra la wallet y herramientas de la sesión (Gratis)' },
-    { name: 'get_mpp_signals',         desc_en: 'Get premium signals settled via MPP ($0.02 USDC)',      desc_es: 'Señales premium liquidadas vía MPP ($0.02 USDC)' },
-    { name: 'get_mpp_market',          desc_en: 'Get enriched market state settled via MPP ($0.05 USDC)',  desc_es: 'Estado de mercado enriquecido vía MPP ($0.05 USDC)' },
+    { name: 'get_mpp_signals',         desc_en: 'Premium signals via MPP, testnet only ($0.02 USDC). Not accepting payments right now',      desc_es: 'Señales premium vía MPP, solo testnet ($0.02 USDC). Sin aceptar pagos por ahora' },
+    { name: 'get_mpp_market',          desc_en: 'Enriched market state via MPP ($0.05 USDC). Not accepting payments right now',  desc_es: 'Estado de mercado enriquecido vía MPP ($0.05 USDC). Sin aceptar pagos por ahora' },
 ];
 
 export default function DevelopersPage() {
@@ -204,7 +202,7 @@ export default function DevelopersPage() {
                         >
                             <div className="inline-flex items-center gap-2 px-5 py-2 rounded-full border border-stellar-teal/30 bg-stellar-teal/10 text-stellar-teal text-xs font-black uppercase tracking-[0.2em] shadow-[0_0_20px_rgba(45,235,232,0.15)]">
                                 <Code2 className="w-4 h-4" />
-                                SDK + API + MCP
+                                Package + API + MCP
                             </div>
                         </motion.div>
 
@@ -295,6 +293,20 @@ export default function DevelopersPage() {
                                     <span className="px-2 py-0.5 rounded border border-white/10">No Custodian</span>
                                     <span className="px-2 py-0.5 rounded border border-white/10">Atomic On-chain</span>
                                 </div>
+                                <p className="mt-4 text-xs text-amber-300/80 leading-relaxed">
+                                    {lang(
+                                        'Known limitation: x402Serve() verifies and settles the payment; it does not deduplicate a payment proof across requests or rate-limit callers. Add your own protection if you need either.',
+                                        'Limitación conocida: x402Serve() verifica y liquida el pago; no deduplica un comprobante entre peticiones ni limita la tasa de llamadas. Agrega tu propia protección si la necesitas.',
+                                    )}{' '}
+                                    <a
+                                        href="https://github.com/nirium-protocol/nirium/issues/91"
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        className="text-stellar-teal hover:underline"
+                                    >
+                                        {lang('issue #91', 'issue #91')}
+                                    </a>
+                                </p>
                                 {/* Vive junto al ejemplo de x402 y no en /keys: quien llega
                                     a /keys viene por credenciales, quien llega aquí viene a
                                     decidir si esto sirve — y un pago que ocurre de verdad
@@ -318,6 +330,73 @@ export default function DevelopersPage() {
                                     <span className="px-2 py-0.5 rounded border border-white/10">Ideal for Agents</span>
                                 </div>
                             </div>
+                        </div>
+
+                        {/* Per-endpoint pricing — separado por red, con la razón técnica donde
+                            aplica. Mismo criterio que /pricing: signals/execute son
+                            testnet-only por diseño (loop autónomo apagado / sin llave
+                            firmante en el box de mainnet); market es el único que corre
+                            en las dos redes. No lumpear en un rango $0.02–0.25 sin decir
+                            dónde corre cada uno — esa fue la brecha real en /pricing. */}
+                        <div className="mt-16 overflow-x-auto rounded-3xl border border-white/10 bg-[#080808]">
+                            <table className="w-full text-left">
+                                <thead className="border-b border-white/5 bg-white/[0.02]">
+                                    <tr>
+                                        <th className="px-6 py-4 text-[10px] text-gray-500 uppercase tracking-[0.2em] font-black">{lang('Endpoint', 'Endpoint')}</th>
+                                        <th className="px-6 py-4 text-[10px] text-gray-500 uppercase tracking-[0.2em] font-black">{lang('Price', 'Precio')}</th>
+                                        <th className="px-6 py-4 text-[10px] text-gray-500 uppercase tracking-[0.2em] font-black">{lang('Network', 'Red')}</th>
+                                    </tr>
+                                </thead>
+                                <tbody className="divide-y divide-white/5 font-mono text-xs">
+                                    {[
+                                        {
+                                            ep: 'GET /api/v1/premium/signals',
+                                            price: '$0.02',
+                                            avail: lang('Testnet only', 'Solo testnet'),
+                                            why: lang('needs the autonomous loop, disabled on the mainnet box', 'necesita el loop autónomo, apagado en el box de mainnet'),
+                                        },
+                                        {
+                                            ep: 'GET /api/v1/premium/market',
+                                            price: '$0.05',
+                                            avail: lang('Mainnet + testnet', 'Mainnet + testnet'),
+                                            why: null,
+                                        },
+                                        {
+                                            ep: 'POST /api/v1/premium/execute',
+                                            price: '$0.25',
+                                            avail: lang('Testnet only', 'Solo testnet'),
+                                            why: lang('needs a signing key the mainnet box deliberately does not hold', 'necesita una llave firmante que el box de mainnet deliberadamente no tiene'),
+                                        },
+                                        {
+                                            ep: 'GET /api/v1/mpp/signals',
+                                            price: '$0.02',
+                                            avail: lang('Not accepting payments right now', 'Sin aceptar pagos por ahora'),
+                                            why: lang('implemented; the hosted testnet endpoint rejected MPP payments when tested, use x402', 'implementado; el endpoint de testnet rechazó pagos MPP al probarlo, usa x402'),
+                                        },
+                                        {
+                                            ep: 'GET /api/v1/mpp/market',
+                                            price: '$0.05',
+                                            avail: lang('Not accepting payments right now', 'Sin aceptar pagos por ahora'),
+                                            why: lang('implemented; the hosted testnet endpoint rejected MPP payments when tested, use x402', 'implementado; el endpoint de testnet rechazó pagos MPP al probarlo, usa x402'),
+                                        },
+                                        {
+                                            ep: 'POST /api/v1/mpp/execute',
+                                            price: '$0.25',
+                                            avail: lang('Not accepting payments right now', 'Sin aceptar pagos por ahora'),
+                                            why: lang('implemented; the hosted testnet endpoint rejected MPP payments when tested, use x402', 'implementado; el endpoint de testnet rechazó pagos MPP al probarlo, usa x402'),
+                                        },
+                                    ].map((row) => (
+                                        <tr key={row.ep} className="hover:bg-white/[0.02] transition-colors">
+                                            <td className="px-6 py-3 text-gray-300">{row.ep}</td>
+                                            <td className="px-6 py-3 text-stellar-teal">{row.price}</td>
+                                            <td className="px-6 py-3 text-gray-500">
+                                                {row.avail}
+                                                {row.why && <span className="block text-[10px] text-gray-600 normal-case mt-0.5">{row.why}</span>}
+                                            </td>
+                                        </tr>
+                                    ))}
+                                </tbody>
+                            </table>
                         </div>
 
                         {/* Comparison Table */}
@@ -419,7 +498,7 @@ export default function DevelopersPage() {
                                 className="mb-6 px-4 py-1.5 rounded-full bg-stellar-teal/10 border border-stellar-teal/30 flex items-center gap-2"
                             >
                                 <Activity className="w-3 h-3 text-stellar-teal animate-pulse" />
-                                <span className="text-[10px] font-black text-stellar-teal uppercase tracking-[0.2em]">Live Protocol Surface v0.10.2</span>
+                                <span className="text-[10px] font-black text-stellar-teal uppercase tracking-[0.2em]">Live Protocol Surface v0.16.0</span>
                             </motion.div>
                             
                             <h2 className="text-4xl sm:text-7xl font-black uppercase italic tracking-tighter text-white mb-6 leading-none">
@@ -528,7 +607,7 @@ export default function DevelopersPage() {
                                             { m: 'GET', p: '/api/market', d: 'Live market state and reference rates', s: 'LIVE' },
                                             { m: 'GET', p: '/api/tickers', d: 'Cross-asset price feeds', s: 'LIVE' },
                                             { m: 'GET', p: '/api/strategies', d: 'Strategy marketplace', s: 'LIVE' },
-                                            { m: 'GET', p: '/api/signals/recent', d: 'Recent signals from the autonomous loop (testnet)', s: 'PREMIUM' },
+                                            { m: 'GET', p: '/api/signals/recent', d: 'Recent signals from the autonomous loop (testnet)', s: 'LIVE' },
                                         ]
                                     },
                                     {
@@ -654,13 +733,69 @@ export default function DevelopersPage() {
                     </div>
                 </section>
 
+                {/* PUBLIC USAGE API */}
+                <section className="py-24 border-t border-white/5">
+                    <div className="max-w-5xl mx-auto px-6">
+                        <div className="flex items-center gap-3 mb-4">
+                            <div className="w-1.5 h-6 bg-stellar-teal rounded-full" />
+                            <span className="text-xs font-black text-stellar-teal uppercase tracking-[0.3em]">
+                                {lang('Public Usage API', 'API Pública de Uso')}
+                            </span>
+                        </div>
+                        <h2 className="text-3xl sm:text-5xl font-black uppercase italic tracking-tighter text-white mb-6 max-w-3xl">
+                            {lang('The same endpoint the stats page calls', 'El mismo endpoint que llama la página de stats')}
+                        </h2>
+                        <p className="text-gray-400 max-w-2xl mb-8 leading-relaxed">
+                            {language === 'es' ? (
+                                <>Detrás de <Link href="/stats" className="text-stellar-teal hover:underline">nirium.xyz/stats</Link> hay un solo endpoint público, sin autenticación. No tiene nada de interno — llámalo directo y devuelve el mismo JSON que renderiza la página.</>
+                            ) : (
+                                <>Behind <Link href="/stats" className="text-stellar-teal hover:underline">nirium.xyz/stats</Link> is one public, unauthenticated endpoint. Nothing about it is internal — call it directly and it returns the exact same JSON the page renders.</>
+                            )}
+                        </p>
+
+                        <div className="grid md:grid-cols-2 gap-8">
+                            <div>
+                                <CodeBlock lang="bash" code={`curl https://nirium.xyz/api/stats`} />
+                                <p className="mt-4 text-xs text-gray-500 leading-relaxed">
+                                    {lang(
+                                        'Server-rendered, cached 5 minutes (Cache-Control: s-maxage=300) — this is only to keep GitHub’s search rate limit off real traffic, not to mask staleness; generatedAt is a real per-request timestamp.',
+                                        'Renderizado en el servidor, cache de 5 min (Cache-Control: s-maxage=300) — solo para no golpear el rate limit de búsqueda de GitHub con tráfico real, no para ocultar staleness; generatedAt es un timestamp real por request.')}
+                                </p>
+                            </div>
+                            <div className="rounded-2xl border border-white/10 bg-white/[0.01] p-6">
+                                <p className="text-[10px] font-black text-gray-500 uppercase tracking-widest mb-4">
+                                    {lang('Top-level fields', 'Campos de nivel superior')}
+                                </p>
+                                <div className="space-y-3 text-xs font-mono">
+                                    {[
+                                        { k: 'x402Settlements', d: lang('Mainnet payments — totals, distinct payers, each labeled internal/external', 'Pagos mainnet — totales, pagadores distintos, cada uno etiquetado interno/externo') },
+                                        { k: 'treasuryRebalances', d: lang('Treasury Node rebalance() calls, mainnet', 'Llamadas rebalance() del Treasury Node, mainnet') },
+                                        { k: 'auditTrailAnchors', d: lang('IPFS anchor count from our own reporting API', 'Conteo de anclajes IPFS desde nuestra propia API de reportería') },
+                                        { k: 'npm / pypi', d: lang('Download counts, read live from npmjs.org / pypistats.org', 'Descargas, leídas en vivo de npmjs.org / pypistats.org') },
+                                        { k: 'externalMergedPRs', d: lang('PRs merged by maintainers we don’t control', 'PRs mergeadas por maintainers que no controlamos') },
+                                        { k: 'builtWithNirium', d: lang('Third-party services selling over x402Serve(), independently checked', 'Servicios de terceros que venden por x402Serve(), verificados de forma independiente') },
+                                    ].map((f) => (
+                                        <div key={f.k} className="flex flex-col gap-0.5">
+                                            <code className="text-stellar-teal">{f.k}</code>
+                                            <span className="text-gray-500 font-sans">{f.d}</span>
+                                        </div>
+                                    ))}
+                                </div>
+                                <p className="mt-5 pt-5 border-t border-white/5 text-[10px] text-gray-500 uppercase tracking-widest">
+                                    {lang('Every metric object carries its own source URL — the exact query that produced it, not a claim.', 'Cada objeto de métrica trae su propia URL de fuente — la consulta exacta que lo produjo, no una afirmación.')}
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
                 {/* RESOURCES */}
                 <section className="py-24 border-t border-white/5">
                     <div className="max-w-6xl mx-auto px-6">
                         <div className="grid md:grid-cols-3 gap-6">
                             {[
-                                { icon: Package,  title: 'NPM SDK',     desc_en: 'Official Node.js SDK', desc_es: 'SDK oficial para Node.js',                    href: 'https://www.npmjs.com/package/nirium' },
-                                { icon: Terminal, title: 'PyPI SDK',    desc_en: 'Official Python SDK', desc_es: 'SDK oficial para Python',                      href: 'https://pypi.org/project/nirium/' },
+                                { icon: Package,  title: 'NPM Package', desc_en: 'Official Node.js package', desc_es: 'Paquete oficial para Node.js',              href: 'https://www.npmjs.com/package/nirium' },
+                                { icon: Terminal, title: 'PyPI Package', desc_en: 'Official Python package', desc_es: 'Paquete oficial para Python',              href: 'https://pypi.org/project/nirium/' },
                                 { icon: Globe,    title: 'Stellar RPC',  desc_en: 'Node RPC and testnet endpoints', desc_es: 'Node RPC y testnet endpoints',    href: 'https://developers.stellar.org/docs/data/rpc' },
                                 { icon: Code2,    title: 'Soroban SDK',  desc_en: 'Official Rust + JS docs', desc_es: 'Docs oficiales Rust + JS',                href: 'https://developers.stellar.org/docs/smart-contracts' },
                                 { icon: Terminal, title: 'Stellar CLI', desc_en: 'Local deploy and test', desc_es: 'Deploy y test local',                              href: 'https://developers.stellar.org/docs/tools/developer-tools/cli/stellar-cli' },

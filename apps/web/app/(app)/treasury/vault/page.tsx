@@ -42,8 +42,8 @@ const NODE_ES: Record<string, string> = {
         'rebalance() no acepta dirección de destino — el `to` está fijo a la propia bóveda, así que retirar no es expresable.',
     'The client is the Manager and can call set_rebalance_manager to drop us unilaterally.':
         'El cliente es el Manager y puede llamar set_rebalance_manager para botarnos unilateralmente.',
-    'DeFindex audited by OtterSec (2025-03-18): 16 findings, all 13 vulnerabilities resolved.':
-        'DeFindex auditado por OtterSec (18-03-2025): 16 hallazgos, las 13 vulnerabilidades resueltas.',
+    'DeFindex audited by OtterSec (2025-03-18): 16 findings — 13 vulnerabilities, all resolved; the other 3 are non-critical suggestions, not vulnerabilities.':
+        'DeFindex auditado por OtterSec (18-03-2025): 16 hallazgos — 13 vulnerabilidades, todas resueltas; los otros 3 son sugerencias no críticas, no vulnerabilidades.',
     'Blend V2, independently audited three times.': 'Blend V2, auditado de forma independiente tres veces.',
     'The external pool itself and the configuration of each deployed instance.':
         'El pool externo en sí y la configuración de cada instancia desplegada.',
@@ -887,8 +887,8 @@ export default function TreasuryVaultConsole() {
 
                             <p className="text-[11px] text-white/40 leading-relaxed">
                                 {lang(
-                                    'Deposit moves your tokens into the vault. Invest and Unwind are signed by the agent with its own key — and neither can send anything outside the vault.',
-                                    'Depositar mueve tus tokens a la bóveda. Invertir y Retirar los firma el agente con su propia llave — y ninguno puede mandar nada fuera de la bóveda.')}
+                                    'Deposit moves your tokens into the vault. Invest and Unwind (to the vault) are signed by the agent with its own key — and neither can send anything outside the vault.',
+                                    'Depositar mueve tus tokens a la bóveda. Invertir y Retirar a la bóveda los firma el agente con su propia llave — y ninguno puede mandar nada fuera de la bóveda.')}
                             </p>
 
                             {receipt && (

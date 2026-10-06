@@ -18,7 +18,7 @@ export default function DisclaimersPage() {
           <h1 className="text-4xl sm:text-5xl font-black text-white tracking-tight mb-4">
             Legal Disclaimers
           </h1>
-          <p className="text-sm font-mono text-zinc-500">Last updated: August 15, 2026</p>
+          <p className="text-sm font-mono text-zinc-500">Last updated: October 4, 2026</p>
         </div>
 
         <LegalDisclaimer variant="inline" locale="en" className="mb-12" />
@@ -26,7 +26,8 @@ export default function DisclaimersPage() {
 
         <div className="prose prose-invert prose-zinc max-w-none">
           <h2 className="text-white font-bold text-2xl mt-12 mb-4 border-b border-white/10 pb-2">Network Status</h2>
-          <p>Nirium runs across two Stellar networks. The <strong>non-custodial nodes — settlement (x402/MPP), audit anchoring and reporting — operate on Stellar Mainnet</strong>; these never hold or move client funds. The <strong>autonomous treasury vault operates on Stellar Testnet, audit-gated</strong>, and will only reach mainnet after a formal external security audit. Testnet operations use test tokens with no real-world monetary value.</p>
+          <p>Nirium runs across two Stellar networks. The <strong>non-custodial nodes — settlement (x402), audit anchoring and reporting — operate on Stellar Mainnet</strong>; these never hold or move client funds. Autonomous rebalancing runs on mainnet over DeFindex vaults the client owns, invite-only while legal review concludes. <strong>NiriumVault, Nirium&rsquo;s own contract, operates on Stellar Testnet, audit-gated</strong>, and will only reach mainnet after a formal external security audit. MPP Charge is experimental and not available on mainnet.</p>
+          <p className="text-sm"><strong>Update, 2026-10-04 (checked against the nirium 0.16.0 changelog that day):</strong> this section used to list MPP as part of the settlement running on mainnet and the treasury vault as testnet-only. Both were wrong: MPP Charge is experimental and not available on mainnet, and the treasury that runs on mainnet is DeFindex-based (testnet-only applies to NiriumVault). Testnet operations use test tokens with no real-world monetary value.</p>
 
           <h2 className="text-white font-bold text-2xl mt-12 mb-4 border-b border-white/10 pb-2">Rate Data and Displays</h2>
           <p>All rate figures displayed within Nirium — the Blend supply rate, the Etherfuse CETES reference rate, network fees — are <strong>public protocol reference data, attributed to their source</strong>. They are not return projections, guarantees, financial promises, or a recommendation to buy, sell or hold anything.</p>
@@ -52,7 +53,7 @@ export default function DisclaimersPage() {
           </ul>
 
           <h2 className="text-white font-bold text-2xl mt-12 mb-4 border-b border-white/10 pb-2">Ecosystem Participation</h2>
-          <p>Nirium is an independent project in the Stellar developer ecosystem. It has received SCF Kickstart (Instaward) grants for technical validation, completed under full KYC procedures. Amounts are not disclosed here. Nirium adheres to the Stellar Code of Conduct and builds transparently, with on-chain activity verifiable by anyone.</p>
+          <p>Nirium is an independent project in the Stellar developer ecosystem. It has received SCF Instaward grants for technical validation, completed under full KYC procedures. Amounts are not disclosed here. Nirium adheres to the Stellar Code of Conduct and builds transparently, with on-chain activity verifiable by anyone.</p>
 
           <h2 className="text-white font-bold text-2xl mt-12 mb-4 border-b border-white/10 pb-2">Stellar Code of Conduct</h2>
           <p>We are fully committed to fostering a safe, inclusive, and professional environment. By interacting with the Nirium project, community, or software, you agree to abide by the <a href="https://stellar.org/foundation/code-of-conduct" target="_blank" rel="noopener noreferrer">Stellar Code of Conduct</a>.</p>

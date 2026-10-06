@@ -14,7 +14,7 @@ export const metadata: Metadata = {
         default: "Nirium | Live on Stellar Mainnet — payment & audit rails for AI agents",
         template: "%s | Nirium"
     },
-    description: "Non-custodial payment & audit rails for the agent economy, live on Stellar mainnet. x402 per-request billing, MPP Charge settlement, immutable IPFS receipts and institutional reporting. npm install nirium. Not financial advice.",
+    description: "Non-custodial payment & audit rails for the agent economy, live on Stellar mainnet. x402 per-request billing, immutable IPFS receipts and institutional reporting. npm install nirium. Not financial advice.",
     keywords: ["Stellar", "x402", "MPP", "AI agents", "agent economy", "machine payments", "Soroban", "Nirium", "audit trail", "non-custodial", "Stellar mainnet", "micropayments"],
     authors: [{ name: "Nirium Core" }],
     creator: "Nirium",
@@ -31,9 +31,12 @@ export const metadata: Metadata = {
         },
     },
     icons: {
-        icon: "/brand/logo.png",
-        shortcut: "/brand/logo.png",
-        apple: "/brand/logo.png",
+        icon: [
+            { url: "/brand/icon.svg", type: "image/svg+xml" },
+            { url: "/brand/icon-solid-512.png", type: "image/png", sizes: "512x512" },
+        ],
+        shortcut: "/favicon.ico",
+        apple: "/brand/apple-icon.png",
     },
     openGraph: {
         title: "Nirium | Live on Stellar Mainnet",
@@ -63,6 +66,7 @@ export const metadata: Metadata = {
 import MarketTicker from "@/components/dashboard/MarketTicker";
 import TestnetBanner from "@/components/layout/TestnetBanner";
 import ChatBot from "@/components/ui/ChatBot";
+import ChromeGate from "@/components/layout/ChromeGate";
 
 export default function RootLayout({
     children,
@@ -110,15 +114,19 @@ export default function RootLayout({
                     dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
                 />
                 <Providers>
-                    <TestnetBanner />
-                    <MarketTicker />
+                    <ChromeGate>
+                        <TestnetBanner />
+                        <MarketTicker />
+                    </ChromeGate>
                     {/* Background Layers */}
                     <div className="fixed inset-0 z-[-1] bg-[url('/noise.svg')] opacity-[0.03] pointer-events-none"></div>
                     <div className="fixed inset-0 z-[-2] bg-gradient-to-br from-zinc-50 via-white to-zinc-100 dark:from-[#050505] dark:via-[#0A0A0A] dark:to-[#050505] pointer-events-none transition-colors duration-500"></div>
                     <div className="fixed inset-0 z-[-3] bg-[radial-gradient(circle_at_50%_50%,rgba(138,43,226,0.05),transparent_50%)] pointer-events-none"></div>
 
                     {children}
-                    <ChatBot />
+                    <ChromeGate>
+                        <ChatBot />
+                    </ChromeGate>
                     <Toaster position="bottom-right" theme="system" />
                 </Providers>
                 <Analytics />

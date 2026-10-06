@@ -84,15 +84,15 @@ const ChatBot = () => {
         // Comprehensive Expert Knowledge Base (July 2026)
         const kb: Record<string, any> = {
             es: {
-                home: "**Nirium** es la primera capa de automatización de tesorería institucional sobre Stellar.\n\nNo custodial — el usuario controla las llaves. Impulsado por **x402 + MPP + Soroban**.\n\n→ [Inicio](/) · [Treasury](/treasury) · [Docs](/docs)",
+                home: "**Nirium** es la primera capa de automatización de tesorería institucional sobre Stellar.\n\nNo custodial — el usuario controla las llaves. Impulsado por **x402 + Soroban**.\n\n→ [Inicio](/) · [Treasury](/treasury) · [Docs](/docs)",
                 dashboard: "El [Dashboard](/dashboard) centraliza el control de tus agentes.\n\nMonitorea actividad de protocolo, nodos en ejecución y flujos de CETES en tiempo real.",
                 marketplace: "El [Marketplace](/marketplace) ofrece kernels pre-configurados para optimización de ruteo FX y gestión de liquidez institucional.\n\nCada kernel corre en Soroban — atómico, auditable, no custodial.",
                 treasury: "La sección de [Tesorería](/treasury) gestiona tus bóvedas Soroban **2-de-3 multisig** y reglas de flujo de caja.\n\nActivos soportados: **XLM · USDC · CETES**\nProveedor: Etherfuse (0.2% all-in)",
                 analytics: "La sección de [Analytics](/analytics) proporciona una vista forense de cada transacción — criptográficamente firmada, anclada en IPFS.",
                 fiat: "Para obtener CETES tokenizados contratas directamente con **Etherfuse**, operador regulado: tú le transfieres a su CLABE y ellos emiten el token a tu wallet.\n\n**Nirium nunca recibe, sostiene ni convierte fiat** — solo muestra la instrucción y lee el saldo. El KYC lo hace Etherfuse. Hoy en sandbox: [ver flujo](/ramp).",
-                devs: "La sección de [Developers](/developers) expone **86 endpoints REST**, SDK TypeScript/Python, servidor MCP para Claude/Cursor, y soporte nativo para **x402 + MPP**.",
+                devs: "La sección de [Developers](/developers) expone **86 endpoints REST**, SDK TypeScript/Python, servidor MCP para Claude/Cursor, y soporte nativo para **x402** (cliente MPP Charge: experimental).",
                 docs: {
-                    overview: "Visión general de Nirium v0.10.2: [Ver Documentación](/docs?tab=overview).",
+                    overview: "Visión general de Nirium v0.16.0: [Ver Documentación](/docs?tab=overview).",
                     api: "API Sandbox: Gestiona tus llaves y explora endpoints en [Docs > API](/docs?tab=api).",
                     blueprints: "Casos técnicos listos para clonar en [Docs > Blueprints](/docs?tab=blueprints).",
                     architecture: "Arquitectura del protocolo: [Docs > Architecture](/docs?tab=architecture).",
@@ -100,22 +100,22 @@ const ChatBot = () => {
                     agent: "Lógica de Nodos: Sistema ELO y autonomía en [Docs > Agent](/docs?tab=agent).",
                     builder: "Visual Builder: Crea reglas sin código en [Docs > Builder](/docs?tab=builder).",
                     frontend: "Integración UI: Componentes React en [Docs > Frontend](/docs?tab=frontend).",
-                    security: "Auditoría forense + HMAC-SHA256: [Docs > Security](/docs?tab=security)."
+                    security: "Auditoría forense + SHA-256: [Docs > Security](/docs?tab=security)."
                 },
-                scf: "Nirium es beneficiario de SCF Kickstart y sigue:\n\n**· Código de Conducta Stellar**\n**· Estándares del Ecosistema SDF** — sin garantías de rendimiento\n\nMás info en [Docs > Security](/docs?tab=security).",
-                compliance: "La página de [Compliance](/compliance) genera reportes auditables en formato **audit-ready**.\n\nCada acción del agente: firmada HMAC-SHA256 → encadenada → anclada IPFS → exportable JSON.",
+                scf: "Nirium es beneficiario de un Instaward SCF y sigue:\n\n**· Código de Conducta Stellar**\n**· Estándares del Ecosistema SDF** — sin garantías de rendimiento\n\nMás info en [Docs > Security](/docs?tab=security).",
+                compliance: "La página de [Compliance](/compliance) genera reportes auditables y verificables criptográficamente.\n\nCada acción del agente: hash SHA-256 del registro → anclado en IPFS → exportable JSON, con firma ed25519 opcional de quién lo declaró.",
                 default: "Soy el asistente técnico de Nirium. Puedo guiarte a:\n\n[Dashboard](/dashboard) · [Treasury](/treasury) · [Developers](/developers) · [Docs](/docs) · [Compliance](/compliance)\n\n¿Qué necesitas?"
             },
             en: {
-                home: "**Nirium** is the first institutional treasury automation layer on Stellar.\n\nNon-custodial — users control keys. Powered by **x402 + MPP + Soroban**.\n\n→ [Home](/) · [Treasury](/treasury) · [Docs](/docs)",
+                home: "**Nirium** is the first institutional treasury automation layer on Stellar.\n\nNon-custodial — users control keys. Powered by **x402 + Soroban**.\n\n→ [Home](/) · [Treasury](/treasury) · [Docs](/docs)",
                 dashboard: "The [Dashboard](/dashboard) centralizes agent control.\n\nMonitor protocol activity, running nodes, and CETES flows in real-time.",
                 marketplace: "The [Marketplace](/marketplace) offers pre-built kernels for liquidity routing optimization and institutional treasury management.\n\nEach kernel runs on Soroban — atomic, auditable, non-custodial.",
                 treasury: "The [Treasury](/treasury) section manages your Soroban **2-of-3 multisig** vaults and automated cash-flow rules.\n\nSupported assets: **XLM · USDC · CETES**\nProvider: Etherfuse (0.2% all-in)",
                 analytics: "The [Analytics](/analytics) section provides a forensic view of every transaction — cryptographically signed and IPFS-anchored.",
                 fiat: "To get tokenized CETES you contract directly with **Etherfuse**, a regulated operator: you transfer to their CLABE and they issue the token to your wallet.\n\n**Nirium never receives, holds or converts fiat** — we only show the instruction and read the balance. KYC is done by Etherfuse. Sandbox today: [see the flow](/ramp).",
-                devs: "The [Developers](/developers) section exposes **86 REST endpoints**, TypeScript/Python SDK, MCP server for Claude/Cursor, and native **x402 + MPP** support.",
+                devs: "The [Developers](/developers) section exposes **86 REST endpoints**, TypeScript/Python SDK, MCP server for Claude/Cursor, and native **x402** support (MPP Charge client: experimental).",
                 docs: {
-                    overview: "Nirium v0.10.2 overview: [View Documentation](/docs?tab=overview).",
+                    overview: "Nirium v0.16.0 overview: [View Documentation](/docs?tab=overview).",
                     api: "API Sandbox: Manage keys and explore endpoints at [Docs > API](/docs?tab=api).",
                     blueprints: "Technical use cases ready to clone at [Docs > Blueprints](/docs?tab=blueprints).",
                     architecture: "Protocol architecture: [Docs > Architecture](/docs?tab=architecture).",
@@ -123,10 +123,10 @@ const ChatBot = () => {
                     agent: "Node logic + ELO system: [Docs > Agent](/docs?tab=agent).",
                     builder: "Visual drag-and-drop builder: [Docs > Builder](/docs?tab=builder).",
                     frontend: "React component integration: [Docs > Frontend](/docs?tab=frontend).",
-                    security: "Forensic audit + HMAC-SHA256: [Docs > Security](/docs?tab=security)."
+                    security: "Forensic audit + SHA-256: [Docs > Security](/docs?tab=security)."
                 },
-                scf: "Nirium is an SCF Kickstart grantee and follows:\n\n**· Stellar Code of Conduct**\n**· SDF Ecosystem Standards** — no yield guarantees\n\nRead more at [Docs > Security](/docs?tab=security).",
-                compliance: "The [Compliance](/compliance) page generates auditable reports in **audit-ready** format.\n\nEvery agent action: HMAC-SHA256 signed → cryptographically chained → IPFS-anchored → JSON export.",
+                scf: "Nirium is an SCF Instaward recipient and follows:\n\n**· Stellar Code of Conduct**\n**· SDF Ecosystem Standards** — no yield guarantees\n\nRead more at [Docs > Security](/docs?tab=security).",
+                compliance: "The [Compliance](/compliance) page generates auditable, cryptographically verifiable reports.\n\nEvery agent action: SHA-256 hash of the record → IPFS-anchored → JSON export, with an optional ed25519 signature attesting who declared it.",
                 default: "I'm Nirium's technical assistant. I can guide you to:\n\n[Dashboard](/dashboard) · [Treasury](/treasury) · [Developers](/developers) · [Docs](/docs) · [Compliance](/compliance)\n\nWhat do you need?"
             }
         };
@@ -236,7 +236,7 @@ const ChatBot = () => {
                         <div className="p-3 border-b border-white/5 flex items-center justify-between bg-white/[0.01]">
                             <div className="flex items-center gap-2">
                                 <div className="w-6 h-6 flex items-center justify-center">
-                                    <img src="/brand/logo.png" alt="Nirium Logo" className="w-full h-full object-contain" />
+                                    <img src="/brand/icon.svg" alt="Nirium Logo" className="w-full h-full object-contain" />
                                 </div>
                                 <h3 className="text-[11px] font-bold uppercase text-white tracking-tighter">Nirium AI</h3>
                             </div>

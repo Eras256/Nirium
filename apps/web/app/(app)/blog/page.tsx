@@ -10,8 +10,18 @@ const localeFor = (lang: string) => (lang === "es" ? "es-MX" : "en-US");
 
 export default function BlogPage() {
     const { t, language } = useLanguage();
-    const fmtDate = (iso: string) =>
-        new Date(iso).toLocaleDateString(localeFor(language), { year: "numeric", month: "long", day: "numeric" });
+    // Post dates are calendar dates with no time component ("2026-08-31").
+    // `new Date(iso)` parses that as UTC midnight, so toLocaleDateString()
+    // in a timezone behind UTC (e.g. Mexico, UTC-6) rolls it back a day.
+    // Building the Date from local Y/M/D components sidesteps that entirely.
+    const fmtDate = (iso: string) => {
+        const [year, month, day] = iso.split("-").map(Number);
+        return new Date(year, month - 1, day).toLocaleDateString(localeFor(language), {
+            year: "numeric",
+            month: "long",
+            day: "numeric",
+        });
+    };
 
     return (
         <main className="min-h-screen bg-black text-white selection:bg-stellar-teal/30">

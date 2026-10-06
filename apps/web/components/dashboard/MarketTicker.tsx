@@ -17,7 +17,7 @@ import { useLanguage } from '@/context/LanguageContext';
 
 function buildTickers(market: any, prev: any, t: any): TickerItem[] {
     const fmt = (n: number | null, decimals = 4) =>
-        n != null ? n.toFixed(decimals) : '—';
+        n != null ? n.toFixed(decimals) : '-';
 
     const trend = (curr: number | null, old: number | null): 'up' | 'down' | 'neutral' => {
         if (curr == null || old == null) return 'neutral';
@@ -40,35 +40,40 @@ function buildTickers(market: any, prev: any, t: any): TickerItem[] {
 
     // Sin dato no se inventa uno. Los fallbacks anteriores ('$0.1732', '5.57%',
     // '0.81bps', '+0.01%') hacían que el ticker siguiera mostrando cifras
-    // creíbles cuando el agente no respondía — o sea, precisamente cuando el
+    // creíbles cuando el agente no respondía - o sea, precisamente cuando el
     // usuario más necesita saber que no hay dato. Ahora dice em-dash.
     return [
         {
             label: "XLM/USDC",
-            value: xlm != null ? `$${fmt(xlm)}` : '—',
+            value: xlm != null ? `$${fmt(xlm)}` : '-',
             change: prevXlm != null && xlm != null
                 ? `${xlm >= prevXlm ? '+' : ''}${((xlm - prevXlm) / prevXlm * 100).toFixed(3)}%`
-                : '—',
+                : '-',
             trend: trend(xlm, prevXlm),
         },
         {
             // La tasa está FIJA en 5.57 (stellarProvider.fetchEtherfuseApy la
             // devuelve constante, verificada contra Etherfuse en jun-2026), así
             // que no tiene variación que reportar. El código anterior forzaba
-            // `trend` a 'up' cuando el cálculo daba 'neutral' — o sea, pintaba
+            // `trend` a 'up' cuando el cálculo daba 'neutral' - o sea, pintaba
             // flecha verde de subida sobre un número que nunca se mueve. En un
             // indicador de tasa eso no es un detalle de estilo.
             label: "🇲🇽 CETES rate",
-            value: cetesApy != null && cetesApy > 0 ? `${cetesApy.toFixed(2)}%` : '—',
+            value: cetesApy != null && cetesApy > 0 ? `${cetesApy.toFixed(2)}%` : '-',
             change: 'Banxico ref · Etherfuse',
             trend: 'neutral',
         },
         {
+            // Consulta real el order book de Horizon (XLM/USDC) - no es un
+            // stub. El - es honesto: testnet no tiene liquidez real y el
+            // proveedor descarta spreads sin sentido (>500bps) a propósito.
+            // Se usa como contexto de mercado para el LLM, no para ejecutar
+            // la conversión a CETES (esa corre off-chain vía Etherfuse).
             label: t.common.tickers.sdex_spread,
-            value: spread != null ? `${spread.toFixed(2)}bps` : '—',
+            value: spread != null ? `${spread.toFixed(2)}bps` : '-',
             change: prevSpread != null && spread != null
                 ? `${spread >= prevSpread ? '+' : ''}${(spread - prevSpread).toFixed(2)}bps`
-                : '—',
+                : 'XLM/USDC book · thin liquidity',
             trend: spread != null ? trend(spread, prevSpread) : 'neutral',
         },
         {
@@ -92,14 +97,14 @@ const MarketTicker = () => {
 
     // Estado inicial, antes de que llegue el primer dato. El comentario anterior
     // decía, literalmente, "placeholder tickers localized with real-looking data"
-    // — y eso era exactamente el problema: precios, variaciones y flechas de
+    // - y eso era exactamente el problema: precios, variaciones y flechas de
     // tendencia inventadas que se ven idénticas a las reales durante el primer
     // segundo de cada carga, y para siempre si el agente no responde.
     useEffect(() => {
         setTickers([
-            { label: "XLM/USDC", value: '—', change: '—', trend: 'neutral' },
-            { label: "🇲🇽 CETES rate", value: '—', change: 'Banxico ref · Etherfuse', trend: 'neutral' },
-            { label: t.common.tickers.sdex_spread, value: '—', change: '—', trend: 'neutral' },
+            { label: "XLM/USDC", value: '-', change: '-', trend: 'neutral' },
+            { label: "🇲🇽 CETES rate", value: '-', change: 'Banxico ref · Etherfuse', trend: 'neutral' },
+            { label: t.common.tickers.sdex_spread, value: '-', change: '-', trend: 'neutral' },
             { label: "COMPLIANCE", value: "NON-FINANCIAL ADVICE // REFERENCE DATA", change: "LCP · in legal review", trend: 'neutral' },
         ]);
     }, [t]);
@@ -122,7 +127,7 @@ const MarketTicker = () => {
                 // cuando el API no respondía, generaba precios con Math.random()
                 // partiendo de una base fija. Su propio comentario decía para qué:
                 // "Enhanced volatility (0.1% range) to ensure colors are always
-                // active" — o sea, existía para que las flechas parpadearan.
+                // active" - o sea, existía para que las flechas parpadearan.
                 //
                 // Fabricaba también movimiento de la TASA DE CETES
                 // (cetesApy + random), que es el número más sensible del sitio:

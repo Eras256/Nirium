@@ -11,6 +11,7 @@ import {
 import { Button } from "@/components/ui/Button";
 import { useLanguage } from "@/context/LanguageContext";
 import { ComplianceBanner } from "@/components/ui/ComplianceBanner";
+import TreasuryPlainTerms from "@/components/home/TreasuryPlainTerms";
 
 export default function TreasuryPage() {
     const { t } = useLanguage();
@@ -199,31 +200,15 @@ export default function TreasuryPage() {
                         </div>
                     </div>
 
+                    {/* La comparativa de 3 números (rieles legacy / crypto / Nirium) se
+                        quitó — no tenía fuente citable para ~4.5% ni 1.5%, y el ~0.8%
+                        de "Nirium + Etherfuse" contradecía el propio modelo de cobro
+                        del proyecto (licencia fija + por-llamada, nunca % del capital;
+                        el único % real y sourced es el ~0.20% de Etherfuse, que sigue
+                        explicado abajo). Mismo estándar que el resto del sitio: sin
+                        fuente citable, se quita en vez de decorarse con un disclaimer. */}
                     <div className="rounded-xl border border-white/10 bg-white/[0.02] p-6">
-                        <div className="grid sm:grid-cols-3 gap-4 text-center">
-                            <div>
-                                <div className="text-xs uppercase tracking-widest text-white/40 mb-2">
-                                    {t.treasury_page.cross_border.traditional}
-                                </div>
-                                <div className="text-2xl font-black text-red-400/70">~4.5%</div>
-                                <div className="text-xs text-white/50 mt-1">Western Union</div>
-                            </div>
-                            <div className="border-x border-white/5">
-                                <div className="text-xs uppercase tracking-widest text-white/40 mb-2">
-                                    {t.treasury_page.cross_border.best_crypto}
-                                </div>
-                                <div className="text-2xl font-black text-yellow-400/80">1.5%</div>
-                                <div className="text-xs text-white/50 mt-1">Bridge</div>
-                            </div>
-                            <div>
-                                <div className="text-xs uppercase tracking-widest text-stellar-teal mb-2">
-                                    {t.treasury_page.cross_border.nirium}
-                                </div>
-                                <div className="text-2xl font-black text-stellar-teal">~0.8%</div>
-                                <div className="text-xs text-white/50 mt-1">{t.treasury_page.cross_border.total_to_user}</div>
-                            </div>
-                        </div>
-                        <p className="mt-6 text-sm text-white/50 text-center max-w-2xl mx-auto leading-relaxed">
+                        <p className="text-sm text-white/50 text-center max-w-2xl mx-auto leading-relaxed">
                             {t.treasury_page.cross_border.explanation}
                         </p>
                     </div>
@@ -331,6 +316,8 @@ export default function TreasuryPage() {
             </section>
 
             {/* CTA */}
+            <TreasuryPlainTerms />
+
             <section className="py-24 border-t border-white/5">
                 <div className="max-w-3xl mx-auto px-6 text-center">
                     <h2 className="text-3xl sm:text-5xl font-black tracking-tight">

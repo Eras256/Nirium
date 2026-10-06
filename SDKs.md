@@ -1268,7 +1268,7 @@ Verify transactions: `https://stellar.expert/explorer/testnet/tx/<txHash>`
 
 ## Support
 
-- **Security issues:** xvaiosx7@gmail.com
+- **Security issues:** niriumprotocol@gmail.com
 - **npm:** https://www.npmjs.com/package/nirium
 - **PyPI:** https://pypi.org/project/nirium/
 - **API reference:** [API_DOCUMENTATION_OPENAPI.yaml](API_DOCUMENTATION_OPENAPI.yaml)

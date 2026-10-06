@@ -1,11 +1,16 @@
 'use client';
-import { Shield, Lock, Info, CheckCircle, Heart } from 'lucide-react';
+import { Shield, Lock, CheckCircle, Heart } from 'lucide-react';
 import { useLanguage } from "@/context/LanguageContext";
-import { motion } from "framer-motion";
 
 export function ComplianceBanner() {
     const { t } = useLanguage();
 
+    // El texto de "Aviso Regulatorio" que vivía aquí se quitó a propósito
+    // (21-ago-2026): era una variante corta y distinta del disclaimer real
+    // (LegalDisclaimer.tsx, footer sitewide) — dos versiones del mismo aviso
+    // legal en paralelo, una de ellas sin actualizar cuando la otra se
+    // corrigió. El footer ya aparece en cada página; no hace falta duplicarlo
+    // aquí. Los badges de abajo no son un claim legal, se quedan.
     return (
         <div className="space-y-4 mb-8">
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
@@ -21,24 +26,6 @@ export function ComplianceBanner() {
                     </div>
                 ))}
             </div>
-
-            <motion.div 
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                className="bg-stellar-teal/5 border border-stellar-teal/20 rounded-xl p-4"
-            >
-                <div className="flex items-start gap-3">
-                    <Info size={16} className="text-stellar-teal mt-0.5 shrink-0" />
-                    <div className="space-y-1">
-                        <p className="text-[10px] font-bold text-stellar-teal uppercase tracking-widest">
-                            {t.compliance.regulatory_awareness}
-                        </p>
-                        <p className="text-[11px] text-gray-400 leading-relaxed font-medium">
-                            {t.compliance.disclosure_text}
-                        </p>
-                    </div>
-                </div>
-            </motion.div>
         </div>
     );
 }

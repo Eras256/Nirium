@@ -11,7 +11,7 @@
     "postinstall": "node -e \"try{require('./scripts/postinstall.js')}catch(e){console.log('[postinstall] skipped:',e.message)}\""
   },
   "engines": {
-    "node": "20.x"
+    "node": "22.x"
   },
   "packageManager": "pnpm@9.12.2",
   "devDependencies": {
@@ -25,10 +25,10 @@
       "handlebars": ">=4.7.9",
       "defu": ">=6.1.5",
       "axios": "^1.20.0",
+      "browserslist": "^4.28.7",
       "protobufjs": "^7.6.6",
       "brace-expansion@1": "1.1.21",
       "brace-expansion@2": "2.1.7",
-      "brace-expansion@5": "5.0.12",
       "fast-uri": "^3.1.8",
       "hono": "^4.12.25",
       "ip-address": "^10.3.1",
@@ -37,9 +37,9 @@
       "next": "^15.5.21",
       "postcss": "^8.5.18",
       "sharp": "^0.35.0",
-      "browserslist": "^4.28.7",
       "@toon-format/toon": ">=2.3.1",
       "toml": ">=4.1.2",
+      "smol-toml": ">=1.7.1",
       "undici@6": "6.28.1",
       "undici@8": "8.10.2",
       "ws@7": "7.5.11",

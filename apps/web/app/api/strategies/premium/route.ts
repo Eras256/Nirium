@@ -10,7 +10,12 @@ import { Horizon } from '@stellar/stellar-sdk';
 
 const SETTLEMENT_HUB = process.env.NEXT_PUBLIC_CONTRACT_PROTOCOL || "CC2TU5BDTKTPRRRQPEF77I54XYHFQ25XGIRO2TCWKSR7NRJDFR5L5NR5";
 const USDC_ASSET = "USDC:GBBD47IF6LWK7P7MDEVSCWR7DPUWV3NY3DTQEVFL4NAT4AQH3ZLLFLA5";
+const [USDC_CODE, USDC_ISSUER] = USDC_ASSET.split(':');
 const FEE_AMOUNT = "0.10";
+
+// Best-effort, in-memory only — not persisted across restarts or shared
+// across instances. Same documented limit as apps/web/app/api/marketplace/install/[id]/route.ts.
+const consumedTxHashes = new Set<string>();
 
 export async function GET(request: Request) {
     const { searchParams } = new URL(request.url);
@@ -44,20 +49,39 @@ export async function GET(request: Request) {
 
     // 2. Verify the payment on-chain via Horizon
     try {
+        if (consumedTxHashes.has(txHash)) {
+            return NextResponse.json({ error: "Transaction already consumed" }, { status: 403 });
+        }
+
         const horizon = new Horizon.Server("https://horizon-testnet.stellar.org");
-        const tx = await horizon.transactions().transaction(txHash);
-        
-        // Security checks: Check destination and amount
+        // .transaction(id) returns a CallBuilder, not the record — needs
+        // .call() to actually fetch. The pre-existing `await ...transaction(txHash)`
+        // (no .call()) never fetched anything; its result was unused, so the
+        // bug was silent until this check needed the real record.
+        const tx = await horizon.transactions().transaction(txHash).call();
+        if (!tx.successful) {
+            return NextResponse.json({ error: "Transaction did not succeed" }, { status: 403 });
+        }
+
+        // Security checks: destination, asset, and amount — a payment op
+        // has no asset_code/asset_issuer check here previously, so any
+        // self-issued or native asset moved at sufficient face value would
+        // pass. Fixed 1-sep-2026 alongside the same bug class already found
+        // in marketplace/install/[id]/route.ts.
         const operations = await horizon.operations().forTransaction(txHash).call();
-        const paymentOp = operations.records.find((op: any) => 
-            op.type === 'payment' && 
-            op.to === SETTLEMENT_HUB && 
+        const paymentOp = operations.records.find((op: any) =>
+            op.type === 'payment' &&
+            op.to === SETTLEMENT_HUB &&
+            op.asset_code === USDC_CODE &&
+            op.asset_issuer === USDC_ISSUER &&
             parseFloat(op.amount) >= parseFloat(FEE_AMOUNT)
         );
 
         if (!paymentOp) {
             return NextResponse.json({ error: "Invalid payment record" }, { status: 403 });
         }
+
+        consumedTxHashes.add(txHash);
 
         // 3. Return the Premium Strategy data
         return NextResponse.json({

@@ -24,8 +24,12 @@ export async function GET() {
         ).then(res => res.ok ? res.json() : []) : Promise.resolve([]);
 
         // 2. Fetch from logs (Soroban Intelligence, Activity)
+        // agent_id=neq.REBALANCER-RATIO: the rebalancer stores its own rate
+        // history in this table (message = "RATIO:<vault>|<n>|<ts>") as a
+        // poor-man's KV store — internal bookkeeping, never meant to render
+        // as a feed line.
         const activityLogsPromise = (SUPABASE_URL && SUPABASE_KEY) ? fetch(
-            `${SUPABASE_URL}/rest/v1/logs?select=*&order=timestamp.desc&limit=30`,
+            `${SUPABASE_URL}/rest/v1/logs?select=*&agent_id=neq.REBALANCER-RATIO&order=timestamp.desc&limit=30`,
             {
                 headers: {
                     apikey: SUPABASE_KEY,

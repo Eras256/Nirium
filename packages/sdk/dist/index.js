@@ -4,6 +4,8 @@
 // desincroniza y ya mintió antes — decía 0.6.2 estando en 0.7.0).
 // ═══════════════════════════════════════════════════════════════
 import WebSocket from 'ws';
+import { createHash } from 'node:crypto';
+import { createRequire } from 'node:module';
 // @ts-ignore — ESM subpath imports
 import { x402Client as X402ClientClass, wrapFetchWithPayment } from '@x402/fetch';
 // @ts-ignore
@@ -11,6 +13,7 @@ import { createEd25519Signer } from '@x402/stellar';
 // @ts-ignore
 import { ExactStellarScheme } from '@x402/stellar/exact/client';
 import * as MppxModule from 'mppx';
+import { checkReplay, checkRateLimit } from './x402-guard.js';
 /** Build a `?a=1&b=2` suffix, dropping undefined values. Returns '' when empty. */
 function queryString(params) {
     if (!params)
@@ -381,6 +384,20 @@ export class Agent {
         return this.request('POST', '/api/treasury/rebalance', options);
     }
     /**
+     * Ask the agent what it would propose for this vault — the same decision
+     * logic the autonomous signer uses (rate vs. your own enterAt/exitAt),
+     * but this never signs. Returns an unsigned XDR for you to review and
+     * sign yourself, or an empty `instructions` array with a `reason` if
+     * there's nothing to do right now. Public: no allowlist, no invite —
+     * works for any vault where `caller` is already the on-chain
+     * rebalanceManager. Unlike executeTreasuryRebalance, Nirium never
+     * executes on your behalf here, so this doesn't wait on the same legal
+     * review the fully autonomous path does.
+     */
+    async proposeTreasuryRebalance(options) {
+        return this.request('POST', '/api/treasury/rebalance/propose', options);
+    }
+    /**
      * Sign and submit a rebalance with Nirium's own RebalanceManager key and
      * wait for confirmation. Only available where that key actually lives —
      * mainnet's receive-only box returns 501 by design, not a broken 500.
@@ -558,6 +575,57 @@ export class Agent {
         this.logCallbacks = [];
     }
 }
+// ─── x402Serve — el otro lado del mostrador ────────────────────
+//
+// `initX402` te deja PAGAR por APIs ajenas. Esto te deja COBRAR por la tuya.
+//
+// Montar x402 a mano son ~25 líneas: cliente del facilitador, headers de
+// auth por método, registro de esquema por red, y una tabla de rutas con
+// una forma que hay que adivinar leyendo la librería. Aquí van los defaults
+// que ya corren en producción y quedan tres líneas.
+//
+//   app.use('/premium', x402Serve({
+//       payTo: 'G...',
+//       routes: { 'GET /signals': '$0.02' },
+//   }));
+//
+// Devuelve middleware de Express. `@x402/express` se carga solo si llamas
+// esto — quien use el SDK únicamente como cliente no arrastra Express.
+// ─── Telemetría de uso, opt-in, no autorización ────────────────
+//
+// x402Serve() corre en TU servidor, no en el de Nirium — Nirium no opera
+// nada aquí, y por default no se entera de nada tampoco. Si querés ayudar
+// a decidir si esta librería necesita algún tipo de gate más adelante
+// (ver x402serve-gate-design.md), podés optar por mandar un ping
+// best-effort con tu `payTo` (dirección pública Stellar) y un hash de tu
+// `facilitatorApiKey` — nunca la llave en sí — con
+// `NIRIUM_X402SERVE_TELEMETRY=true`. Apagado por default desde v0.14.1:
+// antes era opt-out, y ser el único canal que conecta a Nirium con el uso
+// real de un tercero no debía ser una decisión que tomáramos por vos.
+// Nunca bloquea, nunca lanza, nunca retrasa una respuesta de pago.
+const X402SERVE_TELEMETRY_URL = 'https://nirium-agent-mainnet.fly.dev/api/x402serve/telemetry';
+const X402SERVE_TELEMETRY_ENABLED = process.env.NIRIUM_X402SERVE_TELEMETRY === 'true';
+const pingX402ServeTelemetry = (body) => {
+    if (!X402SERVE_TELEMETRY_ENABLED)
+        return;
+    try {
+        fetch(X402SERVE_TELEMETRY_URL, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(body),
+            signal: AbortSignal.timeout(4000),
+        }).catch(() => { });
+    }
+    catch { /* best-effort — un entorno sin fetch global no debe romper esto */ }
+};
+const sdkVersionForTelemetry = () => {
+    try {
+        return createRequire(import.meta.url)('../package.json').version;
+    }
+    catch {
+        return undefined;
+    }
+};
 const X402_FACILITATORS = {
     'stellar:pubnet': 'https://channels.openzeppelin.com/x402',
     'stellar:testnet': 'https://channels.openzeppelin.com/x402/testnet',
@@ -613,15 +681,27 @@ export function x402Serve(config) {
         const spec = typeof value === 'string' ? { price: value } : value;
         const routeKey = /^[A-Z]+\s/.test(key) ? key : `GET ${key}`;
         routes[routeKey] = {
+            // description va en el nivel de RouteConfig, no dentro de accepts
+            // (PaymentOption nunca tuvo ese campo — el resource server real
+            // lee routeConfig.description directo, mismo bug ya documentado
+            // en packages/agent/src/middleware/x402.ts).
+            ...(spec.description ? { description: spec.description } : {}),
             accepts: {
                 scheme: 'exact',
                 price: spec.price,
                 network,
                 payTo: config.payTo,
-                ...(spec.description ? { description: spec.description } : {}),
             },
         };
     }
+    const facilitatorKeyHash = config.facilitatorApiKey
+        ? createHash('sha256').update(config.facilitatorApiKey).digest('hex').slice(0, 16)
+        : undefined;
+    const sdkVersion = sdkVersionForTelemetry();
+    pingX402ServeTelemetry({
+        event: 'mount', payTo: config.payTo, facilitatorKeyHash, network,
+        routeCount: entries.length, sdkVersion,
+    });
     // El middleware se construye en la PRIMERA petición, no aquí.
     //
     // `paymentMiddlewareFromConfig` dispara su inicialización contra el
@@ -685,7 +765,53 @@ export function x402Serve(config) {
                 : 'the facilitator could not be reached',
         });
     };
+    // Volumen aproximado, no exacto: un contador en memoria que se vacía cada
+    // ~10 minutos o cada 50 requests, lo que llegue primero. Sin timers — un
+    // setInterval en un proceso serverless queda colgado o nunca corre; esto
+    // solo se revisa cuando de todos modos ya hay una petición en curso.
+    let requestsSinceFlush = 0;
+    let lastFlush = Date.now();
+    const HEARTBEAT_INTERVAL_MS = 10 * 60 * 1000;
+    const HEARTBEAT_REQUEST_THRESHOLD = 50;
+    const maybeFlushHeartbeat = () => {
+        requestsSinceFlush += 1;
+        if (requestsSinceFlush < HEARTBEAT_REQUEST_THRESHOLD && Date.now() - lastFlush < HEARTBEAT_INTERVAL_MS)
+            return;
+        pingX402ServeTelemetry({
+            event: 'heartbeat', payTo: config.payTo, facilitatorKeyHash, network,
+            requestCount: requestsSinceFlush, sdkVersion,
+        });
+        requestsSinceFlush = 0;
+        lastFlush = Date.now();
+    };
+    const sendDenied = (res, d) => {
+        if (d.headers)
+            for (const [k, v] of Object.entries(d.headers))
+                res.setHeader(k, v);
+        res.status(d.status).json(d.body);
+    };
     return async function niriumX402(req, res, next) {
+        maybeFlushHeartbeat();
+        if (config.guard) {
+            const guardReq = { method: req.method, url: req.originalUrl ?? req.url, headers: req.headers, ip: req.ip };
+            const rl = await checkRateLimit(guardReq, config.guard);
+            if (!rl.allowed) {
+                sendDenied(res, rl.denied);
+                return;
+            }
+            const replay = await checkReplay(guardReq, config.guard);
+            if (!replay.allowed) {
+                sendDenied(res, replay.denied);
+                return;
+            }
+            if (replay.release) {
+                const release = replay.release;
+                res.on('finish', () => {
+                    if (res.statusCode < 200 || res.statusCode >= 300)
+                        release();
+                });
+            }
+        }
         try {
             if (!cached) {
                 await preflight();
@@ -699,5 +825,11 @@ export function x402Serve(config) {
         }
     };
 }
+// `.js` extension required even though the source is `.ts`: `module:
+// ESNext` emits these specifiers verbatim, and Node's native ESM resolver
+// (unlike a bundler) needs the real extension to find the compiled file.
+export { x402Metrics } from './metrics.js';
+export { createUpstashX402GuardStore } from './x402-guard-upstash.js';
 export default Agent;
+export { ResilientSignalClient, } from './resilient-ws.js';
 //# sourceMappingURL=index.js.map

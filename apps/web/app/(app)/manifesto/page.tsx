@@ -169,7 +169,7 @@ export default function ManifestoPage() {
                             Nirium is not just a technology layer; it is a commitment to the <strong className="text-white">Stellar Ecosystem</strong>. We believe in the power of open financial rails to provide equitable access to the global economy.
                         </p>
                         <p className="text-gray-300 italic">
-                            "As an independent project in the Stellar ecosystem and an SCF Kickstart grantee, Nirium operates under a mandate of technical transparency and professional integrity. Our agents are designed to serve, our code is built to be audited, and our mission is to ensure that the Autonomous Economy remains inclusive, secure, and focused on real-world impact."
+                            "As an independent project in the Stellar ecosystem and an SCF Instaward recipient, Nirium operates under a mandate of technical transparency and professional integrity. Our agents are designed to serve, our code is built to be audited, and our mission is to ensure that the Autonomous Economy remains inclusive, secure, and focused on real-world impact."
                         </p>
                     </section>
                 </div>

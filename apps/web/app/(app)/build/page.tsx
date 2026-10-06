@@ -4,8 +4,8 @@ import Link from "next/link";
 import { motion } from "framer-motion";
 import {
     Rocket, Bot, Wallet, Gift, Wand2, ScrollText, PlayCircle, Clock,
-    Code2, ArrowRight, Globe, Zap, Download, Layers, Webhook,
-    KeyRound, Send, Coins, Radio, Lock, LineChart, Brain, Trophy,
+    Code2, ArrowRight, Globe, Zap, Layers, Webhook,
+    KeyRound, Send, Coins, Radio, LineChart, Brain, Trophy,
     Terminal as TerminalIcon, Package, Github, Shield,
     Landmark, ShieldCheck, Image, Database, Handshake, Cpu
 } from "lucide-react";
@@ -34,25 +34,27 @@ const STARTUP_CARDS = [
 ] as const;
 
 const API_ENDPOINTS = [
-    { id: "auth",     icon: KeyRound,     path: "/v1/auth",    method: "POST" },
-    { id: "market",   icon: LineChart,    path: "/v1/market",  method: "GET"  },
-    { id: "exec",     icon: TerminalIcon, path: "/v1/execute", method: "POST" },
-    { id: "skills",   icon: Brain,        path: "/v1/skills",  method: "POST" },
-    { id: "billing",  icon: Coins,        path: "/v1/x402",    method: "POST" },
-    { id: "settle",   icon: Send,         path: "/v1/mpp",     method: "POST" },
-    { id: "vault",    icon: Lock,         path: "/v1/vault",   method: "POST" },
-    { id: "elo",      icon: Trophy,       path: "/v1/elo",     method: "GET"  },
-    { id: "webhooks", icon: Webhook,      path: "/v1/hooks",   method: "SUB"  },
-    { id: "mcp",      icon: Radio,        path: "/v1/mcp",     method: "WS"   },
+    { id: "auth",     icon: KeyRound,     path: "/api/auth/keys",           method: "POST" },
+    { id: "market",   icon: LineChart,    path: "/api/market",              method: "GET"  },
+    { id: "exec",     icon: TerminalIcon, path: "/api/execute",             method: "POST" },
+    { id: "skills",   icon: Brain,        path: "/api/skills",              method: "GET"  },
+    { id: "billing",  icon: Coins,        path: "/api/v1/premium/signals",  method: "GET"  },
+    { id: "settle",   icon: Send,         path: "/api/v1/mpp/execute",      method: "POST" },
+    { id: "vault",    icon: Landmark,     path: "/api/treasury/vaults",     method: "GET"  },
+    { id: "audit",    icon: ScrollText,   path: "/api/audit/log",           method: "POST" },
+    { id: "payroll",  icon: Wallet,       path: "/api/payroll/run",         method: "POST" },
+    { id: "webhooks", icon: Webhook,      path: "/api/webhooks",            method: "POST" },
 ];
 
 const SDK_ICONS: Record<string, any> = {
-    ts: Package, py: Package, mcp: Radio, rest: Webhook, tauri: Download, studio: Layers,
+    ts: Package, py: Package, mcp: Radio, rest: Webhook, studio: Layers,
 };
 
 const SDK_HREFS: Record<string, string> = {
     ts: 'https://www.npmjs.com/package/nirium',
     py: 'https://pypi.org/project/nirium/',
+    mcp: 'https://www.npmjs.com/package/nirium-mcp',
+    studio: '/treasury/builder',
 };
 
 export default function BuildPage() {
@@ -103,7 +105,7 @@ export default function BuildPage() {
 
                         <div className="flex flex-col sm:flex-row gap-3 justify-center pt-8">
                             <a
-                                href="https://nirium-agent.fly.dev/docs"
+                                href="https://nirium.xyz/docs"
                                 target="_blank"
                                 rel="noopener noreferrer"
                                 className="inline-flex items-center justify-center gap-2 px-7 py-3.5 rounded-full bg-stellar-yellow text-[#0b0b0b] font-black text-sm uppercase tracking-tight hover:bg-stellar-yellow/90 transition-all shadow-[0_10px_30px_rgba(255,215,0,0.25)]"
@@ -249,7 +251,7 @@ export default function BuildPage() {
                                     <motion.a
                                         key={api.id}
                                         {...fadeUp(idx * 0.04)}
-                                        href="https://nirium-agent.fly.dev/docs"
+                                        href="https://nirium.xyz/docs"
                                         target="_blank"
                                         rel="noopener noreferrer"
                                         className="group relative p-4 rounded-2xl bg-black/60 border border-white/10 hover:border-stellar-teal/40 hover:bg-black/80 transition-all overflow-hidden"
@@ -309,18 +311,20 @@ export default function BuildPage() {
                             </div>
                             <pre className="p-4 sm:p-6 text-[11px] sm:text-[13px] font-mono leading-relaxed overflow-x-auto text-gray-300">
 <code>
-<span className="text-purple-400">import</span> {"{"} <span className="text-stellar-teal">Nirium</span> {"}"} <span className="text-purple-400">from</span> <span className="text-green-400">'nirium'</span>;{"\n\n"}
-<span className="text-blue-400">const</span> nirium = <span className="text-blue-400">new</span> <span className="text-stellar-teal">Nirium</span>({"{"} apiKey: <span className="text-yellow-300">'sk_live_...'</span> {"}"});{"\n\n"}
-<span className="text-gray-500">// 1. Create a vault on Stellar</span>{"\n"}
-<span className="text-blue-400">const</span> vault = <span className="text-purple-400">await</span> nirium.vaults.<span className="text-cyan-400">create</span>({"{"} asset: <span className="text-green-400">'USDC'</span>, signers: <span className="text-yellow-300">2</span> {"}"});{"\n\n"}
-<span className="text-gray-500">// 2. Deploy an AI helper with x402 micro-billing</span>{"\n"}
-<span className="text-blue-400">const</span> agent = <span className="text-purple-400">await</span> nirium.agents.<span className="text-cyan-400">deploy</span>({"{"}{"\n"}
-{"  "}name: <span className="text-green-400">'TreasuryBot'</span>, vault: vault.id,{"\n"}
-{"  "}billing: {"{"} trigger: <span className="text-green-400">'inference'</span>, unit: <span className="text-yellow-300">0.001</span> {"}"},{"\n"}
-{"}"});{"\n\n"}
-<span className="text-gray-500">// 3. Subscribe to on-chain events</span>{"\n"}
-nirium.events.<span className="text-cyan-400">on</span>(<span className="text-green-400">'vault.settled'</span>, (tx) =&gt; {"{"}{"\n"}
-{"  "}console.<span className="text-cyan-400">log</span>(<span className="text-green-400">'Settled on Stellar'</span>, tx.hash);{"\n"}
+<span className="text-purple-400">import</span> {"{"} <span className="text-stellar-teal">Agent</span> {"}"} <span className="text-purple-400">from</span> <span className="text-green-400">'nirium'</span>;{"\n\n"}
+<span className="text-blue-400">const</span> nirium = <span className="text-blue-400">new</span> <span className="text-stellar-teal">Agent</span>({"{"} apiKey: <span className="text-yellow-300">'sk_free_...'</span> {"}"});{"\n\n"}
+<span className="text-gray-500">// 1. Deploy a treasury vault — this returns an UNSIGNED xdr.</span>{"\n"}
+<span className="text-gray-500">//    You sign it with YOUR OWN key; Nirium never holds it.</span>{"\n"}
+<span className="text-blue-400">const</span> vault = <span className="text-purple-400">await</span> nirium.<span className="text-cyan-400">deployTreasuryVault</span>({"{"}{"\n"}
+{"  "}caller: <span className="text-green-400">'G...'</span>, manager: <span className="text-green-400">'G...'</span>,{"\n"}
+{"}"});{"\n"}
+<span className="text-gray-500">// vault.xdr — sign with `caller`, then submitTreasuryTx(signedXdr)</span>{"\n\n"}
+<span className="text-gray-500">// 2. Charge for your own API with x402 micro-billing</span>{"\n"}
+nirium.<span className="text-cyan-400">initX402</span>({"{"} secretKey: process.env.STELLAR_SECRET_KEY {"}"});{"\n"}
+<span className="text-blue-400">const</span> res = <span className="text-purple-400">await</span> nirium.<span className="text-cyan-400">x402Fetch</span>(<span className="text-green-400">'https://your-api.com/paid-endpoint'</span>);{"\n\n"}
+<span className="text-gray-500">// 3. Subscribe to live signals over WebSocket</span>{"\n"}
+nirium.<span className="text-cyan-400">subscribe</span>((signal) =&gt; {"{"}{"\n"}
+{"  "}console.<span className="text-cyan-400">log</span>(<span className="text-green-400">'Signal:'</span>, signal);{"\n"}
 {"}"});
 </code>
                             </pre>
@@ -332,13 +336,10 @@ nirium.events.<span className="text-cyan-400">on</span>(<span className="text-gr
                                 const sdk = ah.sdks[key];
                                 const IconComp = SDK_ICONS[key as string] || Package;
                                 const href = SDK_HREFS[key as string];
-                                const Wrapper = href ? 'a' : 'div';
-                                return (
-                                    <Wrapper
-                                        key={key}
-                                        {...(href ? { href, target: '_blank', rel: 'noopener noreferrer' } : {})}
-                                        className="group p-4 rounded-2xl bg-gradient-to-br from-white/[0.03] to-transparent border border-white/10 hover:border-stellar-teal/30 transition-all"
-                                    >
+                                const isInternal = href?.startsWith('/');
+                                const cardClassName = "group p-4 rounded-2xl bg-gradient-to-br from-white/[0.03] to-transparent border border-white/10 hover:border-stellar-teal/30 transition-all";
+                                const cardBody = (
+                                    <>
                                         <div className="flex items-start justify-between gap-3 mb-2">
                                             <div className="flex items-center gap-2.5">
                                                 <div className="w-8 h-8 rounded-lg bg-stellar-teal/5 border border-stellar-teal/20 flex items-center justify-center shrink-0">
@@ -356,8 +357,19 @@ nirium.events.<span className="text-cyan-400">on</span>(<span className="text-gr
                                         <div className="px-2.5 py-1.5 bg-black/60 border border-white/5 rounded-lg">
                                             <code className="text-[10px] sm:text-[11px] font-mono text-stellar-teal/90 block truncate">{sdk.cmd}</code>
                                         </div>
-                                    </Wrapper>
+                                    </>
                                 );
+                                if (isInternal && href) {
+                                    return <Link key={key} href={href} className={cardClassName}>{cardBody}</Link>;
+                                }
+                                if (href) {
+                                    return (
+                                        <a key={key} href={href} target="_blank" rel="noopener noreferrer" className={cardClassName}>
+                                            {cardBody}
+                                        </a>
+                                    );
+                                }
+                                return <div key={key} className={cardClassName}>{cardBody}</div>;
                             })}
                         </motion.div>
                     </div>
@@ -384,7 +396,7 @@ nirium.events.<span className="text-cyan-400">on</span>(<span className="text-gr
                     {/* CTAs */}
                     <motion.div {...fadeUp(0.3)} className="flex flex-col sm:flex-row flex-wrap justify-center gap-3">
                         <a
-                            href="https://nirium-agent.fly.dev/docs"
+                            href="https://nirium.xyz/docs"
                             target="_blank"
                             rel="noopener noreferrer"
                             className="inline-flex items-center justify-center gap-2 px-6 py-3 rounded-full bg-stellar-teal text-[#0b0b0b] font-black text-xs sm:text-sm uppercase tracking-tight hover:bg-stellar-teal/90 transition-all shadow-[0_10px_30px_rgba(45,235,232,0.2)]"
@@ -397,7 +409,7 @@ nirium.events.<span className="text-cyan-400">on</span>(<span className="text-gr
                             {ah.cta_sandbox}
                         </Link>
                         <a
-                            href="https://github.com/nirium"
+                            href="https://github.com/nirium-protocol/nirium-sdk"
                             target="_blank"
                             rel="noopener noreferrer"
                             className="inline-flex items-center justify-center gap-2 px-6 py-3 rounded-full bg-white/5 border border-white/10 text-white font-bold text-xs sm:text-sm uppercase tracking-tight hover:bg-white/10 transition-all"
@@ -444,9 +456,7 @@ nirium.events.<span className="text-cyan-400">on</span>(<span className="text-gr
                                     {si.cta_button}
                                 </Link>
                                 <a
-                                    href="https://discord.gg/nirium"
-                                    target="_blank"
-                                    rel="noopener noreferrer"
+                                    href="mailto:niriumprotocol@gmail.com"
                                     className="inline-flex items-center justify-center gap-2 px-7 py-3.5 rounded-full bg-white/5 border border-white/10 text-white font-bold text-sm uppercase tracking-tight hover:bg-white/10 transition-all"
                                 >
                                     {si.cta_discord}

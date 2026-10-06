@@ -75,7 +75,7 @@ function DocsContent() {
                                     <div className="flex items-center gap-3">
                                         <h1 className="text-3xl sm:text-5xl md:text-7xl font-black font-mono tracking-tighter uppercase leading-none">{t.docs.overview.title}</h1>
                                         <span className="px-2 py-0.5 bg-green-500/20 text-green-400 text-xs font-mono rounded-full border border-green-500/30 animate-pulse">
-                                            v0.10.2
+                                            v0.16.0
                                         </span>
                                     </div>
                                 </div>
@@ -221,7 +221,7 @@ function OverviewSection() {
             {/* Hero Stats */}
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-5 gap-4">
                 {[
-                    { label: t.docs.overview.hero.version, value: 'v0.10.2', color: 'text-stellar-teal' },
+                    { label: t.docs.overview.hero.version, value: 'v0.16.0', color: 'text-stellar-teal' },
                     { label: t.docs.overview.hero.contracts, value: '2 Testnet', color: 'text-green-400' },
                     { label: t.docs.overview.hero.helpers, value: '6', color: 'text-purple-400' },
                     { label: t.docs.overview.hero.fee, value: '$0.02–0.25', color: 'text-amber-400' },
@@ -550,7 +550,7 @@ function ContractsSection() {
         <div className="space-y-12">
             {/* Deployed Contracts */}
             <section>
-                <h2 className="text-2xl font-bold mb-6">{t.docs.api.contracts_title} (Testnet v0.10.2)</h2>
+                <h2 className="text-2xl font-bold mb-6">{t.docs.api.contracts_title} (Testnet v0.16.0)</h2>
                 <div className="overflow-x-auto">
                     <table className="w-full text-left border-collapse">
                         <thead>
@@ -702,7 +702,7 @@ function AgentSection() {
                         </div>
                         <p className="text-sm text-gray-400 mt-2">
                             x402 service: <code className="text-stellar-teal">{t.docs.agent.status_running}</code><br/>
-                            MPP Charge: <code className="text-amber-500">{t.docs.agent.status_running}</code>
+                            MPP Charge: <code className="text-amber-500">experimental, not available on mainnet</code>
                         </p>
                     </div>
                 </div>
@@ -713,7 +713,7 @@ function AgentSection() {
                 <div className="bg-[#0A0A0A] border border-white/10 rounded-xl p-4 font-mono text-[10px] xs:text-xs sm:text-sm overflow-x-auto scrollbar-thin scrollbar-thumb-white/10">
                     <pre className="text-gray-400 whitespace-pre">
                         {`packages/
-├── mcp/                      # Model Context Protocol server (14 tools)
+├── mcp/                      # Model Context Protocol server (25 tools)
 ├── sdk/                      # TypeScript SDK  (npm: nirium)
 ├── sdk-python/               # Python SDK      (pip: nirium)
 └── agent/                    # Express 5 runtime — 86 endpoints
@@ -898,14 +898,14 @@ function FrontendSection() {
                         { path: '/analytics', name: t.docs.frontend.pages.analytics.name, desc: t.docs.frontend.pages.analytics.desc, lines: 200 },
                         { path: '/docs', name: t.docs.frontend.pages.docs.name, desc: t.docs.frontend.pages.docs.desc, lines: 1173 },
                     ].map((page) => (
-                        <div key={page.path} className="bg-white/5 border border-white/10 rounded-lg p-4 flex items-center justify-between">
+                        <Link key={page.path} href={page.path} className="bg-white/5 border border-white/10 rounded-lg p-4 flex items-center justify-between hover:bg-white/10 hover:border-white/20 transition-colors">
                             <div className="flex items-center gap-4">
                                 <code className="text-stellar-teal text-sm">{page.path}</code>
                                 <span className="text-white font-medium">{page.name}</span>
                                 <span className="text-gray-500 text-sm hidden md:block">{page.desc}</span>
                             </div>
                             <span className="text-xs text-gray-500 font-mono">{page.lines} lines</span>
-                        </div>
+                        </Link>
                     ))}
                 </div>
             </section>
@@ -1168,12 +1168,10 @@ ws.on('open', () => {
 ws.on('message', (payload) => {
   const msg = JSON.parse(payload);
   if (msg.type === 'signal') {
-    const confidence = msg.data?.confidence ?? 0;
-    if (confidence > 0.90) {
-      console.log('🔥 SIGNAL:', msg.signal_type);
-      console.log('   Pair:', msg.pair);
-      console.log('   Spread opp:', msg.data.spreadPercentage + '%');
-    }
+    console.log('📡 EVENT:', msg.signal_type);
+    console.log('   Pair:', msg.pair);
+    console.log('   Details:', msg.data?.details ?? '(see docs for schema)');
+    // Factual event data, not a recommendation — decide your own thresholds.
   }
 });`}
                         </pre>
@@ -1185,7 +1183,7 @@ ws.on('message', (payload) => {
             <section id="endpoints-directory">
                 <div className="flex items-center gap-3 mb-8">
                     <Workflow className="text-stellar-teal w-6 h-6" />
-                    <h3 className="text-2xl font-bold uppercase tracking-tighter">{t.docs.api.explorer_title} (50+)</h3>
+                    <h3 className="text-2xl font-bold uppercase tracking-tighter">{t.docs.api.explorer_title} (86)</h3>
                 </div>
 
                 <EndpointExplorer />
@@ -1526,10 +1524,6 @@ function SecuritySection() {
                         <p className="text-sm text-gray-400 mb-6">
                             {t.docs.security.stellar_coc.compliance}
                         </p>
-                        <div className="flex items-center gap-2 px-3 py-2 bg-black/40 rounded-lg border border-white/5">
-                            <Clock className="w-4 h-4 text-gray-500" />
-                            <span className="text-[10px] font-mono text-gray-500 uppercase">Last Verification: July 10, 2026</span>
-                        </div>
                     </div>
                 </div>
             </section>
@@ -1579,7 +1573,7 @@ function SecuritySection() {
                             Institutional Integrity & Governance
                         </h2>
                         <p className="text-gray-400 leading-relaxed mb-6">
-                            Nirium Protocol operates under the highest integrity standards of the Stellar ecosystem. Our architecture is designed to satisfy institutional audits and international regulatory frameworks (KYC/AML/SEP-12) within the July 2026 compliance landscape.
+                            Nirium Protocol operates under the highest integrity standards of the Stellar ecosystem: every action logged, cryptographically chained, and independently verifiable — the evidence layer regulated operators need to run their own compliance process, without building it themselves.
                         </p>
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                             <div className="bg-black/40 p-4 rounded-xl border border-white/5">
@@ -1587,8 +1581,8 @@ function SecuritySection() {
                                 <p className="text-[11px] text-gray-500 text-balance">Full alignment with SDF guidelines for transparency, security, and professional conduct across the public network.</p>
                             </div>
                             <div className="bg-black/40 p-4 rounded-xl border border-white/5">
-                                <div className="text-stellar-teal font-bold text-xs uppercase mb-1">SEP-12 / SEP-24 Readiness</div>
-                                <p className="text-[11px] text-gray-500 text-balance">Infrastructure prepared for regulated identity provider integration and 'Know Your Customer' strict compliance.</p>
+                                <div className="text-stellar-teal font-bold text-xs uppercase mb-1">Trustline Onboarding</div>
+                                <p className="text-[11px] text-gray-500 text-balance">Self-signed USDC trustline setup for new recipients — no custodial identity provider in the loop.</p>
                             </div>
                         </div>
                     </div>
@@ -1596,10 +1590,10 @@ function SecuritySection() {
                         <div className="w-16 h-16 bg-stellar-teal/20 rounded-full flex items-center justify-center mb-4">
                             <Shield className="w-8 h-8 text-stellar-teal" />
                         </div>
-                        <div className="text-white font-bold mb-1">Audit-Ready v0.5</div>
+                        <div className="text-white font-bold mb-1">Cryptographically Verifiable</div>
                         <p className="text-[10px] text-gray-400 leading-tight">Every byte of telemetry is cryptographically signed and independently verifiable.</p>
                         <div className="mt-4 px-3 py-1 bg-stellar-teal text-[#0b0b0b] text-[10px] font-black rounded-full uppercase tracking-tighter">
-                            SCF KICKSTART · ECOSISTEMA SDF
+                            SCF INSTAWARD · ECOSISTEMA SDF
                         </div>
                     </div>
                 </div>
@@ -1659,7 +1653,7 @@ function IdeasSection() {
                                     <Icon size={32} />
                                 </div>
                                 <span className="px-3 py-1 rounded-full bg-white/5 text-[10px] sm:text-xs font-mono text-gray-400 self-start xs:self-center">
-                                    {t.docs.ideas.difficulty}: {idea.diff === 'Easy' ? t.docs.ideas.easy : idea.diff === 'Medium' ? t.docs.ideas.medium : t.docs.ideas.hard}
+                                    {t.docs.ideas.difficulty}: {idea.diff === 'Standard' ? t.docs.ideas.easy : idea.diff === 'Intermediate' ? t.docs.ideas.medium : t.docs.ideas.hard}
                                 </span>
                             </div>
                             <h3 className="text-xl sm:text-2xl font-bold text-white mb-2">{idea.name}</h3>
@@ -1691,7 +1685,7 @@ function PayrollSection() {
         <div className="space-y-16 animate-in fade-in slide-in-from-bottom-4 duration-700">
             <div>
                 <h1 className="text-3xl sm:text-5xl font-black uppercase italic tracking-tighter mb-4">{t.docs.payroll?.title || 'Payroll Integration'}</h1>
-                <p className="text-lg text-gray-400">{t.docs.payroll?.desc || 'Non-custodial batch disbursement using the x402 and MPP standards.'}</p>
+                <p className="text-lg text-gray-400">{t.docs.payroll?.desc || 'Non-custodial batch disbursement on Stellar, signed with your own wallet.'}</p>
             </div>
 
             <section>

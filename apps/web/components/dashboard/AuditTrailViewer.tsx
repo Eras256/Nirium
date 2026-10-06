@@ -262,7 +262,7 @@ export default function AuditTrailViewer() {
                                                 </div>
                                                 <div className="flex items-center justify-between mt-2">
                                                     <span className="text-[9px] font-mono text-white/20">
-                                                        HMAC-SHA256 verified // Pinata Gateway
+                                                        SHA-256 verified // Pinata Gateway
                                                     </span>
                                                     <a
                                                         href={entry.gateway_url}

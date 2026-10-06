@@ -34,8 +34,8 @@ export default function MarketplacePage() {
                 "Maintains 60% minimum USDC liquidity. Rebalances when spread exceeds operator-configured threshold (default 1.5%). Full immutable audit trail anchored on IPFS.",
                 "Mantiene liquidez mínima del 60% en USDC. Rebalancea cuando el spread supera el umbral configurado (default 1.5%). Rastro de auditoría inmutable completo anclado en IPFS."),
             status: lang(
-                "Design public · Mainnet Q4 2026",
-                "Diseño público · Mainnet Q4 2026"),
+                "Design public · no mainnet date committed",
+                "Diseño público · sin fecha de mainnet comprometida"),
             statusColor: "text-stellar-teal",
             borderColor: "border-stellar-teal/20",
         },
@@ -123,8 +123,8 @@ export default function MarketplacePage() {
                         <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-stellar-yellow/10 border border-stellar-yellow/20 rounded-full text-stellar-yellow text-[10px] font-black uppercase tracking-widest">
                             <Clock className="w-3 h-3" />
                             {lang(
-                                "COMING SOON · POST-MAINNET Q4 2026",
-                                "PRÓXIMAMENTE · POST-MAINNET Q4 2026")}
+                                "COMING SOON · NO DATE COMMITTED",
+                                "PRÓXIMAMENTE · SIN FECHA COMPROMETIDA")}
                         </div>
                         {strategyCount !== null && (
                             <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-stellar-teal/10 border border-stellar-teal/20 rounded-full text-stellar-teal text-[10px] font-black uppercase tracking-widest">
@@ -324,8 +324,8 @@ export default function MarketplacePage() {
                     <Lock className="w-4 h-4 text-white/20 mt-0.5 shrink-0" />
                     <p className="text-white/30 text-xs leading-relaxed">
                         {lang(
-                            "Marketplace pending launch. Templates shown are non-operative preliminary designs. Nirium does not offer investment products, financial instruments, or speculative trading strategies.",
-                            "Marketplace pendiente de lanzamiento. Las plantillas mostradas son diseños preliminares no operativos. Nirium no ofrece productos de inversión, instrumentos financieros ni estrategias de trading especulativo.")}
+                            "Marketplace pending launch. Templates shown are non-operative preliminary designs. Nirium does not issue or market financial instruments — access to CETES is provided by Etherfuse, an independent regulated operator.",
+                            "Marketplace pendiente de lanzamiento. Las plantillas mostradas son diseños preliminares no operativos. Nirium no emite ni comercializa instrumentos financieros — el acceso a CETES lo provee Etherfuse, operador regulado independiente.")}
                     </p>
                 </motion.div>
 

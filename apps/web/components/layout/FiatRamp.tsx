@@ -1,5 +1,5 @@
 'use client';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ArrowRight, DollarSign, Wallet, CheckCircle, Loader2, ArrowDown, ExternalLink, Shield } from 'lucide-react';
 import { useLanguage } from "@/context/LanguageContext";
@@ -11,9 +11,40 @@ export default function FiatRamp() {
     const [selectedBond, setSelectedBond] = useState<string>('CETES');
     const [status, setStatus] = useState<'idle' | 'onboarding' | 'kyc_pending' | 'quoting' | 'quoted' | 'ordering' | 'wiring' | 'success'>('idle');
 
+    // ref_rate/fiat son datos aparte (tasa Banxico, ya verificada en otra
+    // sesión) — tvl/cost eran un snapshot fijo que se quedó congelado y
+    // terminó desalineado ~5.4x contra el TVL real. Se reemplazan con el
+    // fetch en vivo de abajo; nunca mostrar un número fijo con pinta de dato
+    // en vivo.
     const BONDS = [
-        { id: 'CETES', name: 'CETES', ref_rate: '5.57%', tvl: 'MX$476,145,215', cost: 'MX$1.13224', fiat: 'MXN' }
+        { id: 'CETES', name: 'CETES', ref_rate: '5.57%', fiat: 'MXN' }
     ];
+    const [liveLookup, setLiveLookup] = useState<Record<string, { tvl: string; cost: string }>>({});
+    useEffect(() => {
+        let cancelled = false;
+        BONDS.forEach(async (b) => {
+            try {
+                const res = await fetch('/api/etherfuse', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ action: 'lookup', bondId: b.id }),
+                });
+                const data = await res.json();
+                if (cancelled || !data?.tokenPriceDecimal || !data?.netValueDecimal) return;
+                setLiveLookup((prev) => ({
+                    ...prev,
+                    [b.id]: {
+                        cost: `MX$${Number(data.tokenPriceDecimal).toFixed(5)}`,
+                        tvl: `MX$${Math.round(Number(data.netValueDecimal)).toLocaleString('en-US')}`,
+                    },
+                }));
+            } catch {
+                // Sandbox/red caída — se deja sin dato en vez de mostrar un número viejo.
+            }
+        });
+        return () => { cancelled = true; };
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
     const [quote, setQuote] = useState<any>(null);
     const [order, setOrder] = useState<any>(null);
     const [error, setError] = useState<string>('');
@@ -163,8 +194,8 @@ export default function FiatRamp() {
                                                 <span className={`font-black text-sm ${selectedBond === b.id ? 'text-emerald-400' : 'text-white'}`}>{b.name}</span>
                                                 <span className="text-[10px] font-mono text-gray-400 bg-white/5 px-1.5 py-0.5 rounded">{b.ref_rate} Banxico</span>
                                             </div>
-                                            <div className="text-[10px] text-gray-500 font-mono mb-1">TVL: {b.tvl}</div>
-                                            <div className="text-[10px] text-gray-400 font-mono">Cost: {b.cost}</div>
+                                            <div className="text-[10px] text-gray-500 font-mono mb-1" title="Etherfuse market TVL, not Nirium's">Etherfuse market TVL: {liveLookup[b.id]?.tvl ?? '…'}</div>
+                                            <div className="text-[10px] text-gray-400 font-mono">Cost: {liveLookup[b.id]?.cost ?? '…'}</div>
                                         </button>
                                     ))}
                                 </div>

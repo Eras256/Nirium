@@ -29,7 +29,7 @@ export default function NetworkSwitchModal({ open, onConfirm, onCancel }: Props)
 
     const rows: { label: string; testnet: React.ReactNode; mainnet: React.ReactNode }[] = [
         {
-            label: lang("Settlement — x402 + MPP Charge", "Liquidación — x402 + MPP Charge"),
+            label: lang("Settlement — x402", "Liquidación — x402"),
             testnet: yes,
             mainnet: (
                 <span className="text-[10px] font-bold text-emerald-400">

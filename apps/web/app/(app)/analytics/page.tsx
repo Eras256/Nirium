@@ -363,14 +363,10 @@ export default function AnalyticsPage() {
                     <div className="space-y-6">
                         <div className="bg-[#121212] border border-white/5 rounded-3xl p-8 shadow-xl relative overflow-hidden group">
                             <h3 className="text-[10px] font-black mb-8 text-gray-500 uppercase tracking-[0.3em]">INSTITUTIONAL AUDIT</h3>
-                            <div className="flex flex-col items-center text-center mb-8">
-                                <div className="text-6xl font-black text-white mb-2 font-mono italic tracking-tighter">100%</div>
-                                <p className="text-[10px] text-gray-400 font-black uppercase tracking-widest">COMPLIANCE UPTIME</p>
-                            </div>
-                            
+
                             <div className="flex items-center justify-center gap-3 mb-8">
                                 <span className="text-[9px] bg-blue-500/10 text-blue-400 px-3 py-1 rounded-lg border border-blue-500/20 font-black uppercase">IPFS Anchored</span>
-                                <span className="text-[9px] bg-stellar-yellow/10 text-stellar-yellow px-3 py-1 rounded-lg border border-stellar-yellow/20 font-black uppercase">Audit-Ready</span>
+                                <span className="text-[9px] bg-stellar-yellow/10 text-stellar-yellow px-3 py-1 rounded-lg border border-stellar-yellow/20 font-black uppercase">Cryptographically Signed</span>
                             </div>
 
                             <div className="space-y-3">
@@ -380,7 +376,7 @@ export default function AnalyticsPage() {
                                 </div>
                                 <p className="text-[10px] text-gray-500 leading-relaxed pl-6">
                                     Decision Anchoring: ACTIVE<br/>
-                                    Audit Trail (HMAC-SHA256): VERIFIED<br/>
+                                    Audit Trail (SHA-256): VERIFIED<br/>
                                     Aligned with Stellar Code of Conduct
                                 </p>
                             </div>
@@ -397,7 +393,7 @@ export default function AnalyticsPage() {
                             <div className="space-y-4 max-h-[400px] overflow-y-auto pr-2 custom-scrollbar">
                                 {[
                                     { net: 'mainnet' as const, date: '2026-07-09', tx: '3134a51c66091fd7fbd85b38a4a6ec6cd432bb92c2450eac84ea7855cb7558bc', msg: 'x402 settlement — 0.02 USDC to treasury' },
-                                    { net: 'mainnet' as const, date: '2026-07-27', tx: '4813645165d15af1e503d66ef84d826e83fff235d4f98c3f6eba8a4e7c83795e', msg: 'x402 settlement — 0.02 USDC, signed via Pollar adapter' },
+                                    { net: 'mainnet' as const, date: '2026-08-05', tx: 'e4fa3df9cb225a4d7f64dd0082eb38218ada4b4af3378f288989a5d4b1116ed9', msg: 'x402 settlement — 0.02 USDC, signed via Pollar social login' },
                                     // Se retiró la tx del 19-abr etiquetada 'NiriumVault — revoke_agent(1218)'.
                                     // El hash era real y la cuenta fue nuestra, pero el contrato invocado era
                                     // CAU2XBJT… — el vault VIEJO, retirado en la consolidación a 2 contratos de
@@ -466,7 +462,8 @@ export default function AnalyticsPage() {
                         </div>
                         <div className="space-y-2">
                             <p className="text-[9px] text-gray-500 uppercase font-black tracking-widest">Network Protocol</p>
-                            <span className="text-xs font-mono font-black text-white">Protocol 23</span>
+                            {/* Verificado 4-oct-2026 contra el último ledger de Horizon: protocol_version 29. */}
+                            <span className="text-xs font-mono font-black text-white">Protocol 29</span>
                         </div>
                     </div>
                 </div>

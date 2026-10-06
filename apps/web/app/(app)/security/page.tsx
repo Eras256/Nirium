@@ -47,8 +47,8 @@ export default function SecurityPage() {
                     </h2>
                     <p className="mt-4 text-center text-white/60 max-w-2xl mx-auto">
                         {lang(
-                            'Any critical vault operation requires 2 of 3 signatures. No one can move funds alone.',
-                            'Para cualquier operación crítica del vault se necesitan 2 de 3 firmas. Nadie puede mover los fondos solo.')}
+                            'The vault is controlled by three keys — pause/unpause needs two of them. Every other critical operation is gated to one specific signer. The agent alone can never move funds.',
+                            'El vault lo controlan tres llaves — pausar/reanudar necesita dos de ellas. Cualquier otra operación crítica está acotada a un firmante único específico. El agente por sí solo nunca puede mover fondos.')}
                     </p>
 
                     <div className="mt-12 grid md:grid-cols-3 gap-6">
@@ -120,10 +120,16 @@ export default function SecurityPage() {
                                 <Shield className="w-5 h-5 text-amber-400" />
                                 <h3 className="text-lg font-bold">{lang('Critical operations', 'Operaciones críticas')}</h3>
                             </div>
+                            {/* "2 firmas obligatorias" era falso para 3 de estas 4 — verificado
+                                línea por línea en nirium_vault.rs: withdraw/close_vault llaman
+                                solo vault.owner.require_auth(), set_cosigners solo
+                                admin.require_auth(). El único caso de multisig 2-de-3 real es
+                                pause/unpause (verify_multisig), y aun ahí cae a admin-solo si
+                                los cosignatarios no están configurados todavía. */}
                             <p className="text-sm text-white/60 mb-4">
                                 {lang(
-                                    'These require 2 human signatures, no exceptions:',
-                                    'Estas requieren 2 firmas humanas obligatoriamente:')}
+                                    "These need a human signature outside the agent's automatic limits — who exactly signs depends on the operation:",
+                                    'Estas necesitan una firma humana fuera de los límites automáticos del agente — quién firma exactamente depende de la operación:')}
                             </p>
                             <ul className="space-y-2 text-sm text-white/70">
                                 <li className="flex items-start gap-2">
@@ -132,15 +138,15 @@ export default function SecurityPage() {
                                 </li>
                                 <li className="flex items-start gap-2">
                                     <Shield className="w-4 h-4 text-amber-400/80 shrink-0 mt-0.5" />
-                                    {lang('Cosigner changes', 'Cambio de cosignatarios')}
+                                    {lang('Cosigner changes — only the admin can sign it (bootstraps the 2-of-3 setup)', 'Cambio de cosignatarios — solo lo firma el admin (arranca la configuración 2-de-3)')}
                                 </li>
                                 <li className="flex items-start gap-2">
                                     <Shield className="w-4 h-4 text-amber-400/80 shrink-0 mt-0.5" />
-                                    {lang('Emergency vault pause', 'Pausa de emergencia del vault')}
+                                    {lang('Emergency pause / unpause — 2-of-3 multisig once cosigners are registered; admin-only until then', 'Pausa / reanudación de emergencia — multisig 2-de-3 una vez registrados los cosignatarios; solo admin mientras tanto')}
                                 </li>
                                 <li className="flex items-start gap-2">
                                     <Shield className="w-4 h-4 text-amber-400/80 shrink-0 mt-0.5" />
-                                    {lang('Vault closure', 'Cierre del vault')}
+                                    {lang('Vault closure — only the vault owner can sign it', 'Cierre del vault — solo lo firma el dueño de la bóveda')}
                                 </li>
                             </ul>
                         </div>
@@ -178,6 +184,11 @@ export default function SecurityPage() {
                             </div>
                         ))}
                     </div>
+                    <p className="mt-4 text-center text-xs text-white/40">
+                        {lang(
+                            'Checked directly against the contract’s live exported interface below — not yet confirmed by an independent third-party audit.',
+                            'Verificado directo contra la interfaz exportada real del contrato, abajo — todavía sin confirmar por una auditoría externa independiente.')}
+                    </p>
                 </div>
             </section>
 
@@ -220,6 +231,20 @@ export default function SecurityPage() {
                                 <FileSearch className="w-3.5 h-3.5" />
                                 {lang('View source code', 'Ver código fuente')}
                             </Link>
+                        </div>
+                        <div className="mt-5 pt-5 border-t border-white/5 space-y-2">
+                            <div className="flex items-center justify-between">
+                                <span className="text-xs uppercase tracking-widest text-white/40 font-mono">WASM hash</span>
+                                <span className="text-[10px] text-white/50 font-mono">stellar contract fetch</span>
+                            </div>
+                            <code className="text-xs text-white/60 font-mono break-all block">
+                                d36eba5ce2b6e7fcc93064960321b6cedc7fdde28e02c7a8a60cc0eab0d529d3
+                            </code>
+                            <p className="text-[11px] text-white/50 leading-relaxed pt-1">
+                                {lang(
+                                    'Fetched directly from the live testnet ledger and inspected: 29 exported functions, none named upgrade, migrate, or set_wasm. "Cannot modify code once deployed" is not asserted — it is absent from the bytecode itself, checkable by anyone with the Stellar CLI (stellar contract fetch --id CBTWMZCG3P72EHFAQ4ZLSEBIOFYJC244H5J6DHZIJ56FHFWJ2CFAWSZU --network testnet, then stellar contract info interface --wasm). Stellar Expert still shows this contract as "unverified" — that badge requires a separate reproducible-build submission we have not completed yet; this on-chain interface check is independent of it and does not depend on that badge.',
+                                    'Bajado directo del ledger de testnet en vivo e inspeccionado: 29 funciones exportadas, ninguna llamada upgrade, migrate ni set_wasm. "No se puede modificar el código una vez deployado" no se afirma — está ausente del bytecode mismo, verificable por cualquiera con el CLI de Stellar (stellar contract fetch --id CBTWMZCG3P72EHFAQ4ZLSEBIOFYJC244H5J6DHZIJ56FHFWJ2CFAWSZU --network testnet, luego stellar contract info interface --wasm). Stellar Expert todavía marca este contrato como "unverified" — esa insignia requiere un envío de build reproducible aparte que aún no hicimos; esta verificación de interfaz on-chain es independiente de esa insignia y no depende de ella.')}
+                            </p>
                         </div>
                     </div>
                 </div>

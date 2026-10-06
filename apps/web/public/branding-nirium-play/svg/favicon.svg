@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
+  <defs>
+    <linearGradient id="gold" x1="0" y1="0" x2="100" y2="100" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#F5D57A"/>
+      <stop offset="0.5" stop-color="#D4AF37"/>
+      <stop offset="1" stop-color="#8B6F2E"/>
+    </linearGradient>
+  </defs>
+
+  <!-- solid filled controller silhouette (body + two grip bulges), no fine
+       bumper/notch detail — that's what breaks up at 16px. Reads as a
+       gamepad shape from the outline alone. -->
+  <path d="M14,34 H86 a10,10 0 0 1 10,10 v6 a18,18 0 0 1 -18,18 a12,12 0 0 1 -10,-5.5 L62,54 H38 l-6,8.5 a12,12 0 0 1 -10,5.5 A18,18 0 0 1 4,50 v-6 a10,10 0 0 1 10,-10 Z" fill="url(#gold)"/>
+
+  <!-- N and star knocked out, bold -->
+  <path d="M27,56 L27,38 L43,56 L43,38" fill="none" stroke="#0A0A0C" stroke-width="6.5" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M72,36 L75,45 L84,48 L75,51 L72,60 L69,51 L60,48 L69,45 Z" fill="#0A0A0C"/>
+</svg>

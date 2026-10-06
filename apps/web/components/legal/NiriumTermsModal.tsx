@@ -173,14 +173,11 @@ export default function NiriumTermsModal({ walletAddress }: NiriumTermsProps) {
 
                             <div className="mt-5 pt-5 border-t border-white/5 flex items-center justify-between">
                                 <div className="text-[10px] text-gray-500 font-bold uppercase tracking-wider">
-                                    {t.legal_modal.terms_link} & {t.legal_modal.risk_link}
+                                    {t.legal_modal.terms_link}
                                 </div>
                                 <div className="flex gap-3">
                                     <Link href="/terms" target="_blank" className="text-stellar-teal hover:text-white transition-colors">
                                         <ExternalLink size={12} />
-                                    </Link>
-                                    <Link href="/risk-disclosure" target="_blank" className="text-stellar-teal hover:text-white transition-colors">
-                                        <Scale size={12} />
                                     </Link>
                                 </div>
                             </div>

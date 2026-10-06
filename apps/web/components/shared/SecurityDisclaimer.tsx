@@ -20,8 +20,8 @@ export default function SecurityDisclaimer() {
                     </h3>
                     <p className="text-white/50 text-xs leading-relaxed max-w-3xl">
                         {lang(
-                            "Non-custodial nodes (settlement, payouts, audit, reporting) run on mainnet without holding funds. The treasury vault has not yet undergone a formal third-party audit and remains testnet-only until one is completed.",
-                            "Los nodos non-custodial (liquidación, payouts, auditoría, reportería) corren en mainnet sin custodiar fondos. El vault de tesorería todavía no ha sido sometido a una auditoría formal de un tercero y permanece solo-testnet hasta que se complete una."
+                            "Non-custodial nodes (settlement, audit, reporting) run on mainnet without holding funds. Payouts also runs on mainnet, invite-only while legal review closes. The treasury vault has not yet undergone a formal third-party audit and remains testnet-only until one is completed.",
+                            "Los nodos non-custodial (liquidación, auditoría, reportería) corren en mainnet sin custodiar fondos. Payouts también corre en mainnet, solo por invitación mientras cierra la revisión legal. El vault de tesorería todavía no ha sido sometido a una auditoría formal de un tercero y permanece solo-testnet hasta que se complete una."
                         )}
                     </p>
                 </div>

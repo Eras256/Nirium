@@ -14,13 +14,13 @@ interface LegalDisclaimerProps {
 }
 
 const SHORT: Record<Locale, string> = {
-  en: "Nirium is B2B software-only infrastructure on Stellar (Mainnet + Testnet). It is an enterprise SDK, not a financial product. No yields guaranteed. Use at your own risk.",
-  es: "Nirium es infraestructura de software B2B en Stellar (Mainnet + Testnet). Es un SDK para empresas, no un producto financiero. No garantiza rendimientos. Úselo bajo su propio riesgo.",
+  en: "Nirium is B2B software-only infrastructure on Stellar (Mainnet + Testnet). It is enterprise software, not a financial product. No yields guaranteed. Use at your own risk.",
+  es: "Nirium es infraestructura de software B2B en Stellar (Mainnet + Testnet). Es software para empresas, no un producto financiero. No garantiza rendimientos. Úselo bajo su propio riesgo.",
 };
 
 const FULL: Record<Locale, string> = {
-  en: "Nirium is software-only B2B infrastructure. It is an SDK, not a consumer financial product, not investment advice, and not a regulated financial activity. Nirium never holds or custodies funds. Non-custodial settlement (x402/MPP), batch payouts (early access), audit anchoring and reporting run on Stellar mainnet. Autonomous rebalancing runs on DeFindex vaults — third-party audited contracts the client owns — invite-only while legal review concludes; the role Nirium holds cannot withdraw funds, and the client can revoke it at any time. NiriumVault, Nirium’s own contract, runs on Stellar testnet only, audit-gated until a formal external audit. Nirium does not guarantee yields, dividends, or returns. Any rate data shown (e.g., Etherfuse CETES) is public reference information, not a promise of return. Crypto assets are volatile. Financial services are provided by regulated partners, not by Nirium.",
-  es: "Nirium es infraestructura de software B2B, software-only. Es un SDK, no un producto financiero para consumidores, no es asesoría de inversión, ni una actividad financiera regulada. Nirium nunca custodia fondos. La liquidación non-custodial (x402/MPP), las dispersiones en lote (early access), el anclaje de auditoría y la reportería corren en Stellar mainnet. El rebalanceo autónomo corre sobre bóvedas de DeFindex —contratos de terceros, auditados y propiedad del cliente— en modo invitación mientras concluye la revisión legal; el rol que Nirium sostiene no puede retirar fondos y el cliente puede revocarlo cuando quiera. NiriumVault, el contrato propio de Nirium, corre únicamente en Stellar testnet, audit-gated hasta una auditoría externa formal. Nirium no garantiza rendimientos, dividendos ni retornos de ningún tipo. Las tasas mostradas (ej. CETES vía Etherfuse) son información pública de referencia, no promesas de ganancia. Los criptoactivos son volátiles. Los servicios financieros los prestan partners regulados, no Nirium.",
+  en: "Nirium is software-only B2B infrastructure. It is software, not a consumer financial product, and not investment advice. Nirium never holds or custodies funds. Non-custodial settlement (x402), batch payouts (early access), audit anchoring and reporting run on Stellar mainnet. Autonomous rebalancing runs on DeFindex vaults — third-party audited contracts the client owns — invite-only while legal review concludes; the role Nirium holds cannot withdraw funds, and the client can revoke it at any time. NiriumVault, Nirium’s own contract, runs on Stellar testnet only, audit-gated until a formal external audit. Nirium does not guarantee yields, dividends, or returns. Any rate data shown (e.g., Etherfuse CETES) is public reference information, not a promise of return. MPP Charge is experimental and not available on mainnet. Crypto assets are volatile. Financial services are provided by regulated partners, not by Nirium.",
+  es: "Nirium es infraestructura de software B2B, software-only. Es software, no un producto financiero para consumidores, ni asesoría de inversión. Nirium nunca custodia fondos. La liquidación non-custodial (x402), las dispersiones en lote (early access), el anclaje de auditoría y la reportería corren en Stellar mainnet. El rebalanceo autónomo corre sobre bóvedas de DeFindex —contratos de terceros, auditados y propiedad del cliente— en modo invitación mientras concluye la revisión legal; el rol que Nirium sostiene no puede retirar fondos y el cliente puede revocarlo cuando quiera. NiriumVault, el contrato propio de Nirium, corre únicamente en Stellar testnet, audit-gated hasta una auditoría externa formal. Nirium no garantiza rendimientos, dividendos ni retornos de ningún tipo. Las tasas mostradas (ej. CETES vía Etherfuse) son información pública de referencia, no promesas de ganancia. MPP Charge es experimental y no está disponible en mainnet. Los criptoactivos son volátiles. Los servicios financieros los prestan partners regulados, no Nirium.",
 };
 
 const COC_URL = "https://stellar.org/foundation/code-of-conduct";
@@ -85,11 +85,22 @@ export default function LegalDisclaimer({
   }
 
   if (variant === "footer") {
+    // Short pointer, not a third independently-written full text — the only
+    // full version lives on /disclaimers (which itself renders FULL via the
+    // "inline" variant below). Duplicating FULL here risked the footer and
+    // /disclaimers drifting apart in wording over time.
     return (
       <p
         className={`text-[10px] leading-relaxed text-zinc-500 font-mono italic ${className}`}
       >
-        {FULL[locale]}{" "}
+        {SHORT[locale]}{" "}
+        <Link
+          href="/disclaimers"
+          className="underline underline-offset-2 text-zinc-400 hover:text-zinc-300 transition-colors font-bold not-italic"
+        >
+          {locale === "es" ? "Ver aviso legal completo →" : "Read full legal notice →"}
+        </Link>
+        {" · "}
         <a
           href={COC_URL}
           target="_blank"

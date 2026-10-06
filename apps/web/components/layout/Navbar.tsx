@@ -5,7 +5,8 @@ import { usePathname } from "next/navigation";
 import { useFreighter } from "@/hooks/useFreighter";
 import {
     Menu, X, Zap, Shield, Activity,
-    LogOut, CreditCard, Building2, Code2, ArrowUpRight, Newspaper, KeyRound, Mail
+    LogOut, CreditCard, Building2, Code2, ArrowUpRight, Newspaper, KeyRound, Mail,
+    ChevronDown, Send, ShieldCheck, Cpu
 } from "lucide-react";
 import { useState, useEffect, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
@@ -27,6 +28,7 @@ export default function Navbar() {
     const hasIdentity = !!activeAddress;
     const [isScrolled, setIsScrolled] = useState(false);
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+    const [isProductOpen, setIsProductOpen] = useState(false);
     const [isAIModalOpen, setIsAIModalOpen] = useState(false);
     const [aiConfig, setAIConfig] = useState<any>({ provider: 'nirium', model: 'nirium-core-v1' });
     const { language, setLanguage, t } = useLanguage();
@@ -44,16 +46,47 @@ export default function Navbar() {
         return () => window.removeEventListener("scroll", handleScroll);
     }, [handleScroll]);
 
-    // Marketing nav — clean links (SCF-optimised)
+    // Marketing nav — mismas 3 categorías que el sidebar de la app (CORE /
+    // TREASURY / DEVELOPER), para que quien entra por la home y quien entra
+    // por la app tengan el mismo mapa mental del producto. Precios y Blog
+    // no tienen equivalente en la app (son marketing-only) y quedan aparte.
     // Logo → / | "Launch app" → /dashboard
+    const productGroups = [
+        {
+            label: t.nav.group_core,
+            items: [
+                { name: t.nav.agents,     href: "/agents",     icon: Cpu },
+                { name: t.nav.payroll,    href: "/payouts",    icon: Send },
+                { name: t.nav.security,   href: "/security",   icon: ShieldCheck },
+                { name: t.nav.compliance, href: "/compliance", icon: Shield },
+            ],
+        },
+        {
+            label: t.nav.group_treasury,
+            items: [
+                { name: t.nav.treasury, href: "/treasury",         icon: Building2 },
+                { name: t.nav.vault,    href: "/treasury/vault",   icon: ShieldCheck },
+                { name: t.nav.builder,  href: "/treasury/builder", icon: Zap },
+                { name: t.nav.ramp,     href: "/ramp",             icon: Globe },
+            ],
+        },
+        {
+            label: t.nav.group_developer,
+            items: [
+                { name: t.nav.docs,       href: "/docs",       icon: Newspaper },
+                { name: t.nav.developers, href: "/developers", icon: Code2 },
+                { name: t.nav.api,        href: "/keys",       icon: KeyRound },
+            ],
+        },
+    ];
+    const productHrefs = productGroups.flatMap(g => g.items.map(i => i.href));
+    const isProductActive = productHrefs.some(href => pathname === href || pathname.startsWith(href + "/"));
+
     const navLinks = [
-        { name: t.nav.home,       href: "/"           },
-        { name: t.nav.developers, href: "/developers" },
-        { name: t.nav.docs,       href: "/docs"       },
-        { name: t.nav.api,        href: "/keys"       },
-        { name: t.nav.payroll,    href: "/payroll"    },
-        { name: t.nav.pricing,    href: "/pricing"    },
-        { name: t.nav.blog,       href: "/blog"       },
+        { name: t.nav.home,    href: "/"        },
+        { name: t.nav.build,   href: "/build"   },
+        { name: t.nav.pricing, href: "/pricing" },
+        { name: t.nav.blog,    href: "/blog"    },
     ];
 
     return (
@@ -70,14 +103,82 @@ export default function Navbar() {
                     <div className="relative">
                         <div className="absolute inset-0 bg-stellar-teal/10 blur-xl rounded-full group-hover:bg-stellar-teal/30 transition-all" />
                         <div className="relative bg-transparent transition-all group-hover:scale-105 overflow-hidden w-14 xs:w-20 sm:w-28 h-8 xs:h-10 sm:h-12 flex items-center justify-center">
-                            <img src="/brand/logo.png" alt="Nirium" className="w-full h-full object-contain" />
+                            <img src="/brand/icon.svg" alt="Nirium" className="w-full h-full object-contain" />
                         </div>
                     </div>
                 </Link>
 
                 {/* ── Desktop nav — full labels (xl+) ── */}
                 <div className="hidden xl:flex items-center gap-1 mx-4">
-                    {navLinks.map((link) => {
+                    <Link
+                        href="/"
+                        className={`px-3 py-1.5 rounded-lg text-[11px] font-semibold tracking-wide transition-all ${
+                            pathname === "/"
+                                ? "text-white bg-white/8 border border-white/10"
+                                : "text-white/50 hover:text-white hover:bg-white/5"
+                        }`}
+                    >
+                        {t.nav.home}
+                    </Link>
+
+                    {/* Product — mismas 3 categorías del sidebar de la app */}
+                    <div
+                        className="relative"
+                        onMouseEnter={() => setIsProductOpen(true)}
+                        onMouseLeave={() => setIsProductOpen(false)}
+                    >
+                        <button
+                            className={`flex items-center gap-1 px-3 py-1.5 rounded-lg text-[11px] font-semibold tracking-wide transition-all ${
+                                isProductActive
+                                    ? "text-white bg-white/8 border border-white/10"
+                                    : "text-white/50 hover:text-white hover:bg-white/5"
+                            }`}
+                        >
+                            {t.nav.product_menu}
+                            <ChevronDown className={`w-3 h-3 transition-transform ${isProductOpen ? "rotate-180" : ""}`} />
+                        </button>
+                        <AnimatePresence>
+                            {isProductOpen && (
+                                <motion.div
+                                    initial={{ opacity: 0, y: 4 }}
+                                    animate={{ opacity: 1, y: 0 }}
+                                    exit={{ opacity: 0, y: 4 }}
+                                    transition={{ duration: 0.15 }}
+                                    className="absolute left-0 top-full pt-2 w-[560px]"
+                                >
+                                    <div className="grid grid-cols-3 gap-4 p-4 rounded-2xl bg-black/95 border border-white/10 backdrop-blur-2xl shadow-2xl">
+                                        {productGroups.map((group) => (
+                                            <div key={group.label}>
+                                                <p className="px-2 mb-1.5 text-[9px] font-black uppercase tracking-[0.2em] text-white/25">
+                                                    {group.label}
+                                                </p>
+                                                <ul className="space-y-0.5">
+                                                    {group.items.map(({ href, name, icon: Icon }) => (
+                                                        <li key={href}>
+                                                            <Link
+                                                                href={href}
+                                                                onClick={() => setIsProductOpen(false)}
+                                                                className={`flex items-center gap-2 px-2 py-1.5 rounded-lg text-[12px] font-medium transition-colors ${
+                                                                    pathname === href
+                                                                        ? "text-white bg-white/8"
+                                                                        : "text-white/60 hover:text-white hover:bg-white/5"
+                                                                }`}
+                                                            >
+                                                                <Icon className="w-3.5 h-3.5 shrink-0" />
+                                                                <span className="truncate">{name}</span>
+                                                            </Link>
+                                                        </li>
+                                                    ))}
+                                                </ul>
+                                            </div>
+                                        ))}
+                                    </div>
+                                </motion.div>
+                            )}
+                        </AnimatePresence>
+                    </div>
+
+                    {navLinks.slice(1).map((link) => {
                         const isActive = pathname === link.href;
                         return (
                             <Link
@@ -100,6 +201,8 @@ export default function Navbar() {
                     {[
                         { href: "/",           Icon: Home,       name: t.nav.home       },
                         { href: "/developers", Icon: Code2,      name: t.nav.developers },
+                        { href: "/docs",       Icon: Newspaper,  name: t.nav.docs       },
+                        { href: "/treasury",   Icon: Building2,  name: t.nav.treasury   },
                         { href: "/keys",       Icon: KeyRound,   name: t.nav.api        },
                         { href: "/pricing",    Icon: CreditCard, name: t.nav.pricing    },
                         { href: "/blog",       Icon: Newspaper,  name: t.nav.blog       },
@@ -261,8 +364,50 @@ export default function Navbar() {
                                 <X size={16} />
                             </button>
 
-                            {/* Nav links */}
-                            {navLinks.map((link) => {
+                            {/* Home — top level */}
+                            <Link
+                                href="/"
+                                onClick={() => setIsMobileMenuOpen(false)}
+                                className={`flex items-center px-4 py-3.5 rounded-xl text-sm font-semibold border transition-all ${
+                                    pathname === "/"
+                                        ? "bg-white text-black border-white"
+                                        : "bg-white/[0.03] text-white/60 border-white/5 hover:text-white hover:bg-white/[0.06]"
+                                }`}
+                            >
+                                {t.nav.home}
+                            </Link>
+
+                            {/* Product — mismas 3 categorías del sidebar de la app */}
+                            {productGroups.map((group) => (
+                                <div key={group.label} className="mt-1">
+                                    <p className="px-4 mb-1.5 text-[9px] font-black uppercase tracking-[0.2em] text-white/25">
+                                        {group.label}
+                                    </p>
+                                    <div className="flex flex-col gap-1.5">
+                                        {group.items.map(({ href, name, icon: Icon }) => {
+                                            const isActive = pathname === href;
+                                            return (
+                                                <Link
+                                                    key={href}
+                                                    href={href}
+                                                    onClick={() => setIsMobileMenuOpen(false)}
+                                                    className={`flex items-center gap-2.5 px-4 py-3 rounded-xl text-sm font-semibold border transition-all ${
+                                                        isActive
+                                                            ? "bg-white text-black border-white"
+                                                            : "bg-white/[0.03] text-white/60 border-white/5 hover:text-white hover:bg-white/[0.06]"
+                                                    }`}
+                                                >
+                                                    <Icon className="w-4 h-4 shrink-0" />
+                                                    {name}
+                                                </Link>
+                                            );
+                                        })}
+                                    </div>
+                                </div>
+                            ))}
+
+                            {/* Precios / Blog — marketing-only, sin equivalente en la app */}
+                            {navLinks.slice(1).map((link) => {
                                 const isActive = pathname === link.href;
                                 return (
                                     <Link
@@ -322,7 +467,7 @@ export default function Navbar() {
 
                             {/* Status strip */}
                             <div className="mt-3 pt-4 border-t border-white/5 flex items-center justify-between text-[9px] font-mono text-white/20 uppercase tracking-widest">
-                                <span>{t.nav.uplink_ready.replace('{v}', 'v0.7.0')}</span>
+                                <span>{t.nav.uplink_ready.replace('{v}', 'v0.16.0')}</span>
                                 <div className="flex items-center gap-1 text-stellar-teal/60">
                                     <Shield className="w-2.5 h-2.5" />
                                     {t.footer.scf_verified}
