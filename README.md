@@ -19,7 +19,7 @@
 >
 > Nirium is **experimental software**. Nirium's own **NiriumVault** treasury contract remains on **Stellar Testnet, audit-gated**: no independent third-party audit has occurred yet, and no real client funds ever reach that contract.
 >
-> The **autonomous treasury node runs on mainnet over a DeFindex vault the client owns**: a third-party contract audited by OtterSec, not ours. Nirium holds only the vault's `RebalanceManager` role, which by the contract's own design cannot withdraw funds, change roles, or pause anything. Autonomous rebalancing on mainnet is **invite-only** while a legal review closes. A separate set of receive-only nodes (x402 micropayments, MPP Charge, IPFS audit anchoring, non-custodial Payouts, Reporting) also run in **mainnet early access**, where real USDC moves under the client's own wallet signature. **Nirium never custodies funds.**
+> The **autonomous treasury node runs on mainnet over a DeFindex vault the client owns**: a third-party contract audited by OtterSec, not ours. Nirium holds only the vault's `RebalanceManager` role, which by the contract's own design cannot withdraw funds, change roles, or pause anything. Autonomous rebalancing on mainnet is **invite-only** while a legal review closes. A separate set of receive-only nodes (x402 micropayments, IPFS audit anchoring, non-custodial Payouts, Reporting) also run in **mainnet early access**, where real USDC moves under the client's own wallet signature. **Nirium never custodies funds.**
 >
 > **Nirium is not financial advice. It is not an investment product. It does not guarantee yields, dividends, asset appreciation, or returns of any kind.** Reference rate data shown on the dashboard (Blend supply rate, Etherfuse CETES rate) is **public protocol information only**, not projections or promises of return. XLM and Stellar assets are volatile. Smart contracts carry risk even when audited. Use at your own risk.
 >
@@ -35,7 +35,7 @@
 
 | # | Node | Status | Network | What it does |
 |---|---|---|---|---|
-| 1 | **Settlement** (x402 + MPP Charge) | ✅ Active | both | Per-request micropayments for AI agents. Pay for others' APIs with `initX402()` today. Charging for your own with `x402Serve()` as a third-party facilitator is invite-only while legal review closes — same gate as Treasury and Payouts. |
+| 1 | **Settlement** (x402 active; MPP Charge experimental) | x402 ✅ Active · MPP ⚠️ Experimental | both | Per-request micropayments for AI agents. Pay for others' APIs with `initX402()` today. Charging for your own with `x402Serve()` as a third-party facilitator is invite-only while legal review closes — same gate as Treasury and Payouts. |
 | 2 | **Audit Trail** | ✅ Active | both | Evidence anchored to IPFS as immutable receipts, optionally **signed by the agent that produced it** (ed25519 over a domain-separated statement), so the CID proves not just *that* a fact is unaltered but *who declared it*. |
 | 3 | **Payouts** | ✅ Active | both | Non-custodial batch disbursements, up to 100 recipients per transaction. Mainnet is invite-only; independent service payments only (contractors, freelancers, B2B); never subordinate-employee salary. A milestone variant (Trustless Work Multi-Release — one contract, a distinct receiver per milestone) runs on testnet: `GET /api/payroll/escrow/info`. |
 | 4 | **Treasury Rebalance** | ✅ Active | both | Moves idle capital into a CETES strategy and back, on its own, over a **DeFindex vault the client owns**. Live on mainnet, invite-only during legal review. |
