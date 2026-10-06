@@ -252,9 +252,9 @@ app.use('/premium', x402Serve({
 }));
 ```
 
-**MPP runs in Charge mode only**, on both networks: the client signs a complete USDC transfer inside the request, the server validates it by simulation and broadcasts it: no external facilitator. MPP's Channel mode is implemented but **disabled**, because its setup phase deploys a channel contract holding a deposit, which is temporary custody and falls under the same audit gate as our own vault.
+**MPP Charge is experimental**: implemented, but testnet rejected a valid payment on 1 Oct 2026 and mainnet is unverified. Its design: the client signs a complete USDC transfer inside the request, the server validates it by simulation and broadcasts it, with no external facilitator. MPP's Channel mode is implemented but **disabled**, because its setup phase deploys a channel contract holding a deposit, which is temporary custody and falls under the same audit gate as our own vault.
 
-The MCP server exposes Nirium as **25 tools** for Claude Desktop, Cursor, and any MCP-compatible IDE: 10 free, 9 authenticated, 1 informational, 3 paid over x402, 2 paid over MPP.
+The MCP server exposes Nirium as **25 tools** for Claude Desktop, Cursor, and any MCP-compatible IDE: 10 free, 9 authenticated, 1 informational, 3 paid over x402, 2 MPP tools (experimental).
 
 ### Audit Trail Engine
 
@@ -423,7 +423,7 @@ Nirium received Kickstart funding via a regional Stellar Ambassador chapter, wit
 
 | Milestone | Status |
 |---|---|
-| Core infrastructure + x402/MPP on testnet | ✅ Complete |
+| Core infrastructure + x402 on testnet | ✅ Complete · MPP experimental |
 | Institutional API (86 endpoints) + published SDKs | ✅ Complete |
 | Internal security review (83/83 vectors checked) | ✅ Complete |
 | MCP server v0.6.0, 25 tools | ✅ Complete |
