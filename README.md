@@ -390,7 +390,7 @@ Nirium/                        (public repo)
 
 - **Internal security review**: 83/83 vectors checked, 0 critical, 0 high
 - Methodology: static analysis (`cargo clippy`, grep), dynamic analysis, full-spectrum pentesting, `cargo audit` + `pnpm audit`, fuzz testing (5 cargo-fuzz targets), manual code review
-- A formal independent audit is planned before any mainnet deployment of **NiriumVault**. The mainnet nodes running today do not depend on it: they either never touch funds (x402, MPP, audit, reporting), or the client signs every fund movement themselves (Payouts), or they operate a **third-party contract already audited by OtterSec** in a role that cannot withdraw (Treasury).
+- A formal independent audit is planned before any mainnet deployment of **NiriumVault**. The mainnet nodes running today do not depend on it: they either never touch funds (x402, audit, reporting), or the client signs every fund movement themselves (Payouts), or they operate a **third-party contract already audited by OtterSec** in a role that cannot withdraw (Treasury).
 - The mainnet API box holds **no signing key**, enforced at startup. The autonomous mainnet signer is a separate process with no HTTP surface.
 - See [SECURITY.md](SECURITY.md) for responsible disclosure, and [INTERNAL_SECURITY_AUDIT.md](INTERNAL_SECURITY_AUDIT.md) for the full 83-vector report.
 
@@ -429,7 +429,7 @@ Nirium received Kickstart funding via a regional Stellar Ambassador chapter, wit
 | MCP server v0.6.0, 25 tools | ✅ Complete |
 | Etherfuse CETES integration (testnet + SPEI sandbox) | ✅ Complete |
 | Self-service API keys console (`/keys`, wallet-signed via SEP-53) | ✅ Live |
-| Mainnet receive-only nodes (x402, MPP Charge, Audit Trail, Reporting) | ✅ Live, early access |
+| Mainnet receive-only nodes (x402, Audit Trail, Reporting) | ✅ Live, early access |
 | Payouts node, non-custodial batch disbursements | ✅ Live, mainnet invite-only |
 | `x402Serve()`, charge for your own API in one call | ✅ Shipped in SDK, third-party use invite-only during legal review |
 | Agent attestation in the audit trail (signed evidence) | ✅ Shipped |
