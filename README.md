@@ -402,7 +402,7 @@ Nirium operates in alignment with the [Stellar Code of Conduct](https://stellar.
 
 | Principle | Nirium status |
 |---|---|
-| Stellar must be **core and valuable**, not auxiliary | ✅ Soroban contracts, SDEX, Blend, DeFindex, x402, MPP; Stellar is the execution layer |
+| Stellar must be **core and valuable**, not auxiliary | ✅ Soroban contracts, SDEX, Blend, DeFindex, x402; MPP experimental; Stellar is the execution layer |
 | No speculation, wash trading, or insider trading with grant funds | ✅ Grant funds allocated to development, not trading |
 | No investment advice or yield promises | ✅ Prominent disclaimer; rates displayed as protocol reference data only |
 | No marketing promising interest, dividends, or appreciation | ✅ Language focuses on workflow automation, not guaranteed returns |
