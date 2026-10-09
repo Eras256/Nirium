@@ -71,7 +71,7 @@ function generateHistory(points: number, hoursBack: number) {
 type AnalyticsLog = { time: string; source: string; type: string; msg: string; tx?: string };
 
 const ANALYTICS_LOGS: AnalyticsLog[] = [
-    { time: '00:25:44', source: 'REBALANCE_NODE', type: 'info', msg: 'Scan — CETES 5.57% (Etherfuse reference) vs idle USDC | base fee 100 stroops.' },
+    { time: '00:25:44', source: 'REBALANCE_NODE', type: 'info', msg: 'Scan — CETES 5.57% (Etherfuse fixed reference, Jun 2026) vs idle USDC | base fee 100 stroops.' },
     { time: '00:25:46', source: 'REBALANCE_NODE', type: 'success', msg: 'Threshold exceeded (>2.5%). Moving 1.0 USDC to vault treasury — conversion is executed off-chain by Etherfuse, not by a DEX.' },
     { time: '00:25:48', source: 'AUDIT_NODE', type: 'audit', msg: 'Transaction confirmed on-chain before logging, then included in the daily anchored digest.' },
     { time: '00:30:12', source: 'PAYOUTS_NODE', type: 'payment', msg: 'Batch prepared: unsigned XDR built server-side. The client signs it with their own wallet — Nirium never holds the key.' },
@@ -129,7 +129,7 @@ export default function AnalyticsPage() {
             elo.getScore(accountStr).then(s => setEloScore(String(s))).catch(() => {});
         }
 
-        // Fetch live CETES rate from agent API
+        // CETES reference rate from the agent API: a fixed value (Jun 2026), not a live reading
         fetch('https://nirium-agent.fly.dev/api/tickers')
             .then(r => r.json())
             .then(d => { if (d.cetesRate) setCetesRate(`${d.cetesRate.toFixed(2)}%`); })
@@ -210,9 +210,9 @@ export default function AnalyticsPage() {
                         status="LIVE"
                     />
                     <StatCard
-                        title="CETES Rate (Banxico)"
+                        title="CETES reference (fixed)"
                         value={cetesRate}
-                        change="REF. ONLY"
+                        change="FIXED · JUN 2026"
                         icon={Shield}
                         color="text-stellar-teal"
                     />
@@ -273,7 +273,7 @@ export default function AnalyticsPage() {
                         <h3 className="text-[10px] font-black mb-8 text-gray-500 uppercase tracking-widest">CAPITAL DEPLOYMENT MATRIX</h3>
                         <div className="space-y-4">
                             {[
-                                { asset: 'CETES', name: 'Etherfuse Stablebond', rate: '5.57%', type: 'GOVT BACKED' },
+                                { asset: 'CETES', name: 'Etherfuse Stablebond', rate: '5.57% fixed ref. (Jun 2026)', type: 'GOVT BACKED' },
                                 { asset: 'USDC', name: 'Operational Liquidity', rate: '0.00%', type: 'STABLE' },
                                 { asset: 'AUDIT', name: 'IPFS Compliance Logs', rate: '100%', type: 'IMMUTABLE' },
                                 { asset: 'XLM', name: 'Gas Reserve', rate: 'Min.', type: 'UTILITY' },

@@ -72,8 +72,8 @@ The agent API URL defaults to `https://nirium-agent.fly.dev`. For local dev set 
 The landing page and dashboard show 5 real-time indicators:
 - **XLM/USDC** — multi-tier oracle (Reflector → CoinGecko → Stellar Expert)
 - **SDEX SPREAD** — orderbook spread in basis points
-- **BLEND APY** — Blend Protocol supply yield (~5.12%)
-- **ETHERFUSE APY** — tokenized CETES yield via Etherfuse (~5.78%)
+- **BLEND RATE** — Blend Protocol supply rate, read from the pool when available (0 means no data)
+- **ETHERFUSE RATE** — CETES reference value, fixed at 5.57% (Jun 2026, app.etherfuse.com/b/cetes), not live
 - **BASE FEE** — Stellar network base fee
 
 ## Key Components

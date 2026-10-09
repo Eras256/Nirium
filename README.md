@@ -21,6 +21,8 @@
 >
 > The **autonomous treasury node runs on mainnet over a DeFindex vault the client owns**: a third-party contract audited by OtterSec, not ours. Nirium holds only the vault's `RebalanceManager` role, which by the contract's own design cannot withdraw funds, change roles, or pause anything. Autonomous rebalancing on mainnet is **invite-only** while a legal review closes. A separate set of receive-only nodes (x402 micropayments, IPFS audit anchoring, non-custodial Payouts, Reporting) also run in **mainnet early access**, where real USDC moves under the client's own wallet signature. **Nirium never custodies funds.**
 >
+> **Update, 2026-10-08 (checked against the live `/api/tickers` on both networks that day):** until today the site, the API and the docs showed a CETES rate of 5.57% under labels such as "Banxico ref", "Today" and, on one dashboard card, "LIVE". It was a fixed reference value read once from app.etherfuse.com/b/cetes in June 2026, not a live reading and not from Banxico. The labels are corrected; the value itself is unchanged and still not live. The same release stops publishing `1 / xlmPrice` as the USDC price in `/api/tickers`: that figure (about 5.25) was how many XLM one dollar buys, and is now `null`.
+>
 > **Nirium is not financial advice. It is not an investment product. It does not guarantee yields, dividends, asset appreciation, or returns of any kind.** Reference rate data shown on the dashboard (Blend supply rate, Etherfuse CETES rate) is **public protocol information only**, not projections or promises of return. XLM and Stellar assets are volatile. Smart contracts carry risk even when audited. Use at your own risk.
 >
 > This project does not use grant funds for speculation, trading, investment advice, or marketing of products promising interest or appreciation, in accordance with the [Stellar Community Fund Official Rules](https://stellar.gitbook.io/scf-handbook/scf-awards/official-rules-for-submissions).
@@ -279,7 +281,7 @@ An invalid signature returns **400 and nothing is anchored**: IPFS has no delete
 | **XLM/USDC** | Reflector → CoinGecko → Stellar Expert | Multi-tier oracle price feed |
 | **SDEX spread** | Stellar Horizon orderbook | Live XLM/USDC spread in basis points |
 | **Blend rate** | Blend Protocol on-chain | Liquidity reference rate |
-| **CETES rate** | Etherfuse | Tokenized CETES reference rate (~5.57%) |
+| **CETES rate** | Etherfuse (fixed reference) | **Fixed** reference value 5.57%, read 2026-06 from app.etherfuse.com/b/cetes; not updated live |
 | **Base fee** | Stellar Horizon | Live network base fee |
 
 ### Published SDKs (npm + PyPI)

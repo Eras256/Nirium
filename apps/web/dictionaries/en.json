@@ -912,7 +912,8 @@
       "supply": "Supply",
       "borrow": "Borrow",
       "target_yield": "SETTLEMENT RATE",
-      "cetes_banxico": "CETES (Banxico)",
+      "cetes_reference": "CETES (reference)",
+      "cetes_fixed_ref": "Fixed reference (Jun 2026), not updated live",
       "cetes_rate_label": "Ref. Rate",
       "network_fee": "Network fee",
       "corridors": "Active corridors"
@@ -941,6 +942,7 @@
     "hours_ago": "h ago",
     "just_now": "just now",
     "tickers": {
+      "cetes_fixed": "Fixed reference (Jun 2026), not updated live",
       "live_feed": "LIVE",
       "sdex_spread": "SDEX SPREAD",
       "blend_apy": "BLEND RATE (EST)",
@@ -2239,12 +2241,12 @@
     "header": {
       "badge": "SPEI → CETES Funding via Etherfuse",
       "title": "Contract with Etherfuse to obtain CETES",
-      "subtitle": "Transfer MXN via SPEI to a CLABE. Etherfuse — an independent regulated operator — converts it to tokenized CETES on Stellar at the Banxico reference rate. KYC/KYB required. Sandbox active — no real funds are moved."
+      "subtitle": "Transfer MXN via SPEI to a CLABE. Etherfuse — an independent regulated operator — converts it to tokenized CETES on Stellar at the quote Etherfuse returns for each order. KYC/KYB required. Sandbox active — no real funds are moved."
     },
     "component": {
       "title": "SPEI → CETES Funding",
       "powered_by": "Operated by Etherfuse · Stellar Testnet",
-      "select_bond": "Sovereign Instrument (CETES — Banxico rate)",
+      "select_bond": "Sovereign Instrument (CETES)",
       "errors": {
         "amount": "Amount must be between 1 and 10,000 MXN in Sandbox",
         "wallet": "Please enter your corporate vault address on Testnet (G...)"

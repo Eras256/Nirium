@@ -2727,16 +2727,15 @@ function DashboardContent() {
                 </div>
                 <div className="glass-panel p-4 rounded-xl border border-white/5">
                     <h3 className="text-xs text-gray-400 uppercase tracking-wider mb-1">
-                        {t.dashboard.payment_streams.cetes_banxico}
+                        {t.dashboard.payment_streams.cetes_reference}
                     </h3>
                     <div className="text-xl font-mono text-stellar-teal font-bold flex items-center gap-2">
                         {(currentMarketState?.etherfuseApy ?? 0) > 0
                             ? `${currentMarketState!.etherfuseApy.toFixed(2)}%`
                             : '...'}
-                        <span className="text-[10px] bg-stellar-teal/20 text-stellar-teal px-1.5 rounded animate-pulse">LIVE</span>
                     </div>
                     <div className="text-[10px] text-gray-500 mt-1 font-mono">
-                        {t.dashboard.payment_streams.cetes_rate_label} · Etherfuse · NON-FINANCIAL ADVICE
+                        {t.dashboard.payment_streams.cetes_fixed_ref} · Etherfuse · NON-FINANCIAL ADVICE
                     </div>
                 </div>
                 <div className="glass-panel p-4 rounded-xl border border-white/5">
@@ -2878,7 +2877,7 @@ function DashboardContent() {
                                             <span>2%</span>
                                             {(currentMarketState?.etherfuseApy ?? 0) > 0 ? (
                                                 <span className="text-stellar-teal/60">
-                                                    {language === 'es' ? 'Hoy' : 'Today'}: {currentMarketState!.etherfuseApy.toFixed(2)}%
+                                                    {language === 'es' ? 'Ref. fija (jun-2026)' : 'Fixed ref. (Jun 2026)'}: {currentMarketState!.etherfuseApy.toFixed(2)}%
                                                 </span>
                                             ) : null}
                                             <span>8%</span>
@@ -2930,7 +2929,7 @@ function DashboardContent() {
                                             <span>1%</span>
                                             {(currentMarketState?.etherfuseApy ?? 0) > 0 ? (
                                                 <span className="text-amber-400/60">
-                                                    {language === 'es' ? 'Hoy' : 'Today'}: {currentMarketState!.etherfuseApy.toFixed(2)}%
+                                                    {language === 'es' ? 'Ref. fija (jun-2026)' : 'Fixed ref. (Jun 2026)'}: {currentMarketState!.etherfuseApy.toFixed(2)}%
                                                 </span>
                                             ) : null}
                                             <span>6%</span>
@@ -3296,8 +3295,7 @@ function DashboardContent() {
                         <h3 className="text-xs text-gray-400 uppercase tracking-widest mb-3">{t.dashboard.payment_streams.market_rates}</h3>
                         <div className="bg-white/5 p-3 rounded-lg border border-stellar-teal/10 mb-3">
                             <div className="text-[10px] text-stellar-teal font-bold mb-2 flex items-center gap-1.5">
-                                <span className="w-1.5 h-1.5 rounded-full bg-stellar-teal animate-pulse"></span>
-                                {t.dashboard.payment_streams.cetes_banxico}
+                                {t.dashboard.payment_streams.cetes_reference}
                             </div>
                             <div className="flex justify-between items-end">
                                 <span className="text-gray-400 text-xs">{t.dashboard.payment_streams.cetes_rate_label}</span>
@@ -3307,7 +3305,7 @@ function DashboardContent() {
                                         : '...'}
                                 </span>
                             </div>
-                            <p className="text-[9px] text-gray-600 mt-1 font-mono">NON-FINANCIAL ADVICE · EST DATA</p>
+                            <p className="text-[9px] text-gray-600 mt-1 font-mono">NON-FINANCIAL ADVICE · {t.dashboard.payment_streams.cetes_fixed_ref}</p>
                         </div>
                         <div className="grid grid-cols-2 gap-2">
                             <div className="bg-white/[0.03] p-2 rounded border border-white/5">

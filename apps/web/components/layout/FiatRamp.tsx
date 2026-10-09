@@ -11,8 +11,8 @@ export default function FiatRamp() {
     const [selectedBond, setSelectedBond] = useState<string>('CETES');
     const [status, setStatus] = useState<'idle' | 'onboarding' | 'kyc_pending' | 'quoting' | 'quoted' | 'ordering' | 'wiring' | 'success'>('idle');
 
-    // ref_rate/fiat son datos aparte (tasa Banxico, ya verificada en otra
-    // sesión) — tvl/cost eran un snapshot fijo que se quedó congelado y
+    // ref_rate/fiat son datos aparte: ref_rate es una referencia FIJA de jun-2026
+    // (app.etherfuse.com/b/cetes), no una lectura en vivo — tvl/cost eran un snapshot fijo que se quedó congelado y
     // terminó desalineado ~5.4x contra el TVL real. Se reemplazan con el
     // fetch en vivo de abajo; nunca mostrar un número fijo con pinta de dato
     // en vivo.
@@ -192,7 +192,7 @@ export default function FiatRamp() {
                                         >
                                             <div className="flex justify-between items-start mb-1">
                                                 <span className={`font-black text-sm ${selectedBond === b.id ? 'text-emerald-400' : 'text-white'}`}>{b.name}</span>
-                                                <span className="text-[10px] font-mono text-gray-400 bg-white/5 px-1.5 py-0.5 rounded">{b.ref_rate} Banxico</span>
+                                                <span className="text-[10px] font-mono text-gray-400 bg-white/5 px-1.5 py-0.5 rounded">{b.ref_rate} fixed ref. (Jun 2026)</span>
                                             </div>
                                             <div className="text-[10px] text-gray-500 font-mono mb-1" title="Etherfuse market TVL, not Nirium's">Etherfuse market TVL: {liveLookup[b.id]?.tvl ?? '…'}</div>
                                             <div className="text-[10px] text-gray-400 font-mono">Cost: {liveLookup[b.id]?.cost ?? '…'}</div>

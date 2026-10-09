@@ -32,8 +32,8 @@ export default function DisclaimersPage() {
           <h2 className="text-white font-bold text-2xl mt-12 mb-4 border-b border-white/10 pb-2">Rate Data and Displays</h2>
           <p>All rate figures displayed within Nirium — the Blend supply rate, the Etherfuse CETES reference rate, network fees — are <strong>public protocol reference data, attributed to their source</strong>. They are not return projections, guarantees, financial promises, or a recommendation to buy, sell or hold anything.</p>
           <ul>
-            <li><strong>Blend Protocol Rate:</strong> The ~5.12% reference rate represents the current algorithmic rate dictated by the Blend Protocol's public smart contracts.</li>
-            <li><strong>Etherfuse CETES Rate:</strong> The ~5.57% reference rate represents public data sourced via the Etherfuse integration, reflecting the underlying Mexican government bond rate.</li>
+            <li><strong>Blend Protocol Rate:</strong> Shown when the node can read it from Blend's public smart contracts; a value of 0 means no data was available, not a 0% rate.</li>
+            <li><strong>Etherfuse CETES Rate:</strong> The 5.57% shown is a fixed reference value read from app.etherfuse.com/b/cetes in June 2026. It is not updated live and may differ from the current rate.</li>
           </ul>
           <p>These figures are provided strictly for informational and UI demonstration purposes.</p>
 

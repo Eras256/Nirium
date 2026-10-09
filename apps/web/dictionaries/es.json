@@ -912,7 +912,8 @@
       "supply": "Aporte",
       "borrow": "Préstamo",
       "target_yield": "TASA DE LIQUIDACIÓN",
-      "cetes_banxico": "CETES (Banxico)",
+      "cetes_reference": "CETES (referencia)",
+      "cetes_fixed_ref": "Referencia fija (jun-2026), no actualizada en vivo",
       "cetes_rate_label": "Tasa ref.",
       "network_fee": "Fee de red",
       "corridors": "Corredores activos"
@@ -941,6 +942,7 @@
     "hours_ago": "h atrás",
     "just_now": "justo ahora",
     "tickers": {
+      "cetes_fixed": "Referencia fija (jun-2026), no actualizada en vivo",
       "live_feed": "LIVE",
       "sdex_spread": "SPREAD SDEX",
       "blend_apy": "BLEND RATE (EST)",
@@ -2239,12 +2241,12 @@
     "header": {
       "badge": "CETES vía Etherfuse — operador regulado",
       "title": "Contrata con Etherfuse para obtener CETES",
-      "subtitle": "Transfiere MXN vía SPEI a una CLABE. Etherfuse — operador regulado independiente — lo convierte en CETES tokenizados en Stellar a la tasa de referencia Banxico. KYC/KYB requerido. Sandbox activo — no se movilizan fondos reales."
+      "subtitle": "Transfiere MXN vía SPEI a una CLABE. Etherfuse — operador regulado independiente — lo convierte en CETES tokenizados en Stellar a la cotización que Etherfuse devuelve en cada orden. KYC/KYB requerido. Sandbox activo — no se movilizan fondos reales."
     },
     "component": {
       "title": "CETES vía Etherfuse",
       "powered_by": "Operado por Etherfuse · Testnet Stellar",
-      "select_bond": "Instrumento Soberano (CETES — Banxico)",
+      "select_bond": "Instrumento Soberano (CETES)",
       "errors": {
         "amount": "El monto debe estar entre 1 y 10,000 MXN en el Sandbox",
         "wallet": "Por favor ingrese la dirección de su bóveda corporativa en Testnet (G...)"

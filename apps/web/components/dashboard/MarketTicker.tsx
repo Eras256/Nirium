@@ -58,9 +58,9 @@ function buildTickers(market: any, prev: any, t: any): TickerItem[] {
             // `trend` a 'up' cuando el cálculo daba 'neutral' - o sea, pintaba
             // flecha verde de subida sobre un número que nunca se mueve. En un
             // indicador de tasa eso no es un detalle de estilo.
-            label: "🇲🇽 CETES rate",
+            label: "🇲🇽 CETES",
             value: cetesApy != null && cetesApy > 0 ? `${cetesApy.toFixed(2)}%` : '-',
-            change: 'Banxico ref · Etherfuse',
+            change: t.common.tickers.cetes_fixed,
             trend: 'neutral',
         },
         {
@@ -103,7 +103,7 @@ const MarketTicker = () => {
     useEffect(() => {
         setTickers([
             { label: "XLM/USDC", value: '-', change: '-', trend: 'neutral' },
-            { label: "🇲🇽 CETES rate", value: '-', change: 'Banxico ref · Etherfuse', trend: 'neutral' },
+            { label: "🇲🇽 CETES", value: '-', change: t.common.tickers.cetes_fixed, trend: 'neutral' },
             { label: t.common.tickers.sdex_spread, value: '-', change: '-', trend: 'neutral' },
             { label: "COMPLIANCE", value: "NON-FINANCIAL ADVICE // REFERENCE DATA", change: "LCP · in legal review", trend: 'neutral' },
         ]);
