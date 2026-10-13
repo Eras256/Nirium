@@ -27,6 +27,9 @@ import {
     VERIFY_OUTPUT,
     EXAMPLE_CID,
     EXAMPLE_GATEWAY,
+    MAINNET_DOCUMENT,
+    MAINNET_CID,
+    MAINNET_GATEWAY,
 } from "./snippets";
 
 const SLUG = "audit-trail-verify-it-yourself";
@@ -185,6 +188,30 @@ export default function AuditTrailVerifyItYourselfPost() {
                     <p>{meta.verify_p2}</p>
                     <Code>{VERIFY_OUTPUT}</Code>
                     <p>{meta.verify_p3}</p>
+
+                    <h2 className="text-2xl font-bold text-white pt-4">{meta.h_mainnet}</h2>
+                    <p>{meta.mainnet_p1}</p>
+                    <p>{meta.mainnet_p2}</p>
+                    <Code>{MAINNET_DOCUMENT}</Code>
+                    <div className="my-2 rounded-2xl border border-stellar-teal/20 bg-white/[0.03] p-5 md:p-6">
+                        <div className="mb-3 text-xs font-mono uppercase tracking-widest text-stellar-teal/80">
+                            {meta.mainnet_evidence_label}
+                        </div>
+                        <a
+                            href={MAINNET_GATEWAY}
+                            target="_blank"
+                            rel="noreferrer"
+                            className="group flex items-center justify-between gap-3 text-sm text-gray-300 hover:text-white transition-colors"
+                        >
+                            <span className="flex items-center gap-2 min-w-0">
+                                <ExternalLink className="w-3.5 h-3.5 shrink-0 text-white/30 group-hover:text-stellar-teal transition-colors" />
+                                <span className="truncate">{meta.mainnet_evidence_label}</span>
+                            </span>
+                            <span className="shrink-0 font-mono text-xs text-white/40 group-hover:text-stellar-teal/80 transition-colors">
+                                {MAINNET_CID.slice(0, 8)}…{MAINNET_CID.slice(-6)}
+                            </span>
+                        </a>
+                    </div>
 
                     <h2 className="text-2xl font-bold text-white pt-4">{meta.h_limits}</h2>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4 my-2">

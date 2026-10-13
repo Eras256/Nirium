@@ -121,7 +121,7 @@ export function renderOgImage() {
                                 backgroundColor: "#2DEBE8",
                             }}
                         />
-                        <div style={{ display: "flex" }}>Stellar testnet</div>
+                        <div style={{ display: "flex" }}>Testnet & mainnet</div>
                     </div>
                     <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
                         <div
