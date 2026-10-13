@@ -1,4 +1,5 @@
-import { type X402GuardConfig } from './x402-guard.js';
+import { type X402GuardConfig } from './x402-guard';
+import { type X402PolicyHook } from './x402-policy';
 export interface AgentConfig {
     apiKey: string;
     baseUrl?: string;
@@ -10,6 +11,10 @@ export interface AgentConfig {
  * SEP-43 signer. Only `address` and `signAuthEntry` are required — that is all
  * x402 needs, and it is what browser wallets expose (Freighter, Stellar Wallets
  * Kit, Pollar). Lets the SDK pay from a browser without ever holding a secret.
+ *
+ * Note: what `signAuthEntry` receives is the base64 `HashIdPreimage` of the
+ * Soroban authorization (the bytes whose sha256 gets signed), not the
+ * `SorobanAuthorizationEntry` itself.
  * @see https://github.com/stellar/stellar-protocol/blob/master/ecosystem/sep-0043.md
  */
 export interface X402Signer {
@@ -39,6 +44,13 @@ export interface X402Config {
     network?: string;
     /** Soroban RPC endpoint override (defaults per network) */
     rpcUrl?: string;
+    /**
+     * Pre-sign policy hook (#96). Runs after the Stellar authorization is
+     * built and before anything is signed; only an ALLOW bound to that exact
+     * authorization, and still valid, reaches the signer. Without it,
+     * x402Fetch behaves exactly as before. See X402PolicyHook.
+     */
+    policy?: X402PolicyHook;
 }
 export interface MppConfig {
     /**
@@ -542,6 +554,7 @@ export declare class Agent {
     private logCallbacks;
     private token;
     private x402Client;
+    private x402Policy;
     private mppClient;
     constructor(config: AgentConfig);
     private request;
@@ -840,11 +853,22 @@ export declare class Agent {
      * Fetch a paid resource via x402 protocol.
      * The client automatically handles 402 negotiation, auth-entry signing, and payment.
      * Returns the Response object — call .json() or .text() for the payload.
+     *
+     * Throws `X402SpendCapError` when @x402/core refuses a payment for being above
+     * its per-payment cap (before anything is signed), and `X402PolicyError` when
+     * a `policy` refuses it.
      */
     x402Fetch(url: string, init?: RequestInit): Promise<Response>;
+    private x402FetchWithPolicy;
     /**
      * Initialize the MPP Charge client for per-request Soroban SAC payments.
      * Uses canonical @stellar/mpp charge mode with mppx.
+     *
+     * EXPERIMENTAL. The client works against a compliant MPP Charge server, but
+     * Nirium's hosted testnet `/api/v1/mpp/*` endpoint rejected MPP payments when
+     * tested on 2026-10-01 (`402 Verification Failed`), and in `push` mode the
+     * payment has already settled on-chain when that happens. The mainnet
+     * endpoint was not tested. Use `initX402()` for paid endpoints. See the README.
      * In pull mode, the server assembles and broadcasts the transaction.
      *
      * @example
@@ -889,11 +913,13 @@ export interface X402ServeConfig {
     guard?: X402GuardConfig;
 }
 export declare function x402Serve(config: X402ServeConfig): any;
-export { x402Metrics } from './metrics.js';
-export type { X402MetricsResult, MetricsSnapshot } from './metrics.js';
-export type { X402GuardStore, X402GuardConfig, GuardRequest, GuardDenied } from './x402-guard.js';
-export { createUpstashX402GuardStore } from './x402-guard-upstash.js';
-export type { UpstashX402GuardStoreOptions } from './x402-guard-upstash.js';
+export { X402PolicyError } from './x402-policy';
+export { X402SpendCapError } from './x402-spend-cap';
+export type { X402PolicyHook, X402PolicyContext, X402PolicyDecision, X402PolicyVerdict, X402PolicyOutcome, X402PolicyRecord, X402PaymentRequirementsView, } from './x402-policy';
+export { x402Metrics } from './metrics';
+export type { X402MetricsResult, MetricsSnapshot } from './metrics';
+export type { X402GuardStore, X402GuardConfig, GuardRequest, GuardDenied } from './x402-guard';
+export { createUpstashX402GuardStore } from './x402-guard-upstash';
+export type { UpstashX402GuardStoreOptions } from './x402-guard-upstash';
 export default Agent;
-export { ResilientSignalClient, type ResilientSignalClientOptions, type ConnectionStatus, type ConnectionStatusInfo, } from './resilient-ws.js';
-//# sourceMappingURL=index.d.ts.map
+export { ResilientSignalClient, type ResilientSignalClientOptions, type ConnectionStatus, type ConnectionStatusInfo, } from './resilient-ws';

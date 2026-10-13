@@ -1,19 +1,63 @@
+"use strict";
 // ═══════════════════════════════════════════════════════════════
 // nirium — Official TypeScript SDK (x402 + MPP)
 // Versión: solo en package.json (no aquí: un número en un comentario se
 // desincroniza y ya mintió antes — decía 0.6.2 estando en 0.7.0).
 // ═══════════════════════════════════════════════════════════════
-import WebSocket from 'ws';
-import { createHash } from 'node:crypto';
-import { createRequire } from 'node:module';
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    var desc = Object.getOwnPropertyDescriptor(m, k);
+    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+      desc = { enumerable: true, get: function() { return m[k]; } };
+    }
+    Object.defineProperty(o, k2, desc);
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || (function () {
+    var ownKeys = function(o) {
+        ownKeys = Object.getOwnPropertyNames || function (o) {
+            var ar = [];
+            for (var k in o) if (Object.prototype.hasOwnProperty.call(o, k)) ar[ar.length] = k;
+            return ar;
+        };
+        return ownKeys(o);
+    };
+    return function (mod) {
+        if (mod && mod.__esModule) return mod;
+        var result = {};
+        if (mod != null) for (var k = ownKeys(mod), i = 0; i < k.length; i++) if (k[i] !== "default") __createBinding(result, mod, k[i]);
+        __setModuleDefault(result, mod);
+        return result;
+    };
+})();
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.ResilientSignalClient = exports.createUpstashX402GuardStore = exports.x402Metrics = exports.X402SpendCapError = exports.X402PolicyError = exports.Agent = void 0;
+exports.x402Serve = x402Serve;
+const ws_1 = __importDefault(require("ws"));
+const node_crypto_1 = require("node:crypto");
 // @ts-ignore — ESM subpath imports
-import { x402Client as X402ClientClass, wrapFetchWithPayment } from '@x402/fetch';
+const fetch_1 = require("@x402/fetch");
 // @ts-ignore
-import { createEd25519Signer } from '@x402/stellar';
+const stellar_1 = require("@x402/stellar");
 // @ts-ignore
-import { ExactStellarScheme } from '@x402/stellar/exact/client';
-import * as MppxModule from 'mppx';
-import { checkReplay, checkRateLimit } from './x402-guard.js';
+const client_1 = require("@x402/stellar/exact/client");
+// @ts-ignore: ESM subpath imports (mismo patrón que los de @x402 de arriba)
+const client_2 = require("mppx/client");
+// @ts-ignore
+const client_3 = require("@stellar/mpp/charge/client");
+const x402_guard_1 = require("./x402-guard");
+const x402_policy_1 = require("./x402-policy");
+const x402_spend_cap_1 = require("./x402-spend-cap");
 /** Build a `?a=1&b=2` suffix, dropping undefined values. Returns '' when empty. */
 function queryString(params) {
     if (!params)
@@ -51,7 +95,7 @@ function queryString(params) {
  * });
  * ```
  */
-export class Agent {
+class Agent {
     apiKey;
     baseUrl;
     wsUrl;
@@ -62,6 +106,7 @@ export class Agent {
     logCallbacks = [];
     token = null;
     x402Client = null;
+    x402Policy = null;
     mppClient = null;
     constructor(config) {
         this.apiKey = config.apiKey;
@@ -431,10 +476,10 @@ export class Agent {
         this.connectWebSocket();
     }
     connectWebSocket(subscriptionId) {
-        if (this.ws?.readyState === WebSocket.OPEN)
+        if (this.ws?.readyState === ws_1.default.OPEN)
             return;
         const authQuery = this.token ? `?token=${this.token}` : '';
-        this.ws = new WebSocket(`${this.wsUrl}${authQuery}`);
+        this.ws = new ws_1.default(`${this.wsUrl}${authQuery}`);
         this.ws.on('open', () => {
             console.log('[Nirium SDK] WebSocket connected');
             this.reconnectAttempts = 0;
@@ -507,31 +552,87 @@ export class Agent {
         if (config.signer && config.secretKey) {
             throw new Error('initX402 got both `secretKey` and `signer` — pass only one, so it is unambiguous which key signs.');
         }
-        const signer = config.signer ?? createEd25519Signer(config.secretKey, network);
+        if (config.policy !== undefined)
+            (0, x402_policy_1.assertValidPolicyHook)(config.policy);
+        const signer = config.signer ?? stellar_1.createEd25519Signer(config.secretKey, network);
         // Pubnet: el SDF NO corre RPC público de mainnet — soroban.stellar.org no
         // existe. Default al RPC público de gateway.fm (mismo default que
         // @stellar/mpp); siempre overrideable por config.rpcUrl.
         const rpcUrl = config.rpcUrl || (network.includes('testnet')
             ? 'https://soroban-testnet.stellar.org'
             : 'https://soroban-rpc.mainnet.stellar.gateway.fm');
-        const client = new X402ClientClass().register('stellar:*', new ExactStellarScheme(signer, { url: rpcUrl }));
-        this.x402Client = { fetch: wrapFetchWithPayment(fetch, client) };
+        if (config.policy) {
+            // Con policy el cliente se arma en cada x402Fetch: el signer de
+            // stellar-sdk no recibe la URL, y un closure por llamada ata URL,
+            // método y requisitos a ese pago sin estado compartido.
+            this.x402Policy = { base: signer, rpcUrl, policy: config.policy };
+            this.x402Client = null;
+            return;
+        }
+        this.x402Policy = null;
+        const scheme = new client_1.ExactStellarScheme(signer, { url: rpcUrl });
+        const client = new fetch_1.x402Client().register('stellar:*', scheme);
+        // El cliente es uno solo; el fetch envuelto se arma en cada llamada
+        // (un closure barato) para que lo capturado de cada 402 sea de esa llamada.
+        this.x402Client = { client, scheme, baseFetch: fetch };
     }
     /**
      * Fetch a paid resource via x402 protocol.
      * The client automatically handles 402 negotiation, auth-entry signing, and payment.
      * Returns the Response object — call .json() or .text() for the payload.
+     *
+     * Throws `X402SpendCapError` when @x402/core refuses a payment for being above
+     * its per-payment cap (before anything is signed), and `X402PolicyError` when
+     * a `policy` refuses it.
      */
     async x402Fetch(url, init) {
+        if (this.x402Policy)
+            return this.x402FetchWithPolicy(this.x402Policy, url, init);
         if (!this.x402Client) {
             throw new Error('x402 client not initialized. Call agent.initX402() first.');
         }
-        return this.x402Client.fetch(url, init);
+        const { client, scheme, baseFetch } = this.x402Client;
+        const sink = {};
+        try {
+            return await (0, fetch_1.wrapFetchWithPayment)((0, x402_spend_cap_1.captureRequirements)(baseFetch, sink), client)(url, init);
+        }
+        catch (e) {
+            throw (0, x402_spend_cap_1.toSpendCapError)(e, url, sink.offered, scheme.findDefaultAsset?.bind(scheme)) ?? e;
+        }
+    }
+    async x402FetchWithPolicy(cfg, url, init) {
+        const slot = {};
+        const gated = (0, x402_policy_1.createPolicyGatedSigner)(cfg.base, cfg.policy, () => ({ url, method: (init?.method ?? 'GET').toUpperCase(), requirements: slot.requirements }), (err) => { slot.error = err; });
+        const scheme = new client_1.ExactStellarScheme(gated, { url: cfg.rpcUrl });
+        const sink = {};
+        const client = new fetch_1.x402Client()
+            .register('stellar:*', scheme)
+            .onBeforePaymentCreation(async ({ selectedRequirements: r }) => {
+            slot.requirements = {
+                scheme: r.scheme, network: r.network, asset: r.asset,
+                payTo: r.payTo, amount: r.amount, maxTimeoutSeconds: r.maxTimeoutSeconds,
+            };
+        });
+        // NUNCA registrar onPaymentCreationFailure aquí: puede devolver un
+        // payload sin pasar por el signer, y el gate quedaría puenteado.
+        try {
+            return await (0, fetch_1.wrapFetchWithPayment)((0, x402_spend_cap_1.captureRequirements)(globalThis.fetch, sink), client)(url, init);
+        }
+        catch (e) {
+            // @x402/fetch reenvuelve el error y pierde la clase.
+            throw slot.error ?? (0, x402_spend_cap_1.toSpendCapError)(e, url, sink.offered, scheme.findDefaultAsset?.bind(scheme)) ?? e;
+        }
     }
     // ─── MPP Protocol (Charge Mode) ────────────────────────────
     /**
      * Initialize the MPP Charge client for per-request Soroban SAC payments.
      * Uses canonical @stellar/mpp charge mode with mppx.
+     *
+     * EXPERIMENTAL. The client works against a compliant MPP Charge server, but
+     * Nirium's hosted testnet `/api/v1/mpp/*` endpoint rejected MPP payments when
+     * tested on 2026-10-01 (`402 Verification Failed`), and in `push` mode the
+     * payment has already settled on-chain when that happens. The mainnet
+     * endpoint was not tested. Use `initX402()` for paid endpoints. See the README.
      * In pull mode, the server assembles and broadcasts the transaction.
      *
      * @example
@@ -541,17 +642,14 @@ export class Agent {
      * ```
      */
     initMpp(config) {
-        const Mppx = MppxModule.default || MppxModule;
-        const mppx = Mppx.create({
-            stellar: {
-                charge: {
-                    secretKey: config.secretKey,
-                    network: config.network || 'stellar:testnet',
-                    mode: config.mode || 'pull',
-                },
-            },
+        // La red la dicta el reto 402 del servidor (methodDetails.network), no el cliente:
+        // `config.network` se acepta por compatibilidad pero ya no se usa.
+        // polyfill:false es obligatorio: sin él mppx reemplaza globalThis.fetch y
+        // pasaría a interceptar también los 402 de x402Fetch.
+        this.mppClient = client_2.Mppx.create({
+            methods: [client_3.stellar.charge({ secretKey: config.secretKey, mode: config.mode || 'pull' })],
+            polyfill: false,
         });
-        this.mppClient = mppx;
     }
     /**
      * Fetch a paid resource via MPP Charge protocol.
@@ -575,6 +673,7 @@ export class Agent {
         this.logCallbacks = [];
     }
 }
+exports.Agent = Agent;
 // ─── x402Serve — el otro lado del mostrador ────────────────────
 //
 // `initX402` te deja PAGAR por APIs ajenas. Esto te deja COBRAR por la tuya.
@@ -620,7 +719,8 @@ const pingX402ServeTelemetry = (body) => {
 };
 const sdkVersionForTelemetry = () => {
     try {
-        return createRequire(import.meta.url)('../package.json').version;
+        // CommonJS build: plain `require` is already in scope, no import.meta needed.
+        return require('../package.json').version;
     }
     catch {
         return undefined;
@@ -630,7 +730,7 @@ const X402_FACILITATORS = {
     'stellar:pubnet': 'https://channels.openzeppelin.com/x402',
     'stellar:testnet': 'https://channels.openzeppelin.com/x402/testnet',
 };
-export function x402Serve(config) {
+function x402Serve(config) {
     if (!config.payTo || !/^G[A-Z2-7]{55}$/.test(config.payTo)) {
         throw new Error('x402Serve: `payTo` must be a Stellar public key (G...). Without it there is nobody to pay.');
     }
@@ -659,7 +759,7 @@ export function x402Serve(config) {
     // formatos y distingue de verdad entre ausente y roto.
     const load = async (m) => {
         try {
-            return await import(/* @vite-ignore */ m);
+            return await Promise.resolve(`${m}`).then(s => __importStar(require(s)));
         }
         catch (err) {
             const missing = /cannot find (module|package)/i.test(String(err?.message));
@@ -695,7 +795,7 @@ export function x402Serve(config) {
         };
     }
     const facilitatorKeyHash = config.facilitatorApiKey
-        ? createHash('sha256').update(config.facilitatorApiKey).digest('hex').slice(0, 16)
+        ? (0, node_crypto_1.createHash)('sha256').update(config.facilitatorApiKey).digest('hex').slice(0, 16)
         : undefined;
     const sdkVersion = sdkVersionForTelemetry();
     pingX402ServeTelemetry({
@@ -794,12 +894,12 @@ export function x402Serve(config) {
         maybeFlushHeartbeat();
         if (config.guard) {
             const guardReq = { method: req.method, url: req.originalUrl ?? req.url, headers: req.headers, ip: req.ip };
-            const rl = await checkRateLimit(guardReq, config.guard);
+            const rl = await (0, x402_guard_1.checkRateLimit)(guardReq, config.guard);
             if (!rl.allowed) {
                 sendDenied(res, rl.denied);
                 return;
             }
-            const replay = await checkReplay(guardReq, config.guard);
+            const replay = await (0, x402_guard_1.checkReplay)(guardReq, config.guard);
             if (!replay.allowed) {
                 sendDenied(res, replay.denied);
                 return;
@@ -828,8 +928,14 @@ export function x402Serve(config) {
 // `.js` extension required even though the source is `.ts`: `module:
 // ESNext` emits these specifiers verbatim, and Node's native ESM resolver
 // (unlike a bundler) needs the real extension to find the compiled file.
-export { x402Metrics } from './metrics.js';
-export { createUpstashX402GuardStore } from './x402-guard-upstash.js';
-export default Agent;
-export { ResilientSignalClient, } from './resilient-ws.js';
-//# sourceMappingURL=index.js.map
+var x402_policy_2 = require("./x402-policy");
+Object.defineProperty(exports, "X402PolicyError", { enumerable: true, get: function () { return x402_policy_2.X402PolicyError; } });
+var x402_spend_cap_2 = require("./x402-spend-cap");
+Object.defineProperty(exports, "X402SpendCapError", { enumerable: true, get: function () { return x402_spend_cap_2.X402SpendCapError; } });
+var metrics_1 = require("./metrics");
+Object.defineProperty(exports, "x402Metrics", { enumerable: true, get: function () { return metrics_1.x402Metrics; } });
+var x402_guard_upstash_1 = require("./x402-guard-upstash");
+Object.defineProperty(exports, "createUpstashX402GuardStore", { enumerable: true, get: function () { return x402_guard_upstash_1.createUpstashX402GuardStore; } });
+exports.default = Agent;
+var resilient_ws_1 = require("./resilient-ws");
+Object.defineProperty(exports, "ResilientSignalClient", { enumerable: true, get: function () { return resilient_ws_1.ResilientSignalClient; } });

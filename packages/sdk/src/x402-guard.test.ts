@@ -9,7 +9,7 @@
  * https://github.com/nirium-protocol/nirium/issues/91.
  */
 
-import { checkReplay, checkRateLimit, type X402GuardStore, type X402GuardConfig, type GuardRequest } from './x402-guard.js';
+import { checkReplay, checkRateLimit, type X402GuardStore, type X402GuardConfig, type GuardRequest } from './x402-guard';
 
 function fakeStore(): X402GuardStore & { claims: Map<string, number> } {
     const claims = new Map<string, number>();

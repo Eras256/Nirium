@@ -6,7 +6,7 @@
  * feature is modeled on actually uses. See x402-guard.ts.
  */
 
-import type { X402GuardStore } from './x402-guard.js';
+import type { X402GuardStore } from './x402-guard';
 
 export interface UpstashX402GuardStoreOptions {
     /** e.g. https://usw1-xxxx.upstash.io */
