@@ -1,6 +1,6 @@
 # nirium-mcp
 
-Model Context Protocol server for [Nirium](https://nirium.xyz) — exposes market data, autonomous treasury loop control, and x402/MPP paid endpoints to any MCP-compatible AI: Claude, GPT, Cursor, VS Code Copilot, and others.
+Model Context Protocol server for [Nirium](https://nirium.xyz) — exposes market data, autonomous treasury loop control, and x402 paid endpoints (plus experimental MPP Charge, no confirmed mainnet settlement yet) to any MCP-compatible AI: Claude, GPT, Cursor, VS Code Copilot, and others.
 
 Software-only. This server never holds funds — paid tools sign per-request payments from a Stellar wallet you control via `STELLAR_SECRET_KEY`.
 

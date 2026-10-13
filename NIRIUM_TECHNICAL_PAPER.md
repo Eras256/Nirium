@@ -266,17 +266,9 @@ Nirium charges a fixed software license fee (platform subscription + per-API-cal
 ## 9. Security
 
 ### 9.1 Internal Security Review (May 2026)
-Internal security framework (Kali Linux, 7-pillar methodology). Result: **83/83 PASS, 0 critical, 0 high.**
+Internal self-review only: static analysis, `cargo audit` and `pnpm audit` in CI, fuzz smoke runs (5 `cargo-fuzz` targets), runtime checks on testnet, and manual code review. It is not a third-party audit, not a penetration test, and carries no score. Method, findings, fixes and what was left out are in `INTERNAL_SECURITY_AUDIT.md`.
 
-| Pillar | Score |
-|---|---|
-| Soroban/Rust smart contracts | 20/20 |
-| OWASP API Top 10 | 10/10 |
-| Frontend & obfuscation | 12/12 |
-| Supply chain & CI/CD | 8/8 |
-| Regulatory compliance (MX/US) | 6/6 |
-| Pentesting (network/infra) | 5/5 |
-| Full-spectrum pentest | 22/22 |
+**Update, 2026-10-12 (checked against `INTERNAL_SECURITY_AUDIT.md` that day):** this subsection previously reported "83/83 PASS, 0 critical, 0 high" with a per-pillar score table that included a "Full-spectrum pentest" row. The scores and that row were removed: no external pentest was performed, and counts over a checklist written by the same team are not evidence a reader can check.
 
 ### 9.2 Smart Contract Security
 - `require_auth` on all state-modifying functions
@@ -382,7 +374,9 @@ All revenue streams are classified as software licensing under LRITF Art. 22, LM
 
 Nirium is the infrastructure layer where institutional DeFi and the agentic economy converge on Stellar. Institutions get automated treasury operations with full auditability and compliance-ready output. AI agents get a protocol they can pay into and execute against without human intermediation.
 
-The protocol's deployment — 66 API endpoints (65 HTTP + 1 WebSocket) across a dual-network stack, a single autonomous execution agent with deterministic fallback, 2 consolidated Soroban contracts, x402/MPP/Payouts payment protocols live in mainnet early access, multi-LLM support, MCP server (11 tools, 12/12 PASS), published SDKs (npm + PyPI, v0.7.0), internal security review passed (83/83) — establishes the architectural foundation for the NiriumVault treasury contract's mainnet readiness, pending a formal independent third-party audit.
+The protocol's deployment — 66 API endpoints (65 HTTP + 1 WebSocket) across a dual-network stack, a single autonomous execution agent with deterministic fallback, 2 consolidated Soroban contracts, x402 and Payouts live in mainnet early access, MPP experimental, multi-LLM support, MCP server (11 tools), published SDKs (npm + PyPI, v0.7.0), an internal security self-review (no external audit) — establishes the architectural foundation for the NiriumVault treasury contract's mainnet readiness, pending a formal independent third-party audit.
+
+**Update, 2026-10-12:** this paragraph previously listed "12/12 PASS" for the MCP server and "internal security review passed (83/83)". Both scores were removed (see section 9.1). The rest of this paper is dated July 13, 2026 and has not been re-verified; versions and the mainnet status of MPP in particular have since changed (MPP Charge is experimental, with no confirmed mainnet settlement).
 
 ---
 

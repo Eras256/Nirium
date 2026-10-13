@@ -52,7 +52,9 @@ The following components are in scope for security reports:
 
 The protocol is currently deployed on **Stellar Testnet only** and uses test tokens with no monetary value. A formal third-party audit is planned for Month 3 of operations (Soroban layer via SCF Audit Bank; API/server layer independently funded).
 
-**Internal security review (May 2026):** 83/83 vectors PASS, 0 critical, 0 high. This is a self-assessment, not a third-party certification. Full report: [INTERNAL_SECURITY_AUDIT.md](INTERNAL_SECURITY_AUDIT.md).
+**Internal security review (May 2026, revised 2026-10-12):** a self-review, not a third-party audit and not a certification. Method, findings, fixes and what was left out are in [INTERNAL_SECURITY_AUDIT.md](INTERNAL_SECURITY_AUDIT.md).
+
+**Update, 2026-10-12 (checked against the report and the code that day):** this paragraph previously quoted a score of "83/83 vectors PASS, 0 critical, 0 high". The score was withdrawn; it did not support the claim.
 
 ### Security Measures Currently in Place
 
@@ -75,7 +77,7 @@ The protocol is currently deployed on **Stellar Testnet only** and uses test tok
 - Prototype pollution guard
 - HMAC-SHA256 webhook signature validation
 - Sliding-window rate limiting (60/30/300 rpm by tier)
-- AML screening + domain lock + response obfuscation middleware
+- **Update, 2026-10-07 (checked against the code that day):** this list previously also named "AML screening + domain lock + response obfuscation middleware" as controls in place. The AML middleware was never imported or mounted on any route and has been removed. Domain lock and response obfuscation remain in the repository but are not mounted either. None of the three is a live control.
 
 **Infrastructure:**
 - Row Level Security (RLS) on all Supabase tables

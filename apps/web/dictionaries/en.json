@@ -74,7 +74,7 @@
         "h_takeaway": "What we took away",
         "takeaway_p1": "Beyond the pitch, the value of La Arena was the conversations it opened — with investors and ecosystem operators who understand both the Stellar stack and the Mexican regulatory context. Those are the relationships that turn a working testnet protocol into a funded, audited, mainnet product. We left with new threads to pull, and a clearer read on what institutional partners need to see next: verifiable adoption, not promises.",
         "where_label": "Where we are",
-        "where_body": "Nirium runs live on Stellar testnet — an autonomous agent, published TypeScript and Python SDKs, native x402/MPP agentic payments, and an immutable audit trail. Mainnet remains audit-gated. Backed by the Stellar ecosystem: SCF Instaward recipient, SDF Scale graduate, and an active Stellar Mexico Ambassador."
+        "where_body": "Nirium runs an autonomous agent on Stellar testnet and published TypeScript and Python SDKs. On mainnet, x402 payments, Audit Trail and Reporting already run, receive-only and non-custodial; MPP is experimental. NiriumVault, our own treasury contract, remains audit-gated. Backed by the Stellar ecosystem: two-time Stellar Community Fund Instawards recipient (via the Stellar Ambassador Program) and an active Stellar Mexico Ambassador."
       },
       "treasury-node-verify-it-yourself": {
         "tag": "Treasury",

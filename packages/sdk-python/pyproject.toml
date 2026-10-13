@@ -5,7 +5,7 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "nirium"
 version = "0.9.0"
-description = "Official Python SDK for Nirium autonomous agents on Stellar (x402 + MPP)"
+description = "Autonomous treasury and agentic-payments infrastructure for Stellar (x402) — Python client"
 readme = "README.md"
 requires-python = ">=3.10"
 license = "Apache-2.0"
