@@ -12,6 +12,11 @@ export interface BlogPostMeta {
 
 export const posts: BlogPostMeta[] = [
     {
+        slug: "audit-trail-verify-it-yourself",
+        date: "2026-10-13",
+        readMinutes: 5,
+    },
+    {
         slug: "x402-outage-verify-it-yourself",
         date: "2026-09-14",
         readMinutes: 6,
