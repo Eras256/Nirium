@@ -3,9 +3,9 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-<title>Nirium — Composable treasury, settlement & audit for AI agents</title>
+<title>Nirium: Composable treasury, settlement & audit for AI agents</title>
 <meta name="description" content="Infraestructura componible on-chain para agentes de IA en Stellar: tesorería autónoma, pagos x402 y audit trail. El LLM propone, el contrato decide." />
-<meta property="og:title" content="Nirium — On-chain infrastructure for AI agents" />
+<meta property="og:title" content="Nirium: On-chain infrastructure for AI agents" />
 <meta property="og:description" content="Composable treasury, settlement & audit for AI agents. Built on Stellar / Soroban. Live on testnet." />
 <meta property="og:type" content="website" />
 <meta name="theme-color" content="#05070a" />
@@ -144,12 +144,12 @@
 
   <!-- 1 · TITLE -->
   <section class="slide active">
-    <div class="kick">Para apps, empresas y agentes de IA — sobre Stellar</div>
+    <div class="kick">Para apps, empresas y agentes de IA, sobre Stellar</div>
     <div class="logo">
       <img src="https://nirium.xyz/brand/NiLo.png" alt="Nirium" />
       <h1>NIRIUM</h1>
     </div>
-    <p class="sub">Ponemos a trabajar el dinero que duerme: <b style="color:#fff">tesorería, pagos y auditoría on-chain</b> — automáticos y sin custodia. Hecho sobre Stellar.</p>
+    <p class="sub">Ponemos a trabajar el dinero que duerme: <b style="color:#fff">tesorería, pagos y auditoría on-chain</b>, automáticos y sin custodia. Hecho sobre Stellar.</p>
     <div class="stats">
       <div class="stat"><div class="l">Agent</div><div class="v teal" id="t-status">● live</div></div>
       <a class="stat" href="https://nirium.xyz" target="_blank" rel="noopener"><div class="l">Scan ↗</div><div class="v" id="t-scan">#25625</div></a>
@@ -162,14 +162,14 @@
   <section class="slide">
     <div class="kick">El problema, en una frase</div>
     <p class="quote">&ldquo;Como founder, mi tesorero era yo. Y yo dormía.&rdquo;</p>
-    <p class="sub">El dinero de las empresas — y de muchos de nosotros — duerme en una cuenta perdiendo valor por la inflación. Mantenerlo trabajando es un trabajo manual de 24/7 que casi nadie tiene tiempo de hacer.</p>
+    <p class="sub">El dinero de las empresas, y de muchos de nosotros, duerme en una cuenta perdiendo valor por la inflación. Mantenerlo trabajando es un trabajo manual de 24/7 que casi nadie tiene tiempo de hacer.</p>
   </section>
 
   <!-- 3 · WHAT -->
   <section class="slide">
     <h2>No es un solo truco. Son <span class="accent">tres piezas que puedes usar por separado.</span></h2>
     <div class="grid3">
-      <div class="card"><div class="n">N1 · TESORERÍA</div><div class="ic">💰</div><h3>Dinero que trabaja</h3><p>Pone tu USDC ocioso a ganar en CETES (bonos del gobierno MX) vía Etherfuse — solito, 24/7.</p></div>
+      <div class="card"><div class="n">N1 · TESORERÍA</div><div class="ic">💰</div><h3>Dinero que trabaja</h3><p>Pone tu USDC ocioso a ganar en CETES (bonos del gobierno MX) vía Etherfuse, solito, 24/7.</p></div>
       <div class="card"><div class="n">N2 · PAGOS</div><div class="ic">⚡</div><h3>Cobra por uso</h3><p>Cóbrale a apps y agentes de IA por lo que usan, pago por pago, con x402 + MPP.</p></div>
       <div class="card"><div class="n">N3 · AUDITORÍA</div><div class="ic">🔒</div><h3>Todo verificable</h3><p>Cada acción queda guardada en IPFS: pública y verificable. Transparencia desde el día uno.</p></div>
     </div>
@@ -178,7 +178,7 @@
 
   <!-- 4 · LIVE DEMO -->
   <section class="slide">
-    <div class="kick">En vivo — no son slides</div>
+    <div class="kick">En vivo: no son slides</div>
     <h2>La IA propone. <span class="accent">El contrato decide.</span></h2>
     <div class="stats">
       <a class="stat" href="https://nirium.xyz" target="_blank" rel="noopener"><div class="l">Scan # ↗</div><div class="v" id="d-scan">#25625</div></a>
@@ -191,7 +191,7 @@
         <div class="fl"><span class="ft">--:--:--</span> <span class="fs">cargando transferencias confirmadas…</span> · click para abrir en Stellar Expert</div>
       </div>
     </div>
-    <div class="decision" id="d-decision">[IA] rebalance (95%) — CETES 5.57% (referencia fija de jun-2026) supera al USDC ocioso (0%). Mueve USDC → CETES.</div>
+    <div class="decision" id="d-decision">[IA] rebalance (95%): CETES 5.57% (referencia fija de jun-2026) supera al USDC ocioso (0%). Mueve USDC → CETES.</div>
     <p class="hint">▶ Datos reales del agente · cada movimiento se verifica en <a href="https://nirium.xyz" target="_blank" rel="noopener">Stellar Expert</a></p>
   </section>
 
@@ -209,7 +209,7 @@
 
   <!-- 6 · WEDGE (x402 code) -->
   <section class="slide">
-    <div class="kick">Lo que ya funciona — x402 en vivo</div>
+    <div class="kick">Lo que ya funciona: x402 en vivo</div>
     <h2>Una app paga por lo que usa. <span class="accent">Automático, on-chain, sin humano.</span></h2>
     <pre><span class="c-key">import</span> { Agent } <span class="c-key">from</span> <span class="c-str">"nirium"</span>;
 
@@ -219,14 +219,14 @@ agent.<span class="c-fn">initX402</span>({ secretKey: process.env.STELLAR_SECRET
 
 <span class="c-com">// Un request = un pago on-chain. El SDK firma el auth entry y paga solo.</span>
 <span class="c-key">const</span> res = <span class="c-key">await</span> agent.<span class="c-fn">x402Fetch</span>(<span class="c-str">"https://nirium-agent.fly.dev/api/v1/premium/signals"</span>);</pre>
-    <p class="sub">Esto ya corre <b>hoy</b>. ¿Tienes una API o un proyecto? Imagina cobrar por uso sin montar pasarelas — <b>yo te ayudo a integrarlo.</b></p>
+    <p class="sub">Esto ya corre <b>hoy</b>. ¿Tienes una API o un proyecto? Imagina cobrar por uso sin montar pasarelas. <b>Yo te ayudo a integrarlo.</b></p>
   </section>
 
   <!-- 7 · AUDIT -->
   <section class="slide">
     <h2>Y una <span class="accent">bitácora inmutable</span>, como servicio.</h2>
     <ul class="bul">
-      <li><b>Hoy:</b> cada acción del agente queda anclada en <b>IPFS (Pinata)</b>. Pública y verificable en vivo. <small style="opacity:.7">(Actualizado 2026-10-12: solo cambió la puntuación.)</small></li>
+      <li><b>Hoy:</b> cada acción del agente queda anclada en <b>IPFS (Pinata)</b>. Pública y verificable en vivo.</li>
       <li><b>Pronto:</b> abierto para que tu app guarde sus eventos igual. Busco <b>design partners</b>.</li>
       <li>Transparencia y cumplimiento sin que montes infraestructura propia.</li>
     </ul>
@@ -241,7 +241,7 @@ agent.<span class="c-fn">initX402</span>({ secretKey: process.env.STELLAR_SECRET
 
   <!-- 8 · ASK -->
   <section class="slide">
-    <div class="kick">Construyamos juntos — literal</div>
+    <div class="kick">Construyamos juntos: literal</div>
     <p class="big">Busco <span class="grad">2-3 de ustedes</span></p>
     <p class="ask">que prueben <b>x402</b> en su proyecto, o sean <b>design partners</b> del audit. <b>Me siento con ustedes y los ayudo a integrarlo.</b> Ustedes: infra lista y acceso temprano. Yo: mis primeros usuarios y su feedback. Ganamos los dos. 🤝</p>
     <p class="tag" style="margin-top:28px">Ya en pláticas con varios equipos del ecosistema Stellar.</p>
@@ -252,7 +252,7 @@ agent.<span class="c-fn">initX402</span>({ secretKey: process.env.STELLAR_SECRET
   <section class="slide">
     <div class="closewrap">
       <div class="closetext">
-        <h2>Dónde estamos — y a dónde <span class="accent">vamos.</span></h2>
+        <h2>Dónde estamos, y a dónde <span class="accent">vamos.</span></h2>
         <ul class="bul">
           <li><b>Hoy:</b> en testnet corre todo, incluido el agente 24/7. SDKs en npm y PyPI, API pública. <small style="opacity:.7">(Actualizado 2026-10-12: antes decía "todo en vivo en testnet", lo que contradecía la línea de mainnet de abajo.)</small></li>
           <li><b>Los dos Instawards</b> ya se entregaron. Lo que sigue es que <b>se use</b>, y eso empieza con ustedes. <small style="opacity:.7">(Actualizado 2026-10-12: esta línea decía que el #2 era "que se use", como si siguiera en curso.)</small></li>
@@ -324,7 +324,7 @@ agent.<span class="c-fn">initX402</span>({ secretKey: process.env.STELLAR_SECRET
       // CETES y la decisión se muestran con el valor REAL de Etherfuse (3.13%), no el del loop.
     }catch(e){ /* mantiene el snapshot real visible, sin parpadeo */ }
   }
-  // Confirmed on-chain transfers — each line links to the real tx on Stellar Expert.
+  // Confirmed on-chain transfers: each line links to the real tx on Stellar Expert.
   // Pulled from the public logs table (anon key, same one the site ships to the browser).
   const SB='https://qbiljjnaikscnvlbcoga.supabase.co';
   const SBKEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFiaWxqam5haWtzY252bGJjb2dhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODAzNjc4MzksImV4cCI6MjA5NTk0MzgzOX0.Y2ub_eqkF44X3qhy9_b0KSwQywgJnlNQq721Hv1I2wQ';
@@ -349,7 +349,7 @@ agent.<span class="c-fn">initX402</span>({ secretKey: process.env.STELLAR_SECRET
     }catch(e){/* keep fallback content */}
   }
 
-  // Audit trail — each CID links to the real file on the IPFS (Pinata) gateway.
+  // Audit trail: each CID links to the real file on the IPFS (Pinata) gateway.
   async function pollAudit(){
     try{
       const url=SB+'/rest/v1/logs?message=ilike.*IPFS-AUDIT*&order=timestamp.desc&limit=8&select=timestamp,message';
