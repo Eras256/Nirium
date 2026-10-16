@@ -1076,7 +1076,7 @@
       },
       "intellectual_property": {
         "title": "9. SDK Intellectual Property",
-        "content": "All Soroban smart contracts, routing logic, REST endpoints, and proprietary visualizations of the Treasury Builder are the exclusive intellectual property of Nirium. Provisioning grants a limited, non-exclusive, and revocable B2B software license."
+        "content": "The Soroban smart contracts, libraries, MCP server and command line tool published in Nirium's public repository are licensed under the Apache License 2.0. Nirium keeps the copyright over them and all rights over the parts that are not published: the hosted agent API, routing logic, REST endpoints and the proprietary visualizations of the Treasury Builder. Provisioning grants a limited, non-exclusive, and revocable B2B software license."
       },
       "stellar_code": {
         "title": "10. Alignment with the Stellar Code of Conduct",
