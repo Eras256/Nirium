@@ -40,7 +40,7 @@ The smart contracts and the integration libraries are public so that anyone can 
 
 ## Attribution
 
-This software includes components licensed under Apache 2.0. See the `NOTICE` file at the repository root for attribution requirements (Apache 2.0 section 4(d)) if one is present.
+This software includes components licensed under Apache 2.0. See the `NOTICE` file at the repository root for attribution requirements (Apache 2.0 section 4(d)).
 
 ---
 
