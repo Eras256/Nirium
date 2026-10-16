@@ -512,7 +512,7 @@ wscat -c "wss://nirium-agent.fly.dev/ws/signals?token=YOUR_JWT"
 
 ## Legal
 
-Nirium Protocol is open-source and licensed under the [Apache License 2.0](https://www.apache.org/licenses/LICENSE-2.0), meeting the Stellar Community Fund open-source requirement.
+The code in this repository (smart contracts, libraries, MCP server, CLI and web app) is open-source and licensed under the [Apache License 2.0](https://www.apache.org/licenses/LICENSE-2.0), which covers the Stellar Community Fund open-source requirement for smart contracts. The hosted agent API (`packages/agent`) and the desktop wrapper are private and are not part of this repository.
 
 For full details, see [LICENSING.md](LICENSING.md).
 

@@ -1,43 +1,49 @@
 # Licensing
 
-Nirium is **100% Open Source Software**.
+The code in this public repository is open source under the Apache License 2.0. Some parts of Nirium are not in this repository: they are private and are not covered by this license.
+
+> **Correction, 2026-10-16.** An earlier version of this file said "Nirium is 100% Open Source Software" and listed `packages/agent` as Apache-2.0. That was wrong. The agent API (`packages/agent`) and the desktop wrapper (`packages/desktop`) are private, and the code in `packages/agent` in this repository is only a placeholder with a README. The table below now lists only what is actually published here.
 
 ---
 
-## Unified License — Apache License 2.0
+## Public, licensed under Apache License 2.0
 
-The entire Nirium Protocol ecosystem, including the core protocol and the commercial interface, is licensed under the [Apache License 2.0](http://www.apache.org/licenses/LICENSE-2.0):
+The root [`LICENSE`](LICENSE) file applies to everything in this repository.
 
-| Package | Description |
-|---------|-------------|
-| `apps/web/` | nirium.xyz SaaS dashboard & Interface |
+| Package | What it is |
+|---------|------------|
+| `apps/web/` | nirium.xyz web dashboard |
 | `packages/contracts/` | Soroban smart contracts (NiriumVault, NiriumProtocol) |
-| `packages/agent/` | Agent API — 66 endpoints, autonomous execution logic |
-| `packages/mcp/` | MCP Server — 11 tools for Claude, GPT, Cursor integration |
-| `packages/sdk/` | TypeScript SDK (`npm install nirium`) |
-| `packages/sdk-python/` | Python SDK (`pip install nirium`) |
-| `packages/cli/` | CLI tooling |
+| `packages/policy-account/` | Soroban policy account that scopes a key to one vault |
+| `packages/sdk/` | TypeScript library (`npm install nirium`) |
+| `packages/sdk-python/` | Python library (`pip install nirium`) |
+| `packages/pollar-adapter/` | Adapter to sign x402 payments with a social login |
+| `packages/mcp/` | MCP server (`nirium-mcp` on npm) |
+| `packages/cli/` | Command line tool (`nirium-cli` on npm) |
 
-You may freely use, modify, and distribute these packages in commercial and non-commercial projects, subject to the Apache License 2.0. See the root `LICENSE` file for details.
+You may use, modify and distribute these packages in commercial and non-commercial projects, under the terms of the Apache License 2.0.
 
----
+## Private, not part of this repository
 
-## Why This Model
+| Package | What it is |
+|---------|------------|
+| `packages/agent/` | The hosted agent API and its execution logic. Only a placeholder README and stubs are published here. |
+| `packages/desktop/` | Tauri desktop wrapper. |
 
-To ensure full compliance with the **Stellar Community Fund (SCF) v7.0** open-source requirements, we have eliminated all restrictive BSL licensing.
+These are not licensed under this repository's license. Access to the hosted API is through the public libraries above.
 
-The protocol layer and the interface layer are shared infrastructure. Apache 2.0 allows any developer to build on Nirium's treasury primitives, integrate the SDKs, deploy autonomous agents, and contribute back to the ecosystem without restriction.
+## Why it is split this way
+
+The smart contracts and the integration libraries are public so that anyone can read, verify and build on them. The hosted execution engine stays private.
 
 ---
 
 ## Attribution
 
-This software includes components licensed under Apache 2.0. See the `NOTICE` file at the repository root for attribution requirements (Apache 2.0 §4(d)).
+This software includes components licensed under Apache 2.0. See the `NOTICE` file at the repository root for attribution requirements (Apache 2.0 section 4(d)) if one is present.
 
 ---
 
 ## Contact
 
 For commercial licensing inquiries: **legal@nirium.xyz**
-
-*Nirium Protocol — May 2026.*
